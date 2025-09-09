@@ -1,8 +1,29 @@
 {
   "custom": {
-    "viewDigitalization": "Page/Digitalizacion_Template"
+    "refreshStatus": false,
+    "viewDigitalization": "/nodeID/value/papoID/value/digitalization",
+    "viewOn": true
+  },
+  "events": {
+    "system": {
+      "onShutdown": {
+        "config": {
+          "script": "\tself.custom.viewOn \u003d False"
+        },
+        "scope": "G",
+        "type": "script"
+      },
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.viewOn \u003d True"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
   },
   "params": {
+    "action": "value",
     "buttomDisplay": [
       {
         "instancePosition": {},
@@ -59,10 +80,11 @@
         "registerPath": "Page/Embedded/Questions_EA11-0901_mmto"
       }
     ],
-    "lastRegisterTime": 22,
-    "lastRegisterType": "Cambio de SKU",
-    "papoName": "Papo 1",
-    "papoStatus": "En Proceso",
+    "minutesSince": 10,
+    "name": "value",
+    "nodeID": "value",
+    "papoID": "value",
+    "reference": "value",
     "shiftButtom": {
       "end": {
         "label": "Fin Turno",
@@ -75,29 +97,71 @@
         "registerPath": "Page/Embedded/Questions_EA11-0901_start"
       }
     },
-    "userName": "Tulio Perez"
+    "status": "value",
+    "timestamp": "value",
+    "user": "value",
+    "workstationID": "value"
   },
   "propConfig": {
+    "custom.refreshStatus": {
+      "onChange": {
+        "enabled": null,
+        "script": "\timport time\n\tstatusView \u003d self.custom.viewOn\n\tif statusView:\n\t\ttime.sleep(1)\n\t\t\t\n\t\tlistCustom \u003d [\n\t\t    \n\t\t    \"viewDigitalization\"\n\t\t]\n\t\tfor path in listCustom:\n\t\t    self.view.refreshBinding(\"custom.{}\".format(path))\n\t\t    \n\t\tself.custom.refreshStatus \u003d False\n\telse:\n\t\tNone"
+      },
+      "persistent": true
+    },
     "custom.viewDigitalization": {
+      "binding": {
+        "config": {
+          "struct": {
+            "nodeID": "{view.params.nodeID}",
+            "papoID": "{view.params.papoID}",
+            "urlBase": "{session.props.gateway.address}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\turlBase \u003d value[\"urlBase\"]\n\tpapoID \u003d value[\"papoID\"]\n\tnodeID \u003d value[\"nodeID\"]\n\t\n\tpagePath \u003d \"/nodeID/%s/papoID/%s/digitalization\" % (nodeID, papoID)\n\t\n\treturn pagePath",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.viewOn": {
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.refreshStatus \u003d True"
+      },
+      "persistent": true
+    },
+    "params.action": {
+      "paramDirection": "input",
       "persistent": true
     },
     "params.buttomDisplay": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.lastRegisterTime": {
+    "params.minutesSince": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.lastRegisterType": {
+    "params.name": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.papoName": {
+    "params.nodeID": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.papoStatus": {
+    "params.papoID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.reference": {
       "paramDirection": "input",
       "persistent": true
     },
@@ -105,7 +169,19 @@
       "paramDirection": "input",
       "persistent": true
     },
-    "params.userName": {
+    "params.status": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.timestamp": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.user": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationID": {
       "paramDirection": "input",
       "persistent": true
     }
@@ -125,13 +201,14 @@
               "name": "Label_1"
             },
             "position": {
-              "basis": "200px"
+              "basis": "100%",
+              "grow": 1
             },
             "propConfig": {
               "props.text": {
                 "binding": {
                   "config": {
-                    "path": "view.params.papoName"
+                    "path": "view.params.reference"
                   },
                   "type": "property"
                 }
@@ -139,72 +216,22 @@
             },
             "props": {
               "style": {
-                "classes": "text-titles",
+                "classes": "text-titles-2",
                 "color": "#2F0C54",
+                "fontSize": 40,
                 "fontWeight": "bold"
               }
             },
             "type": "ia.display.label"
-          },
-          {
-            "custom": {
-              "viewDigitalization": "Page/Digitalizacion_Template"
-            },
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tviewDigitalization \u003d self.view.custom.viewDigitalization\n\tpapoReport \u003d self.view.params.shiftButtom.start.papoPath\n\tregisterPath \u003d self.view.params.shiftButtom.start.registerPath\n\tsystem.perspective.navigate(\n\t\tview \u003d viewDigitalization,\n   \t\tparams\u003d{\"papoReport\": papoReport, \"registerType\": registerPath}\n   \t\t)"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "position.display": {
-                "binding": {
-                  "config": {
-                    "path": "view.params.buttomDisplay.startShift"
-                  },
-                  "enabled": false,
-                  "type": "property"
-                }
-              },
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "path": "view.params.shiftButtom.start.label"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "classes": "button-1"
-              }
-            },
-            "type": "ia.input.button"
           }
         ],
         "meta": {
           "name": "FlexContainer_3"
         },
         "position": {
-          "basis": "50px"
+          "basis": "50px",
+          "grow": 1,
+          "shrink": 0
         },
         "props": {
           "justify": "space-between",
@@ -221,13 +248,14 @@
               "name": "Label_1"
             },
             "position": {
-              "basis": "200px"
+              "basis": "293px",
+              "grow": 1
             },
             "propConfig": {
               "props.text": {
                 "binding": {
                   "config": {
-                    "path": "view.params.papoStatus"
+                    "path": "view.params.status"
                   },
                   "type": "property"
                 }
@@ -235,63 +263,20 @@
             },
             "props": {
               "style": {
-                "classes": "text-titles",
-                "color": "#209FC9"
+                "classes": "text-titles-2",
+                "color": "#209FC9",
+                "fontSize": 30
               }
             },
             "type": "ia.display.label"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\t#self.view.params.applyButton \u003d 1\n\tviewDigitalization \u003d self.view.custom.viewDigitalization\n\tpapoReport \u003d self.view.params.shiftButtom.end.papoPath\n\tregisterPath \u003d self.view.params.shiftButtom.end.registerPath\n\tsystem.perspective.navigate(\n\t\tview \u003d viewDigitalization,\n   \t\tparams\u003d{\"papoReport\": papoReport, \"registerType\": registerPath}\n   \t\t)"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_0"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "path": "view.params.shiftButtom.end.label"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "classes": "button-2",
-                "marginBottom": 3,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 3
-              }
-            },
-            "type": "ia.input.button"
           }
         ],
         "meta": {
           "name": "FlexContainer_4"
         },
         "position": {
-          "basis": "40px"
+          "basis": "40px",
+          "shrink": 0
         },
         "props": {
           "justify": "space-between",
@@ -308,41 +293,15 @@
               "name": "Label_1"
             },
             "position": {
-              "basis": "200px"
-            },
-            "props": {
-              "style": {
-                "classes": "text-description-centered"
-              },
-              "text": "Turno creado por:",
-              "textStyle": {
-                "color": "--neutral-80"
-              }
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "meta": {
-              "name": "Label_2"
-            },
-            "position": {
-              "basis": "180px"
-            },
-            "propConfig": {
-              "props.text": {
-                "binding": {
-                  "config": {
-                    "path": "view.params.userName"
-                  },
-                  "type": "property"
-                }
-              }
+              "basis": "100%",
+              "grow": 1
             },
             "props": {
               "style": {
                 "classes": "text-description-centered",
-                "fontWeight": "bold"
+                "fontSize": 20
               },
+              "text": "Ultimo registro:",
               "textStyle": {
                 "color": "--neutral-80"
               }
@@ -354,7 +313,73 @@
           "name": "FlexContainer_0"
         },
         "position": {
-          "basis": "50px"
+          "basis": "35px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "250px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.action} + \" \" + \"( \" + {view.params.minutesSince} + \" min. )\""
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-description-centered",
+                    "color": "--neutral-80",
+                    "fontWeight": "bold",
+                    "paddingBottom": 10
+                  },
+                  "textStyle": {
+                    "fontSize": 20
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "basis": "100%",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_1"
+        },
+        "position": {
+          "basis": "35px",
+          "shrink": 0
         },
         "props": {
           "style": {
@@ -370,19 +395,38 @@
               "name": "Label_1"
             },
             "position": {
-              "basis": "200px"
+              "basis": "100%",
+              "shrink": 0
             },
             "props": {
               "style": {
                 "classes": "text-description-centered"
               },
-              "text": "Último registro:",
+              "text": "Turno creado por:",
               "textStyle": {
-                "color": "--neutral-80"
+                "color": "--neutral-80",
+                "fontSize": 20
               }
             },
             "type": "ia.display.label"
-          },
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_6"
+        },
+        "position": {
+          "basis": "35px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
           {
             "children": [
               {
@@ -390,13 +434,14 @@
                   "name": "Label_2"
                 },
                 "position": {
-                  "basis": "180px"
+                  "basis": "180px",
+                  "grow": 1
                 },
                 "propConfig": {
                   "props.text": {
                     "binding": {
                       "config": {
-                        "path": "view.params.lastRegisterType"
+                        "path": "view.params.user"
                       },
                       "type": "property"
                     }
@@ -406,39 +451,11 @@
                   "style": {
                     "classes": "text-description-centered",
                     "color": "--neutral-80",
-                    "fontWeight": "bold"
-                  }
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "meta": {
-                  "name": "Label_3"
-                },
-                "position": {
-                  "basis": "180px"
-                },
-                "propConfig": {
-                  "props.text": {
-                    "binding": {
-                      "config": {
-                        "path": "view.params.lastRegisterTime"
-                      },
-                      "transforms": [
-                        {
-                          "expression": "\u0027 (\u0027+ {value} + \u0027 min)\u0027",
-                          "type": "expression"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "classes": "text-description-centered",
-                    "color": "--neutral-80",
-                    "fontWeight": "bold"
+                    "fontWeight": "bold",
+                    "paddingBottom": 10
+                  },
+                  "textStyle": {
+                    "fontSize": 20
                   }
                 },
                 "type": "ia.display.label"
@@ -448,10 +465,10 @@
               "name": "FlexContainer_1"
             },
             "position": {
-              "basis": "180px"
+              "basis": "180px",
+              "grow": 1
             },
             "props": {
-              "direction": "column",
               "style": {
                 "overflow": "hidden"
               }
@@ -460,10 +477,11 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer_1"
+          "name": "FlexContainer_7"
         },
         "position": {
-          "basis": "50px"
+          "basis": "35px",
+          "shrink": 0
         },
         "props": {
           "style": {
@@ -471,300 +489,55 @@
           }
         },
         "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_0"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "position.display": {
-                "binding": {
-                  "config": {
-                    "path": "view.params.buttomDisplay.min30"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "marginBottom": 8,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 8
-              },
-              "text": "30 min"
-            },
-            "type": "ia.input.button"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_2"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "marginBottom": 8,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 8
-              },
-              "text": "1 h"
-            },
-            "type": "ia.input.button"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_3"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "marginBottom": 8,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 8
-              },
-              "text": "2 h"
-            },
-            "type": "ia.input.button"
-          }
-        ],
-        "meta": {
-          "name": "FlexContainer_2"
-        },
-        "position": {
-          "basis": "50px",
-          "display": false
-        },
-        "props": {
-          "justify": "center",
-          "style": {
-            "overflow": "hidden"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "children": [
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_4"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "marginBottom": 8,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 8
-              },
-              "text": "4h"
-            },
-            "type": "ia.input.button"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_5"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "marginBottom": 8,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 8
-              },
-              "text": "SKU"
-            },
-            "type": "ia.input.button"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_6"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "marginBottom": 8,
-                "marginLeft": 5,
-                "marginRight": 5,
-                "marginTop": 8
-              },
-              "text": "Mmto"
-            },
-            "type": "ia.input.button"
-          }
-        ],
-        "meta": {
-          "name": "FlexContainer_5"
-        },
-        "position": {
-          "basis": "50px",
-          "display": false
-        },
-        "props": {
-          "justify": "center",
-          "style": {
-            "overflow": "hidden"
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "meta": {
-          "name": "FlexRepeater"
-        },
-        "position": {
-          "basis": "90px"
-        },
-        "propConfig": {
-          "props.instances": {
-            "binding": {
-              "config": {
-                "path": "view.params.buttomDisplay"
-              },
-              "type": "property"
-            }
-          }
-        },
-        "props": {
-          "alignContent": "space-around",
-          "alignItems": "flex-end",
-          "justify": "center",
-          "path": "Page/Embedded/Embedded_Buttom",
-          "style": {
-            "overflow": "hidden"
-          },
-          "useDefaultViewHeight": false,
-          "wrap": "wrap"
-        },
-        "type": "ia.display.flex-repeater"
       }
     ],
+    "custom": {
+      "OnMouseOver": false
+    },
+    "events": {
+      "dom": {
+        "onClick": {
+          "config": {
+            "newTab": true,
+            "page": "{view.custom.viewDigitalization}"
+          },
+          "scope": "C",
+          "type": "nav"
+        },
+        "onMouseOut": {
+          "config": {
+            "script": "\tself.custom.OnMouseOver \u003d False"
+          },
+          "scope": "G",
+          "type": "script"
+        },
+        "onMouseOver": {
+          "config": {
+            "script": "\tself.custom.OnMouseOver \u003d True"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
     "meta": {
       "name": "root"
+    },
+    "propConfig": {
+      "props.style.borderStyle": {
+        "binding": {
+          "config": {
+            "expression": "if({this.custom.OnMouseOver} \u003d True, \"solid\", \"none\")"
+          },
+          "type": "expr"
+        }
+      }
     },
     "props": {
       "direction": "column",
       "style": {
+        "borderColor": "#18C8FE",
+        "borderWidth": 2,
         "classes": "container-borders-dautom-widget",
         "margin": 10,
         "overflow": "hidden",

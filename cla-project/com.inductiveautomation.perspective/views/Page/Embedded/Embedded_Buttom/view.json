@@ -4,7 +4,7 @@
   },
   "params": {
     "label": "30 min",
-    "papoPath": "Formato_Reportes_CLA/Ensamble Linea 1/EA11-0901",
+    "registerID": 3,
     "registerPath": "Page/Embedded/Questions_EA11-0901_30min"
   },
   "propConfig": {
@@ -15,67 +15,81 @@
       "paramDirection": "input",
       "persistent": true
     },
-    "params.papoPath": {
-      "paramDirection": "input",
+    "params.registerID": {
+      "paramDirection": "inout",
       "persistent": true
     },
     "params.registerPath": {
-      "paramDirection": "input",
+      "paramDirection": "inout",
       "persistent": true
     }
   },
   "props": {
     "defaultSize": {
-      "height": 35,
-      "width": 99
+      "height": 50,
+      "width": 120
     }
   },
   "root": {
     "children": [
       {
-        "events": {
-          "dom": {
-            "onClick": {
-              "config": {
-                "script": "\t\n\t#self.view.params.applyButton \u003d 1\n\tviewDigitalization \u003d self.view.custom.viewDigitalization\n\tpapoReport \u003d self.view.params.papoPath\n\tregisterPath \u003d self.view.params.registerPath\n\tsystem.perspective.navigate(\n\t\tview \u003d viewDigitalization,\n   \t\tparams\u003d{\"papoReport\": papoReport, \"registerType\": registerPath}\n   \t\t)"
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tregisterType \u003d self.view.params.registerPath\n\tregisterID \u003d self.view.params.registerID\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"openEmbeded\", \n\t    payload\u003d{\"estado\": True,\n\t    \t\t\"registro\": registerType,\n\t    \t\t\"registerID\": registerID},\n\t    scope\u003d\"session\"\n\t)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_1"
+            },
+            "position": {
+              "basis": "90%",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.label"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
               },
-              "scope": "G",
-              "type": "script"
-            }
+              "primary": false,
+              "style": {
+                "classes": "button-2"
+              }
+            },
+            "type": "ia.input.button"
           }
-        },
+        ],
         "meta": {
-          "name": "Button_Apply_4"
+          "name": "FlexContainer_0"
         },
         "position": {
-          "basis": "20px",
+          "basis": "100%",
           "shrink": 0
         },
-        "propConfig": {
-          "props.text": {
-            "binding": {
-              "config": {
-                "path": "view.params.label"
-              },
-              "type": "property"
-            }
-          }
-        },
         "props": {
-          "image": {
-            "height": 30,
-            "width": 15
-          },
-          "primary": false,
+          "justify": "center",
           "style": {
-            "classes": "button-2",
-            "marginBottom": 2,
-            "marginLeft": 2,
-            "marginRight": 2,
-            "marginTop": 2
+            "overflow": "hidden"
           }
         },
-        "type": "ia.input.button"
+        "type": "ia.container.flex"
       }
     ],
     "meta": {
