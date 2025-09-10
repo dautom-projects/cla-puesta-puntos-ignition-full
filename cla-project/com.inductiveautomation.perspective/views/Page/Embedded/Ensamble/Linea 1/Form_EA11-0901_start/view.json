@@ -2,8 +2,9 @@
   "custom": {
     "answers": {},
     "fontSize": 17,
-    "insights": "This is QA",
-    "refreshSecond": 16
+    "insights": "",
+    "refreshSecond": 4,
+    "registerTypeID": 7
   },
   "params": {
     "applyButton": 1,
@@ -874,6 +875,9 @@
       },
       "persistent": true
     },
+    "custom.registerTypeID": {
+      "persistent": true
+    },
     "params.applyButton": {
       "paramDirection": "input",
       "persistent": true
@@ -1188,7 +1192,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5\u0027s."
                 },
                 "type": "ia.input.checkbox"
@@ -1226,7 +1229,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Cabinas electricas cerradas."
                 },
                 "type": "ia.input.checkbox"
@@ -1264,7 +1266,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Guardas en su lugar."
                 },
                 "type": "ia.input.checkbox"
@@ -1302,7 +1303,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Cabinas electricas con libre acceso."
                 },
                 "type": "ia.input.checkbox"
@@ -1340,7 +1340,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Verificación del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena"
                 },
                 "type": "ia.input.checkbox"
@@ -1396,7 +1395,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "No hay objetos sobre las cabinas elécticas."
                 },
                 "type": "ia.input.checkbox"
@@ -1434,7 +1432,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Cableado en buenas condiciones."
                 },
                 "type": "ia.input.checkbox"
@@ -1472,7 +1469,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Switch y controles de seguridad funcionando correctamente."
                 },
                 "type": "ia.input.checkbox"
@@ -1547,7 +1543,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Boton parada de emergencia funcionando correctamente."
                 },
                 "type": "ia.input.checkbox"
@@ -1585,7 +1580,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text   # 👈 insights como parte de \"answer\"\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -1717,7 +1712,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Los sistemas de alarmas funcionan correctamente."
                 },
                 "type": "ia.input.checkbox"
@@ -1892,7 +1886,6 @@
                       }
                     },
                     "props": {
-                      "selected": true,
                       "text": "Buen estado de los electrodos (RH02-0500 anexo 4). Para la fabricación de batría Sofasa se deben usar electrodos nuevos."
                     },
                     "type": "ia.input.checkbox"
@@ -1930,7 +1923,6 @@
                       }
                     },
                     "props": {
-                      "selected": true,
                       "text": "Se encuentran las galgas en el puesto y calibración vigente"
                     },
                     "type": "ia.input.checkbox"
@@ -1986,7 +1978,6 @@
                       }
                     },
                     "props": {
-                      "selected": true,
                       "text": "Manometros calibrados y en buen estado"
                     },
                     "type": "ia.input.checkbox"
@@ -2443,7 +2434,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text   # 👈 insights como parte de \"answer\"\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -2854,7 +2845,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text   # 👈 insights como parte de \"answer\"\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -2936,10 +2927,13 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "borderBottomLeftRadius": 10,
+            "borderBottomRightRadius": 10,
+            "borderTopLeftRadius": 10,
+            "borderTopRightRadius": 10,
             "marginLeft": 15,
             "marginRight": 30
-          },
-          "text": "This is QA"
+          }
         },
         "type": "ia.input.text-field"
       },
@@ -2950,7 +2944,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer1\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer2\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.seguridad\",\n\t\t\"answers.OperacionControl\",\n\t\t\"answers.EstadoMaquina\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswerSeg \u003d self.view.custom.answers.seguridad\n\tanswerOp \u003d self.view.custom.answers.OperacionControl\n\tanswerEst \u003d self.view.custom.answers.EstadoMaquina\n\t\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d 1\n\tworkstationID \u003d 1\n\tnodeID \u003d 4\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\t\n\tif regCode\u003d\u003dNone:\n\t\tregCode\u003d0\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(7, system.util.jsonEncode(answerSeg), regCode+1)  \n\tinsert_answer(7, system.util.jsonEncode(answerOp), regCode+1)  \n\tinsert_answer(7, system.util.jsonEncode(answerEst), regCode+1)  \n\t\n\t\n\t\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)"
+                    "script": "\t\t\n\tsystem.perspective.sendMessage(\"resetTable\", payload\u003d{})\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer1\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer2\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.seguridad\",\n\t\t\"answers.OperacionControl\",\n\t\t\"answers.EstadoMaquina\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswerSeg \u003d self.view.custom.answers.seguridad\n\tanswerOp \u003d self.view.custom.answers.OperacionControl\n\tanswerEst \u003d self.view.custom.answers.EstadoMaquina\n\t\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d 1\n\tworkstationID \u003d 1\n\tnodeID \u003d 4\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\t\n\tif regCode\u003d\u003dNone:\n\t\tregCode\u003d0\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(7, system.util.jsonEncode(answerSeg), regCode+1)  \n\tinsert_answer(7, system.util.jsonEncode(answerOp), regCode+1)  \n\tinsert_answer(7, system.util.jsonEncode(answerEst), regCode+1)  \n\t\n\t\n\t\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\t"
                   },
                   "scope": "G",
                   "type": "script"

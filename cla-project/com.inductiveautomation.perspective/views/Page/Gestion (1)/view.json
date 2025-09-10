@@ -4,16 +4,16 @@
       "$": [
         "ts",
         192,
-        1757547267695
+        1757540771203
       ],
-      "$ts": 1757547267694
+      "$ts": 1757540771203
     },
     "areaId": null,
     "dataArea": {
       "$": [
         "ds",
         192,
-        1757543178659
+        1757535581712
       ],
       "$columns": [
         {
@@ -57,7 +57,7 @@
       "$": [
         "ds",
         192,
-        1757543178659
+        1757540398435
       ],
       "$columns": [
         {
@@ -76,7 +76,7 @@
       "$": [
         "ds",
         192,
-        1757543178672
+        1757540398442
       ],
       "$columns": [
         {
@@ -276,9 +276,9 @@
       "$": [
         "ts",
         192,
-        1757547267696
+        1757540771203
       ],
-      "$ts": 1757547240000
+      "$ts": 1757540760000
     },
     "lineId": "",
     "nodeId": null,
@@ -288,7 +288,7 @@
       "$": [
         "ts",
         192,
-        1757547267696
+        1757540771203
       ],
       "$ts": 1757502000000
     }
@@ -990,7 +990,7 @@
             "props": {
               "dismissOnSelect": false,
               "format": "YYYY-MM-DD HH:mm:ss",
-              "formattedValue": "2025-09-10 18:34:00",
+              "formattedValue": "2025-09-10 16:46:00",
               "inputProps": {
                 "style": {
                   "classes": "dateTime"
@@ -1048,7 +1048,7 @@
                       },
                       "transforms": [
                         {
-                          "code": "\n    if value is None:\n        return []\n\n    # Convertimos el dataset en PyDataSet\n    pyds \u003d system.dataset.toPyDataSet(value)\n    colNames \u003d pyds.getColumnNames()\n\n    out \u003d []\n    for row in pyds:\n        # Acceso seguro a la columna \"Status\"\n        try:\n            status \u003d str(row[\"Status\"]).strip().lower()\n        except:\n            status \u003d \"\"\n\n        # Definimos estilo si está finalizado\n        if status \u003d\u003d \"finalizado\":\n            style \u003d {\"backgroundColor\": \"#b7cd7f\"}\n        else:\n            style \u003d {}\n\n        # Aplicamos estilo a todas las celdas de la fila\n        row_cells \u003d {}\n        for col in colNames:\n            row_cells[col] \u003d {\"value\": row[col], \"style\": style}\n\n        out.append(row_cells)\n\n    return out",
+                          "code": "\n    from system.dataset import toPyDataSet\n    pyds \u003d toPyDataSet(value)\n    data \u003d []\n\n    for row in pyds:\n        row_dict \u003d {}\n        # Si la fila es Finalizado, definimos estilo para toda la fila\n        if row[\"Status\"] \u003d\u003d \"Finalizado\":\n            style \u003d {\"backgroundColor\": \"#b7cd7f\"}\n        else:\n            style \u003d {}\n\n        for col in pyds.getColumnNames():\n            row_dict[col] \u003d {\"value\": row[col], \"style\": style}\n        data.append(row_dict)\n\n    return data",
                           "type": "script"
                         }
                       ],
@@ -1714,6 +1714,21 @@
                     "borderRightColor": "D5D5D5",
                     "borderRightStyle": "solid",
                     "borderRightWidth": 1
+                  },
+                  "selection": {
+                    "data": [
+                      {
+                        "NodeName": "Ensamble",
+                        "PapoDescription": "Linea automatica",
+                        "PapoReference": "EA11-0901",
+                        "Status": "En proceso",
+                        "Timestamp": "Wed Sep 10 2025 13:36:30 GMT-0500 (Colombia Standard Time)",
+                        "User": "admin",
+                        "WorkstationDescription": "Workstation de pruebas"
+                      }
+                    ],
+                    "selectedColumn": "User",
+                    "selectedRow": 7
                   }
                 },
                 "type": "ia.display.table"

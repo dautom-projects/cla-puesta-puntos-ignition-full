@@ -2,8 +2,9 @@
   "custom": {
     "answers": {},
     "fontSize": 17,
-    "insights": "Half Hour QA",
-    "refreshSecond": 16
+    "insights": "",
+    "refreshSecond": 39,
+    "registerTypeID": 3
   },
   "params": {
     "applyButton": 1,
@@ -858,6 +859,9 @@
       },
       "persistent": true
     },
+    "custom.registerTypeID": {
+      "persistent": true
+    },
     "params.applyButton": {
       "paramDirection": "input",
       "persistent": true
@@ -1187,7 +1191,6 @@
                       }
                     },
                     "props": {
-                      "selected": true,
                       "text": "Prueba de desgarre soldadura de punto."
                     },
                     "type": "ia.input.checkbox"
@@ -1317,6 +1320,7 @@
         },
         "position": {
           "basis": "10px",
+          "display": false,
           "grow": 1
         },
         "propConfig": {
@@ -1328,7 +1332,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text   # 👈 insights como parte de \"answer\"\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -1412,8 +1416,7 @@
           "style": {
             "marginLeft": 15,
             "marginRight": 30
-          },
-          "text": "Half Hour QA"
+          }
         },
         "type": "ia.input.text-field"
       },
