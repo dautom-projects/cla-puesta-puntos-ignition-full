@@ -1,6 +1,7 @@
 {
   "custom": {
     "refreshStatus": false,
+    "timeFormated": "00h 10m",
     "viewDigitalization": "/nodeID/value/papoID/value/digitalization",
     "viewOn": true
   },
@@ -107,6 +108,24 @@
       "onChange": {
         "enabled": null,
         "script": "\timport time\n\tstatusView \u003d self.custom.viewOn\n\tif statusView:\n\t\ttime.sleep(1)\n\t\t\t\n\t\tlistCustom \u003d [\n\t\t    \n\t\t    \"viewDigitalization\"\n\t\t]\n\t\tfor path in listCustom:\n\t\t    self.view.refreshBinding(\"custom.{}\".format(path))\n\t\t    \n\t\tself.custom.refreshStatus \u003d False\n\telse:\n\t\tNone"
+      },
+      "persistent": true
+    },
+    "custom.timeFormated": {
+      "binding": {
+        "config": {
+          "struct": {
+            "mins": "{view.params.minutesSince}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tmins \u003d value[\"mins\"]\n\tminsFormated \u003d utils.minutesformat(mins)\n\treturn str(minsFormated)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
       },
       "persistent": true
     },
@@ -339,7 +358,7 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "expression": "{view.params.action} + \" \" + \"( \" + {view.params.minutesSince} + \" min. )\""
+                        "expression": "{view.params.action} + \" \" + \"( \" + {view.custom.timeFormated} + \" )\""
                       },
                       "type": "expr"
                     }
@@ -402,7 +421,7 @@
               "style": {
                 "classes": "text-description-centered"
               },
-              "text": "Turno creado por:",
+              "text": "Registrado por:",
               "textStyle": {
                 "color": "--neutral-80",
                 "fontSize": 20
@@ -496,17 +515,26 @@
     },
     "events": {
       "dom": {
-        "onClick": {
-          "config": {
-            "newTab": true,
-            "page": "{view.custom.viewDigitalization}"
+        "onClick": [
+          {
+            "config": {
+              "newTab": true,
+              "page": "{view.custom.viewDigitalization}"
+            },
+            "scope": "C",
+            "type": "nav"
           },
-          "scope": "C",
-          "type": "nav"
-        },
+          {
+            "config": {
+              "script": "\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)"
+            },
+            "scope": "G",
+            "type": "script"
+          }
+        ],
         "onMouseOut": {
           "config": {
-            "script": "\tself.custom.OnMouseOver \u003d False"
+            "script": "\tself.custom.OnMouseOver \u003d False\n\t\n"
           },
           "scope": "G",
           "type": "script"

@@ -1,0 +1,801 @@
+{
+  "custom": {
+    "actualDateTime": {
+      "$": [
+        "ts",
+        192,
+        1757451633297
+      ],
+      "$ts": 1757451633297
+    },
+    "dataLine": {
+      "$": [
+        "ds",
+        192,
+        1757451404362
+      ],
+      "$columns": [
+        {
+          "data": [
+            1006,
+            1005,
+            1004,
+            1003,
+            7,
+            5
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "Planta de agua ",
+            "Refinacion",
+            "Fundicion",
+            "Triturado",
+            "Linea 4",
+            "Linea 1"
+          ],
+          "name": "Name",
+          "type": "String"
+        }
+      ]
+    },
+    "dataPapo": {
+      "$": [
+        "ds",
+        192,
+        1757451607502
+      ],
+      "$columns": [
+        {
+          "data": [
+            24,
+            23,
+            22,
+            21,
+            20,
+            19,
+            18,
+            17,
+            16,
+            15,
+            14,
+            13,
+            12,
+            10,
+            8,
+            7,
+            6,
+            5,
+            3,
+            2,
+            1
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "EA11-2501",
+            "RE11-0101",
+            "SO02-4502",
+            "EA11-4200",
+            "EA11-2501",
+            "FU11-0101",
+            "PA11-0301",
+            "PA11-0401",
+            "RE10-0102",
+            "RE11-0101",
+            "SO02-1006",
+            "SO02-4502",
+            "TR11-0101",
+            "EA11-4200",
+            "EA11-4101",
+            "EA11-2501",
+            "EA11-2201",
+            "EA11-1101",
+            "EA11-2201",
+            "EA11-1101",
+            "EA11-0901"
+          ],
+          "name": "Reference",
+          "type": "String"
+        }
+      ]
+    },
+    "dataTable": "",
+    "dbConnection": "papo_db",
+    "endTime": {
+      "$": [
+        "ts",
+        192,
+        1757451633298
+      ],
+      "$ts": 1757451360000
+    },
+    "nodeId": null,
+    "papoId": "",
+    "shift": "C",
+    "startTime": {
+      "$": [
+        "ts",
+        192,
+        1757451633298
+      ],
+      "$ts": 1757364960000
+    }
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tdb \u003d self.custom.dbConnection\n\tself.custom.dataLine \u003d sql.line(db)\n\tnodeId \u003d self.custom.nodeId\n\tself.custom.dataPapo \u003d sql.papoByNode(nodeId)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {},
+  "propConfig": {
+    "custom.actualDateTime": {
+      "binding": {
+        "config": {
+          "expression": "{[System]Gateway/CurrentDateTime}\r\n"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.dataLine": {
+      "persistent": true
+    },
+    "custom.dataPapo": {
+      "persistent": true
+    },
+    "custom.dataTable": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "persistent": true
+    },
+    "custom.endTime": {
+      "binding": {
+        "config": {
+          "expression": "{this.custom.actualDateTime}"
+        },
+        "transforms": [
+          {
+            "code": "\t\"\"\"\n\tTransforms the provided date value based on user-selected options for \n\tperiod and shift.\n\t\n\tArgs:\n\t    value (Date): The date value to transform.\n\t    quality (Quality): The quality of the data (not used in this function).\n\t    timestamp (Timestamp): The timestamp of the value (not used in this function).\n\t\n\tReturns:\n\t    Date: The transformed date based on the selected options.\n\t\"\"\"\n\t\n\tdef set_datetime(year, month, day, hour, minute\u003d0, second\u003d0):\n\t    \"\"\"Helper function to set the date and time.\"\"\"\n\t    date \u003d system.date.getDate(year, month, day)\n\t    return system.date.setTime(date, hour, minute, second)\n\t\"\"\"\n\t# Test hour\n\tvalue \u003d set_datetime(2024, 9, 22, 15)\n\tprint value\n\tshift \u003d \"B\"\n\tdropDownPeriod \u003d 5  # 0: Turno A, 1: Turno B, 2: Turno C, 3: Previous Day, 4: Current Day, 5: Weeks, 6: Months, 7: Custom\n\tendTime \u003d set_datetime(2020, 10, 2, 21)\n\t\"\"\"\n\t\n\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\tMin \u003d system.date.getMinute(value)\n\t\n\t\n\t# Variables to hold user selections\n\tendTime \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"DateTimeInput_EndTime\").props.value\n\tshift \u003d self.custom.shift\n\tdropDownPeriod \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"Dropdown Periodo\").props.value\n\t\n\t\n\t# Process the selected period\n\tif dropDownPeriod \u003d\u003d 7:  # Custom selected\n\t    value \u003d endTime\n\t\n\telif dropDownPeriod \u003d\u003d 0:  # Selecting Shift A\n\t    if shift \u003d\u003d \u0027C\u0027:\n\t        value \u003d set_datetime(Year, Month, Day-1, 5, 59, 59)  # End of Shift A\n\t    elif shift \u003d\u003d \u0027B\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 5, 59, 59)  # End of Shift A (when switching from Shift B)\n\t    elif shift \u003d\u003d \u0027A\u0027:\n\t        if Hour \u003c 6:  # In Shift C between 0:00 and 5:59\n\t            value \u003d set_datetime(Year, Month, Day, 5, 59, 59)  # End of previous Shift A\n\t        else:\n\t            value \u003d set_datetime(Year, Month, Day+1, 5, 59, 59)  # Current Shift A end time\n\t\n\telif dropDownPeriod \u003d\u003d 1:  # Selecting Shift B\n\t    if shift \u003d\u003d \u0027C\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 13, 59, 59)  # End of previous Shift B\n\t    elif shift \u003d\u003d \u0027B\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 13, 59, 59)  # Current Shift B end time\n\t    elif shift \u003d\u003d \u0027A\u0027:\n\t    \tif Hour \u003c 6:  \n\t        \tvalue \u003d set_datetime(Year, Month, Day -1 , 13, 59, 59)  # End Shift B\n\t        else:\n\t        \tvalue \u003d set_datetime(Year, Month, Day , 13, 59, 59)  # End Shift B\n\t\n\telif dropDownPeriod \u003d\u003d 2:  # Selecting Shift C\n\t    if shift \u003d\u003d \u0027C\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 21, 59, 59)  # End of Shift C\n\t    elif shift \u003d\u003d \u0027B\u0027:\n\t        value \u003d set_datetime(Year, Month, Day-1, 21, 59, 59)  # End of previous Shift C\n\t    elif shift \u003d\u003d \u0027A\u0027:    \t\n\t    \tif Hour \u003c 6:  \n\t        \tvalue \u003d set_datetime(Year, Month, Day -1 , 21, 59, 59)  # End Shift B\n\t        else:\n\t        \tvalue \u003d set_datetime(Year, Month, Day , 21, 59, 59)  # End Shift B\n\t\n\telif dropDownPeriod \u003d\u003d 3:  # Selecting Previous Day\n\t    if Hour \u003c 6:  # If the current time is between 0:00 and 5:59\n\t        value \u003d set_datetime(Year, Month, Day - 1, 5, 59, 59)  # End of previous day\n\t    else:\n\t        value \u003d set_datetime(Year, Month, Day, 5, 59, 59)  # End of current day\n\t\n\telse:  # Default case, just use the current hour and minute\n\t    value \u003d set_datetime(Year, Month, Day, Hour, Min, 0)\n\t    \n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.nodeId": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Station.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.papoId": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Papo.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.shift": {
+      "binding": {
+        "config": {
+          "expression": "if(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 22 || dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 6,\r\n\t\u0027A\u0027, \r\n\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 6 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 14,\r\n\t\t\t\u0027B\u0027, \r\n\t\t\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 14 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 22, \r\n\t\t\t\t\t\u0027C\u0027, \r\n\t\t\t\t\t\u0027none\u0027\r\n\t\t\t\t\t)\r\n\t\t\t)\r\n\t)"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.startTime": {
+      "binding": {
+        "config": {
+          "expression": "{this.custom.actualDateTime}"
+        },
+        "transforms": [
+          {
+            "code": "\t# startTime\n\t\n\t\"\"\"\n\tTransforms the provided date value based on user-selected options for \n\tperiod and shift.\n\t\n\tArgs:\n\t    value (Date): The date value to transform.\n\t    quality (Quality): The quality of the data (not used in this function).\n\t    timestamp (Timestamp): The timestamp of the value (not used in this function).\n\t\n\tReturns:\n\t    Date: The transformed date based on the selected options.\n\t\"\"\"\n\t\n\tdef set_datetime(year, month, day, hour):\n\t\t\"\"\"Helper function to set the date and time.\"\"\"\n\t\tdate \u003d system.date.getDate(year, month, day)\n\t\treturn system.date.setTime(date, hour, 0, 0)\n\t\"\"\"\n\t# Test hour\n\tvalue \u003d set_datetime(2024, 9, 22, 7)\n\tprint value\n\tshift \u003d \"A\"\n\tdropDownPeriod \u003d 5  # 0: Turno A, 1: Turno B, 2: Turno C, 3: Previous Day, 4: Current Day, 5: Weeks, 6: Months, 7: Custom\n\tstartTime \u003d set_datetime(2020, 10, 2, 21)\n\t\"\"\"\n\tyear \u003d system.date.getYear(value)\n\tmonth \u003d system.date.getMonth(value)\n\tday \u003d system.date.getDayOfMonth(value)\n\thour \u003d system.date.getHour24(value)\n\tdayOfWeek \u003d system.date.getDayOfWeek(value)\n\t#print dayOfWeek\n\t\n\t# Variables to hold user selections\n\tdropDownPeriod \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"Dropdown Periodo\").props.value\n\tshift \u003d self.custom.shift\n\tstartTime \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"DateTimeInput_StartTime\").props.value\n\t\n\t# Process the selected period\n\tif dropDownPeriod !\u003d 7:  # Assuming \u00277\u0027 represents a custom option\n\t\tif dropDownPeriod \u003d\u003d 4:  # Current Day\n\t\t\t# Use current day\u0027s start time if after 6 AM; otherwise, use the previous day\u0027s\n\t\t\tnewDate \u003d set_datetime(year, month, day if hour \u003e\u003d 6 else day - 1, 6)\n\t\t\tvalue \u003d newDate\n\t\n\t\telif dropDownPeriod \u003d\u003d 3:  # Previous Day\n\t\t\t# Use the previous day\u0027s start time based on current hour\n\t\t\tnewDate \u003d set_datetime(year, month, day - (1 if hour \u003e\u003d 6 else 2), 6)\n\t\t\tvalue \u003d newDate\n\t\t\t\n\t\telif dropDownPeriod \u003d\u003d -1:  # No specific selection (consider using a different value)\n\t\t\tvalue \u003d set_datetime(year, month, day, hour)\n\t\t\t\n\t\telif dropDownPeriod \u003d\u003d 6:  # Months\n\t\t\tvalue \u003d set_datetime(year, month, 1, 6)\n\t\t\n\t\telif dropDownPeriod \u003d\u003d 5:  # Weeks\n\t\t\t# Calculate the day of the week (1: Sunday, 7: Saturday)\n\t\t\tdayOfWeek \u003d system.date.getDayOfWeek(system.date.getDate(year, month, day))\n\t\t\n\t\t\t# Calculate the previous Monday\n\t\t\tif dayOfWeek \u003d\u003d 2:  # If it is Monday (Day 2)\t\n\t\t\t\tif hour \u003e\u003d 6:\n\t\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -dayOfWeek + 2)\n\t\t\t\telse:\n\t\t\t\t\t# Go back one week (7 days)\n\t\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -7)\n\t\t    \n\t\n\t\t\telif dayOfWeek \u003e 2:\n\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -dayOfWeek + 2)\n\t\t\t\t\n\t\t\telse:\n\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -6)\n\t\t\n\t\t\t# Set the time to 6:00:00\n\t\t\tvalue \u003d set_datetime(system.date.getYear(previousMonday), system.date.getMonth(previousMonday), system.date.getDayOfMonth(previousMonday), 6)\n\t\t    \n\t\t# Shift logic\n\t\tif shift \u003d\u003d \u0027C\u0027:\n\t\t\tif dropDownPeriod \u003d\u003d 2:  # Selecting Shift C while in Shift C\n\t\t\t\tnewHour \u003d 14 \n\t\t\t\tvalue \u003d set_datetime(year, month, day, newHour)\n\t\n\t\t\telif dropDownPeriod \u003d\u003d 0:  # Selecting Shift A while in Shift C\n\t\t\t\tnewHour \u003d 22\n\t\t\t\tvalue \u003d set_datetime(year, month, day-1, newHour)\n\t\n\t\t\telif dropDownPeriod \u003d\u003d 1:  # Selecting Shift B while in Shift C\n\t\t\t\tnewHour \u003d 6\n\t\t\t\tvalue \u003d set_datetime(year, month, day, newHour)\n\t\n\t\telif shift \u003d\u003d \u0027B\u0027:\n\t\t\tif dropDownPeriod \u003d\u003d 0:  # Selecting Shift A while in Shift B\n\t\t\t\tvalue \u003d set_datetime(year, month, day-1, 22)\n\t\n\t\t\telif dropDownPeriod \u003d\u003d 2:  # Selecting Shift C while in Shift B\n\t\t\t\tvalue \u003d set_datetime(year, month, day - 1, 14)\n\t\n\t\t\telif dropDownPeriod \u003d\u003d 1:  # Selecting Shift B while in Shift B\n\t\t\t\tvalue \u003d set_datetime(year, month, day, 6)\n\t\n\t\telif shift \u003d\u003d \u0027A\u0027:\n\t\t\tif dropDownPeriod \u003d\u003d 1:  # Selecting Shift B while in Shift A\n\t\t\t\tif hour \u003c 6:\n\t\t\t\t\tday1 \u003d day-1\n\t\t\t\telse:\n\t\t\t\t\tday1 \u003d day\n\t\t\t\tvalue \u003d set_datetime(year, month, day1, 6)\n\t\n\t\t\telif dropDownPeriod \u003d\u003d 0:  # Selecting Shift A while in Shift A\n\t\t\t\tif hour \u003c 6:\n\t\t\t\t\tday1 \u003d day-1\n\t\t\t\telse:\n\t\t\t\t\tday1 \u003d day\n\t\t\t\tvalue \u003d set_datetime(year, month, day1, 22)\n\t\n\t\t\telif dropDownPeriod \u003d\u003d 2:  # Selecting Shift C while in Shift A\n\t\t\t\tif hour \u003c 6:\n\t\t\t\t\tday1 \u003d day-1\n\t\t\t\telse:\n\t\t\t\t\tday1 \u003d day\n\t\t\t\tvalue \u003d set_datetime(year, month, day1, 14)\n\telse:\n\t\t# If the dropdown period is 7, use the start time as the value\n\t\tvalue \u003d startTime\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1024,
+      "width": 1814
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "EmbeddedView"
+            },
+            "position": {
+              "basis": "100%"
+            },
+            "props": {
+              "params": {
+                "icon": "material/assignment",
+                "text": "Gestion de formularios",
+                "transform": "value"
+              },
+              "path": "Page/Embedded/Title_Header"
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Station"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Linea:",
+              "textStyle": {
+                "fontSize": 20,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tself.view.custom.dataPapo \u003d sql.papoByNode(nodeId \u003d self.view.custom.nodeId, db \u003d self.view.custom.dbConnection)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Dropdown Station"
+            },
+            "position": {
+              "basis": "200px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dataLine"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione línea..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": null
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo"
+            },
+            "position": {
+              "basis": "110px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Formulario:",
+              "textStyle": {
+                "fontSize": 20,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Papo"
+            },
+            "position": {
+              "basis": "250px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dataPapo"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione formulario..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              }
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Period"
+            },
+            "position": {
+              "basis": "80}px",
+              "shrink": 0
+            },
+            "props": {
+              "enabled": false,
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Periodo:",
+              "textStyle": {
+                "fontSize": 20,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\t\n\t\n\t\"\"\"\n\t#Limpiar dropdowns\n\t\n\t#equipos\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d None\n\t#funciones\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason Function\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason Function\").custom.selectedLabel \u003d None\n\t\n\t#Tipos\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Type\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Type\").custom.selectedLabel \u003d None\n\t\n\t#razones\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").custom.selectedLabel \u003d None\n\t\n\tsystem.perspective.sendMessage(\u0027updateMicroEvents\u0027)\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)\n\tself.custom.selectedCode \u003d self.custom.selectedLabel[:3]\t\n\tlineCode \u003d self.custom.selectedCode\n\tequipmentValue \u003d None\n\tequipmentLabel \u003d None\n\t\t\n\tlineCode_mapping \u003d {\n    \u0027322\u0027: (6, \u002732000 - General\u0027),\n    \u0027321\u0027: (6, \u002732000 - General\u0027),\n    \u0027421\u0027: (14, \u002742000 - General\u0027),\n    \u0027422\u0027: (14, \u002742000 - General\u0027)\n\t}\n\t\n\tif lineCode in lineCode_mapping:\n\t    equipmentValue, equipmentLabel \u003d lineCode_mapping[lineCode]\n\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d equipmentValue\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d equipmentLabel\n\t\n\t\"\"\""
+                  },
+                  "enabled": false,
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Dropdown Periodo"
+            },
+            "position": {
+              "basis": "200px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "options": [
+                {
+                  "label": "Turno A",
+                  "value": 0
+                },
+                {
+                  "label": "Turno B",
+                  "value": 1
+                },
+                {
+                  "label": "Turno C",
+                  "value": 2
+                },
+                {
+                  "label": "Día Anterior",
+                  "value": 3
+                },
+                {
+                  "label": "Día Actual",
+                  "value": 4
+                },
+                {
+                  "label": "Semana",
+                  "value": 5
+                },
+                {
+                  "label": "Mes",
+                  "value": 6
+                },
+                {
+                  "label": "Personalizado",
+                  "value": 7
+                }
+              ],
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione línea..."
+              },
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": 7
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "refresh",
+                  "pageScope": true,
+                  "script": "\tself.refreshBinding(\"props.options\")\n\t# implement your handler here",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Start_Time"
+            },
+            "position": {
+              "basis": "70px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Inicio:",
+              "textStyle": {
+                "fontSize": 20,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "system": {
+                "onStartup": {
+                  "config": {
+                    "script": "\t#from datetime import date\n\t#from datetime import datetime\n\t#today \u003ddate.today()\n\t#midnight \u003d datetime.combine(today, datetime.min.time())\n\t#self.props.value \u003d midnight\n\t#self.props.value \u003d system.date.addDays(today, -1)\n\t#self.props.value \u003d system.date.addDays(system.date.now(),-1)\n\t#self.props.value \u003d system.date.now()\n\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day-1)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate\n\t"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "DateTimeInput_StartTime"
+            },
+            "position": {
+              "basis": "250px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Periodo.props.value} !\u003d 7 ,false,true)"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.maxDate": {
+                "binding": {
+                  "config": {
+                    "expression": "now(5000)"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, 00, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.startTime"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dismissOnSelect": false,
+              "format": "YYYY-MM-DD HH:mm:00",
+              "formattedValue": "2025-09-08 15:56:00",
+              "inputProps": {
+                "style": {
+                  "classes": "dateTime"
+                }
+              },
+              "locale": "es"
+            },
+            "type": "ia.input.date-time-input"
+          },
+          {
+            "meta": {
+              "name": "Label__End_Time"
+            },
+            "position": {
+              "basis": "40px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Fin:",
+              "textStyle": {
+                "fontSize": 20,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "system": {
+                "onStartup": {
+                  "config": {
+                    "script": "\t#from datetime import date\n\t#from datetime import datetime\n\t#today \u003d date.today()\n\t#midnight \u003d datetime.combine(today, datetime.min.time())\n\t#self.props.value \u003d midnight\n\t#self.props.value \u003d today\n\t#self.props.value \u003d system.date.now()\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "DateTimeInput_EndTime"
+            },
+            "position": {
+              "basis": "250px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Periodo.props.value} !\u003d 7 ,false,true)"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.maxDate": {
+                "binding": {
+                  "config": {
+                    "expression": "now(5000)"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\tMinute \u003d system.date.getMinute(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.endTime"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dismissOnSelect": false,
+              "format": "YYYY-MM-DD HH:mm:ss",
+              "formattedValue": "2025-09-09 15:56:00",
+              "inputProps": {
+                "style": {
+                  "classes": "dateTime"
+                }
+              },
+              "locale": "es",
+              "style": {
+                "margin": ""
+              }
+            },
+            "type": "ia.input.date-time-input"
+          },
+          {
+            "meta": {
+              "name": "Label_Period_0"
+            },
+            "position": {
+              "basis": "1px",
+              "shrink": 0
+            },
+            "props": {
+              "enabled": false,
+              "textStyle": {
+                "classes": "text-subtitles"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Filters"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "50%"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "ReportViewer"
+                },
+                "position": {
+                  "basis": "100%"
+                },
+                "props": {
+                  "allowDownload": false,
+                  "allowOpenInTab": false,
+                  "page": 1,
+                  "pageCount": 1
+                },
+                "type": "ia.reporting.report-viewer"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "50%"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "100%"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}
