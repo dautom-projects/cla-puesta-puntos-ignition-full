@@ -1,0 +1,36 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tlogger \u003d system.util.getLogger(\"StationDebug\")\n\t\n\tdef _get_this_sessioninfo(session_id):\n\t    for s in system.perspective.getSessionInfo():\n\t        if s.get(\u0027id\u0027) \u003d\u003d session_id:\n\t            return s\n\t    return {}\n\t\n\ttry:\n\t    session_id \u003d self.session.props.id\n\t\n\t    sinfo \u003d _get_this_sessioninfo(session_id)\n\t    client_ip    \u003d sinfo.get(\u0027clientAddress\u0027, \u0027\u0027) or \u0027\u0027\n\t    user_agent   \u003d sinfo.get(\u0027userAgent\u0027, \u0027\u0027) or \u0027\u0027\n\t    page_url     \u003d sinfo.get(\u0027pageUrl\u0027, sinfo.get(\u0027url\u0027, \u0027\u0027)) or \u0027\u0027\n\t    query_params \u003d sinfo.get(\u0027queryParams\u0027, {}) or {}\n\t\n\t    device_id \u003d self.session.props.device.identifier  # 👈 huella digital\n\t\n\t    logger.info(\"\u003d\u003d\u003d Station Debug \u003d\u003d\u003d\")\n\t    logger.info(\"SessionId: %s\" % session_id)\n\t    logger.info(\"DeviceId:  %s\" % device_id)\n\t    logger.info(\"Client IP: %s\" % client_ip)\n\t    logger.info(\"UserAgent: %s\" % user_agent)\n\t    logger.info(\"Page URL:  %s\" % page_url)\n\t    logger.info(\"QueryParams: %s\" % system.util.jsonEncode(query_params))\n\t\n\texcept Exception as e:\n\t    logger.error(\"Error obteniendo datos de sesión: %s\" % e)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Button"
+        },
+        "position": {
+          "basis": "34px"
+        },
+        "type": "ia.input.button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

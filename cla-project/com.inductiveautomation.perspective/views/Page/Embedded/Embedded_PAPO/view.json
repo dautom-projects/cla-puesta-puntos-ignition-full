@@ -2,7 +2,7 @@
   "custom": {
     "refreshStatus": false,
     "timeFormated": "00h 10m",
-    "viewDigitalization": "/nodeID/value/papoID/value/digitalization",
+    "viewDigitalization": "/nodeID/value/papoID/value/workstationID/value/workstationnodeID/value/digitalization",
     "viewOn": true
   },
   "events": {
@@ -33,7 +33,8 @@
     "status": "value",
     "timestamp": "value",
     "user": "value",
-    "workstationID": "value"
+    "workstationID": "value",
+    "workstationnodeID": "value"
   },
   "propConfig": {
     "custom.refreshStatus": {
@@ -67,13 +68,15 @@
           "struct": {
             "nodeID": "{view.params.nodeID}",
             "papoID": "{view.params.papoID}",
-            "urlBase": "{session.props.gateway.address}"
+            "urlBase": "{session.props.gateway.address}",
+            "wrkID": "{view.params.workstationID}",
+            "wrknID": "{view.params.workstationnodeID}"
           },
           "waitOnAll": true
         },
         "transforms": [
           {
-            "code": "\t\n\turlBase \u003d value[\"urlBase\"]\n\tpapoID \u003d value[\"papoID\"]\n\tnodeID \u003d value[\"nodeID\"]\n\t\n\tpagePath \u003d \"/nodeID/%s/papoID/%s/digitalization\" % (nodeID, papoID)\n\t\n\treturn pagePath",
+            "code": "\t\n\turlBase \u003d value[\"urlBase\"]\n\tpapoID \u003d value[\"papoID\"]\n\tnodeID \u003d value[\"nodeID\"]\n\twrkID \u003d value[\"wrkID\"]\n\twrknID \u003d value[\"wrknID\"]\n\t\n\tpagePath \u003d \"/nodeID/%s/papoID/%s/workstationID/%s/workstationnodeID/%s/digitalization\" % (nodeID, papoID, wrkID,wrknID)\n\t\n\treturn pagePath",
             "type": "script"
           }
         ],
@@ -125,6 +128,10 @@
       "persistent": true
     },
     "params.workstationID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationnodeID": {
       "paramDirection": "input",
       "persistent": true
     }
@@ -208,10 +215,11 @@
             "classes": "text-description-centered",
             "color": "--neutral-80",
             "fontWeight": "bold",
-            "paddingBottom": 10
+            "paddingBottom": 0
           },
           "textStyle": {
-            "fontSize": 20
+            "fontSize": 20,
+            "lineHeight": 1
           }
         },
         "type": "ia.display.label"
@@ -251,6 +259,7 @@
         },
         "position": {
           "basis": "40px",
+          "grow": 1,
           "shrink": 0
         },
         "props": {
@@ -289,6 +298,7 @@
         },
         "position": {
           "basis": "35px",
+          "grow": 1,
           "shrink": 0
         },
         "props": {
@@ -354,6 +364,7 @@
         },
         "position": {
           "basis": "35px",
+          "grow": 1,
           "shrink": 0
         },
         "props": {
@@ -391,6 +402,7 @@
         },
         "position": {
           "basis": "35px",
+          "grow": 1,
           "shrink": 0
         },
         "props": {
@@ -456,6 +468,7 @@
         },
         "position": {
           "basis": "35px",
+          "grow": 1,
           "shrink": 0
         },
         "props": {
@@ -488,16 +501,16 @@
             "type": "script"
           }
         ],
-        "onMouseOut": {
+        "onMouseEnter": {
           "config": {
-            "script": "\tself.custom.OnMouseOver \u003d False\n\t\n"
+            "script": "\tself.custom.OnMouseOver \u003d True"
           },
           "scope": "G",
           "type": "script"
         },
-        "onMouseOver": {
+        "onMouseLeave": {
           "config": {
-            "script": "\tself.custom.OnMouseOver \u003d True"
+            "script": "\tself.custom.OnMouseOver \u003d False"
           },
           "scope": "G",
           "type": "script"

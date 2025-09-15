@@ -111,6 +111,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                     rh.RegisterCode,
                     rh.NodeID,
                     rh.PapoID,
+                    n.Topic AS Path,
                     ROW_NUMBER() OVER (
                         PARTITION BY rh.NodeID, rh.PapoID, rh.RegisterCode
                         ORDER BY rh.Timestamp DESC
@@ -134,9 +135,11 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                 WorkstationDescription,
                 RegisterCode,
                 NodeID,
-                PapoID
+                PapoID,
+                Path
             FROM ranked
             WHERE rn = 1
+            AND Status != 'Sin Iniciar'
             ORDER BY NodeID, PapoID, RegisterCode
         '''
         
