@@ -3,8 +3,10 @@
     "answers": {},
     "fontSize": 17,
     "insights": "",
-    "refreshSecond": 47,
-    "registerTypeID": 1
+    "path": "[UNS]Clarios/Andina/Ensamble/Linea 1/UI/EA 11-0901",
+    "refreshSecond": 21,
+    "registerTypeID": 1,
+    "user": "Mohamed Salah"
   },
   "params": {
     "applyButton": 1,
@@ -857,6 +859,9 @@
       },
       "persistent": true
     },
+    "custom.path": {
+      "persistent": true
+    },
     "custom.refreshSecond": {
       "binding": {
         "config": {
@@ -871,6 +876,21 @@
       "persistent": true
     },
     "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.user": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.firstName"
+        },
+        "transforms": [
+          {
+            "expression": "{value} + \" \" +{session.props.auth.user.lastName}",
+            "type": "expression"
+          }
+        ],
+        "type": "property"
+      },
       "persistent": true
     },
     "params.applyButton": {
@@ -1019,8 +1039,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 915,
-      "width": 912
+      "height": 2135,
+      "width": 1076
     }
   },
   "root": {
@@ -1208,6 +1228,24 @@
                           "config": {
                             "path": "this.props.selected"
                           },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
                           "type": "property"
                         }
                       },
@@ -1221,7 +1259,6 @@
                       }
                     },
                     "props": {
-                      "selected": true,
                       "text": "Prueba de desgarre soldadura de punto."
                     },
                     "type": "ia.input.checkbox"
@@ -1279,6 +1316,24 @@
                           "config": {
                             "path": "this.props.selected"
                           },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
                           "type": "property"
                         }
                       },
@@ -1292,7 +1347,6 @@
                       }
                     },
                     "props": {
-                      "selected": true,
                       "text": "Alineación de soldadura"
                     },
                     "type": "ia.input.checkbox"
@@ -1349,7 +1403,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -1575,8 +1629,7 @@
                       "style": {
                         "classes": "dropdown",
                         "marginLeft": 0
-                      },
-                      "value": 45
+                      }
                     },
                     "type": "ia.input.numeric-entry-field"
                   }
@@ -1617,7 +1670,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Salida corriente"
+                      "text": "Salida corriente [ms]"
                     },
                     "type": "ia.display.label"
                   },
@@ -1662,8 +1715,7 @@
                       "style": {
                         "classes": "dropdown",
                         "marginLeft": 0
-                      },
-                      "value": 58
+                      }
                     },
                     "type": "ia.input.numeric-entry-field"
                   }
@@ -1706,7 +1758,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo soldadura"
+                      "text": "Tiempo soldadura [ms]"
                     },
                     "type": "ia.display.label"
                   },
@@ -1751,8 +1803,7 @@
                       "style": {
                         "classes": "dropdown",
                         "marginLeft": 0
-                      },
-                      "value": 12
+                      }
                     },
                     "type": "ia.input.numeric-entry-field"
                   }
@@ -1827,7 +1878,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Corriente de soldadura"
+                      "text": "Corriente de soldadura [%]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2143,7 +2194,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo corriente de prueba"
+                      "text": "Tiempo corriente de prueba [ms]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2264,7 +2315,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Corriente prueba max60%"
+                      "text": "Corriente prueba max60% [%]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2558,7 +2609,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "% Superior de Rechazo"
+                      "text": "% Superior de Rechazo [ms]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2644,7 +2695,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "% Inferior de Rechazo"
+                      "text": "% Inferior de Rechazo [ms]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2935,6 +2986,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -2948,14 +3017,116 @@
                   }
                 },
                 "props": {
-                  "selected": true,
-                  "text": "Huella 3.5 ± 0.5 mm (verificación del cumplimiento con galga)  Buen estado de los electrodos"
+                  "text": "Huella 3.5 ± 0.5 mm (verificación del cumplimiento con galga) Buen estado de los electrodos"
                 },
                 "type": "ia.input.checkbox"
               }
             ],
             "meta": {
               "name": "FlexContainer_18"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "paddingLeft": 0
+                      },
+                      "text": "Presion aire mordaza"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 163,
+                        "registerTypeID": 1
+                      }
+                    },
+                    "meta": {
+                      "name": "NumericEntryField"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.value"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "align": "left",
+                      "format": "none",
+                      "placeholder": "Esciba aqui",
+                      "spinner": {
+                        "enabled": false
+                      },
+                      "style": {
+                        "classes": "dropdown",
+                        "marginLeft": 0
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "220px",
+                  "shrink": 0
+                },
+                "props": {
+                  "alignItems": "flex-start",
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_19"
             },
             "position": {
               "basis": "60px",
@@ -3021,7 +3192,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Amperaje cada termoselladora"
+                      "text": "Amperaje cada termoselladora [Amp]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3124,7 +3295,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Temperatura Planchas"
+                      "text": "Temperatura Planchas [ºC]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3150,6 +3321,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Temp_Planchas"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3164,8 +3348,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3208,7 +3391,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Queme bat. negra Queme bat. restantes"
+                      "text": "Queme bat. negra Queme bat. restantes [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3234,6 +3417,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Queme_Bat_rest"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3248,8 +3444,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3318,6 +3513,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Queme_Bat"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3332,8 +3540,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3403,7 +3610,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo selle bats"
+                      "text": "Tiempo selle bats [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3429,6 +3636,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiemp_Selle_Bat"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3443,8 +3663,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3488,7 +3707,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Velocidad de desplazamiento baterias"
+                      "text": "Velocidad de desplazamiento baterias [mm/s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3514,6 +3733,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Velo_Desp_Caja_Cubi_Bat"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3528,8 +3760,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3573,7 +3804,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Velocidad de desplazamiento baterias restantes"
+                      "text": "Velocidad de desplazamiento baterias restantes [mm/Seg]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3599,6 +3830,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Velo_Desp_Caja_Cubi_Bat_rest"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3613,8 +3857,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3666,6 +3909,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -3679,7 +3940,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Polaridad y referencia de cubierta según la lista"
                 },
                 "type": "ia.input.checkbox"
@@ -3704,6 +3964,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -3717,7 +3995,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Cubierta sin rechupes o contracción"
                 },
                 "type": "ia.input.checkbox"
@@ -3742,6 +4019,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -3755,7 +4050,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Apariencia y calidad densimetro"
                 },
                 "type": "ia.input.checkbox"
@@ -3797,6 +4091,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -3810,7 +4122,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Densimetro según la referencia y lista de materiales"
                 },
                 "type": "ia.input.checkbox"
@@ -3883,7 +4194,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo de soldar (Fusión)"
+                      "text": "Tiempo de soldar (Fusión) [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3909,6 +4220,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiemp_Soldador"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -3923,8 +4247,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -3968,7 +4291,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiemp antes apagar gas despues de soldar"
+                      "text": "Tiemp antes apagar gas despues de soldar [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -3994,6 +4317,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiemp_Espe_Antes_Apag_Gas"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -4008,8 +4344,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -4053,7 +4388,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo antes apagar O2 despues de soldar"
+                      "text": "Tiempo antes apagar O2 despues de soldar [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -4079,6 +4414,19 @@
                           "type": "property"
                         }
                       },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiemp_Espe_Antes_Oxi"
+                          },
+                          "type": "tag"
+                        }
+                      },
                       "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
@@ -4093,8 +4441,7 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value"
+                      }
                     },
                     "type": "ia.display.label"
                   }
@@ -4171,7 +4518,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Presion regulador gas"
+                      "text": "Presion regulador gas [mBar]"
                     },
                     "type": "ia.display.label"
                   },
@@ -4259,7 +4606,7 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Presion regulador Oxigeno"
+                      "text": "Presion regulador Oxigeno [mBar]"
                     },
                     "type": "ia.display.label"
                   },
@@ -4371,6 +4718,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4384,7 +4749,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Altura borne positivo"
                 },
                 "type": "ia.input.checkbox"
@@ -4409,6 +4773,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4422,7 +4804,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Altura borne negativo"
                 },
                 "type": "ia.input.checkbox"
@@ -4447,6 +4828,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4460,7 +4859,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Apariencia de borne."
                 },
                 "type": "ia.input.checkbox"
@@ -4479,132 +4877,6 @@
               }
             },
             "type": "ia.container.flex"
-          },
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Checkbox"
-                    },
-                    "position": {
-                      "basis": "56px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Prueba de desgarre soldadura de punto."
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer"
-                },
-                "position": {
-                  "basis": "50%",
-                  "shrink": 0
-                },
-                "props": {
-                  "direction": "column"
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Checkbox"
-                    },
-                    "position": {
-                      "basis": "56px"
-                    },
-                    "propConfig": {
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Alineación de soldadura"
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer_0"
-                },
-                "position": {
-                  "basis": "50%",
-                  "shrink": 0
-                },
-                "props": {
-                  "direction": "column"
-                },
-                "type": "ia.container.flex"
-              }
-            ],
-            "meta": {
-              "name": "FlexContainer4"
-            },
-            "position": {
-              "basis": "60px",
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "backgroundColor": "",
-                "borderBottomLeftRadius": 15,
-                "borderBottomRightRadius": 15,
-                "borderTopLeftRadius": 15,
-                "borderTopRightRadius": 15,
-                "marginLeft": 10,
-                "marginRight": 10
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "meta": {
-              "name": "Label_0"
-            },
-            "position": {
-              "basis": "32px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.style.fontSize": {
-                "binding": {
-                  "config": {
-                    "path": "view.custom.fontSize"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "style": {
-                "color": "#1199C7",
-                "marginTop": -25,
-                "paddingLeft": 30
-              },
-              "text": "Nota: revisar criterios de aceptación y rechazo"
-            },
-            "type": "ia.display.label"
           },
           {
             "meta": {
@@ -4787,6 +5059,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4800,7 +5090,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Verificacion de DAPE con muestra patrón"
                 },
                 "type": "ia.input.checkbox"
@@ -4825,6 +5114,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4838,7 +5145,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Aplicación de silicona en ventozas para garantizar sello entre ventozas y roscas"
                 },
                 "type": "ia.input.checkbox"
@@ -4908,6 +5214,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4921,7 +5245,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Caja y cubierta de color sin talladuras"
                 },
                 "type": "ia.input.checkbox"
@@ -4946,6 +5269,24 @@
                       "config": {
                         "path": "this.props.selected"
                       },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
                       "type": "property"
                     }
                   },
@@ -4959,7 +5300,6 @@
                   }
                 },
                 "props": {
-                  "selected": true,
                   "text": "Apariencia general de batería según criterios de aceptación y rechazo RH02-0500 Anexo 4."
                 },
                 "type": "ia.input.checkbox"
@@ -4997,7 +5337,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -5116,7 +5456,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\t\t\n\tlogger \u003d system.util.getLogger(\"oneHour\")\n\tlogger.info(\"Mensaje enviado\")\n\t\n\talerts.showAlert(state\u003d\"warning\", title\u003d\"Guardar registro\", message\u003d\"Esta seguro de que desea guardar el registro de una hora?\", \n\tbtnTextPrimary\u003d\"Si\", btnTextSecondary\u003d\"No\", btnActionPrimary\u003d\"saveHourRegister_test\")\n\t\n\t\n\t\u0027\u0027\u0027\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer5\").refreshBinding(\"custom.{}\".format(path))\n\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.one_hour\",\n\t\t\"answers.half_hour\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswer30min \u003d self.view.custom.answers.half_hour\n\tanswer1hour \u003d self.view.custom.answers.one_hour\n\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workStationNodeID\n\tworkstationID \u003d self.view.params.workStation\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(3, system.util.jsonEncode(answer30min),regCode)  # 30 minutos\n\tinsert_answer(1, system.util.jsonEncode(answer1hour),regCode)  # 1 hora\n\n\t\n\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\t\u0027\u0027\u0027"
+                    "script": "\t\t\n\tlogger \u003d system.util.getLogger(\"oneHour\")\n\tlogger.info(\"Mensaje enviado\")\n\t\n\talerts.showAlert(state\u003d\"warning\", title\u003d\"Guardar registro\", message\u003d\"Esta seguro de que desea guardar el registro de una hora?\", \n\tbtnTextPrimary\u003d\"Si\", btnTextSecondary\u003d\"No\", btnActionPrimary\u003d\"saveHourRegister_test\")\n\t\n\t\n\t\u0027\u0027\u0027\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer5\").refreshBinding(\"custom.{}\".format(path))\n\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.one_hour\",\n\t\t\"answers.half_hour\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswer30min \u003d self.view.custom.answers.half_hour\n\tanswer1hour \u003d self.view.custom.answers.one_hour\n\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workStationNodeID\n\tworkstationID \u003d self.view.params.workStation\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(3, system.util.jsonEncode(answer30min),regCode)  # 30 minutos\n\tinsert_answer(1, system.util.jsonEncode(answer1hour),regCode)  # 1 hora\n\n\t\n\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\t\u0027\u0027\u0027\n\t\n\t"
                   },
                   "scope": "G",
                   "type": "script"
@@ -5148,7 +5488,7 @@
                 {
                   "messageType": "saveHourRegister_test",
                   "pageScope": true,
-                  "script": "\t\t\n\tlogger \u003d system.util.getLogger(\"oneHour\")\n\tlogger.info(\"Mensaje recibido\")\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer5\").refreshBinding(\"custom.{}\".format(path))\n\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.one_hour\",\n\t\t\"answers.half_hour\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswer30min \u003d self.view.custom.answers.half_hour\n\tanswer1hour \u003d self.view.custom.answers.one_hour\n\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(3, system.util.jsonEncode(answer30min),regCode)  # 30 minutos\n\tinsert_answer(1, system.util.jsonEncode(answer1hour),regCode)  # 1 hora\n\n\t\n\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)",
+                  "script": "\t\t\n\tlogger \u003d system.util.getLogger(\"oneHour\")\n\tlogger.info(\"Mensaje recibido\")\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer5\").refreshBinding(\"custom.{}\".format(path))\n\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.one_hour\",\n\t\t\"answers.half_hour\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswer30min \u003d self.view.custom.answers.half_hour\n\tanswer1hour \u003d self.view.custom.answers.one_hour\n\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY RegisterCode DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tstatus \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(3, system.util.jsonEncode(answer30min),regCode)  # 30 minutos\n\tinsert_answer(1, system.util.jsonEncode(answer1hour),regCode)  # 1 hora\n\n\t\n\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshPeriodic\", \n\t    payload\u003d{\"min\": 0,},\n\t    scope\u003d\"session\"\n\t)",
                   "sessionScope": false,
                   "viewScope": false
                 }

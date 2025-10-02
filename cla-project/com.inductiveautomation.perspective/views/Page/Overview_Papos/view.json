@@ -8,50 +8,37 @@
     "dropdownWorkstation": {},
     "formats": [
       {
-        "action": "Fin de turno",
-        "minutesSince": 11,
-        "name": "Linea automatica",
-        "nodeID": 5,
-        "papoID": 1,
-        "reference": "EA11-0901",
+        "action": "Idle",
+        "minutesSince": 5714,
+        "name": "Mezcladoras",
+        "nodeID": 35,
+        "papoID": 25,
+        "reference": "MZ11-0101",
         "status": "Sin Iniciar",
-        "timestamp": "2025-09-15 17:55:04",
+        "timestamp": "2025-09-25 17:40:24",
         "user": "admin",
-        "workstationID": 1,
-        "workstationnodeID": 1
+        "workstationID": 13,
+        "workstationnodeID": 18
       },
       {
-        "action": "Inicio de turno",
-        "minutesSince": 1,
-        "name": "Control proceso ensobradora Henderman Linea 1 y Linea 4",
-        "nodeID": 5,
-        "papoID": 2,
-        "reference": "EA11-1101",
+        "action": "Media hora",
+        "minutesSince": 5682,
+        "name": "Mezcladora (Preparacion de Pasta)",
+        "nodeID": 35,
+        "papoID": 26,
+        "reference": "MZ07-0101",
         "status": "En proceso",
-        "timestamp": "2025-09-15 18:05:05",
+        "timestamp": "2025-09-25 18:12:28",
         "user": "admin",
-        "workstationID": 1,
-        "workstationnodeID": 1
-      },
-      {
-        "action": null,
-        "minutesSince": 0,
-        "name": "Control proceso COS Linea 1",
-        "nodeID": 5,
-        "papoID": 3,
-        "reference": "EA11-2201",
-        "status": null,
-        "timestamp": null,
-        "user": null,
-        "workstationID": 1,
-        "workstationnodeID": 1
+        "workstationID": 13,
+        "workstationnodeID": 18
       }
     ],
     "refreshOnAction": false,
-    "refreshPeriodic": 6,
+    "refreshPeriodic": 54,
     "userRol": "Administrator",
     "viewOn": true,
-    "workstationID": 1
+    "workstationID": 0
   },
   "events": {
     "system": {
@@ -216,14 +203,15 @@
       "binding": {
         "config": {
           "struct": {
+            "areaID": "{view.custom.dropdownArea.idSelected}",
             "db": "{view.custom.dbConnection}",
-            "parentID": "{view.custom.dropdownLine.idSelected}"
+            "lineID": "{view.custom.dropdownLine.idSelected}"
           },
           "waitOnAll": true
         },
         "transforms": [
           {
-            "code": "\t\n\tdb \u003d value[\"db\"]\n\tparentID \u003d value[\"parentID\"]\n\t\n\tif parentID !\u003d None:\t\t\n\t\twhere \u003d \"WHERE wkn.NodeID \u003d {}\".format(parentID)\n\telse:\n\t\twhere \u003d \"\"\n\tquery \u003d \"\"\"\tSELECT wk.ID, wk.Description \n\t\t\t\tFROM  workstation wk\n\t\t\t\tINNER JOIN workstationnode wkn ON wkn.WorkstationID \u003d wk.ID\n\t\t\t\t{}\n\t\t\t\t\"\"\".format(where)\n\t\t\t\t\n\tds \u003d system.db.runQuery(query, db)\n\t\n\treturn ds",
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\tlineID \u003d value[\"lineID\"]\n\tareaID \u003d value[\"areaID\"]\n\t\n\twhere \u003d \"WHERE 1\u003d1\"\n\t\n\tif lineID !\u003d None:\t\t\n\t\twhere +\u003d \"AND wkn.NodeID \u003d {}\".format(int(lineID))\n\tif areaID !\u003d None:\t\t\n\t\twhere +\u003d \"AND n.ParentNodeID \u003d {}\".format(int(areaID))\n\telse:\n\t\twhere \u003d \"\"\n\t\n\tquery \u003d \"\"\"\tSELECT DISTINCT\n\t\t\t\t    wk.ID,\n\t\t\t\t    wk.Description\n\t\t\t\tFROM workstation AS wk\n\t\t\t\tINNER JOIN workstationnode AS wkn\n\t\t\t\t    ON wkn.WorkstationID \u003d wk.ID\n\t\t\t\tINNER JOIN node AS n\n\t\t\t\t    ON n.ID \u003d wkn.NodeID\n\t\t\t\t{}\n\t\t\t\t\"\"\".format(where)\n\t\t\t\t\n\tds \u003d system.db.runQuery(query, db)\n\t\n\treturn ds",
             "type": "script"
           }
         ],
@@ -250,6 +238,7 @@
             "db": "{view.custom.dbConnection}",
             "entID": "{view.custom.dropdownEnterprise.idSelected}",
             "linID": "{view.custom.dropdownLine.idSelected}",
+            "rol": "{/root/Filters.position.display}",
             "sitID": "{view.custom.dropdownSite.idSelected}",
             "wksID": "{view.custom.workstationID}"
           },
@@ -257,7 +246,7 @@
         },
         "transforms": [
           {
-            "code": "\tenterpriseId  \u003d value[\"entID\"]\n\tsiteId        \u003d value[\"sitID\"]\n\tareaId        \u003d value[\"areID\"]\n\tlineId        \u003d value[\"linID\"]\n\tworkstationId \u003d value[\"wksID\"]\n\tdb            \u003d value[\"db\"]\n\t\n\t# WHERE simple (agrega solo lo que venga)\n\twhere \u003d \"WHERE 1\u003d1\"\n\tif workstationId is not None:\n\t    where +\u003d \" AND ws.ID \u003d {}\".format(workstationId)\n\tif enterpriseId is not None:\n\t    where +\u003d \" AND entN.ID \u003d {}\".format(enterpriseId)\n\tif siteId is not None:\n\t    where +\u003d \" AND siteN.ID \u003d {}\".format(siteId)\n\tif areaId is not None:\n\t    where +\u003d \" AND areaN.ID \u003d {}\".format(areaId)\n\tif lineId is not None:\n\t    where +\u003d \" AND lineN.ID \u003d {}\".format(lineId)\n\t\n\tquery \u003d \"\"\"\n\tSELECT \n\t    ws.ID         AS WorkstationID,\n\t    wsn.ID        AS WorkstationNodeID,   -- ✅ lo traemos del join con workstationnode\n\t    n.ID          AS NodeID,\n\t    p.ID          AS PapoID,\n\t    p.Description AS PapoName,\n\t    p.Reference   AS Reference,\n\t    lastRH.[User]      AS [User],\n\t    lastRH.[Timestamp] AS [Timestamp],\n\t    lastRH.[Status]    AS [Status],\n\t    lastRH.Action      AS Action,\n\t    DATEDIFF(MINUTE, lastRH.[Timestamp], GETDATE()) AS MinutesSince\n\tFROM workstation ws\n\tINNER JOIN workstationnode wsn ON wsn.WorkstationID \u003d ws.ID\n\tINNER JOIN node n              ON n.ID \u003d wsn.NodeID\n\t\n\t-- Mapeo jerárquico usando Type (sin Topic):\n\tLEFT JOIN node lineN ON \n\t    lineN.Type \u003d \u0027LINE\u0027\n\t    AND lineN.ID \u003d CASE \n\t        WHEN n.Type \u003d \u0027LINE\u0027 THEN n.ID \n\t        WHEN n.Type \u003d \u0027CELL\u0027 THEN n.ParentNodeID \n\t        ELSE NULL \n\t    END\n\t\n\tLEFT JOIN node areaN ON \n\t    areaN.Type \u003d \u0027AREA\u0027\n\t    AND areaN.ID \u003d CASE \n\t        WHEN lineN.ID IS NOT NULL THEN lineN.ParentNodeID \n\t        ELSE NULL \n\t    END\n\t\n\tLEFT JOIN node siteN ON \n\t    siteN.Type \u003d \u0027SITE\u0027\n\t    AND siteN.ID \u003d CASE \n\t        WHEN areaN.ID IS NOT NULL THEN areaN.ParentNodeID \n\t        ELSE NULL \n\t    END\n\t\n\tLEFT JOIN node entN ON \n\t    entN.Type \u003d \u0027ENTERPRISE\u0027\n\t    AND entN.ID \u003d CASE \n\t        WHEN siteN.ID IS NOT NULL THEN siteN.ParentNodeID \n\t        ELSE NULL \n\t    END\n\t\n\tINNER JOIN papo p ON p.NodeID \u003d n.ID\n\t\n\t-- último registro por Papo/WorkstationNode (para MinutesSince)\n\tOUTER APPLY (\n\t    SELECT TOP (1)\n\t        rh.[User],\n\t        rh.[Timestamp],\n\t        rh.[Status],\n\t        rt.[Description] AS Action\n\t    FROM registerhistory rh\n\t    INNER JOIN registertype rt ON rt.ID \u003d rh.RegisterTypeID\n\t    WHERE rh.WorkstationNodeID \u003d wsn.ID\n\t      AND rh.PapoID            \u003d p.ID\n\t    ORDER BY rh.[Timestamp] DESC\n\t) AS lastRH\n\t\n\t{where}\n\tORDER BY p.ID;\n\t\"\"\".format(where\u003dwhere)\n\t\n\tds \u003d system.db.runQuery(query, db)\n\t\n\trows \u003d []\n\tif ds:\n\t    for i in range(ds.getRowCount()):\n\t        ts \u003d ds.getValueAt(i, \"Timestamp\")\n\t        ts_str \u003d system.date.format(ts, \"yyyy-MM-dd HH:mm:ss\") if ts is not None else None\n\t        rows.append({\n\t            \"workstationID\":     ds.getValueAt(i, \"WorkstationID\"),\n\t            \"workstationnodeID\": ds.getValueAt(i, \"WorkstationNodeID\"),  # ✅ ahora desde wsn.ID\n\t            \"nodeID\":            ds.getValueAt(i, \"NodeID\"),\n\t            \"papoID\":            ds.getValueAt(i, \"PapoID\"),\n\t            \"name\":              ds.getValueAt(i, \"PapoName\"),\n\t            \"reference\":         ds.getValueAt(i, \"Reference\"),\n\t            \"action\":            ds.getValueAt(i, \"Action\"),\n\t            \"status\":            ds.getValueAt(i, \"Status\"),\n\t            \"user\":              ds.getValueAt(i, \"User\"),\n\t            \"timestamp\":         ts_str,\n\t            \"minutesSince\":      int(ds.getValueAt(i, \"MinutesSince\") or 0),\n\t        })\n\t\n\t    # ordenar JSON de más a menos por MinutesSince\n\t    rows.sort(key\u003dlambda x: x[\"minutesSince\"], reverse\u003dTrue)\n\t\n\treturn rows",
+            "code": "\tenterpriseId  \u003d value[\"entID\"]\n\tsiteId        \u003d value[\"sitID\"]\n\tareaId        \u003d value[\"areID\"]\n\tlineId        \u003d value[\"linID\"]\n\tworkstationId \u003d value[\"wksID\"]\n\trol           \u003d value[\"rol\"]\n\tdb            \u003d value[\"db\"]\n\t\n\t# Si el rol es false y el workstationId es 0, retornar una lista vacía\n\tif rol \u003d\u003d \"false\" and workstationId \u003d\u003d 0:\n\t    return []\n\t\n\t# WHERE simple (agrega solo lo que sea \"truthy\": None/0/\"\" NO filtran)\n\twhere \u003d \"WHERE 1\u003d1\"\n\tif workstationId:\n\t    where +\u003d \" AND ws.ID \u003d {}\".format(int(workstationId))\n\tif enterpriseId:\n\t    where +\u003d \" AND entN.ID \u003d {}\".format(int(enterpriseId))\n\tif siteId:\n\t    where +\u003d \" AND siteN.ID \u003d {}\".format(int(siteId))\n\tif areaId:\n\t    where +\u003d \" AND areaN.ID \u003d {}\".format(int(areaId))\n\tif lineId:\n\t    where +\u003d \" AND lineN.ID \u003d {}\".format(int(lineId))\n\t\n\tquery \u003d \"\"\"\n\tSELECT \n\t    ws.ID AS WorkstationID, \n\t    wsn.ID AS WorkstationNodeID, \n\t    n.ID AS NodeID, \n\t    p.ID AS PapoID, \n\t    p.Description AS PapoName, \n\t    p.Reference AS Reference, \n\t    -- Acción: del último item del JSON (si existe), si no, la del RegisterType de la fila \n\t    COALESCE(lastRH.SourceAction, lastRH.FallbackAction) AS Action, \n\t\n\t    lastRH.[User] AS [User], \n\t    lastRH.[Timestamp] AS [Timestamp], \n\t    lastRH.[Status] AS [Status], \n\t    lastRH.SourceRegisterTypeID, \n\t    lastRH.RegisterCode, -- Agregamos registerCode para obtener el último \n\t    DATEDIFF(MINUTE, lastRH.[Timestamp], GETDATE()) AS MinutesSince\n\t\n\tFROM workstation ws \n\tJOIN workstationnode wsn ON wsn.WorkstationID \u003d ws.ID \n\tJOIN node n ON n.ID \u003d wsn.NodeID\n\t\n\t-- Jerarquía por Type (para filtros)\n\tLEFT JOIN node lineN ON lineN.Type \u003d \u0027LINE\u0027 \n\t    AND lineN.ID \u003d CASE \n\t        WHEN n.Type \u003d \u0027LINE\u0027 THEN n.ID \n\t        WHEN n.Type \u003d \u0027CELL\u0027 THEN n.ParentNodeID \n\t        ELSE NULL \n\t    END\n\tLEFT JOIN node areaN ON areaN.Type \u003d \u0027AREA\u0027 \n\t    AND areaN.ID \u003d CASE WHEN lineN.ID IS NOT NULL THEN lineN.ParentNodeID ELSE NULL END\n\tLEFT JOIN node siteN ON siteN.Type \u003d \u0027SITE\u0027 \n\t    AND siteN.ID \u003d CASE WHEN areaN.ID IS NOT NULL THEN areaN.ParentNodeID ELSE NULL END\n\tLEFT JOIN node entN ON entN.Type \u003d \u0027ENTERPRISE\u0027 \n\t    AND entN.ID \u003d CASE WHEN siteN.ID IS NOT NULL THEN siteN.ParentNodeID ELSE NULL END\n\t\n\t-- Relación Papo ↔ Node \n\tJOIN nodepapo np ON np.NodeID \u003d n.ID \n\tJOIN papo p ON p.ID \u003d np.PapoID\n\t\n\t-- Último registro + último registerTypeID del JSON\n\tOUTER APPLY (\n\t    SELECT TOP (1)\n\t        rh.[User], \n\t        rh.[Timestamp], \n\t        rh.[Status], \n\t        \n\t        -- Fallback: descripción del RegisterTypeID de la fila \n\t        rt.[Description] AS FallbackAction,\n\t\n\t        -- Del JSON: último items[].registerTypeID\n\t        js.SourceRegisterTypeID, \n\t        rts.[Description] AS SourceAction,\n\t\n\t        -- Incluir el registerCode\n\t        rh.RegisterCode\n\t\n\t    FROM registerhistory rh \n\t    JOIN registertype rt ON rt.ID \u003d rh.RegisterTypeID \n\t    OUTER APPLY (\n\t        SELECT TOP(1)\n\t            TRY_CAST(JSON_VALUE(j.value, \u0027$.registerTypeID\u0027) AS INT) AS SourceRegisterTypeID \n\t        FROM OPENJSON(rh.DataAnswer, \u0027$.items\u0027) AS j \n\t        ORDER BY j.[key] DESC\n\t    ) js \n\t    LEFT JOIN registertype rts ON rts.ID \u003d js.SourceRegisterTypeID \n\t    WHERE rh.WorkstationNodeID \u003d wsn.ID \n\t      AND rh.PapoID \u003d p.ID \n\t    ORDER BY rh.RegisterCode DESC, rh.[Timestamp] DESC\n\t) AS lastRH\n\t\n\t{where};\n\t\"\"\".format(where\u003dwhere)\n\t\n\tds \u003d system.db.runQuery(query, db)\n\t\n\trows \u003d []\n\tif ds:\n\t    for i in range(ds.getRowCount()):\n\t        ts \u003d ds.getValueAt(i, \"Timestamp\")\n\t        ts_str \u003d system.date.format(ts, \"yyyy-MM-dd HH:mm:ss\") if ts is not None else None\n\t        rows.append({\n\t            \"workstationID\":       ds.getValueAt(i, \"WorkstationID\"),\n\t            \"workstationnodeID\":   ds.getValueAt(i, \"WorkstationNodeID\"),\n\t            \"nodeID\":              ds.getValueAt(i, \"NodeID\"),\n\t            \"papoID\":              ds.getValueAt(i, \"PapoID\"),\n\t            \"name\":                ds.getValueAt(i, \"PapoName\"),\n\t            \"reference\":           ds.getValueAt(i, \"Reference\"),\n\t            \"action\":              ds.getValueAt(i, \"Action\"),\n\t            \"status\":              ds.getValueAt(i, \"Status\"),\n\t            \"user\":                ds.getValueAt(i, \"User\"),\n\t            \"timestamp\":           ts_str,\n\t            \"minutesSince\":        int(ds.getValueAt(i, \"MinutesSince\") or 0),\n\t        })\n\t\n\t    # Ordenar de más a menos por MinutesSince\n\t    rows.sort(key\u003dlambda x: x[\"minutesSince\"], reverse\u003dTrue)\n\t\n\treturn rows",
             "type": "script"
           }
         ],
@@ -306,7 +295,7 @@
         },
         "transforms": [
           {
-            "code": "\tdb \u003d value[\"db\"]\n\twkSelected \u003d value[\"wkSelected\"]\n\tfilterStatus \u003d value[\"filterStatus\"]\n\t\n\t# ---------- Perspective: Button -\u003e onActionPerformed ----------\n\tlogger \u003d system.util.getLogger(\"WS-Check\")\n\tDATASOURCE \u003d db  # \u003c-- tu Data Source\n\t\n\tdef _normalize_ip(ip):\n\t    if ip and ip.startswith(\"::ffff:\"):\n\t        return ip.split(\":\")[-1]\n\t    return (ip or \"\").strip()\n\t\n\tdef _get_this_sessioninfo(self):\n\t    sid \u003d self.session.props.id\n\t    for s in system.perspective.getSessionInfo():\n\t        if s.get(\u0027id\u0027) \u003d\u003d sid:\n\t            return s\n\t    return {}\n\t\n\ttry:\n\t    sinfo \u003d _get_this_sessioninfo(self)\n\t    ip \u003d _normalize_ip(sinfo.get(\u0027clientAddress\u0027,\u0027\u0027))\n\t\n\t    rows \u003d system.db.runPrepQuery(\n\t        \"SELECT TOP 1 ID, [Description], Hostname FROM dbo.workstation WHERE IpAddress \u003d ?\",\n\t        [ip], DATASOURCE\n\t    )\n\t    ws_id   \u003d int(rows[0][\u0027ID\u0027]) if rows else 0\n\t    ws_desc \u003d rows[0][\u0027Description\u0027] if rows else \u0027\u0027\n\t    ws_host \u003d rows[0][\u0027Hostname\u0027] if rows else \u0027\u0027\n\t\n\t    #logger.info(\"Button check -\u003e IP\u003d%s  WSID\u003d%s  Desc\u003d%s  Host\u003d%s\" % (ip, ws_id, ws_desc, ws_host))\n\t\n\texcept Exception as e:\n\t    logger.error(\"Button check error: %s\" % e)\n\t    \n\t    \n\tif filterStatus:\n\t\tidValue \u003d wkSelected\n\telse:\n\t\tidValue \u003d ws_id\n\treturn idValue",
+            "code": "\tdb           \u003d value[\"db\"]\n\twkSelected   \u003d value[\"wkSelected\"]\n\tfilterStatus \u003d value[\"filterStatus\"]\n\t\n\tlogger \u003d system.util.getLogger(\"WS-Check\")\n\t\n\tdef _normalize_ip(ip):\n\t\t# Normaliza IPv6-mapped (p.ej. ::ffff:10.0.0.5) a IPv4\n\t\tif ip and ip.startswith(\"::ffff:\"):\n\t\t\treturn ip.split(\":\")[-1]\n\t\treturn (ip or \"\").strip()\n\t\n\tdef _get_this_sessioninfo(self):\n\t\tsid \u003d self.session.props.id\n\t\tfor s in system.perspective.getSessionInfo():\n\t\t\tif s.get(\"id\") \u003d\u003d sid:\n\t\t\t\treturn s\n\t\treturn {}\n\t\n\t# Si NO filtras, resolvemos por IP; si filtras, devolvemos wkSelected.\n\tif not filterStatus:\n\t\ttry:\n\t\t\tsinfo \u003d _get_this_sessioninfo(self)\n\t\t\tip \u003d _normalize_ip(sinfo.get(\"clientAddress\", \"\"))\n\t\n\t\t\t# SQL Server: SELECT TOP 1 ...\n\t\t\tsql \u003d \"\"\"\n\t\t\t\tSELECT TOP 1 ID, Description, Hostname\n\t\t\t\tFROM workstation\n\t\t\t\tWHERE IpAddress \u003d ?\n\t\t\t\"\"\"\n\t\t\tds \u003d system.db.runPrepQuery(sql, [ip], db)\n\t\n\t\t\tif ds and ds.getRowCount() \u003e 0:\n\t\t\t\treturn int(ds.getValueAt(0, \"ID\"))\n\t\t\telse:\n\t\t\t\tlogger.info(\"WS-Check: no se encontró workstation para IP\u003d%s\" % ip)\n\t\t\t\treturn 0\n\t\n\t\texcept Exception as e:\n\t\t\tlogger.error(\"WS-Check error: %s\" % e)\n\t\t\treturn 0\n\telse:\n\t\treturn int(wkSelected or 0)",
             "type": "script"
           }
         ],
@@ -330,8 +319,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 931,
-      "width": 1539
+      "height": 870,
+      "width": 1924
     }
   },
   "root": {
@@ -427,7 +416,7 @@
                 "fontWeight": "normal",
                 "textAlign": "center"
               },
-              "value": null,
+              "value": 1,
               "wrapMultiSelectValues": false
             },
             "type": "ia.input.dropdown"
@@ -520,7 +509,7 @@
                 "fontWeight": "normal",
                 "textAlign": "center"
               },
-              "value": null,
+              "value": 2,
               "wrapMultiSelectValues": false
             },
             "type": "ia.input.dropdown"
@@ -597,7 +586,7 @@
                 "fontWeight": "normal",
                 "textAlign": "center"
               },
-              "value": null,
+              "value": 26,
               "wrapMultiSelectValues": false
             },
             "type": "ia.input.dropdown"
@@ -674,7 +663,7 @@
                 "fontWeight": "normal",
                 "textAlign": "center"
               },
-              "value": null,
+              "value": 35,
               "wrapMultiSelectValues": false
             },
             "type": "ia.input.dropdown"
@@ -751,7 +740,7 @@
                 "fontWeight": "normal",
                 "textAlign": "center"
               },
-              "value": 1,
+              "value": null,
               "wrapMultiSelectValues": false
             },
             "type": "ia.input.dropdown"
@@ -1193,7 +1182,7 @@
                     "props": {
                       "dismissOnSelect": false,
                       "format": "YYYY-MM-DD HH:mm:00",
-                      "formattedValue": "2025-09-15 16:00:00",
+                      "formattedValue": "2025-09-29 15:00:00",
                       "locale": "es",
                       "style": {
                         "borderBottomLeftRadius": 10,
@@ -1272,7 +1261,7 @@
                     "props": {
                       "dismissOnSelect": false,
                       "format": "YYYY-MM-DD HH:mm:ss",
-                      "formattedValue": "2025-09-15 16:00:00",
+                      "formattedValue": "2025-09-29 15:00:00",
                       "locale": "es",
                       "style": {
                         "classes": "Container/container_0",
@@ -2193,7 +2182,8 @@
                       "name": "FlexRepeater"
                     },
                     "position": {
-                      "basis": "100%"
+                      "basis": "100%",
+                      "shrink": 0
                     },
                     "propConfig": {
                       "props.instances": {
@@ -2207,9 +2197,6 @@
                     },
                     "props": {
                       "path": "Page/Embedded/Embedded_PAPO",
-                      "style": {
-                        "overflow": "hidden"
-                      },
                       "wrap": "wrap"
                     },
                     "type": "ia.display.flex-repeater"
@@ -2277,7 +2264,7 @@
           "name": "FlexContainer_Reports"
         },
         "position": {
-          "basis": "100vh",
+          "basis": "100%",
           "grow": 1
         },
         "props": {
@@ -2298,6 +2285,19 @@
         "classes": "container-borders-dautom-page",
         "overflow": "hidden"
       }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "refreshPeriodic",
+          "pageScope": false,
+          "script": "\n\tlogger \u003d system.util.getLogger(\"refreshPeriodic\")\n\t_min \u003d payload[\u0027min\u0027]\n\tself.view.custom.refreshPeriodic \u003d _min\n\tlogger.info(\"Overview_Papos/root/script refreshPeriodic ejecuted\")",
+          "sessionScope": true,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }

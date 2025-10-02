@@ -1,9 +1,12 @@
 {
   "custom": {
     "answers": {},
+    "fontSize": 17,
     "insights": "",
-    "refreshSecond": 3,
-    "registerTypeID": 1
+    "path": "[UNS]Clarios/Andina/Ensamble/Linea 1/UI/EA11-2201",
+    "refreshSecond": 53,
+    "registerTypeID": 1,
+    "user": "Mohamed Salah"
   },
   "params": {
     "applyButton": 1,
@@ -811,6 +814,8 @@
       "$ts": 1756308090000
     },
     "historyTagProvider": "ems",
+    "nodeID": 5,
+    "papoID": 3,
     "startTime": {
       "$": [
         "ts",
@@ -818,19 +823,13 @@
         1756331184109
       ],
       "$ts": 1754046000000
-    }
+    },
+    "workstationID": 1,
+    "workstationnodeID": 1
   },
   "propConfig": {
     "custom.answers": {
       "persistent": true
-    },
-    "custom.answers.control": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer4.custom.answers"
-        },
-        "type": "property"
-      }
     },
     "custom.answers.params": {
       "binding": {
@@ -840,6 +839,9 @@
         "type": "property"
       }
     },
+    "custom.fontSize": {
+      "persistent": true
+    },
     "custom.insights": {
       "binding": {
         "config": {
@@ -847,6 +849,9 @@
         },
         "type": "property"
       },
+      "persistent": true
+    },
+    "custom.path": {
       "persistent": true
     },
     "custom.refreshSecond": {
@@ -858,11 +863,26 @@
       },
       "onChange": {
         "enabled": null,
-        "script": "\tlistCustom \u003d [\n\t\t\"answers.params\",\n\t\t\"answers.control\"\n\t\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))"
+        "script": "\tlistCustom \u003d [\n\t\t\"answers.params\"\n\t\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))"
       },
       "persistent": true
     },
     "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.user": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.firstName"
+        },
+        "transforms": [
+          {
+            "expression": "{value} + \" \" +{session.props.auth.user.lastName}",
+            "type": "expression"
+          }
+        ],
+        "type": "property"
+      },
       "persistent": true
     },
     "params.applyButton": {
@@ -975,6 +995,14 @@
       "paramDirection": "input",
       "persistent": true
     },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
     "params.startTime": {
       "binding": {
         "config": {
@@ -989,6 +1017,14 @@
         ],
         "type": "property"
       },
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationnodeID": {
       "paramDirection": "input",
       "persistent": true
     }
@@ -1079,7 +1115,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\n    fc \u003d self.getSibling(\"FlexContainer3\")\n    fc.position.display \u003d not fc.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer4\").position.display \u003d False\n   "
+                "script": "\n    fc \u003d self.getSibling(\"FlexContainer3\")\n    fc.position.display \u003d not fc.position.display\n    \n \n   "
               },
               "scope": "G",
               "type": "script"
@@ -1119,11 +1155,19 @@
               ],
               "type": "property"
             }
+          },
+          "props.style.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
           }
         },
         "props": {
           "style": {},
-          "text": "Parámetros de operación y control proceso",
+          "text": "Parámetros de operación, control proceso y por atributo",
           "textStyle": {
             "textAlign": "center"
           }
@@ -1155,6 +1199,16 @@
               "basis": "-141.2%",
               "shrink": 0
             },
+            "propConfig": {
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              }
+            },
             "props": {
               "text": "Referencia hora/hora",
               "textStyle": {
@@ -1173,6 +1227,16 @@
                     },
                     "position": {
                       "basis": "32px"
+                    },
+                    "propConfig": {
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "align": "left",
@@ -1225,16 +1289,23 @@
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "22px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Presión de aire (100 ± 10 PSI)",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Presión de aire (100 ± 10 PSI)"
                     },
                     "type": "ia.display.label"
                   },
@@ -1256,6 +1327,14 @@
                         "binding": {
                           "config": {
                             "path": "this.props.value"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -1298,14 +1377,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Temperatura crisol",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Temperatura crisol [ºC]"
                     },
                     "type": "ia.display.label"
                   },
@@ -1330,6 +1416,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Temp_Crisol"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -1337,10 +1444,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -1370,15 +1473,24 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "color": "--neutral-80",
                         "paddingLeft": 0
                       },
-                      "text": "Temperatura moldes",
+                      "text": "Temperatura moldes [ºC]",
                       "textStyle": {
-                        "fontSize": 14,
-                        "textAlign": "center"
+                        "textAlign": ""
                       }
                     },
                     "type": "ia.display.label"
@@ -1390,17 +1502,24 @@
                           "name": "Label_1"
                         },
                         "position": {
-                          "basis": "29px"
+                          "basis": "40px"
+                        },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
                         },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "Izq:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "Izq:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1425,6 +1544,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Molde_Izq"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1432,10 +1572,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1460,17 +1596,24 @@
                           "name": "Label_3"
                         },
                         "position": {
-                          "basis": "29px"
+                          "basis": "40px"
+                        },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
                         },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "Der:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "Der:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1495,6 +1638,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Molde_Dere"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1502,10 +1666,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1518,7 +1678,6 @@
                       "basis": "32px"
                     },
                     "props": {
-                      "justify": "center",
                       "style": {
                         "overflow": "hidden"
                       }
@@ -1577,17 +1736,26 @@
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "60px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "style": {
                         "color": "--neutral-80",
                         "paddingLeft": 0
                       },
-                      "text": "Temp. manifold placa Casting/JCI",
+                      "text": "Temp. manifold placa Casting/JCI [ºC]",
                       "textStyle": {
-                        "fontSize": 14,
-                        "textAlign": "center"
+                        "fontWeight": "bold"
                       }
                     },
                     "type": "ia.display.label"
@@ -1601,15 +1769,22 @@
                         "position": {
                           "basis": "99px"
                         },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "2 a 6 Placas:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "2 a 6 Placas:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1634,6 +1809,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Manifold_JCI_2_6"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1641,10 +1837,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1654,7 +1846,7 @@
                           "name": "Label_4"
                         },
                         "position": {
-                          "basis": "150px"
+                          "basis": "50px"
                         },
                         "props": {
                           "style": {
@@ -1671,15 +1863,22 @@
                         "position": {
                           "basis": "107px"
                         },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "7 a 12 Placas:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "7 a 12 Placas:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1704,6 +1903,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Manifold_JCI_7_12"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1711,10 +1931,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1724,7 +1940,7 @@
                           "name": "Label_5"
                         },
                         "position": {
-                          "basis": "150px"
+                          "basis": "50px"
                         },
                         "props": {
                           "style": {
@@ -1741,15 +1957,22 @@
                         "position": {
                           "basis": "119px"
                         },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "13 a 17 Placas:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "13 a 17 Placas:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1774,6 +1997,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Manifold_JCI_13_17"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1781,10 +2025,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1820,7 +2060,7 @@
               "name": "FlexContainer_7"
             },
             "position": {
-              "basis": "60px",
+              "basis": "70px",
               "shrink": 0
             },
             "type": "ia.container.flex"
@@ -1849,7 +2089,17 @@
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "60px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "style": {
@@ -1857,10 +2107,9 @@
                         "color": "--neutral-80",
                         "paddingLeft": 0
                       },
-                      "text": "Temp. manifold placa SOV/COM",
+                      "text": "Temp. manifold placa SOV/COM [ºC]",
                       "textStyle": {
-                        "fontSize": 14,
-                        "fontWeight": "normal"
+                        "textAlign": "left"
                       }
                     },
                     "type": "ia.display.label"
@@ -1874,15 +2123,22 @@
                         "position": {
                           "basis": "99px"
                         },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "2 a 6 Placas:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "2 a 6 Placas:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1907,6 +2163,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Manifold_COM_2_6"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1914,10 +2191,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1927,7 +2200,7 @@
                           "name": "Label_4"
                         },
                         "position": {
-                          "basis": "150px"
+                          "basis": "50px"
                         },
                         "props": {
                           "style": {
@@ -1944,15 +2217,22 @@
                         "position": {
                           "basis": "107px"
                         },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "7 a 12 Placas:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "7 a 12 Placas:"
                         },
                         "type": "ia.display.label"
                       },
@@ -1977,6 +2257,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Manifold_COM_7_12"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -1984,10 +2285,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -1997,7 +2294,7 @@
                           "name": "Label_5"
                         },
                         "position": {
-                          "basis": "150px"
+                          "basis": "50px"
                         },
                         "props": {
                           "style": {
@@ -2014,15 +2311,22 @@
                         "position": {
                           "basis": "119px"
                         },
+                        "propConfig": {
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
                         "props": {
                           "style": {
                             "color": "--neutral-80",
                             "paddingLeft": 0
                           },
-                          "text": "13 a 17 Placas:",
-                          "textStyle": {
-                            "fontSize": 14
-                          }
+                          "text": "13 a 17 Placas:"
                         },
                         "type": "ia.display.label"
                       },
@@ -2047,6 +2351,27 @@
                               },
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Manifold_COM_13_17"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
@@ -2054,10 +2379,6 @@
                             "classes": "text-data-2",
                             "color": "#1199C7",
                             "paddingLeft": 0
-                          },
-                          "text": "Value",
-                          "textStyle": {
-                            "fontSize": 14
                           }
                         },
                         "type": "ia.display.label"
@@ -2093,7 +2414,7 @@
               "name": "FlexContainer_8"
             },
             "position": {
-              "basis": "60px",
+              "basis": "70px",
               "shrink": 0
             },
             "type": "ia.container.flex"
@@ -2114,6 +2435,21 @@
             "type": "ia.display.label"
           },
           {
+            "meta": {
+              "name": "Label_6"
+            },
+            "position": {
+              "basis": "15px",
+              "shrink": 0
+            },
+            "props": {
+              "textStyle": {
+                "fontWeight": "bold"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
             "children": [
               {
                 "children": [
@@ -2124,14 +2460,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Temperatura cabeza de molde",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Temperatura cabeza de molde [ºC]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2156,6 +2499,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Temp_Cabeza_Molde"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2163,10 +2527,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2176,7 +2536,7 @@
                   "name": "FlexContainer"
                 },
                 "position": {
-                  "basis": "36.2%"
+                  "basis": "35%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2196,14 +2556,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Temperatura cabeza de bomba",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Temperatura cabeza de bomba [ºC]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2228,6 +2595,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Temp_Cabeza_Bomba"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2235,10 +2623,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2248,7 +2632,7 @@
                   "name": "FlexContainer_0"
                 },
                 "position": {
-                  "basis": "34.6%"
+                  "basis": "35%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2266,16 +2650,23 @@
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "52px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Frecuencia bomba de dosificación",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Frecuencia bomba de dosificación [Hz]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2300,6 +2691,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Frec_Bomba_Dosi"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2307,10 +2719,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2320,7 +2728,7 @@
                   "name": "FlexContainer_1"
                 },
                 "position": {
-                  "basis": "28.5%"
+                  "basis": "22.6%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2336,8 +2744,14 @@
               "name": "FlexContainer_9"
             },
             "position": {
-              "basis": "60px",
+              "basis": "80px",
               "shrink": 0
+            },
+            "props": {
+              "alignItems": "flex-start",
+              "style": {
+                "overflow": "hidden"
+              }
             },
             "type": "ia.container.flex"
           },
@@ -2367,14 +2781,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Frecuencia normal bomba",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Frecuencia normal bomba [Hz]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2399,6 +2820,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Frec_Normal_Bomba"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2406,10 +2848,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2419,7 +2857,7 @@
                   "name": "FlexContainer"
                 },
                 "position": {
-                  "basis": "36.2%"
+                  "basis": "35%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2439,14 +2877,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo de dosificación",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Tiempo de dosificación [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2471,6 +2916,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiemp_Dosi"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2478,10 +2944,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2491,7 +2953,7 @@
                   "name": "FlexContainer_0"
                 },
                 "position": {
-                  "basis": "34.6%"
+                  "basis": "35%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2515,9 +2977,9 @@
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo de solidificación",
+                      "text": "Tiempo de solidificación [s]",
                       "textStyle": {
-                        "fontSize": 14
+                        "fontSize": 17
                       }
                     },
                     "type": "ia.display.label"
@@ -2543,6 +3005,19 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiempo_Soli"
+                          },
+                          "type": "tag"
+                        }
                       }
                     },
                     "props": {
@@ -2551,9 +3026,8 @@
                         "color": "#1199C7",
                         "paddingLeft": 20
                       },
-                      "text": "Value",
                       "textStyle": {
-                        "fontSize": 14
+                        "fontSize": 17
                       }
                     },
                     "type": "ia.display.label"
@@ -2610,14 +3084,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Retardo descenso de canastillas",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Retardo descenso de canastillas [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2642,6 +3123,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Retardo_Descenso_Canas"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2649,10 +3151,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2662,7 +3160,7 @@
                   "name": "FlexContainer"
                 },
                 "position": {
-                  "basis": "36.6%"
+                  "basis": "35%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2680,16 +3178,23 @@
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "60px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Temp secador de banderas sistema flux",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Temp secador de banderas sistema flux [ºC]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2714,6 +3219,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Temp_Seca_Bandera_Flux"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2721,10 +3247,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2734,7 +3256,7 @@
                   "name": "FlexContainer_0"
                 },
                 "position": {
-                  "basis": "34.8%"
+                  "basis": "35%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2752,16 +3274,23 @@
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "60px"
+                    },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
                     },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Conductividad de flux",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Conductividad de flux [mS/cm]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2786,6 +3315,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Conduc_Flux"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2793,10 +3343,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2806,7 +3352,7 @@
                   "name": "FlexContainer_1"
                 },
                 "position": {
-                  "basis": "23%"
+                  "basis": "27.4%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2822,7 +3368,7 @@
               "name": "FlexContainer_11"
             },
             "position": {
-              "basis": "60px",
+              "basis": "70px",
               "shrink": 0
             },
             "type": "ia.container.flex"
@@ -2853,14 +3399,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Tiempo aplicación flux banderas",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Tiempo aplicación flux banderas [s]"
                     },
                     "type": "ia.display.label"
                   },
@@ -2885,6 +3438,27 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "fallbackDelay": 2.5,
+                            "mode": "indirect",
+                            "references": {
+                              "1": "{view.custom.path}"
+                            },
+                            "tagPath": "{1}/Tiemp_Apli_Flux_Bandera"
+                          },
+                          "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2892,10 +3466,6 @@
                         "classes": "text-data-2",
                         "color": "#1199C7",
                         "paddingLeft": 20
-                      },
-                      "text": "Value",
-                      "textStyle": {
-                        "fontSize": 14
                       }
                     },
                     "type": "ia.display.label"
@@ -2925,14 +3495,21 @@
                     "position": {
                       "basis": "32px"
                     },
+                    "propConfig": {
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
                     "props": {
                       "style": {
                         "paddingLeft": 0
                       },
-                      "text": "Control de temp. agua enfriamiento molde (20 +3/-2 °C)",
-                      "textStyle": {
-                        "fontSize": 14
-                      }
+                      "text": "Control de temp. agua enfriamiento molde (20 +3/-2 °C)"
                     },
                     "type": "ia.display.label"
                   },
@@ -2957,6 +3534,14 @@
                           },
                           "type": "property"
                         }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
                       }
                     },
                     "props": {
@@ -2978,7 +3563,7 @@
                   "name": "FlexContainer_0"
                 },
                 "position": {
-                  "basis": "48.6%"
+                  "basis": "61%"
                 },
                 "props": {
                   "alignItems": "flex-start",
@@ -2998,127 +3583,14 @@
               "shrink": 0
             },
             "type": "ia.container.flex"
-          }
-        ],
-        "meta": {
-          "name": "FlexContainer3"
-        },
-        "position": {
-          "basis": "630px",
-          "grow": 1
-        },
-        "propConfig": {
-          "custom.answers": {
-            "binding": {
-              "config": {
-                "struct": {},
-                "waitOnAll": true
-              },
-              "transforms": [
-                {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
-            }
           },
-          "custom.refreshSecond": {
-            "binding": {
-              "config": {
-                "expression": "dateExtract(now(1000),\"second\")"
-              },
-              "type": "expr"
-            },
-            "onChange": {
-              "enabled": null,
-              "script": "\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\tfor path in listCustom:\n\t\tself.refreshBinding(\"custom.{}\".format(path))"
-            }
-          }
-        },
-        "props": {
-          "direction": "column",
-          "style": {
-            "backgroundColor": "",
-            "borderBottomLeftRadius": 15,
-            "borderBottomRightRadius": 15,
-            "borderTopLeftRadius": 15,
-            "borderTopRightRadius": 15,
-            "marginLeft": 10,
-            "marginRight": 10
-          }
-        },
-        "type": "ia.container.flex"
-      },
-      {
-        "events": {
-          "dom": {
-            "onClick": {
-              "config": {
-                "script": "\n    fc \u003d self.getSibling(\"FlexContainer4\")\n    fc.position.display \u003d not fc.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer3\").position.display \u003d False\n    "
-              },
-              "scope": "G",
-              "type": "script"
-            }
-          }
-        },
-        "meta": {
-          "name": "Label6"
-        },
-        "position": {
-          "basis": "40px",
-          "shrink": 0
-        },
-        "propConfig": {
-          "props.style.classes": {
-            "binding": {
-              "config": {
-                "path": "../FlexContainer4.position.display"
-              },
-              "transforms": [
-                {
-                  "fallback": "button-questions",
-                  "inputType": "scalar",
-                  "mappings": [
-                    {
-                      "input": true,
-                      "output": "button-questions"
-                    },
-                    {
-                      "input": false,
-                      "output": "button-questions-2"
-                    }
-                  ],
-                  "outputType": "scalar",
-                  "type": "map"
-                }
-              ],
-              "type": "property"
-            }
-          }
-        },
-        "props": {
-          "style": {},
-          "text": "Control por atributo",
-          "textStyle": {
-            "textAlign": "center"
-          }
-        },
-        "type": "ia.display.label"
-      },
-      {
-        "children": [
           {
             "meta": {
-              "name": "Label_5"
+              "name": "Label"
             },
             "position": {
-              "basis": "15px"
-            },
-            "props": {
-              "textStyle": {
-                "fontWeight": "bold"
-              }
+              "basis": "32px",
+              "shrink": 0
             },
             "type": "ia.display.label"
           },
@@ -3127,13 +3599,23 @@
               "name": "Label_7"
             },
             "position": {
-              "basis": "15px"
+              "basis": "40px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              }
             },
             "props": {
               "text": "Marque las casillas que cumplan",
               "textStyle": {
-                "fontWeight": "bold",
-                "textAlign": "center"
+                "fontWeight": "bold"
               }
             },
             "type": "ia.display.label"
@@ -3153,13 +3635,39 @@
                       "name": "Checkbox"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3181,13 +3689,39 @@
                       "name": "Checkbox_0"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3209,13 +3743,39 @@
                       "name": "Checkbox_1"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3237,13 +3797,35 @@
                       "name": "Checkbox_2"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "No cumple",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3265,13 +3847,35 @@
                       "name": "Checkbox_3"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "No cumple",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3287,7 +3891,7 @@
                   "name": "FlexContainer"
                 },
                 "position": {
-                  "basis": "70%"
+                  "basis": "50%"
                 },
                 "props": {
                   "direction": "column"
@@ -3307,13 +3911,35 @@
                       "name": "Checkbox"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "No cumple",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3335,13 +3961,35 @@
                       "name": "Checkbox_0"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "No cumple",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3363,13 +4011,35 @@
                       "name": "Checkbox_1"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "No cumple",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3391,13 +4061,35 @@
                       "name": "Checkbox_3"
                     },
                     "position": {
-                      "basis": "56px"
+                      "basis": "40px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "No cumple",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
                           },
                           "type": "property"
                         }
@@ -3425,19 +4117,19 @@
               "name": "FlexContainer_2"
             },
             "position": {
-              "basis": "300px",
+              "basis": "200px",
               "shrink": 0
             },
             "type": "ia.container.flex"
           }
         ],
         "meta": {
-          "name": "FlexContainer4"
+          "name": "FlexContainer3"
         },
         "position": {
-          "basis": "630px",
+          "basis": "670px",
           "display": false,
-          "grow": 1
+          "shrink": 0
         },
         "propConfig": {
           "custom.answers": {
@@ -3448,7 +4140,7 @@
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
                   "type": "script"
                 }
               ],
@@ -3476,7 +4168,7 @@
             "borderBottomRightRadius": 15,
             "borderTopLeftRadius": 15,
             "borderTopRightRadius": 15,
-            "marginLeft": 10,
+            "marginLeft": 15,
             "marginRight": 10
           }
         },
@@ -3543,7 +4235,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
+                    "script": "\t\n\talerts.showAlert(state\u003d\"warning\", title\u003d\"Guardar registro\", message\u003d\"Esta seguro de que desea guardar el registro de inicio de turno?\", \n\tbtnTextPrimary\u003d\"Si\", btnTextSecondary\u003d\"No\", btnActionPrimary\u003d\"saveHourRegister-2201-linea1\")\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshOnAction\", \n\t    payload\u003d{\"status\": True},\n\t    scope\u003d\"session\"\n\t)\n\t\n"
                   },
                   "scope": "G",
                   "type": "script"
@@ -3568,6 +4260,19 @@
               },
               "text": "Guardar"
             },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "saveHourRegister-2201-linea1",
+                  "pageScope": true,
+                  "script": "\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\n\n\t\n\t\n\tlistCustom \u003d [\n\n\t\t\"answers.params\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\n\tanswerParams \u003d self.view.custom.answers.params\n\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY RegisterCode DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tstatus \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\n\tinsert_answer(1, system.util.jsonEncode(answerParams),regCode)  \n\n\t\n\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshPeriodic\", \n\t    payload\u003d{\"min\": 0,},\n\t    scope\u003d\"session\"\n\t)",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
             "type": "ia.input.button"
           },
           {
@@ -3575,7 +4280,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\t\n\tself.view.params.applyButton \u003d 1"
+                    "script": "\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)"
                   },
                   "scope": "G",
                   "type": "script"
@@ -3632,8 +4337,7 @@
     "props": {
       "direction": "column",
       "style": {
-        "classes": "container-borders-dautom-widget",
-        "overflow": "hidden"
+        "classes": "container-borders-dautom-widget"
       }
     },
     "type": "ia.container.flex"
