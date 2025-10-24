@@ -1,0 +1,124 @@
+{
+  "custom": {},
+  "params": {
+    "TagPath": "[uns]VIC/Manufacturing/Electrode Anode/Mixing Anode"
+  },
+  "propConfig": {
+    "params.TagPath": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 178,
+      "width": 991
+    },
+    "dropConfig": {
+      "udts": [
+        {
+          "action": "bind",
+          "param": "",
+          "type": "room"
+        }
+      ]
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Gauge"
+        },
+        "position": {
+          "basis": "320px"
+        },
+        "propConfig": {
+          "props.params.Path": {
+            "binding": {
+              "config": {
+                "path": "view.params.TagPath"
+              },
+              "type": "property"
+            }
+          },
+          "props.params.Tag": {
+            "binding": {
+              "config": {
+                "path": "view.params.TagPath"
+              },
+              "transforms": [
+                {
+                  "code": "\tpathTag \u003d value\n\telectrodeType \u003d \"Cathode\" if \"Cathode\" in pathTag else \"Anode\"\n\t\n\t# Configuración según el tipo de electrodo\n\tif electrodeType \u003d\u003d \"Cathode\":\n\t\treturn \"ProcessMixing/SlurryPdMixer/Temperature/Act_Value\"\n\t\t# Configuración según el tipo de electrodo\n\telif electrodeType \u003d\u003d \"Anode\":\n\t\treturn \"ProcessMixing/SlurryPdMixer1/Temperature/Act_Value\"",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "path": "Node/MixingDashboard/RoomParam/GaugeTT"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Gauge_0"
+        },
+        "position": {
+          "basis": "320px"
+        },
+        "propConfig": {
+          "props.params.Path": {
+            "binding": {
+              "config": {
+                "path": "view.params.TagPath"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "params": {
+            "Tag": "ProcessMixing/SlurryPdMixer/Vacuum/Act_Pressure"
+          },
+          "path": "Node/MixingDashboard/RoomParam/GaugePT"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Gauge_1"
+        },
+        "position": {
+          "basis": "320px"
+        },
+        "propConfig": {
+          "props.params.Path": {
+            "binding": {
+              "config": {
+                "path": "view.params.TagPath"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "params": {
+            "Tag": "DP"
+          },
+          "path": "Node/MixingDashboard/RoomParam/GaugeDP"
+        },
+        "type": "ia.display.view"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "wrap": "wrap"
+    },
+    "type": "ia.container.flex"
+  }
+}

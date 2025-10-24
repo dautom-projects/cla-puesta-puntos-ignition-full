@@ -1,0 +1,226 @@
+{
+  "custom": {},
+  "params": {
+    "Path": "ProcessMixing/SlurryPdMixer/Temperature/Act_Value",
+    "Tag": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode"
+  },
+  "propConfig": {
+    "params.Path": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.Tag": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 184,
+      "width": 318
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Gauge"
+        },
+        "position": {
+          "height": 175,
+          "width": 300
+        },
+        "propConfig": {
+          "props.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "Path": "{view.params.Path}",
+                  "Tag": "{view.params.Tag}"
+                },
+                "tagPath": "{Path}/{Tag}"
+              },
+              "transforms": [
+                {
+                  "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                  "type": "script"
+                }
+              ],
+              "type": "tag"
+            }
+          }
+        },
+        "props": {
+          "backgroundColor": "",
+          "innerAxis": {
+            "data": "secondaryValue",
+            "maxValue": 80,
+            "percentRadius": 85,
+            "show": false,
+            "width": 1
+          },
+          "outerAxis": {
+            "color": "#C0C0C000",
+            "data": "value",
+            "maxValue": 40,
+            "needle": {
+              "origin": 80
+            },
+            "percentRadius": 100,
+            "ranges": [
+              {
+                "color": "#FF0000",
+                "end": 10,
+                "start": 0,
+                "width": 8
+              },
+              {
+                "color": "#FF0000",
+                "end": 40,
+                "start": 30,
+                "width": 8
+              },
+              {
+                "color": "#FF8C00",
+                "end": 15,
+                "start": 10,
+                "width": 8
+              },
+              {
+                "color": "#FF8C00",
+                "end": 30,
+                "start": 25,
+                "width": 8
+              },
+              {
+                "color": "#00D900",
+                "end": 25,
+                "start": 15,
+                "width": 8
+              }
+            ],
+            "show": true,
+            "tickMarks": {
+              "length": 5
+            },
+            "width": 0
+          },
+          "style": {
+            "fontSize": 8
+          }
+        },
+        "type": "ia.chart.gauge"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "height": 32,
+          "width": 50,
+          "x": 103,
+          "y": 87.5
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "Path": "{view.params.Path}",
+                  "Tag": "{view.params.Tag}"
+                },
+                "tagPath": "{Path}/{Tag}"
+              },
+              "transforms": [
+                {
+                  "formatType": "numeric",
+                  "formatValue": "0.0",
+                  "type": "format"
+                },
+                {
+                  "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                  "type": "script"
+                }
+              ],
+              "type": "tag"
+            }
+          }
+        },
+        "props": {
+          "textStyle": {
+            "fontSize": 20,
+            "textAlign": "right"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "height": 32,
+          "width": 50,
+          "x": 154,
+          "y": 87.5
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "indirect",
+                "references": {
+                  "Path": "{view.params.Path}",
+                  "Tag": "{view.params.Tag}"
+                },
+                "tagPath": "{Path}/{Tag}.EngUnit"
+              },
+              "transforms": [
+                {
+                  "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                  "type": "script"
+                }
+              ],
+              "type": "tag"
+            }
+          }
+        },
+        "props": {
+          "textStyle": {
+            "fontSize": 20,
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "height": 32,
+          "width": 106,
+          "x": 97,
+          "y": 119.5
+        },
+        "props": {
+          "text": "Temperature",
+          "textStyle": {
+            "color": "#D5D5D5",
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "type": "ia.container.coord"
+  }
+}

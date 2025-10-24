@@ -1,0 +1,83 @@
+{
+  "custom": {
+    "defectMap": [
+      "Defect Id",
+      "Alarm Level",
+      "Position",
+      "Class Id"
+    ]
+  },
+  "params": {
+    "key": {
+      "id": {
+        "desc": "MH:",
+        "val": "00000"
+      }
+    }
+  },
+  "propConfig": {
+    "custom.defectMap": {
+      "persistent": true
+    },
+    "params.key": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 82,
+      "width": 247
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "FlexRepeater_TankMetric"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.instances": {
+            "binding": {
+              "config": {
+                "path": "view.params.key"
+              },
+              "transforms": [
+                {
+                  "code": "\t\"\"\"\n\tBuild a list of instance objects from the bound params dictionary.\n\n\tParameters:\n\t\tvalue (dict-like): Parameter mapping object (bound via property binding),\n\t\t\twith keys mapping to objects containing \u0027desc\u0027, \u0027uom\u0027, and \u0027val\u0027.\n\t\tquality: Unused parameter.\n\t\ttimestamp: Unused parameter.\n\n\tReturns:\n\t\tlist of dict: Dynamically generated instances.\n\t\"\"\"\n\tinstances \u003d []\n\n\t# Iterate through each parameter entry\n\tfor key, info in value.items():\n\t\t# Duck-type check for mapping-like with get and key membership\n\t\tif hasattr(info, \u0027get\u0027) and \u0027desc\u0027 in info and \u0027val\u0027 in info:\n\t\t\tinstances.append({\n\t\t\t\t\u0027instanceStyle\u0027: {\u0027classes\u0027: \u0027\u0027},\n\t\t\t\t\u0027instancePosition\u0027: {},\n\t\t\t\t\u0027item\u0027: {\n\t\t\t\t\t\u0027desc\u0027: info[\u0027desc\u0027],\n\t\t\t\t\t\u0027uom\u0027: info.get(\u0027uom\u0027, \u0027\u0027),\n\t\t\t\t\t\u0027value\u0027: info[\u0027val\u0027],\n\t\t\t\t}\n\t\t\t})\n\n\treturn instances",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "elementStyle": {
+            "classes": "ml-2 px-2 py-1 rounded text-xs font-medium bg-[--neutral-10]"
+          },
+          "path": "Node/MixingDashboard/ItemID",
+          "style": {
+            "overflow": "hidden"
+          },
+          "useDefaultViewHeight": false,
+          "useDefaultViewWidth": false
+        },
+        "type": "ia.display.flex-repeater"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
