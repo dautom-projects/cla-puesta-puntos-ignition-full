@@ -4,7 +4,7 @@
     "fontSize": 17,
     "insights": "",
     "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
-    "refreshSecond": 21,
+    "refreshSecond": 48,
     "registerTypeID": 3,
     "test": {
       "items": [
@@ -30,17 +30,17 @@
         },
         {
           "answer": "No Cumple",
-          "papoItemID": 5625,
+          "papoItemID": 6805,
           "registerTypeID": 3
         },
         {
           "answer": "No Cumple",
-          "papoItemID": 5626,
+          "papoItemID": 6807,
           "registerTypeID": 3
         },
         {
           "answer": "No Cumple",
-          "papoItemID": 5627,
+          "papoItemID": 6809,
           "registerTypeID": 3
         },
         {
@@ -55,7 +55,7 @@
         },
         {
           "answer": "No Cumple",
-          "papoItemID": 5630,
+          "papoItemID": 6811,
           "registerTypeID": 3
         },
         {
@@ -70,7 +70,7 @@
         },
         {
           "answer": "No Cumple",
-          "papoItemID": 5633,
+          "papoItemID": 6813,
           "registerTypeID": 3
         },
         {
@@ -100,9 +100,9 @@
             "$": [
               "ts",
               192,
-              1759359021466
+              1760638008368
             ],
-            "$ts": 1759359021466
+            "$ts": 1760638008368
           },
           "user": "Mohamed Salah"
         }
@@ -226,9 +226,9 @@
           "style": {
             "classes": "text-titles"
           },
-          "text": "FORMULARIO INICIO DE TURNO",
+          "text": "FORMULARIO CADA 30 MINUTOS",
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -683,7 +683,7 @@
                   {
                     "custom": {
                       "item": {
-                        "papoItemID": 5625
+                        "papoItemID": 6805
                       }
                     },
                     "meta": {
@@ -756,7 +756,7 @@
                   {
                     "custom": {
                       "item": {
-                        "papoItemID": 5626
+                        "papoItemID": 6807
                       }
                     },
                     "meta": {
@@ -845,14 +845,14 @@
                   {
                     "custom": {
                       "item": {
-                        "papoItemID": 5627
+                        "papoItemID": 6809
                       }
                     },
                     "meta": {
                       "name": "Checkbox5"
                     },
                     "position": {
-                      "basis": "297px",
+                      "basis": "625px",
                       "shrink": 0
                     },
                     "propConfig": {
@@ -1120,7 +1120,7 @@
                   {
                     "custom": {
                       "item": {
-                        "papoItemID": 5630
+                        "papoItemID": 6811
                       }
                     },
                     "meta": {
@@ -1350,7 +1350,7 @@
                   {
                     "custom": {
                       "item": {
-                        "papoItemID": 5633
+                        "papoItemID": 6813
                       }
                     },
                     "meta": {
@@ -1752,6 +1752,7 @@
             },
             "position": {
               "basis": "649px",
+              "display": false,
               "shrink": 0
             },
             "props": {
@@ -1771,13 +1772,13 @@
           }
         ],
         "custom": {
-          "baseBasisPx": 180
+          "baseBasisPx": 80
         },
         "meta": {
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "829px",
+          "basis": "80px",
           "shrink": 0
         },
         "propConfig": {
@@ -1830,7 +1831,7 @@
         },
         "position": {
           "basis": "32px",
-          "shrink": 0
+          "grow": 1
         },
         "type": "ia.display.label"
       },
@@ -1864,6 +1865,8 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -1963,7 +1966,9 @@
       "direction": "column",
       "style": {
         "classes": "container-borders-dautom-widget",
-        "overflow": "scroll"
+        "marginLeft": 10,
+        "overflow": "scroll",
+        "paddingLeft": 10
       }
     },
     "scripts": {
@@ -1990,7 +1995,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")",
+          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
           "sessionScope": false,
           "viewScope": false
         }

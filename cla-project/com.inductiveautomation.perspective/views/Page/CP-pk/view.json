@@ -1,0 +1,1050 @@
+{
+  "custom": {
+    "dbConnection": "papo_db",
+    "dropdownArea": {},
+    "dropdownEnterprise": {},
+    "dropdownFormat": {},
+    "dropdownLine": {},
+    "dropdownSite": {},
+    "formats": [
+      {
+        "action": "Idle",
+        "minutesSince": 15591,
+        "name": "Mezcladoras",
+        "nodeID": 35,
+        "papoID": 25,
+        "reference": "MZ11-0101",
+        "status": "Sin Iniciar",
+        "timestamp": "2025-10-10 15:00:57",
+        "user": "operator",
+        "workstationID": 13,
+        "workstationnodeID": 18
+      },
+      {
+        "action": "Firma",
+        "minutesSince": 6980,
+        "name": "Control de Proceso Mezcladora (Preparacion de Pasta)",
+        "nodeID": 35,
+        "papoID": 26,
+        "reference": "MZ07-0101",
+        "status": "Revisado",
+        "timestamp": "2025-10-16 14:31:06",
+        "user": "NA",
+        "workstationID": 13,
+        "workstationnodeID": 18
+      }
+    ],
+    "instance": [],
+    "parentPath": "",
+    "refreshOnAction": true,
+    "refreshPeriodic": 16,
+    "tag": "",
+    "userRol": "Administrator",
+    "viewOn": false,
+    "workstationID": 0
+  },
+  "params": {
+    "pageTitle": "Metricas"
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "persistent": true
+    },
+    "custom.dropdownArea": {
+      "persistent": true
+    },
+    "custom.dropdownArea.ds": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "parentID": "{view.custom.dropdownSite.idSelected}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\tparentID \u003d value[\"parentID\"]\n\t\n\tif parentID !\u003d None:\t\t\n\t\twhereParent \u003d \"AND ParentNodeID \u003d {}\".format(parentID)\n\telse:\n\t\twhereParent \u003d \"\"\n\t\n\tquery \u003d \"\"\"\tSELECT ID, Name FROM node WHERE Type \u003d ? {}\t\"\"\".format(whereParent)\n\targs \u003d [\"AREA\"]\t\n\tds \u003d system.db.runPrepQuery(query, args, db)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.dropdownArea.idSelected": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Area.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.refreshOnAction \u003d True"
+      }
+    },
+    "custom.dropdownEnterprise": {
+      "persistent": true
+    },
+    "custom.dropdownEnterprise.ds": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\t\n\tquery \u003d \"\"\"\n\t\n\tSELECT ID, Name FROM node WHERE Type \u003d ?\n\t\n\t\"\"\"\n\targs \u003d [\"ENTERPRISE\"]\n\t\n\tds \u003d system.db.runPrepQuery(query, args, db)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.dropdownEnterprise.idSelected": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Enterprise.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.refreshOnAction \u003d True"
+      }
+    },
+    "custom.dropdownFormat": {
+      "persistent": true
+    },
+    "custom.dropdownFormat.ds": {
+      "binding": {
+        "config": {
+          "struct": {
+            "areaID": "{view.custom.dropdownArea.idSelected}",
+            "db": "{view.custom.dbConnection}",
+            "lineID": "{view.custom.dropdownLine.idSelected}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\tlineID \u003d value[\"lineID\"]\n\tareaID \u003d value[\"areaID\"]\n\t\n\twhere \u003d \"WHERE 1\u003d1\"\n\t\n\tif lineID !\u003d None:\t\t\n\t\twhere +\u003d \"AND np.NodeID \u003d {}\".format(int(lineID))\n\tif areaID !\u003d None:\t\t\n\t\twhere +\u003d \"AND n.ParentNodeID \u003d {}\".format(int(areaID))\n\t\n\tquery \u003d \"\"\"\tSELECT DISTINCT\n\t\t\t\t    p.ID,\n\t\t\t\t    p.Reference as Name\n\t\t\t\tFROM nodepapo AS np\n\t\t\t\tLEFT JOIN papo AS p\n\t\t\t\t    ON p.ID \u003d np.PapoID\n\t\t\t\tLEFT JOIN node AS n\n\t\t\t\t    ON n.ID \u003d np.NodeID\n\t\t\t\t{}\n\t\t\t\t\"\"\".format(where)\n\t\t\t\t\n\tds \u003d system.db.runQuery(query, db)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.dropdownFormat.idSelected": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Format.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.refreshOnAction \u003d True"
+      }
+    },
+    "custom.dropdownLine": {
+      "persistent": true
+    },
+    "custom.dropdownLine.ds": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "parentID": "{view.custom.dropdownArea.idSelected}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\tparentID \u003d value[\"parentID\"]\n\t\n\tif parentID !\u003d None:\t\t\n\t\twhereParent \u003d \"AND ParentNodeID \u003d {}\".format(parentID)\n\telse:\n\t\twhereParent \u003d \"\"\n\t\n\tquery \u003d \"\"\"\tSELECT ID, Name FROM node WHERE Type \u003d ? {}\t\"\"\".format(whereParent)\n\targs \u003d [\"LINE\"]\t\n\tds \u003d system.db.runPrepQuery(query, args, db)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.dropdownLine.idSelected": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Line.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.refreshOnAction \u003d True"
+      }
+    },
+    "custom.dropdownSite": {
+      "persistent": true
+    },
+    "custom.dropdownSite.ds": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "parentID": "{view.custom.dropdownEnterprise.idSelected}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\tparentID \u003d value[\"parentID\"]\n\t\n\tif parentID !\u003d None:\t\t\n\t\twhereParent \u003d \"AND ParentNodeID \u003d {}\".format(parentID)\n\telse:\n\t\twhereParent \u003d \"\"\n\t\n\tquery \u003d \"\"\"\tSELECT ID, Name FROM node WHERE Type \u003d ? {}\t\"\"\".format(whereParent)\t\n\targs \u003d [\"SITE\"]\t\n\tds \u003d system.db.runPrepQuery(query, args, db)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.dropdownSite.idSelected": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Site.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.refreshOnAction \u003d True"
+      }
+    },
+    "custom.formats": {
+      "binding": {
+        "config": {
+          "struct": {
+            "areID": "{view.custom.dropdownArea.idSelected}",
+            "db": "{view.custom.dbConnection}",
+            "entID": "{view.custom.dropdownEnterprise.idSelected}",
+            "linID": "{view.custom.dropdownLine.idSelected}",
+            "rol": "{/root/Filters.position.display}",
+            "sitID": "{view.custom.dropdownSite.idSelected}",
+            "wksID": "{view.custom.workstationID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tenterpriseId  \u003d value[\"entID\"]\n\tsiteId        \u003d value[\"sitID\"]\n\tareaId        \u003d value[\"areID\"]\n\tlineId        \u003d value[\"linID\"]\n\tworkstationId \u003d value[\"wksID\"]\n\trol           \u003d value[\"rol\"]\n\tdb            \u003d value[\"db\"]\n\t\n\t# Si el rol es false y el workstationId es 0, retornar una lista vacía\n\tif rol \u003d\u003d \"false\" and workstationId \u003d\u003d 0:\n\t    return []\n\t\n\t# WHERE simple (agrega solo lo que sea \"truthy\": None/0/\"\" NO filtran)\n\twhere \u003d \"WHERE 1\u003d1\"\n\tif workstationId:\n\t    where +\u003d \" AND ws.ID \u003d {}\".format(int(workstationId))\n\tif enterpriseId:\n\t    where +\u003d \" AND entN.ID \u003d {}\".format(int(enterpriseId))\n\tif siteId:\n\t    where +\u003d \" AND siteN.ID \u003d {}\".format(int(siteId))\n\tif areaId:\n\t    where +\u003d \" AND areaN.ID \u003d {}\".format(int(areaId))\n\tif lineId:\n\t    where +\u003d \" AND lineN.ID \u003d {}\".format(int(lineId))\n\t\n\tquery \u003d \"\"\"\n\tSELECT \n\t    ws.ID AS WorkstationID, \n\t    wsn.ID AS WorkstationNodeID, \n\t    n.ID AS NodeID, \n\t    p.ID AS PapoID, \n\t    p.Description AS PapoName, \n\t    p.Reference AS Reference, \n\t    -- Acción: del último item del JSON (si existe), si no, la del RegisterType de la fila \n\t    COALESCE(lastRH.SourceAction, lastRH.FallbackAction) AS Action, \n\t\n\t    lastRH.[User] AS [User], \n\t    lastRH.[Timestamp] AS [Timestamp], \n\t    lastRH.[Status] AS [Status], \n\t    lastRH.SourceRegisterTypeID, \n\t    lastRH.RegisterCode, -- Agregamos registerCode para obtener el último \n\t    DATEDIFF(MINUTE, lastRH.[Timestamp], GETDATE()) AS MinutesSince\n\t\n\tFROM workstation ws \n\tJOIN workstationnode wsn ON wsn.WorkstationID \u003d ws.ID \n\tJOIN node n ON n.ID \u003d wsn.NodeID\n\t\n\t-- Jerarquía por Type (para filtros)\n\tLEFT JOIN node lineN ON lineN.Type \u003d \u0027LINE\u0027 \n\t    AND lineN.ID \u003d CASE \n\t        WHEN n.Type \u003d \u0027LINE\u0027 THEN n.ID \n\t        WHEN n.Type \u003d \u0027CELL\u0027 THEN n.ParentNodeID \n\t        ELSE NULL \n\t    END\n\tLEFT JOIN node areaN ON areaN.Type \u003d \u0027AREA\u0027 \n\t    AND areaN.ID \u003d CASE WHEN lineN.ID IS NOT NULL THEN lineN.ParentNodeID ELSE NULL END\n\tLEFT JOIN node siteN ON siteN.Type \u003d \u0027SITE\u0027 \n\t    AND siteN.ID \u003d CASE WHEN areaN.ID IS NOT NULL THEN areaN.ParentNodeID ELSE NULL END\n\tLEFT JOIN node entN ON entN.Type \u003d \u0027ENTERPRISE\u0027 \n\t    AND entN.ID \u003d CASE WHEN siteN.ID IS NOT NULL THEN siteN.ParentNodeID ELSE NULL END\n\t\n\t-- Relación Papo ↔ Node \n\tJOIN nodepapo np ON np.NodeID \u003d n.ID \n\tJOIN papo p ON p.ID \u003d np.PapoID\n\t\n\t-- Último registro + último registerTypeID del JSON\n\tOUTER APPLY (\n\t    SELECT TOP (1)\n\t        rh.[User], \n\t        rh.[Timestamp], \n\t        rh.[Status], \n\t        \n\t        -- Fallback: descripción del RegisterTypeID de la fila \n\t        rt.[Description] AS FallbackAction,\n\t\n\t        -- Del JSON: último items[].registerTypeID\n\t        js.SourceRegisterTypeID, \n\t        rts.[Description] AS SourceAction,\n\t\n\t        -- Incluir el registerCode\n\t        rh.RegisterCode\n\t\n\t    FROM registerhistory rh \n\t    JOIN registertype rt ON rt.ID \u003d rh.RegisterTypeID \n\t    OUTER APPLY (\n\t        SELECT TOP(1)\n\t            TRY_CAST(JSON_VALUE(j.value, \u0027$.registerTypeID\u0027) AS INT) AS SourceRegisterTypeID \n\t        FROM OPENJSON(rh.DataAnswer, \u0027$.items\u0027) AS j \n\t        ORDER BY j.[key] DESC\n\t    ) js \n\t    LEFT JOIN registertype rts ON rts.ID \u003d js.SourceRegisterTypeID \n\t    WHERE rh.WorkstationNodeID \u003d wsn.ID \n\t      AND rh.PapoID \u003d p.ID \n\t    ORDER BY rh.RegisterCode DESC, rh.[Timestamp] DESC\n\t) AS lastRH\n\t\n\t{where};\n\t\"\"\".format(where\u003dwhere)\n\t\n\tds \u003d system.db.runQuery(query, db)\n\t\n\trows \u003d []\n\tif ds:\n\t    for i in range(ds.getRowCount()):\n\t        ts \u003d ds.getValueAt(i, \"Timestamp\")\n\t        ts_str \u003d system.date.format(ts, \"yyyy-MM-dd HH:mm:ss\") if ts is not None else None\n\t        rows.append({\n\t            \"workstationID\":       ds.getValueAt(i, \"WorkstationID\"),\n\t            \"workstationnodeID\":   ds.getValueAt(i, \"WorkstationNodeID\"),\n\t            \"nodeID\":              ds.getValueAt(i, \"NodeID\"),\n\t            \"papoID\":              ds.getValueAt(i, \"PapoID\"),\n\t            \"name\":                ds.getValueAt(i, \"PapoName\"),\n\t            \"reference\":           ds.getValueAt(i, \"Reference\"),\n\t            \"action\":              ds.getValueAt(i, \"Action\"),\n\t            \"status\":              ds.getValueAt(i, \"Status\"),\n\t            \"user\":                ds.getValueAt(i, \"User\"),\n\t            \"timestamp\":           ts_str,\n\t            \"minutesSince\":        int(ds.getValueAt(i, \"MinutesSince\") or 0),\n\t        })\n\t\n\t    # Ordenar de más a menos por MinutesSince\n\t    rows.sort(key\u003dlambda x: x[\"minutesSince\"], reverse\u003dTrue)\n\t\n\treturn rows",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.instance": {
+      "binding": {
+        "config": {
+          "path": "view.custom.parentPath"
+        },
+        "transforms": [
+          {
+            "code": "\n\t\"\"\"\n\tvalue → parentPath recibido del binding\n\tRetorna una lista de instancias para el Flex Repeater,\n\tuna por cada UDT dentro del path.\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tresults \u003d system.tag.browse(value).getResults()\n\tinstances \u003d []\n\n\tfor tag in results:\n\t\tif str(tag[\"tagType\"]) \u003d\u003d \"UdtInstance\":\n\t\t\tudt_name \u003d tag[\"name\"] or \"\"\n\t\t\tudt_path \u003d \"%s/%s\" % (value, udt_name)\n\t\t\t\n\t\t\t# Construimos paths completos a CpK y PpK\n\t\t\tcpk_path \u003d udt_path + \"/CpK\"\n\t\t\tcpp_path \u003d udt_path + \"/PpK\"\n\n\t\t\ttry:\n\t\t\t\tvalues \u003d system.tag.readBlocking([cpk_path, cpp_path])\n\t\t\t\tcpk \u003d values[0].value if values[0].quality.isGood() else 0\n\t\t\t\tcpp \u003d values[1].value if values[1].quality.isGood() else 0\n\t\t\texcept:\n\t\t\t\tcpk, cpp \u003d 0, 0\n\n\t\t\t# Reemplazar None por 0 si los valores no existen\n\t\t\tcpk \u003d cpk if cpk is not None else 0\n\t\t\tcpp \u003d cpp if cpp is not None else 0\n\n\t\t\tinstance \u003d {\n\t\t\t\t\"instanceStyle\": {\"classes\": \"\"},\n\t\t\t\t\"instancePosition\": {},\n\t\t\t\t\"cpk\": cpk,\n\t\t\t\t\"cpp\": cpp,\n\t\t\t\t\"fontZise\": 14,\n\t\t\t\t\"name\": udt_name\n\t\t\t}\n\n\t\t\tinstances.append(instance)\n\n\treturn instances",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.parentPath": {
+      "binding": {
+        "config": {
+          "struct": {
+            "nodeID": "{view.custom.dropdownLine.idSelected}",
+            "tag": "{view.custom.tag}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tnodeID \u003d value [\u0027nodeID\u0027]\n\t\tdb \u003d self.custom.dbConnection\n\t\tquery \u003d \u0027\u0027\u0027\n\t\t\tSELECT\n\t\t\t\tTopic\n\t\t\tFROM\n\t\t\t\tnode\n\t\t\tWHERE\n\t\t\t\tID \u003d ?\n\t\t\u0027\u0027\u0027\n\t\targs \u003d [nodeID]\n\t\tds \u003d system.db.runPrepQuery(query, args, db \u003d db)\n\t\tpath \u003d ds.getValueAt(0,0)\n\t\tif path.find(\u0027Cominco\u0027):\n\t\t\tpath \u003d path.replace(\u0027ME Cominco\u0027,\u0027Cominco\u0027)\n\t\tif path.find(\u0027Rejilladora\u0027):\n\t\t\tpath \u003d path.replace(\u0027Rejilladora\u0027,\u0027Rejilladoras\u0027)\n\t\tparentPath \u003d \u0027[UNS]\u0027+path+\u0027/UI/\u0027+self.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"PowerChart\").custom.enabledReferences[0].form+\u0027/CPK/\u0027+ value[\u0027tag\u0027]\n\t\treturn parentPath\n\texcept:\n\t\treturn \u0027\u0027",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.refreshOnAction": {
+      "onChange": {
+        "enabled": null,
+        "script": "\timport time\n\tstatusView \u003d self.custom.viewOn\n\tif statusView:\n\t\ttime.sleep(1)\n\t\t\t\n\t\tlistCustom \u003d [\n\t\t    \n\t\t    \n\t\t    \"userRol\",\n\t\t    \"dropdownEnterprise.ds\",\n\t\t    \"dropdownSite.ds\",\n\t\t    \"dropdownArea.ds\",\n\t\t    \"dropdownLine.ds\",\n\t\t    \"workstationID\"\n\t\t    \n\t\t]\n\t\tfor path in listCustom:\n\t\t    self.view.refreshBinding(\"custom.{}\".format(path))\n\t\t    \n\t\tself.custom.refreshOnAction \u003d False\n\telse:\n\t\tNone"
+      },
+      "persistent": true
+    },
+    "custom.refreshPeriodic": {
+      "binding": {
+        "config": {
+          "expression": "dateExtract(now(),\"Minutes\")"
+        },
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\t\t\n\timport time\n\tstatusView \u003d self.custom.viewOn\n\tif statusView:\n\t\ttime.sleep(1)\n\t\t\t\n\t\tlistCustom \u003d [\n\t\t    \n\t\t    \"formats\"\n\t\t    \n\t\t]\n\t\tfor path in listCustom:\n\t\t    self.view.refreshBinding(\"custom.{}\".format(path))\n\t\t    \n\telse:\n\t\tNone"
+      },
+      "persistent": true
+    },
+    "custom.tag": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer/PowerChart.custom.enabledReferences[0].name"
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tif value is None:\n\t\t\tvalue \u003d \u0027\u0027\n\t\treturn value\n\texcept:\n\t\treturn \u0027\u0027",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.userRol": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.roles[0]"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.workstationID": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "filterStatus": "{/root/Filters.position.display}",
+            "wkSelected": "{view.custom.dropdownWorkstation.idSelected}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdb           \u003d value[\"db\"]\n\twkSelected   \u003d value[\"wkSelected\"]\n\tfilterStatus \u003d value[\"filterStatus\"]\n\t\n\tlogger \u003d system.util.getLogger(\"WS-Check\")\n\t\n\tdef _normalize_ip(ip):\n\t\t# Normaliza IPv6-mapped (p.ej. ::ffff:10.0.0.5) a IPv4\n\t\tif ip and ip.startswith(\"::ffff:\"):\n\t\t\treturn ip.split(\":\")[-1]\n\t\treturn (ip or \"\").strip()\n\t\n\tdef _get_this_sessioninfo(self):\n\t\tsid \u003d self.session.props.id\n\t\tfor s in system.perspective.getSessionInfo():\n\t\t\tif s.get(\"id\") \u003d\u003d sid:\n\t\t\t\treturn s\n\t\treturn {}\n\t\n\t# Si NO filtras, resolvemos por IP; si filtras, devolvemos wkSelected.\n\tif not filterStatus:\n\t\ttry:\n\t\t\tsinfo \u003d _get_this_sessioninfo(self)\n\t\t\tip \u003d _normalize_ip(sinfo.get(\"clientAddress\", \"\"))\n\t\n\t\t\t# SQL Server: SELECT TOP 1 ...\n\t\t\tsql \u003d \"\"\"\n\t\t\t\tSELECT TOP 1 ID, Description, Hostname\n\t\t\t\tFROM workstation\n\t\t\t\tWHERE IpAddress \u003d ?\n\t\t\t\"\"\"\n\t\t\tds \u003d system.db.runPrepQuery(sql, [ip], db)\n\t\n\t\t\tif ds and ds.getRowCount() \u003e 0:\n\t\t\t\treturn int(ds.getValueAt(0, \"ID\"))\n\t\t\telse:\n\t\t\t\tlogger.info(\"WS-Check: no se encontró workstation para IP\u003d%s\" % ip)\n\t\t\t\treturn ip\n\t\n\t\texcept Exception as e:\n\t\t\tlogger.error(\"WS-Check error: %s\" % e)\n\t\t\treturn -1\n\telse:\n\t\treturn int(wkSelected or 0)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "params.feature": {
+      "paramDirection": "input"
+    },
+    "params.pageTitle": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tier1": {
+      "paramDirection": "input"
+    },
+    "params.tier2": {
+      "paramDirection": "input"
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 870,
+      "width": 1924
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "49px",
+          "shrink": 0
+        },
+        "props": {
+          "params": {
+            "icon": "material/home",
+            "text": "Análisis Estadístico"
+          },
+          "path": "Page/Embedded/Title_Large"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Enterprise"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Empresa:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Enterprise"
+            },
+            "position": {
+              "basis": "223px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dropdownEnterprise.ds"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": 1,
+              "wrapMultiSelectValues": false
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Period_0"
+            },
+            "position": {
+              "basis": "1px",
+              "shrink": 0
+            },
+            "props": {
+              "enabled": false,
+              "textStyle": {
+                "classes": "text-subtitles"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Site"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Sitio:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Site"
+            },
+            "position": {
+              "basis": "217px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dropdownSite.ds"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": 2,
+              "wrapMultiSelectValues": false
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Area"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Area:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Area"
+            },
+            "position": {
+              "basis": "205px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dropdownArea.ds"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": 26,
+              "wrapMultiSelectValues": false
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Line"
+            },
+            "position": {
+              "basis": "55px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Linea:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Line"
+            },
+            "position": {
+              "basis": "213px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dropdownLine.ds"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": 35,
+              "wrapMultiSelectValues": false
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Format"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Formato:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Format"
+            },
+            "position": {
+              "basis": "288px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.basis": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dropdownFormat.ds"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione..."
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "textAlign": "center"
+              },
+              "value": 26,
+              "wrapMultiSelectValues": false
+            },
+            "type": "ia.input.dropdown"
+          }
+        ],
+        "meta": {
+          "name": "Filters"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.custom.userRol"
+              },
+              "enabled": false,
+              "transforms": [
+                {
+                  "fallback": true,
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": "Administrator",
+                      "output": true
+                    },
+                    {
+                      "input": "Supervisor",
+                      "output": true
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "container-borders-dautom-widget",
+            "marginLeft": 10,
+            "marginRight": 10,
+            "marginTop": 10,
+            "padding": 6
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "EmbeddedView"
+            },
+            "position": {
+              "basis": "20%"
+            },
+            "propConfig": {
+              "props.params.areaName": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "ds": "{view.custom.dropdownArea.ds}",
+                      "id": "{view.custom.dropdownArea.idSelected}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tds \u003d value[\"ds\"]        # Dataset\n\ttargetID \u003d value[\"id\"]  # El ID que estás buscando\n\t\n\t# --- Buscar la fila donde la columna \"ID\" coincide ---\n\trowIndex \u003d -1\n\tfor i in range(ds.getRowCount()):\n\t    if ds.getValueAt(i, \"ID\") \u003d\u003d targetID:\n\t        rowIndex \u003d i\n\t        break\n\t\n\t# --- Si lo encontró, obtén el valor que quieras (por nombre o índice) ---\n\tif rowIndex !\u003d -1:\n\t    valor \u003d ds.getValueAt(rowIndex, \"Name\")  # o por nombre de columna: ds.getValueAt(rowIndex, \"Description\")\n\telse:\n\t    valor \u003d None  # No se encontró el ID\n\t\n\treturn valor",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              },
+              "props.params.formName": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "ds": "{view.custom.dropdownFormat.ds}",
+                      "id": "{view.custom.dropdownFormat.idSelected}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tds \u003d value[\"ds\"]        # Dataset\n\ttargetID \u003d value[\"id\"]  # El ID que estás buscando\n\t\n\t# --- Buscar la fila donde la columna \"ID\" coincide ---\n\trowIndex \u003d -1\n\tfor i in range(ds.getRowCount()):\n\t    if ds.getValueAt(i, \"ID\") \u003d\u003d targetID:\n\t        rowIndex \u003d i\n\t        break\n\t\n\t# --- Si lo encontró, obtén el valor que quieras (por nombre o índice) ---\n\tif rowIndex !\u003d -1:\n\t    valor \u003d ds.getValueAt(rowIndex, \"Name\")  # o por nombre de columna: ds.getValueAt(rowIndex, \"Description\")\n\telse:\n\t    valor \u003d None  # No se encontró el ID\n\t\n\treturn valor",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              },
+              "props.params.lineName": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "ds": "{view.custom.dropdownLine.ds}",
+                      "id": "{view.custom.dropdownLine.idSelected}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tds \u003d value[\"ds\"]        # Dataset\n\ttargetID \u003d value[\"id\"]  # El ID que estás buscando\n\t\n\t# --- Buscar la fila donde la columna \"ID\" coincide ---\n\trowIndex \u003d -1\n\tfor i in range(ds.getRowCount()):\n\t    if ds.getValueAt(i, \"ID\") \u003d\u003d targetID:\n\t        rowIndex \u003d i\n\t        break\n\t\n\t# --- Si lo encontró, obtén el valor que quieras (por nombre o índice) ---\n\tif rowIndex !\u003d -1:\n\t    valor \u003d ds.getValueAt(rowIndex, \"Name\")  # o por nombre de columna: ds.getValueAt(rowIndex, \"Description\")\n\t    if valor \u003d\u003d \u0027ME Cominco\u0027:\n\t    \tvalor \u003d \u0027Cominco\u0027\n\t    if valor \u003d\u003d \u0027Rejilladora\u0027:\n\t    \t    \tvalor \u003d \u0027Rejilladoras\u0027\n\telse:\n\t    valor \u003d None  # No se encontró el ID\n\t\n\treturn valor",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "path": "Page/Embedded/CP-pk/ReferenceRepeater",
+              "useDefaultViewHeight": true
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "enabledReferences": []
+            },
+            "meta": {
+              "name": "PowerChart"
+            },
+            "position": {
+              "basis": "60%",
+              "grow": 1
+            },
+            "propConfig": {
+              "custom.enabledPens": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.enabledReferences"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t\"\"\"\n\tGenera ejes, plots y pens dinámicos a partir de instancias que contienen UDTs hijas.\n\tLee automáticamente las unidades de ingeniería desde las tags CurrentValue.\n\tCada unidad genera su propio eje y su propio plot.\n\t\"\"\"\n\n\tfrom java.lang import String\n\n\t# \u003d\u003d\u003d INPUT: lista de instancias base \u003d\u003d\u003d\n\tinstances \u003d value\n\n\t# \u003d\u003d\u003d 1️⃣ Inicializar estructuras \u003d\u003d\u003d\n\tpens \u003d []\n\tunit_map \u003d {}  # {unidad: índice de eje/plot}\n\n\t# \u003d\u003d\u003d 2️⃣ Escanear instancias \u003d\u003d\u003d\n\tfor inst in instances:\n\t    pathSource \u003d inst.get(\"pathSource\", \"\")\n\t    baseColor \u003d inst.get(\"color\", \"#00bcd4\")\n\n\t    try:\n\t        children \u003d system.tag.browse(pathSource).getResults()\n\t    except:\n\t        children \u003d []\n\n\t    for child in children:\n\t        if str(child[\u0027tagType\u0027]) !\u003d \"UdtInstance\":\n\t            continue  # solo UDTs hijas\n\n\t        childName \u003d child[\u0027name\u0027]\n\t        childPath \u003d str(child[\u0027fullPath\u0027])\n\n\t        # Buscar el tag CurrentValue dentro de la UDT hija\n\t        try:\n\t            subTags \u003d system.tag.browse(childPath).getResults()\n\t        except:\n\t            subTags \u003d []\n\n\t        for subTag in subTags:\n\t            if subTag[\u0027name\u0027] !\u003d \"CurrentValue\":\n\t                continue\n\n\t            currentPath \u003d str(subTag[\u0027fullPath\u0027])\n\t            eng_unit \u003d None\n\n\t            # \u003d\u003d\u003d 3️⃣ Detectar unidad de ingeniería \u003d\u003d\u003d\n\t            for prop in (\u0027.EngUnit\u0027, \u0027.EngineeringUnits\u0027, \u0027.Eng Units\u0027, \u0027.Unit\u0027):\n\t                try:\n\t                    result \u003d system.tag.readBlocking([currentPath + prop])[0]\n\t                    if result.quality.isGood() and result.value not in (None, \"\", \" \"):\n\t                        eng_unit \u003d str(result.value).strip()\n\t                        break\n\t                except:\n\t                    continue\n\n\t            if eng_unit is None:\n\t                eng_unit \u003d \"default\"\n\n\t            # \u003d\u003d\u003d 4️⃣ Crear ejes y plots únicos por unidad \u003d\u003d\u003d\n\t            if eng_unit not in unit_map:\n\t                idx \u003d len(unit_map)\n\t                unit_map[eng_unit] \u003d idx\n\n\t            plotIndex \u003d unit_map[eng_unit]\n\n\t            # \u003d\u003d\u003d 5️⃣ Crear pen \u003d\u003d\u003d\n\t            pen \u003d {\n\t                \"name\": childName,\n\t                \"visible\": True,\n\t                \"enabled\": True,\n\t                \"selectable\": False,\n\t                \"axis\": eng_unit,\n\t                \"plot\": plotIndex,  # 👈 cada unidad tiene su propio plot\n\t                \"display\": {\n\t                    \"type\": \"line\",\n\t                    \"interpolation\": \"curveLinear\",\n\t                    \"breakLine\": True,\n\t                    \"radius\": 3,\n\t                    \"styles\": {\n\t                        \"normal\": {\n\t                            \"stroke\": {\"color\": baseColor, \"width\": 1, \"opacity\": 0.8},\n\t                            \"fill\": {\"color\": baseColor, \"opacity\": 0.8},\n\t                        },\n\t                    },\n\t                },\n\t                \"data\": {\n\t                    \"source\": currentPath,\n\t                    \"aggregateMode\": \"default\",\n\t                },\n\t            }\n\t            pens.append(pen)\n\n\t# \u003d\u003d\u003d 6️⃣ Crear ejes (uno por unidad) \u003d\u003d\u003d\n\taxes \u003d []\n\tfor unit in unit_map.keys():\n\t    axis \u003d {\n\t        \"name\": unit,\n\t        \"position\": \"left\",\n\t        \"width\": 60,\n\t        \"color\": \"#757A7F\",\n\t        \"dataFormat\": \"0,0.##\",\n\t        \"range\": {\"auto\": True, \"min\": \"\", \"max\": \"\"},\n\t        \"label\": {\n\t            \"text\": unit,\n\t            \"offset\": 0,\n\t            \"font\": {\"color\": \"#757A7F\", \"size\": 12},\n\t            \"style\": {\"classes\": \"\"}\n\t        },\n\t        \"tick\": {\n\t            \"color\": \"#757A7F\",\n\t            \"count\": \"Auto\",\n\t            \"label\": {\n\t                \"format\": \"Auto\",\n\t                \"font\": {\"color\": \"#757A7F\", \"size\": 10},\n\t                \"style\": {\"classes\": \"\"}\n\t            },\n\t            \"style\": {\"classes\": \"\"}\n\t        },\n\t        \"style\": {\"classes\": \"\"}\n\t    }\n\t    axes.append(axis)\n\n\t# \u003d\u003d\u003d 7️⃣ Crear plots (uno por unidad) \u003d\u003d\u003d\n\tplots \u003d []\n\tfor _ in unit_map.keys():\n\t    plots.append({\n\t        \"relativeWeight\": 3,\n\t        \"color\": \"var(--neutral-10)\",\n\t        \"markers\": [],\n\t        \"style\": {\"classes\": \"\"}\n\t    })\n\n\t# \u003d\u003d\u003d 8️⃣ Asignar resultados \u003d\u003d\u003d\n\tself.props.plots \u003d plots\n\tself.props.axes \u003d axes\n\treturn pens",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.pens": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.enabledPens"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "interaction": {
+                "chartZoomLevel": 1,
+                "rangeZoomLevel": 1
+              },
+              "plots": [],
+              "style": {
+                "borderStyle": "none",
+                "marginBottom": 10,
+                "marginRight": 10
+              }
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "enableDisableReference",
+                  "pageScope": true,
+                  "script": "\tlogging.log(\"Received message\", \"info\")\n\t# Inicializar lista si no existe\n\tif not hasattr(self.custom, \u0027enabledReferences\u0027):\n\t\tself.custom.enabledReferences \u003d []\n\t\n\tenabledReferences \u003d list(self.custom.enabledReferences)\n\tpathSource \u003d payload[\u0027pathSource\u0027]\n\t\n\t# Buscar si ya existe\n\texisting \u003d next((p for p in enabledReferences if p.get(\u0027pathSource\u0027) \u003d\u003d pathSource), None)\n\t\n\tif payload[\u0027enabledOrDisabled\u0027]:\n\t\tenabledReferences \u003d []\n\t\t# Agregar si no existe\n\t\tif not existing:\n\t\t\tenabledReferences.append({\n\t\t\t\t\"name\": payload[\u0027name\u0027],\n\t\t\t\t\"unit\": payload[\u0027unit\u0027],\n\t\t\t\t\"pathSource\": pathSource,\n\t\t\t\t\"group\": payload[\u0027group\u0027],\n\t\t\t\t\"color\": payload[\u0027color\u0027],\n\t\t\t\t\"form\": payload[\u0027form\u0027]\n\t\t\t})\n\telse:\n\t\t# Eliminar si existe\n\t\tif existing:\n\t\t\tenabledReferences.remove(existing)\n\t\n\t# Guardar cambios\n\tself.custom.enabledReferences \u003d enabledReferences",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.chart.powerchart"
+          },
+          {
+            "meta": {
+              "name": "FlexRepeater"
+            },
+            "position": {
+              "basis": "20%",
+              "grow": 1
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.instance"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value \u003d\u003d []:\n\t\tvalue \u003d False\n\telse:\n\t\tvalue \u003d True\n\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.instances": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.instance"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "direction": "column",
+              "elementPosition": {
+                "basis": "auto"
+              },
+              "elementStyle": {
+                "classes": "container-borders-dautom",
+                "margin": 10
+              },
+              "path": "Page/Embedded/CP-pk/gauge",
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.flex-repeater"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "764px",
+          "grow": 1
+        },
+        "props": {
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "refreshPeriodic",
+          "pageScope": false,
+          "script": "\n\tlogger \u003d system.util.getLogger(\"refreshPeriodic\")\n\t_min \u003d payload[\u0027min\u0027]\n\tself.view.custom.refreshPeriodic \u003d _min\n\tlogger.info(\"Overview_Papos/root/script refreshPeriodic ejecuted\")",
+          "sessionScope": true,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

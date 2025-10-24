@@ -3,8 +3,8 @@
     "db": "papo_db",
     "fontSize": 17,
     "insights": "",
-    "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
-    "refreshSecond": 53,
+    "path": "[UNS]Clarios/Andina/FA/Linea_Auxiliar/UI/TE11_2601",
+    "refreshSecond": 19,
     "registerTypeID": 7,
     "test": {
       "items": [
@@ -89,7 +89,7 @@
           "registerTypeID": 7
         },
         {
-          "answer": "",
+          "answer": "No Cumple",
           "papoItemID": 6223,
           "registerTypeID": 7
         },
@@ -99,8 +99,18 @@
           "registerTypeID": 7
         },
         {
-          "answer": "",
+          "answer": "No Cumple",
           "papoItemID": 6225,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "",
+          "papoItemID": 8163,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "",
+          "papoItemID": 6904,
           "registerTypeID": 7
         },
         {
@@ -121,6 +131,16 @@
         {
           "answer": 1,
           "papoItemID": 6229,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "",
+          "papoItemID": 8164,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "",
+          "papoItemID": 6905,
           "registerTypeID": 7
         },
         {
@@ -210,9 +230,9 @@
             "$": [
               "ts",
               192,
-              1759360733820
+              1760629519716
             ],
-            "$ts": 1759360733820
+            "$ts": 1760629519716
           },
           "user": "Mohamed Salah"
         }
@@ -338,7 +358,7 @@
           },
           "text": "FORMULARIO INICIO DE TURNO",
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -2095,7 +2115,10 @@
                     },
                     "props": {
                       "direction": "column",
-                      "justify": "space-around"
+                      "justify": "space-around",
+                      "style": {
+                        "overflow": "hidden"
+                      }
                     },
                     "type": "ia.container.flex"
                   },
@@ -2164,64 +2187,58 @@
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6223,
+                            "registerTypeID": 7
+                          }
                         },
                         "meta": {
-                          "name": "TextField_1"
+                          "name": "Checkbox"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "15px",
+                          "shrink": 0
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.text"
-                              },
-                              "type": "property"
-                            }
-                          },
-                          "custom.item.papoItemID": {
-                            "binding": {
-                              "config": {
-                                "path": "this.meta.name"
+                                "path": "this.props.selected"
                               },
                               "transforms": [
                                 {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
+                                  "fallback": "none",
+                                  "inputType": "scalar",
+                                  "mappings": [
+                                    {
+                                      "input": true,
+                                      "output": "Cumple"
+                                    },
+                                    {
+                                      "input": false,
+                                      "output": "No Cumple"
+                                    }
+                                  ],
+                                  "outputType": "scalar",
+                                  "type": "map"
                                 }
                               ],
                               "type": "property"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.style.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
-                          "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
-                          }
+                          "text": ""
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.input.checkbox"
                       }
                     ],
                     "custom": {
@@ -2235,7 +2252,10 @@
                     },
                     "props": {
                       "direction": "column",
-                      "justify": "space-around"
+                      "justify": "space-around",
+                      "style": {
+                        "overflow": "hidden"
+                      }
                     },
                     "type": "ia.container.flex"
                   }
@@ -2245,6 +2265,11 @@
                 },
                 "position": {
                   "basis": "98px"
+                },
+                "props": {
+                  "style": {
+                    "overflow": "hidden"
+                  }
                 },
                 "type": "ia.container.flex"
               },
@@ -2440,10 +2465,337 @@
                       },
                       {
                         "custom": {
+                          "item": {
+                            "papoItemID": 6225,
+                            "registerTypeID": 7
+                          }
+                        },
+                        "meta": {
+                          "name": "Checkbox"
+                        },
+                        "position": {
+                          "basis": "15px",
+                          "shrink": 0
+                        },
+                        "propConfig": {
+                          "custom.item.answer": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.selected"
+                              },
+                              "transforms": [
+                                {
+                                  "fallback": "none",
+                                  "inputType": "scalar",
+                                  "mappings": [
+                                    {
+                                      "input": true,
+                                      "output": "Cumple"
+                                    },
+                                    {
+                                      "input": false,
+                                      "output": "No Cumple"
+                                    }
+                                  ],
+                                  "outputType": "scalar",
+                                  "type": "map"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.style.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "text": ""
+                        },
+                        "type": "ia.input.checkbox"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6224
+                    },
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "315px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around"
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "S3"
+                },
+                "position": {
+                  "basis": "90px"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "papoItemID": 5374
+                    },
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "584px"
+                    },
+                    "props": {
+                      "style": {
+                        "fontWeight": "bold"
+                      },
+                      "text": "Termosellado TBS linea auxiliar de acabado"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_22"
+                },
+                "position": {
+                  "basis": "48px"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.value": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.value"
+                              },
+                              "enabled": false,
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "text": "Referencia:"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6222
+                    },
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "499px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "custom": {
+                          "item": {
+                            "papoItemID": 8163
+                          }
+                        },
+                        "meta": {
+                          "name": "TextField_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.item.answer": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "enabled": false,
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.registerTypeID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.item.papoItemID"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "placeholder": "Escriba Aqui",
+                          "style": {
+                            "borderBottomLeftRadius": 10,
+                            "borderBottomRightRadius": 10,
+                            "borderTopLeftRadius": 10,
+                            "borderTopRightRadius": 10,
+                            "fontSize": 17,
+                            "marginLeft": 0
+                          }
+                        },
+                        "type": "ia.input.text-field"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6222
+                    },
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "315px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "S8"
+                },
+                "position": {
+                  "basis": "98px"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.value": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.value"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6904
+                    },
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "330px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "custom": {
                           "item": {}
                         },
                         "meta": {
-                          "name": "TextField_1"
+                          "name": "TextField_0"
                         },
                         "position": {
                           "basis": "32px"
@@ -2501,55 +2853,30 @@
                       }
                     ],
                     "custom": {
-                      "basePapo": 6224
+                      "basePapo": 6904
                     },
                     "meta": {
                       "name": "FlexContainer_0"
                     },
                     "position": {
-                      "basis": "315px"
+                      "basis": "200px"
                     },
                     "props": {
                       "direction": "column",
-                      "justify": "space-around"
+                      "justify": "space-around",
+                      "style": {
+                        "overflow": "hidden"
+                      }
                     },
                     "type": "ia.container.flex"
                   }
                 ],
                 "meta": {
-                  "name": "S3"
+                  "name": "S6"
                 },
                 "position": {
-                  "basis": "90px"
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "children": [
-                  {
-                    "custom": {
-                      "papoItemID": 5374
-                    },
-                    "meta": {
-                      "name": "Label"
-                    },
-                    "position": {
-                      "basis": "584px"
-                    },
-                    "props": {
-                      "style": {
-                        "fontWeight": "bold"
-                      },
-                      "text": "Termosellado TBS linea auxiliar de acabado"
-                    },
-                    "type": "ia.display.label"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer_22"
-                },
-                "position": {
-                  "basis": "48px"
+                  "basis": "40px",
+                  "shrink": 0
                 },
                 "type": "ia.container.flex"
               },
@@ -2737,7 +3064,9 @@
                             "answer": 1,
                             "papoItemID": 6226,
                             "registerTypeID": 7
-                          }
+                          },
+                          "rang_down": 0.4,
+                          "rang_up": 1.8
                         },
                         "meta": {
                           "name": "Label_1"
@@ -2746,6 +3075,41 @@
                           "basis": "40 px"
                         },
                         "propConfig": {
+                          "custom.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.style.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.color"
+                              },
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Tiempo_queme"
+                              },
+                              "type": "tag"
+                            }
+                          },
                           "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
@@ -2758,10 +3122,8 @@
                         "props": {
                           "style": {
                             "classes": "text-data-2",
-                            "color": "#1199C7",
                             "paddingLeft": 20
-                          },
-                          "text": "1"
+                          }
                         },
                         "type": "ia.display.label"
                       },
@@ -2771,7 +3133,9 @@
                             "answer": 1,
                             "papoItemID": 6227,
                             "registerTypeID": 7
-                          }
+                          },
+                          "rang_down": 3,
+                          "rang_up": 7
                         },
                         "meta": {
                           "name": "Label_2"
@@ -2780,6 +3144,41 @@
                           "basis": "40px"
                         },
                         "propConfig": {
+                          "custom.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.style.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.color"
+                              },
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Selle"
+                              },
+                              "type": "tag"
+                            }
+                          },
                           "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
@@ -2792,62 +3191,84 @@
                         "props": {
                           "style": {
                             "classes": "text-data-2",
-                            "color": "#1199C7",
                             "paddingLeft": 20
-                          },
-                          "text": "1"
+                          }
                         },
                         "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6228,
+                            "registerTypeID": 7
+                          },
+                          "rang_down": 80,
+                          "rang_up": 100,
+                          "start": 90
                         },
                         "meta": {
-                          "name": "TextField_2"
+                          "name": "NumericEntryField"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "40px"
                         },
                         "propConfig": {
+                          "custom.borderColor": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.value"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\n\tminimo \u003d self.custom.rang_down\n\tmaximo \u003d self.custom.rang_up\n\t\n\tif value \u003d\u003d \"\":\n\t\tvalue \u003d \"#C0C0C0\"\n\t\t\n\telse:\n\t\t\n\t\tif minimo \u003c\u003d value \u003c\u003d maximo:\n\t\t\tvalue \u003d \"#C0C0C0\"\n\t\telse:\n\t\t\tvalue \u003d \"#F70808\"\n\t\n\treturn value",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "custom.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.value"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\n\tminimo \u003d self.custom.rang_down\n\tmaximo \u003d self.custom.rang_up\n\t\n\tif value \u003d\u003d \"\":\n\t\t\tvalue \u003d \"#C0C0C0\"\n\t\t\n\telse:\n\t\n\t\tif minimo \u003c\u003d value \u003c\u003d maximo:\n\t\t\tvalue \u003d \"#000000\"\n\t\telse:\n\t\t\tvalue \u003d \"#F70808\"\n\t\n\treturn value",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.text"
+                                "path": "this.props.value"
                               },
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.style.borderColor": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "path": "this.custom.borderColor"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.style.color": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "this.custom.color"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
+                          "align": "left",
+                          "format": "",
                           "placeholder": "Escriba Aqui",
                           "style": {
                             "borderBottomLeftRadius": 10,
@@ -2855,10 +3276,10 @@
                             "borderTopLeftRadius": 10,
                             "borderTopRightRadius": 10,
                             "fontSize": 17,
-                            "marginLeft": 0
+                            "marginLeft": 9
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.input.numeric-entry-field"
                       },
                       {
                         "custom": {
@@ -2866,7 +3287,10 @@
                             "answer": 1,
                             "papoItemID": 6229,
                             "registerTypeID": 7
-                          }
+                          },
+                          "rang_down": 410,
+                          "rang_up": 490,
+                          "start": 430
                         },
                         "meta": {
                           "name": "Label_3"
@@ -2875,6 +3299,41 @@
                           "basis": "40px"
                         },
                         "propConfig": {
+                          "custom.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.style.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.color"
+                              },
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temperatura"
+                              },
+                              "type": "tag"
+                            }
+                          },
                           "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
@@ -2887,10 +3346,8 @@
                         "props": {
                           "style": {
                             "classes": "text-data-2",
-                            "color": "#1199C7",
                             "paddingLeft": 20
-                          },
-                          "text": "1"
+                          }
                         },
                         "type": "ia.display.label"
                       }
@@ -2946,6 +3403,314 @@
                 },
                 "position": {
                   "basis": "48px"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.value": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.value"
+                              },
+                              "enabled": false,
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "text": "Referencia:"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6222
+                    },
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "499px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "custom": {
+                          "item": {
+                            "papoItemID": 8164
+                          }
+                        },
+                        "meta": {
+                          "name": "TextField_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.item.answer": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "enabled": false,
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.registerTypeID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.item.papoItemID"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "placeholder": "Escriba Aqui",
+                          "style": {
+                            "borderBottomLeftRadius": 10,
+                            "borderBottomRightRadius": 10,
+                            "borderTopLeftRadius": 10,
+                            "borderTopRightRadius": 10,
+                            "fontSize": 17,
+                            "marginLeft": 0
+                          }
+                        },
+                        "type": "ia.input.text-field"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6222
+                    },
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "315px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "S9"
+                },
+                "position": {
+                  "basis": "98px"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.value": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.value"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6905
+                    },
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "330px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "custom": {
+                          "item": {}
+                        },
+                        "meta": {
+                          "name": "TextField_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "propConfig": {
+                          "custom.item.answer": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.meta.name"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.registerTypeID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.item.papoItemID"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "placeholder": "Escriba Aqui",
+                          "style": {
+                            "borderBottomLeftRadius": 10,
+                            "borderBottomRightRadius": 10,
+                            "borderTopLeftRadius": 10,
+                            "borderTopRightRadius": 10,
+                            "fontSize": 17,
+                            "marginLeft": 0
+                          }
+                        },
+                        "type": "ia.input.text-field"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6905
+                    },
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "200px"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "justify": "space-around",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "S7"
+                },
+                "position": {
+                  "basis": "40px",
+                  "shrink": 0
                 },
                 "type": "ia.container.flex"
               },
@@ -3094,7 +3859,10 @@
                             "answer": 1,
                             "papoItemID": 6230,
                             "registerTypeID": 7
-                          }
+                          },
+                          "rang_down": 3,
+                          "rang_up": 5,
+                          "start": 4
                         },
                         "meta": {
                           "name": "Label_1"
@@ -3103,6 +3871,47 @@
                           "basis": "40px"
                         },
                         "propConfig": {
+                          "custom.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.style.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Tiempo_Llenado"
+                              },
+                              "type": "tag"
+                            }
+                          },
                           "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
@@ -3115,10 +3924,8 @@
                         "props": {
                           "style": {
                             "classes": "text-data-2",
-                            "color": "#1199C7",
                             "paddingLeft": 20
-                          },
-                          "text": "1"
+                          }
                         },
                         "type": "ia.display.label"
                       },
@@ -3128,7 +3935,10 @@
                             "answer": 1,
                             "papoItemID": 6231,
                             "registerTypeID": 7
-                          }
+                          },
+                          "rang_down": 2.5,
+                          "rang_up": 3.5,
+                          "start": 3
                         },
                         "meta": {
                           "name": "Label_2"
@@ -3137,6 +3947,47 @@
                           "basis": "40px"
                         },
                         "propConfig": {
+                          "custom.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.style.color": {
+                            "binding": {
+                              "config": {
+                                "path": "this.props.text"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    # Definir los colores para que sea más fácil leerlos\n    color_en_rango \u003d \"#1199C7\"\n    color_fuera_rango \u003d \"#F70808\" # Rojo\n    color_default \u003d \"#C0C0C0\"   # Gris (para valores no numéricos o vacíos)\n\n    # Si el valor de entrada está vacío, devuelve el color por defecto\n    if value is None or value \u003d\u003d \"\":\n        return color_default\n    \n    # Intentamos convertir el valor a un número flotante (con decimales)\n    try:\n        # --- ESTE ES EL PASO CLAVE ---\n        # Convertimos el texto (ej: \"1\") a un número (ej: 1.0)\n        valor_numerico \u003d float(value)\n        \n        # Obtenemos los límites desde las propiedades personalizadas\n        minimo \u003d self.custom.rang_down\n        maximo \u003d self.custom.rang_up\n        \n        # Ahora sí, comparamos número con número\n        if minimo \u003c\u003d valor_numerico \u003c\u003d maximo:\n            return color_en_rango\n        else:\n            return color_fuera_rango\n            \n    # Si la conversión a float() falla (porque el texto no era un número),\n    # devolvemos el color por defecto para evitar un error.\n    except ValueError:\n        return color_default",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Tiempo_Prueba_Bat"
+                              },
+                              "type": "tag"
+                            }
+                          },
                           "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
@@ -3149,10 +4000,8 @@
                         "props": {
                           "style": {
                             "classes": "text-data-2",
-                            "color": "#1199C7",
                             "paddingLeft": 20
-                          },
-                          "text": "1"
+                          }
                         },
                         "type": "ia.display.label"
                       },
@@ -3251,8 +4100,7 @@
               "name": "FlexContainer3"
             },
             "position": {
-              "basis": "660px",
-              "display": false,
+              "basis": "693px",
               "shrink": 0
             },
             "props": {
@@ -4926,6 +5774,7 @@
             },
             "position": {
               "basis": "900px",
+              "display": false,
               "shrink": 0
             },
             "props": {
@@ -4951,7 +5800,7 @@
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "1464px",
+          "basis": "923px",
           "shrink": 0
         },
         "props": {
@@ -5017,6 +5866,8 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -5116,7 +5967,9 @@
       "direction": "column",
       "style": {
         "classes": "container-borders-dautom-widget",
-        "overflow": "scroll"
+        "marginLeft": 10,
+        "overflow": "scroll",
+        "paddingLeft": 10
       }
     },
     "scripts": {
@@ -5143,7 +5996,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\t#logging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")",
+          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\t#logging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
           "sessionScope": false,
           "viewScope": false
         }

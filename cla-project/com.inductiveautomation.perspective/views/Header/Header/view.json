@@ -52,6 +52,7 @@
         },
         "position": {
           "basis": "24px",
+          "display": false,
           "shrink": 0
         },
         "propConfig": {
@@ -60,6 +61,7 @@
               "config": {
                 "expression": "{view.params.size} !\u003d \"large\""
               },
+              "enabled": false,
               "type": "expr"
             }
           }
@@ -76,10 +78,10 @@
       },
       {
         "meta": {
-          "name": "clarios blanco_0"
+          "name": "clarios blanco"
         },
         "position": {
-          "basis": "200px"
+          "basis": "300px"
         },
         "props": {
           "fit": {
@@ -99,6 +101,188 @@
         },
         "props": {
           "text": " "
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "page": "/alarms"
+              },
+              "scope": "C",
+              "type": "nav"
+            }
+          }
+        },
+        "meta": {
+          "name": "Alarm Icon",
+          "visible": false
+        },
+        "position": {
+          "basis": "26px",
+          "display": false,
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.size} !\u003d \"small\""
+              },
+              "enabled": false,
+              "type": "expr"
+            }
+          },
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../Alarms.custom.numAlarms"
+              },
+              "transforms": [
+                {
+                  "expression": "if({value} \u003e 0, \"Header/Alarm_Active\", \"Header/Icon\")",
+                  "type": "expression"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "color": "#FFFFFF",
+          "path": "material/alarm"
+        },
+        "type": "ia.display.icon"
+      },
+      {
+        "meta": {
+          "hasDelegate": true,
+          "name": "Spacer 1"
+        },
+        "position": {
+          "basis": "10px"
+        },
+        "props": {
+          "text": " "
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "page": "/alarms"
+              },
+              "scope": "C",
+              "type": "nav"
+            }
+          }
+        },
+        "meta": {
+          "hasDelegate": true,
+          "name": "Alarms",
+          "visible": false
+        },
+        "position": {
+          "display": false,
+          "shrink": 0
+        },
+        "propConfig": {
+          "custom.numAlarms": {
+            "binding": {
+              "config": {
+                "expression": "now(2000)"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn len(system.alarm.queryStatus(state\u003d[\"ActiveUnacked\"]))",
+                  "type": "script"
+                }
+              ],
+              "type": "expr"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "expression": "{view.params.size} !\u003d \"small\""
+              },
+              "enabled": false,
+              "type": "expr"
+            }
+          },
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../Alarms.custom.numAlarms"
+              },
+              "transforms": [
+                {
+                  "expression": "if({value} \u003e 0, \"Header/Alarm_Active\", \"\")",
+                  "type": "expression"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "this.custom.numAlarms"
+              },
+              "transforms": [
+                {
+                  "expression": "numberFormat({value}, \"#,##0\") + \" alarm\" + if({value} \u003e 1 || {value} \u003d 0, \"s\", \"\")",
+                  "type": "expression"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "cursor": "pointer",
+            "marginLeft": "6px"
+          },
+          "textStyle": {
+            "color": "#FFFFFF"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "hasDelegate": true,
+          "name": "Filler_0"
+        },
+        "position": {
+          "grow": 1
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{session.props.auth.user.firstName} +\u0027 \u0027+{session.props.auth.user.lastName}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "color": "FFFFFF",
+            "cursor": "pointer",
+            "marginLeft": "4px"
+          },
+          "textStyle": {
+            "color": "#FFFFFF",
+            "fontSize": 20,
+            "textAlign": "right"
+          }
         },
         "type": "ia.display.label"
       },
@@ -142,19 +326,6 @@
           }
         },
         "type": "ia.input.dropdown"
-      },
-      {
-        "meta": {
-          "hasDelegate": true,
-          "name": "Spacer 1"
-        },
-        "position": {
-          "basis": "10px"
-        },
-        "props": {
-          "text": " "
-        },
-        "type": "ia.display.label"
       },
       {
         "events": {
@@ -242,10 +413,10 @@
       {
         "meta": {
           "hasDelegate": true,
-          "name": "Spacer 2"
+          "name": "Spacer End"
         },
         "position": {
-          "basis": "10px",
+          "basis": "16px",
           "shrink": 0
         },
         "props": {
@@ -254,135 +425,12 @@
         "type": "ia.display.label"
       },
       {
-        "events": {
-          "dom": {
-            "onClick": {
-              "config": {
-                "page": "/alarms"
-              },
-              "scope": "C",
-              "type": "nav"
-            }
-          }
-        },
-        "meta": {
-          "name": "Alarm Icon"
-        },
-        "position": {
-          "basis": "26px",
-          "shrink": 0
-        },
-        "propConfig": {
-          "props.style.classes": {
-            "binding": {
-              "config": {
-                "path": "../Alarms.custom.numAlarms"
-              },
-              "transforms": [
-                {
-                  "expression": "if({value} \u003e 0, \"Header/Alarm_Active\", \"Header/Icon\")",
-                  "type": "expression"
-                }
-              ],
-              "type": "property"
-            }
-          }
-        },
-        "props": {
-          "color": "#FFFFFF",
-          "path": "material/alarm"
-        },
-        "type": "ia.display.icon"
-      },
-      {
-        "events": {
-          "dom": {
-            "onClick": {
-              "config": {
-                "page": "/alarms"
-              },
-              "scope": "C",
-              "type": "nav"
-            }
-          }
-        },
         "meta": {
           "hasDelegate": true,
-          "name": "Alarms"
+          "name": "Spacer 2"
         },
         "position": {
-          "shrink": 0
-        },
-        "propConfig": {
-          "custom.numAlarms": {
-            "binding": {
-              "config": {
-                "expression": "now(2000)"
-              },
-              "transforms": [
-                {
-                  "code": "\treturn len(system.alarm.queryStatus(state\u003d[\"ActiveUnacked\"]))",
-                  "type": "script"
-                }
-              ],
-              "type": "expr"
-            }
-          },
-          "position.display": {
-            "binding": {
-              "config": {
-                "expression": "{view.params.size} !\u003d \"small\""
-              },
-              "type": "expr"
-            }
-          },
-          "props.style.classes": {
-            "binding": {
-              "config": {
-                "path": "../Alarms.custom.numAlarms"
-              },
-              "transforms": [
-                {
-                  "expression": "if({value} \u003e 0, \"Header/Alarm_Active\", \"\")",
-                  "type": "expression"
-                }
-              ],
-              "type": "property"
-            }
-          },
-          "props.text": {
-            "binding": {
-              "config": {
-                "path": "this.custom.numAlarms"
-              },
-              "transforms": [
-                {
-                  "expression": "numberFormat({value}, \"#,##0\") + \" alarm\" + if({value} \u003e 1 || {value} \u003d 0, \"s\", \"\")",
-                  "type": "expression"
-                }
-              ],
-              "type": "property"
-            }
-          }
-        },
-        "props": {
-          "style": {
-            "cursor": "pointer",
-            "marginLeft": "6px"
-          },
-          "textStyle": {
-            "color": "#FFFFFF"
-          }
-        },
-        "type": "ia.display.label"
-      },
-      {
-        "meta": {
-          "hasDelegate": true,
-          "name": "Spacer End"
-        },
-        "position": {
-          "basis": "16px",
+          "basis": "10px",
           "shrink": 0
         },
         "props": {

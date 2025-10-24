@@ -1,0 +1,542 @@
+{
+  "custom": {},
+  "params": {
+    "key": {
+      "mH": {
+        "desc": "dfhfgh",
+        "uom": "",
+        "val": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/BinderMixer/BinderWeight/Act_Value"
+      },
+      "ml": {
+        "desc": "dfhfgh",
+        "uom": "",
+        "val": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/BinderMixer/BinderWeight/Act_Value"
+      },
+      "press_1": {
+        "desc": "dfhfgh",
+        "uom": "",
+        "val": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/BinderMixer/BinderWeight/Act_Value"
+      },
+      "temp": {
+        "desc": "dfhfgh",
+        "uom": "",
+        "val": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/BinderMixer/BinderWeight/Act_Value"
+      }
+    },
+    "metricHistPath": [
+      {
+        "aggregate": "Average",
+        "alias": "",
+        "path": "[uns]VIC/Manufacturing/Electrode Anode/Mixing Anode/ProcessMixing/CmcMixer/CmcWeight/Act_Value"
+      }
+    ],
+    "tank": {
+      "desiredHigh": 800,
+      "desiredLow": 100,
+      "high": 1000,
+      "low": 0,
+      "pathMixer": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/BinderMixer",
+      "weight": {
+        "desc": "dfgadgfdg",
+        "uom": "",
+        "val": "[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/BinderMixer/BinderWeight/Act_Value"
+      }
+    },
+    "title": "Carbon"
+  },
+  "propConfig": {
+    "params.key": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.metricHistPath": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.tank": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.title": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 250,
+      "width": 250
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "spacer"
+            },
+            "position": {
+              "basis": "8px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_0"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.title"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "text-lg font-semibold"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.style.classes": {
+                        "binding": {
+                          "config": {
+                            "expression": "\"text-sm rounded text-black \" + \nif(\n  Tag({view.params.tank.pathMixer}+\"/HighMixerProcess/Operation_Status\")\u003d6 \n  \u0026\u0026 Tag({view.params.tank.pathMixer}+\"/LowMixerProcess/Operation_Status\")\u003d6, \n  \"bg-green-200\",\n  \"bg-amber-200\"\n)"
+                          },
+                          "type": "expr"
+                        }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "expression": "if(\n  Tag({view.params.tank.pathMixer}+\"/HighMixerProcess/Operation_Status\")\u003d6 \n  \u0026\u0026 Tag({view.params.tank.pathMixer}+\"/LowMixerProcess/Operation_Status\")\u003d6, \n  \"▶ Running\",\n  \"⏸ Idle\"\n)"
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {}
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "title"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "alignItems": "center",
+                  "justify": "space-evenly",
+                  "style": {
+                    "classes": "gap-4",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "header"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "flex justify-between",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "TankInfo"
+                },
+                "position": {
+                  "height": 0.5,
+                  "width": 0.85,
+                  "x": 0.0608,
+                  "y": 0.5289
+                },
+                "propConfig": {
+                  "props.params.key": {
+                    "binding": {
+                      "config": {
+                        "expression": "now(800)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\"\"\"\n\tTrigger on now(), read tag paths from self.view.params.key,\n\tand return a one-column Dataset of live values.\n\n\tParameters:\n\t\tvalue: bound to now(), ignored.\n\t\tquality: unused.\n\t\ttimestamp: unused.\n\n\tReturns:\n\t\tDataset: one column [\u0027value\u0027], one row per tag.\n\t\"\"\"\n\ttry:\n\t\t# 1. Grab the original params\n\t\tparams \u003d self.view.params.key\n\t\t\n\t\t# 2. Extract paths and keep original order of keys\n\t\tpaths \u003d []\n\t\tkeys \u003d []\n\t\tfor key, info in params.items():\n\t\t    path \u003d info.get(\u0027val\u0027)\n\t\t    if path:\n\t\t        paths.append(path)\n\t\t        keys.append(key)\n\t\tif not paths:\n\t\t\toutput \u003d {\n\t\t\t\t\u0027desc\u0027: \"\",\n\t\t\t\t\u0027uom\u0027: \"\",\n\t\t\t\t\u0027val\u0027: \"\"\n\t\t\t}\n\t\t\treturn output\n\t\n\t\t# 3. Read all tags\n\t\tresults \u003d system.tag.readBlocking(paths)\n\t\t\n\t\t# 4. Rebuild output dict\n\t\toutput \u003d {}\n\t\tfor idx, key in enumerate(keys):\n\t\t\tinfo \u003d params[key]\n\t\t\tres \u003d results[idx]\n\t\t\t# Use quality.isGood() instead of .good\n\t\t\tif hasattr(res, \u0027quality\u0027) and res.quality.isGood():\n\t\t\t\tval \u003d res.value\n\t\t\telse:\n\t\t\t\tval \u003d None\n\t\t\toutput[key] \u003d {\n\t\t\t\t\u0027desc\u0027: info[\u0027desc\u0027],\n\t\t\t\t\u0027uom\u0027: info.get(\u0027uom\u0027, \u0027\u0027),\n\t\t\t\t\u0027val\u0027: val\n\t\t\t}\n\t\treturn output\n\texcept:\n\t\toutput \u003d {\n\t\t\t\t\u0027desc\u0027: \"\",\n\t\t\t\t\u0027uom\u0027: \"\",\n\t\t\t\t\u0027val\u0027: \"\"\n\t\t\t}\n\t\treturn output\n\t\n",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "Title": "Product"
+                  },
+                  "path": "Node/MixingDashboard/TankInfo"
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "TankMetric"
+                },
+                "position": {
+                  "height": 0.256,
+                  "width": 0.9154,
+                  "x": 0.0284,
+                  "y": 0.0092
+                },
+                "propConfig": {
+                  "props.params.key": {
+                    "binding": {
+                      "config": {
+                        "expression": "now(800)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\"\"\"\n\tTrigger on now(), read tag paths from self.view.params.key,\n\tand return a dict with:\n\t  - Boolean flags copied straight through.\n\t  - Any dict entries with \u0027val\u0027 updated to the live tag value.\n\t\"\"\"\n\t# 1. Grab the original params\n\tparams \u003d self.view.params.tank\n\n\t# 2. Separate out tag-path entries and preserve other flags\n\ttagKeys \u003d []\n\tpaths \u003d []\n\toutput \u003d {}\n\tfor k, info in params.items():\n\t\t# If this entry is a dict with a \u0027val\u0027 field, it\u0027s a tag path\n\t\tif hasattr(info, \u0027get\u0027) and \u0027val\u0027 in info:\n\t\t\tpath \u003d info.get(\u0027val\u0027)\n\t\t\tif path:\n\t\t\t\ttagKeys.append(k)\n\t\t\t\tpaths.append(path)\n\t\telse:\n\t\t\t# Copy booleans or any other non-dict entries straight through\n\t\t\toutput[k] \u003d info\n\n\t# 3. Guard against no tag paths\n\tif not paths:\n\t\treturn output\n\n\t# 4. Read all tag paths at once\n\tresults \u003d system.tag.readBlocking(paths)\n\n\t# 5. Insert live values for each tagKey\n\tfor idx, k in enumerate(tagKeys):\n\t\tinfo \u003d params[k]\n\t\tres \u003d results[idx]\n\t\t# Use quality.isGood() in Python/Jython\n\t\tliveVal \u003d res.value if hasattr(res, \u0027quality\u0027) and res.quality.isGood() else None\n\t\t# Build that entry in the output\n\t\toutput[k] \u003d {\n\t\t\t\u0027desc\u0027: info.get(\u0027desc\u0027),\n\t\t\t\u0027uom\u0027: info.get(\u0027uom\u0027, \u0027\u0027),\n\t\t\t\u0027val\u0027: liveVal\n\t\t}\n\n\treturn output",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Node/MixingDashboard/TankInfo"
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Tank2"
+                },
+                "position": {
+                  "height": 1.3211,
+                  "width": 1.2,
+                  "x": -0.108,
+                  "y": -0.1903
+                },
+                "props": {
+                  "elements": [
+                    {
+                      "d": "M86 107.5H585.5C587.433 107.5 589 109.067 589 111V327.877C589 328.291 588.957 328.704 588.872 329.11L573.518 402.268C572.735 405.996 575.58 409.5 579.39 409.5H583C586.314 409.5 589 412.186 589 415.5V438.5C589 441.814 586.314 444.5 583 444.5H578C574.686 444.5 572 447.186 572 450.5V571.5C572 574.814 569.314 577.5 566 577.5H105C101.686 577.5 99 574.814 99 571.5V450.5C99 447.186 96.3137 444.5 93 444.5H86C82.6863 444.5 80 441.814 80 438.5V417C80 413.686 82.6863 411 86 411H91.4611C95.3185 411 98.1738 407.412 97.3081 403.653L80.1531 329.165C80.0513 328.723 80 328.271 80 327.818V113.5C80 110.186 82.6863 107.5 86 107.5Z",
+                      "name": "path",
+                      "stroke": {
+                        "linejoin": "round",
+                        "paint": "#27806E",
+                        "width": 4
+                      },
+                      "type": "path"
+                    }
+                  ],
+                  "fill": {
+                    "paint": "transparent"
+                  },
+                  "preserveAspectRatio": "none",
+                  "viewBox": "0 0 660 660"
+                },
+                "type": "ia.shapes.svg"
+              },
+              {
+                "meta": {
+                  "name": "MovingAnalogIndicator"
+                },
+                "position": {
+                  "height": 0.3624,
+                  "width": 0.1617,
+                  "x": 0.765,
+                  "y": 0.199
+                },
+                "propConfig": {
+                  "props.desiredHigh": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.tank.desiredHigh} * 0.85"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.desiredLow": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.tank.desiredLow}*1.85"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.highAlarm": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.tank.desiredHigh}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.lowAlarm": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.tank.desiredLow}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.maxValue": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.tank.high}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.minValue": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.tank.low}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.processValue": {
+                    "binding": {
+                      "config": {
+                        "expression": "tag({view.params.tank.weight.val})"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "desiredRangeColor": "#74C8A9",
+                  "highHighAlarm": null,
+                  "highInterlock": null,
+                  "lowInterlock": null,
+                  "lowLowAlarm": null
+                },
+                "type": "ia.display.moving-analog-indicator"
+              },
+              {
+                "meta": {
+                  "name": "TimeSeriesChart"
+                },
+                "position": {
+                  "height": 0.4358,
+                  "width": 0.9,
+                  "x": -0.092,
+                  "y": 0.1626
+                },
+                "propConfig": {
+                  "props.plots[0].trends[0].series": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.title"
+                      },
+                      "overlayOptOut": true,
+                      "type": "property"
+                    }
+                  },
+                  "props.series[0].data": {
+                    "binding": {
+                      "config": {
+                        "avoidScanClassValidation": true,
+                        "dateRange": {
+                          "mostRecent": "1",
+                          "mostRecentUnits": "HOUR"
+                        },
+                        "enableValueCache": true,
+                        "ignoreBadQuality": false,
+                        "polling": {
+                          "enabled": true,
+                          "rate": "60"
+                        },
+                        "preventInterpolation": true,
+                        "returnFormat": "Wide",
+                        "returnSize": {
+                          "type": "RAW"
+                        },
+                        "tags": "{view.params.metricHistPath}",
+                        "valueFormat": "DATASET"
+                      },
+                      "overlayOptOut": true,
+                      "transforms": [
+                        {
+                          "code": "\t\n\tcolumn_names \u003d list(value.getColumnNames())\n\t\n\tif len(column_names) \u003e\u003d 2:\n\t\tcolumn_names[1] \u003d \"Weight\"  \n\t\n\t\tnew_ds \u003d system.dataset.toDataSet(column_names, system.dataset.toPyDataSet(value))\n\t\treturn new_ds\n\telse:\n\t\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "tag-history"
+                    }
+                  },
+                  "props.series[0].name": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.title"
+                      },
+                      "overlayOptOut": true,
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "defaultStyles": {
+                    "colors": [
+                      "#27806e"
+                    ]
+                  },
+                  "plots": [
+                    {
+                      "axes": [
+                        {
+                          "alignment": "left",
+                          "grid": {
+                            "color": "",
+                            "dashArray": 0,
+                            "opacity": 0.9,
+                            "style": {
+                              "classes": ""
+                            },
+                            "visible": false
+                          },
+                          "label": {
+                            "font": {
+                              "color": "",
+                              "size": 10
+                            },
+                            "offset": 0,
+                            "style": {
+                              "classes": ""
+                            },
+                            "text": "",
+                            "visible": false
+                          },
+                          "max": "",
+                          "min": "",
+                          "name": "weight",
+                          "style": {
+                            "classes": ""
+                          },
+                          "tick": {
+                            "color": "",
+                            "count": "Auto",
+                            "label": {
+                              "font": {
+                                "color": "",
+                                "size": 10
+                              },
+                              "format": "d",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "style": {
+                              "classes": ""
+                            }
+                          },
+                          "width": 60
+                        }
+                      ],
+                      "markers": [],
+                      "relativeWeight": 1,
+                      "trends": [
+                        {
+                          "axis": "weight",
+                          "baselines": [],
+                          "breakLine": true,
+                          "columns": [],
+                          "interpolation": "curveLinear",
+                          "radius": 2,
+                          "stack": true,
+                          "type": "line",
+                          "visible": true
+                        }
+                      ]
+                    }
+                  ],
+                  "series": [
+                    {}
+                  ],
+                  "timeAxis": {
+                    "visible": false
+                  },
+                  "timeRange": {
+                    "visible": false
+                  }
+                },
+                "type": "ia.chart.timeseries"
+              }
+            ],
+            "meta": {
+              "name": "body"
+            },
+            "position": {
+              "basis": "100%",
+              "grow": 1
+            },
+            "props": {
+              "mode": "percent",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.coord"
+          }
+        ],
+        "meta": {
+          "name": "Tank"
+        },
+        "position": {
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "classes": "justify-between hover:ring-inset hover:ring-[--primary-60] hover:ring-2 "
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

@@ -4,10 +4,10 @@
     "db": "papo_db",
     "fontSize": 17,
     "insights": "",
-    "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/CI11-0101",
-    "refreshSecond": 56,
+    "path": "[UNS]Clarios/Andina/OREC/Mezclado/UI/MZ07-0101",
+    "refreshSecond": 13,
     "registerTypeID": 3,
-    "user": "Mohamed Salah"
+    "user": "Edward Otalvaro"
   },
   "params": {
     "nodeID": 26,
@@ -135,7 +135,7 @@
           },
           "text": "FORMULARIO CADA 30 MINUTOS",
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -282,23 +282,30 @@
                           "name": "Label"
                         },
                         "position": {
-                          "basis": "19px"
+                          "basis": "33px"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_0"
+                        },
+                        "position": {
+                          "basis": "18px"
                         },
                         "type": "ia.display.label"
                       },
                       {
                         "custom": {
                           "item": {
-                            "papoItemID": 5211,
-                            "registerTypeID": 3
+                            "papoItemID": 5211
                           }
                         },
                         "meta": {
-                          "name": "TextField"
+                          "name": "Label_1"
                         },
                         "position": {
-                          "basis": "50px",
-                          "shrink": 0
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -306,82 +313,140 @@
                               "config": {
                                 "path": "this.props.text"
                               },
+                              "type": "property"
+                            }
+                          },
+                          "custom.item.registerTypeID": {
+                            "binding": {
+                              "config": {
+                                "path": "this.custom.item.papoItemID"
+                              },
                               "transforms": [
                                 {
-                                  "code": "\treturn value if value else \"-\"",
+                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
                                   "type": "script"
                                 }
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Barcada No"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginBottom": 10,
-                            "marginLeft": 0,
-                            "marginTop": 10
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 5213,
-                            "registerTypeID": 3
-                          }
-                        },
-                        "meta": {
-                          "name": "TextField_0"
-                        },
-                        "position": {
-                          "basis": "50px",
-                          "shrink": 0
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.text"
-                              },
-                              "transforms": [
+                        "children": [
+                          {
+                            "custom": {
+                              "item": {
+                                "papoItemID": 5213,
+                                "registerTypeID": 3
+                              }
+                            },
+                            "meta": {
+                              "name": "Dropdown"
+                            },
+                            "position": {
+                              "basis": "100%",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.value"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\treturn value if value else \"-\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "options": [
                                 {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
+                                  "label": "Pasta Positiva JCI Alto Desempeño",
+                                  "value": "PASTA POSITIVA JCI ALTO DESEMPENO"
+                                },
+                                {
+                                  "label": "Pasta Positiva JCI",
+                                  "value": "PASTA POSITIVA JCI"
+                                },
+                                {
+                                  "label": "Pastas Positivas Sovema",
+                                  "value": "PASTA POSITIVA SOVEMA"
+                                },
+                                {
+                                  "label": "Pastas Negativas Sovema",
+                                  "value": "PASTA NEGATIVA SOVEMA"
+                                },
+                                {
+                                  "label": "Pastas Negativas Cominco",
+                                  "value": "PASTA NEGATIVA COMINCO"
                                 }
                               ],
-                              "type": "property"
-                            }
+                              "style": {
+                                "borderBottomLeftRadius": 10,
+                                "borderBottomRightRadius": 10,
+                                "borderTopLeftRadius": 10,
+                                "borderTopRightRadius": 10,
+                                "fontSize": 17,
+                                "marginBottom": 0,
+                                "marginLeft": 0,
+                                "marginTop": 0
+                              },
+                              "value": "NegativaCominco"
+                            },
+                            "type": "ia.input.dropdown"
                           }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
                         },
-                        "props": {
-                          "placeholder": "Escriba Aqui",
-                          "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginBottom": 10,
-                            "marginLeft": 0,
-                            "marginTop": 10
-                          }
+                        "position": {
+                          "basis": "36px",
+                          "shrink": 0
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.container.flex"
                       }
                     ],
                     "meta": {
                       "name": "FlexContainer_0"
                     },
                     "position": {
-                      "basis": "19.3%"
+                      "basis": "57.3%",
+                      "shrink": 0
                     },
                     "props": {
                       "direction": "column"
@@ -596,23 +661,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_1"
+                          "name": "Label_1"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -629,28 +688,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Oxido_Plomo"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -659,23 +727,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_2"
+                          "name": "Label_2"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -692,28 +754,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Agua"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -722,23 +793,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_3"
+                          "name": "Label_3"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -755,28 +820,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Electrolito"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -974,23 +1048,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_7"
+                          "name": "Label_4"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1007,28 +1075,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Cooling"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1037,23 +1114,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_8"
+                          "name": "Label_5"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1070,28 +1141,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Pico"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1100,23 +1180,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_9"
+                          "name": "Label_6"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1133,28 +1207,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Domo"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1163,23 +1246,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_10"
+                          "name": "Label_7"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1196,28 +1273,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Plasticidad_Final"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1226,23 +1312,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_11"
+                          "name": "Label_8"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1259,28 +1339,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Final_Ciclo"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1289,23 +1378,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_12"
+                          "name": "Label_9"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1322,28 +1405,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Temp_Descarga"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       }
                     ],
                     "meta": {
@@ -1551,23 +1643,17 @@
                           }
                         },
                         "meta": {
-                          "name": "NumericEntryField_3"
+                          "name": "Label_9"
                         },
                         "position": {
-                          "basis": "50px"
+                          "basis": "54px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.text"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\treturn value if value else \"-\"",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           },
@@ -1584,28 +1670,37 @@
                               ],
                               "type": "property"
                             }
+                          },
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "1": "{view.custom.path}"
+                                },
+                                "tagPath": "{1}/Tiemp_Mezcla"
+                              },
+                              "type": "tag"
+                            }
+                          },
+                          "props.textStyle.fontSize": {
+                            "binding": {
+                              "config": {
+                                "path": "view.custom.fontSize"
+                              },
+                              "type": "property"
+                            }
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "containerStyle": {
-                            "marginBottom": 0,
-                            "marginTop": 0,
-                            "paddingBottom": 5,
-                            "paddingTop": 5
-                          },
-                          "format": "none",
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -2384,6 +2479,8 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -2474,7 +2571,8 @@
       "flexCount": [
         1
       ],
-      "flexGroupCount": 1
+      "flexGroupCount": 1,
+      "parentPath": "[UNS]Clarios/Andina/OREC/Mezclado/UI/MZ07-0101/CPK/"
     },
     "meta": {
       "name": "root"
@@ -2482,7 +2580,9 @@
     "props": {
       "direction": "column",
       "style": {
-        "classes": "container-borders-dautom-widget"
+        "classes": "container-borders-dautom-widget",
+        "marginLeft": 10,
+        "paddingLeft": 10
       }
     },
     "scripts": {
@@ -2508,7 +2608,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\t#logging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")",
+          "script": "\tlogger \u003d system.util.getLogger(\u0027MZ07 CPK\u0027)\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t#status \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\tstatus \u003d result.getValueAt(0,0)\n\t\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\t#logging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")\n\n\t#--------------CPP and CPK---------------------\n\tparent_path \u003d self.custom.parentPath\n\treference \u003d self.getChild(\"FlexContainerGroup1\").getChild(\"FlexContainer1\").getChild(\"FlexContainer_1\").getChild(\"FlexContainer_0\").getChild(\"FlexContainer\").getChild(\"Dropdown\").props.value\n\tvariables \u003d [\n\t\t\u0027/Densidad/CurrentValue\u0027,\n\t\t\u0027/Humedad/CurrentValue\u0027,\n\t\t\u0027/Penetracion/CurrentValue\u0027\n\t]\n\t\n\tdes_pasta \u003d self.getChild(\"FlexContainerGroup1\").getChild(\"FlexContainer1\").getChild(\"FlexContainer_3\").getChild(\"FlexContainer_2\").getChild(\"NumericEntryField_5\").props.value\n\thum_pasta \u003d self.getChild(\"FlexContainerGroup1\").getChild(\"FlexContainer1\").getChild(\"FlexContainer_3\").getChild(\"FlexContainer_2\").getChild(\"NumericEntryField_7\").props.value\n\tpen_pasta \u003d self.getChild(\"FlexContainerGroup1\").getChild(\"FlexContainer1\").getChild(\"FlexContainer_3\").getChild(\"FlexContainer_2\").getChild(\"NumericEntryField_6\").props.value\n\t\n\tvalues \u003d [des_pasta, hum_pasta, pen_pasta]\n\tlogger.info(\u0027{} {} {}\u0027.format(des_pasta,hum_pasta,pen_pasta))\n\t# \u003d\u003d\u003d Escribir cada valor en su tag correspondiente \u003d\u003d\u003d\n\tfor var, val in zip(variables, values):\n\n\t\tfull_path \u003d parent_path + reference + var\n\t\tsystem.tag.writeBlocking([full_path], [val])\n\t\tlogger.info(str(val))",
           "sessionScope": false,
           "viewScope": false
         }

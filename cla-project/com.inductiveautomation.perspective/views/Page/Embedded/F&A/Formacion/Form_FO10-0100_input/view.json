@@ -3,8 +3,8 @@
     "db": "papo_db",
     "fontSize": 17,
     "insights": "",
-    "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
-    "refreshSecond": 56,
+    "path": "[UNS]Clarios/Andina/FA/Formacion/UI/FO10_0100",
+    "refreshSecond": 30,
     "registerTypeID": 16,
     "test": {
       "items": [
@@ -29,12 +29,12 @@
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": "1",
           "papoItemID": 6627,
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": "2",
           "papoItemID": 6628,
           "registerTypeID": 16
         },
@@ -44,17 +44,17 @@
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": "3:00:00 PM",
           "papoItemID": 6630,
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": "6:00:00 PM",
           "papoItemID": 6631,
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": "6:30:00 PM",
           "papoItemID": 6632,
           "registerTypeID": 16
         },
@@ -69,22 +69,22 @@
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": 3,
           "papoItemID": 6635,
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": 4,
           "papoItemID": 6636,
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": 5,
           "papoItemID": 6637,
           "registerTypeID": 16
         },
         {
-          "answer": "",
+          "answer": 6,
           "papoItemID": 6638,
           "registerTypeID": 16
         },
@@ -100,9 +100,9 @@
             "$": [
               "ts",
               192,
-              1759348736822
+              1760628330468
             ],
-            "$ts": 1759348736822
+            "$ts": 1760628330468
           },
           "user": "Mohamed Salah"
         }
@@ -188,8 +188,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 1342,
-      "width": 714
+      "height": 1858,
+      "width": 870
     }
   },
   "root": {
@@ -228,7 +228,7 @@
           },
           "text": "FORMULARIO INGRESO DE BATERIAS",
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -1048,13 +1048,16 @@
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6627,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_2"
+                          "name": "Label_1"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1065,57 +1068,49 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Prog_Ingreso"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6628,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_3"
+                          "name": "Label_2"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1126,47 +1121,36 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Prog_Cargado"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1231,13 +1215,16 @@
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6630,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_5"
+                          "name": "Label_3"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1248,57 +1235,58 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Hora_Inicio"
                               },
                               "transforms": [
                                 {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
+                                  "formatType": "datetime",
+                                  "formatValue": {
+                                    "time": "medium"
+                                  },
+                                  "type": "format"
                                 }
                               ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6631,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_6"
+                          "name": "Label_4"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1309,57 +1297,58 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Hora_Final_Est"
                               },
                               "transforms": [
                                 {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
+                                  "formatType": "datetime",
+                                  "formatValue": {
+                                    "time": "medium"
+                                  },
+                                  "type": "format"
                                 }
                               ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6632,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_7"
+                          "name": "Label_5"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1370,47 +1359,45 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Hora_Final_Real"
                               },
                               "transforms": [
                                 {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
+                                  "formatType": "datetime",
+                                  "formatValue": {
+                                    "time": "medium"
+                                  },
+                                  "type": "format"
                                 }
                               ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -1808,13 +1795,16 @@
                     "children": [
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6635,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_0"
+                          "name": "Label_2"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1825,57 +1815,49 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Nivel_Agua_Prog"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6636,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_1"
+                          "name": "Label_3"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1886,57 +1868,49 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Nivel_Agua_Medido"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6637,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_2"
+                          "name": "Label_4"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -1947,57 +1921,49 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Temp_Agua"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
-                          "item": {}
+                          "item": {
+                            "papoItemID": 6638,
+                            "registerTypeID": 16
+                          }
                         },
                         "meta": {
-                          "name": "TextField_3"
+                          "name": "Label_5"
                         },
                         "position": {
-                          "basis": "32px"
+                          "basis": "42px"
                         },
                         "propConfig": {
                           "custom.item.answer": {
@@ -2008,47 +1974,36 @@
                               "type": "property"
                             }
                           },
-                          "custom.item.papoItemID": {
+                          "props.text": {
                             "binding": {
                               "config": {
-                                "path": "this.meta.name"
+                                "fallbackDelay": 2.5,
+                                "mode": "indirect",
+                                "references": {
+                                  "path": "{view.custom.path}"
+                                },
+                                "tagPath": "{path}/Temp_Bat"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
-                                  "type": "script"
-                                }
-                              ],
-                              "type": "property"
+                              "type": "tag"
                             }
                           },
-                          "custom.item.registerTypeID": {
+                          "props.textStyle.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.custom.item.papoItemID"
+                                "path": "view.custom.fontSize"
                               },
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
                           "style": {
-                            "borderBottomLeftRadius": 10,
-                            "borderBottomRightRadius": 10,
-                            "borderTopLeftRadius": 10,
-                            "borderTopRightRadius": 10,
-                            "fontSize": 17,
-                            "marginLeft": 0
+                            "classes": "text-data-2",
+                            "color": "#1199C7",
+                            "paddingLeft": 20
                           }
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.label"
                       },
                       {
                         "custom": {
@@ -2165,13 +2120,13 @@
           }
         ],
         "custom": {
-          "baseBasisPx": 200
+          "baseBasisPx": 80
         },
         "meta": {
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "200px",
+          "basis": "80px",
           "shrink": 0
         },
         "propConfig": {
@@ -2223,9 +2178,8 @@
           "name": "Label"
         },
         "position": {
-          "basis": "32px",
-          "grow": 1,
-          "shrink": 0
+          "basis": "15px",
+          "grow": 1
         },
         "type": "ia.display.label"
       },
@@ -2259,6 +2213,8 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -2358,7 +2314,9 @@
       "direction": "column",
       "style": {
         "classes": "container-borders-dautom-widget",
-        "overflow": "scroll"
+        "marginLeft": 10,
+        "overflow": "scroll",
+        "paddingLeft": 10
       }
     },
     "scripts": {
@@ -2385,7 +2343,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")",
+          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t#status \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\tstatus \u003d result.getValueAt(0,0)\n\t\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
           "sessionScope": false,
           "viewScope": false
         }

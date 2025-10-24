@@ -4,10 +4,45 @@
     "fontSize": 17,
     "insights": "",
     "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
-    "refreshSecond": 36,
+    "refreshSecond": 49,
     "registerTypeID": 7,
     "test": {
       "items": [
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6731,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6732,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6733,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6734,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6735,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6736,
+          "registerTypeID": 7
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 6737,
+          "registerTypeID": 7
+        },
         {
           "answer": "No Cumple",
           "papoItemID": 5527,
@@ -155,9 +190,9 @@
             "$": [
               "ts",
               192,
-              1759352196075
+              1760638009731
             ],
-            "$ts": 1759352196075
+            "$ts": 1760638009731
           },
           "user": "Mohamed Salah"
         }
@@ -283,7 +318,7 @@
           },
           "text": "FORMULARIO INICIO DE TURNO",
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -368,6 +403,1116 @@
           },
           {
             "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_1"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_2"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6731
+                    },
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "33%"
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_1"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6734
+                    },
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "33%"
+                    },
+                    "props": {
+                      "direction": "column"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Image"
+                            },
+                            "position": {
+                              "basis": "73px"
+                            },
+                            "propConfig": {
+                              "props.source": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\tpapoItemID \u003d value   # \u003c-- cambia este ID por uno existente en tu tabla\n\tdb \u003d \"papo_db\"\n\t\n\t# 1. Query\n\tquery \u003d \"SELECT Description FROM papoitem WHERE ID \u003d ?\"\n\tds \u003d system.db.runPrepQuery(query, [papoItemID], db)\n\t\n\tif ds and ds.getRowCount() \u003e 0:\n\t    descripcion \u003d str(ds.getValueAt(0, \"Description\")).strip().lower()\n\t    print \"Descripcion encontrada:\", descripcion\n\t\n\t    # 2. Diccionario normalizado\n\t    paths \u003d {\n\t        \"botas de seguridad\": \"EPP/botas.png\",\n\t        \"botas de pvc\": \"EPP/botapvc.png\",\n\t        \"careta respirador\": \"EPP/caretarespirador.png\",\n\t        \"gafas de seguridad\": \"EPP/gafas.png\",\n\t        \"gafas de seguridad de sello\": \"EPP/gafassello.png\",\n\t        \"guante químico\": \"EPP/guantequimico.png\",\n\t        \"guantes nitrilo\": \"EPP/guantesnitrilo.png\",\n\t        \"guantes poli/algodon\": \"EPP/guantespolialgodon.png\",\n\t        \"multímetro\": \"EPP/multimetro.png\",\n\t        \"protector auditivo tipo diadema\": \"EPP/EPP/protectortipocopa.png\",\n\t        \"tapabocas\": \"EPP/tapaboca.png\",\n\t        \"tapon oido\": \"EPP/tapones.png\",\n\t        \"valvula de cierre\": \"EPP/default.png\"  # fallback\n\t    }\n\t\n\t    # 3. Obtener ruta\n\t    url \u003d paths.get(descripcion, \"EPP/default.png\")\n\t    print \"Ruta asignada:\", url\n\telse:\n\t    print \"No se encontró descripción para ID:\", papoItemID\n\t\n\treturn \u0027/system/images/\u0027+url",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "fit": {
+                                "height": 90,
+                                "mode": "contain",
+                                "width": 20
+                              }
+                            },
+                            "type": "ia.display.image"
+                          },
+                          {
+                            "custom": {
+                              "item": {}
+                            },
+                            "meta": {
+                              "name": "Checkbox8"
+                            },
+                            "position": {
+                              "basis": "141px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "custom.item.answer": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.props.selected"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": "none",
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": true,
+                                          "output": "Cumple"
+                                        },
+                                        {
+                                          "input": false,
+                                          "output": "No Cumple"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.papoItemID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "parent.custom.papoItemID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "custom.item.registerTypeID": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.registerTypeID"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.style.fontSize": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.fontSize"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "this.custom.item.papoItemID"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "type": "ia.input.checkbox"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_1"
+                        },
+                        "position": {
+                          "basis": "118px"
+                        },
+                        "propConfig": {
+                          "custom.papoItemID": {
+                            "binding": {
+                              "config": {
+                                "struct": {
+                                  "base": "{parent.custom.basePapo}",
+                                  "inst_num": "{this.meta.name}"
+                                },
+                                "waitOnAll": true
+                              },
+                              "transforms": [
+                                {
+                                  "code": "    try:\n        s \u003d str(value[\"inst_num\"])  #\n        import re\n        m \u003d re.search(r\u0027_(\\d+)\u0027, s)  # busca dígitos después de \"_\"\n        return value[\"base\"]+int(m.group(1)) if m else None\n    except:\n        return None",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "expr-struct"
+                            }
+                          }
+                        },
+                        "props": {
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "custom": {
+                      "basePapo": 6736
+                    },
+                    "meta": {
+                      "name": "FlexContainer_1"
+                    },
+                    "position": {
+                      "basis": "33%"
+                    },
+                    "props": {
+                      "direction": "column"
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "custom": {
+                  "basePapo": 6717
+                },
+                "meta": {
+                  "name": "FlexContainer4"
+                },
+                "position": {
+                  "basis": "350px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "",
+                    "borderBottomLeftRadius": 15,
+                    "borderBottomRightRadius": 15,
+                    "borderTopLeftRadius": 15,
+                    "borderTopRightRadius": 15,
+                    "marginLeft": 20,
+                    "marginRight": 20,
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
               {
                 "custom": {
                   "item": {}
@@ -1013,7 +2158,7 @@
               "name": "FlexContainer1"
             },
             "position": {
-              "basis": "354px",
+              "basis": "730px",
               "display": false
             },
             "props": {
@@ -1833,7 +2978,8 @@
               "name": "FlexContainer2"
             },
             "position": {
-              "basis": "398px"
+              "basis": "398px",
+              "display": false
             },
             "props": {
               "direction": "column",
@@ -3381,7 +4527,7 @@
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "578px",
+          "basis": "180px",
           "shrink": 0
         },
         "props": {
@@ -3447,6 +4593,8 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -3546,7 +4694,9 @@
       "direction": "column",
       "style": {
         "classes": "container-borders-dautom-widget",
-        "overflow": "scroll"
+        "marginLeft": 10,
+        "overflow": "scroll",
+        "paddingLeft": 10
       }
     },
     "scripts": {
@@ -3573,7 +4723,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")",
+          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
           "sessionScope": false,
           "viewScope": false
         }

@@ -4,7 +4,7 @@
     "fontSize": 17,
     "insights": "",
     "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
-    "refreshSecond": 8,
+    "refreshSecond": 28,
     "registerTypeID": 8,
     "test": {
       "items": [
@@ -19,6 +19,11 @@
           "registerTypeID": 8
         },
         {
+          "answer": "-",
+          "papoItemID": 6450,
+          "registerTypeID": 8
+        },
+        {
           "answer": "No Cumple",
           "papoItemID": 6451,
           "registerTypeID": 8
@@ -29,23 +34,8 @@
           "registerTypeID": 8
         },
         {
-          "answer": "-",
-          "papoItemID": 6450,
-          "registerTypeID": 8
-        },
-        {
-          "answer": "-",
-          "papoItemID": 6471,
-          "registerTypeID": 7
-        },
-        {
-          "answer": "No Cumple",
-          "papoItemID": 6472,
-          "registerTypeID": 7
-        },
-        {
-          "answer": "No Cumple",
-          "papoItemID": 6473,
+          "answer": 2,
+          "papoItemID": 6133,
           "registerTypeID": 7
         },
         {
@@ -55,9 +45,9 @@
             "$": [
               "ts",
               192,
-              1759271168784
+              1760628328750
             ],
-            "$ts": 1759271168784
+            "$ts": 1760628328750
           },
           "user": "Mohamed Salah"
         }
@@ -143,7 +133,7 @@
   },
   "props": {
     "defaultSize": {
-      "height": 758,
+      "height": 685,
       "width": 684
     }
   },
@@ -183,7 +173,7 @@
           },
           "text": "FORMULARIO FIN DE TURNO",
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -788,18 +778,108 @@
                   }
                 },
                 "type": "ia.container.flex"
+              }
+            ],
+            "custom": {
+              "basePapo": 6130
+            },
+            "meta": {
+              "name": "FlexContainer1"
+            },
+            "position": {
+              "basis": "284px",
+              "display": false,
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "backgroundColor": "",
+                "borderBottomLeftRadius": 15,
+                "borderBottomRightRadius": 15,
+                "borderTopLeftRadius": 15,
+                "borderTopRightRadius": 15,
+                "marginLeft": 20,
+                "marginRight": 20,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Section2"
+            },
+            "position": {
+              "basis": "40px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style.classes": {
+                "binding": {
+                  "config": {
+                    "path": "../FlexContainer1.position.display"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "button-questions",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "button-questions"
+                        },
+                        {
+                          "input": false,
+                          "output": "button-questions-2"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
               },
+              "props.textStyle.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {},
+              "text": "Total",
+              "textStyle": {
+                "textAlign": "center"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
               {
                 "children": [
                   {
-                    "custom": {
-                      "papoItemID": 6471
-                    },
                     "meta": {
                       "name": "Label"
                     },
                     "position": {
-                      "basis": "283px"
+                      "basis": "421px"
                     },
                     "propConfig": {
                       "custom.papoItemID": {
@@ -807,7 +887,6 @@
                           "config": {
                             "path": "parent.meta.name"
                           },
-                          "enabled": false,
                           "transforms": [
                             {
                               "code": "\tindex \u003d int(value.replace(\"FlexContainer_\",\"\"))\n\treturn self.parent.parent.custom.basePapo + index",
@@ -836,13 +915,16 @@
                   },
                   {
                     "custom": {
-                      "item": {}
+                      "item": {
+                        "papoItemID": 6133,
+                        "registerTypeID": 7
+                      }
                     },
                     "meta": {
-                      "name": "TextField"
+                      "name": "Label_1"
                     },
                     "position": {
-                      "basis": "351px"
+                      "basis": "105px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
@@ -850,250 +932,35 @@
                           "config": {
                             "path": "this.props.text"
                           },
-                          "transforms": [
-                            {
-                              "code": "\n\treturn value if value else \"-\"",
-                              "type": "script"
-                            }
-                          ],
                           "type": "property"
                         }
                       },
-                      "custom.item.papoItemID": {
+                      "props.textStyle.fontSize": {
                         "binding": {
                           "config": {
-                            "path": "../Label.custom.papoItemID"
+                            "path": "view.custom.fontSize"
                           },
-                          "type": "property"
-                        }
-                      },
-                      "custom.item.registerTypeID": {
-                        "binding": {
-                          "config": {
-                            "path": "this.custom.item.papoItemID"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                              "type": "script"
-                            }
-                          ],
                           "type": "property"
                         }
                       }
                     },
                     "props": {
-                      "placeholder": "Escriba Aqui",
                       "style": {
-                        "borderBottomLeftRadius": 10,
-                        "borderBottomRightRadius": 10,
-                        "borderTopLeftRadius": 10,
-                        "borderTopRightRadius": 10,
-                        "fontSize": 17,
-                        "marginBottom": 10,
-                        "marginLeft": 30,
-                        "marginTop": 10
-                      }
+                        "classes": "text-data-2",
+                        "color": "#1199C7",
+                        "paddingLeft": 20
+                      },
+                      "text": 2
                     },
-                    "type": "ia.input.text-field"
+                    "type": "ia.display.label"
                   }
                 ],
                 "meta": {
-                  "name": "FlexContainer_15"
+                  "name": "FlexContainer_3"
                 },
                 "position": {
                   "basis": "48px",
                   "shrink": 0
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "children": [
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 6472
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox0"
-                    },
-                    "position": {
-                      "basis": "628px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "custom.item.registerTypeID": {
-                        "binding": {
-                          "config": {
-                            "path": "this.custom.item.papoItemID"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "path": "this.custom.item.papoItemID"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer_9"
-                },
-                "position": {
-                  "basis": "50px"
-                },
-                "props": {
-                  "style": {
-                    "overflow": "hidden"
-                  }
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "children": [
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 6473
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox0"
-                    },
-                    "position": {
-                      "basis": "628px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "custom.item.registerTypeID": {
-                        "binding": {
-                          "config": {
-                            "path": "this.custom.item.papoItemID"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "path": "this.custom.item.papoItemID"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer_10"
-                },
-                "position": {
-                  "basis": "50px"
-                },
-                "props": {
-                  "style": {
-                    "overflow": "hidden"
-                  }
                 },
                 "type": "ia.container.flex"
               }
@@ -1102,10 +969,11 @@
               "basePapo": 6130
             },
             "meta": {
-              "name": "FlexContainer1"
+              "name": "FlexContainer2"
             },
             "position": {
-              "basis": "407px",
+              "basis": "284px",
+              "display": false,
               "shrink": 0
             },
             "props": {
@@ -1131,7 +999,7 @@
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "500px",
+          "basis": "180px",
           "shrink": 0
         },
         "propConfig": {
@@ -1218,6 +1086,8 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -1231,7 +1101,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\t\t\n\t\t\n\t\n\n\talerts.showAlert(state\u003d\"warning\", title\u003d\"Guardar registro\", message\u003d\"Esta seguro de que desea finalizar el turno?\", \n\tbtnTextPrimary\u003d\"Si\", btnTextSecondary\u003d\"No\", btnActionPrimary\u003d\"saveStartRegister-2201-end\")\n\t"
+                    "script": "\t\n\talerts.showAlert(state\u003d\"warning\", title\u003d\"Guardar registro\", message\u003d\"Esta seguro de que desea finalizar el turno?\", \n\tbtnTextPrimary\u003d\"Si\", btnTextSecondary\u003d\"No\", btnActionPrimary\u003d\"saveDataRoot\")"
                   },
                   "scope": "G",
                   "type": "script"
@@ -1239,7 +1109,7 @@
               }
             },
             "meta": {
-              "name": "Button_Apply"
+              "name": "Button_Apply_0"
             },
             "position": {
               "basis": "100px",
@@ -1255,19 +1125,6 @@
                 "classes": "button-1"
               },
               "text": "Guardar"
-            },
-            "scripts": {
-              "customMethods": [],
-              "extensionFunctions": null,
-              "messageHandlers": [
-                {
-                  "messageType": "saveStartRegister-2201-end",
-                  "pageScope": true,
-                  "script": "\tsystem.perspective.sendMessage(\"resetTable\", payload\u003d{})\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer1\").refreshBinding(\"custom.{}\".format(path))\n\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.condiciones\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswerCond \u003d self.view.custom.answers.condiciones\n\t\n\tregisterTypeID \u003d self.view.custom.registerTypeID\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\ttry:\n\t\n\t\tfrom java.lang import String\n\t\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT TOP 1 RegisterCode\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\t\tORDER BY RegisterCode DESC\n\t\t\"\"\"\n\t\n\t\n\t\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\t\n\t\tregCode \u003d result.getValueAt(0,0)\n\texcept:\n\t\tregCode \u003d 1\n\t\t\n\ttry:\n\t\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT TOP 1 Status\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\t\tORDER BY Timestamp DESC\n\t\t\"\"\"\n\t\n\t\n\t\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\t\n\t\tstatus \u003d \"Finalizado\"\n\t\t\n\texcept:\n\t\tstatus \u003d \"En proceso\"\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los  JSON ---\n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerCond), regCode)   \n\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshTable\", \n\t    payload\u003d{\"estado\": True,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"refreshPeriodic\", \n\t    payload\u003d{\"min\": 0,},\n\t    scope\u003d\"session\"\n\t)",
-                  "sessionScope": false,
-                  "viewScope": false
-                }
-              ]
             },
             "type": "ia.input.button"
           },
@@ -1302,38 +1159,6 @@
               "text": "Cancelar"
             },
             "type": "ia.input.button"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\talerts.showAlert(state\u003d\"warning\", title\u003d\"Guardar registro\", message\u003d\"Esta seguro de que desea guardar el registro de Inicio de turno?\", \n\tbtnTextPrimary\u003d\"Si\", btnTextSecondary\u003d\"No\", btnActionPrimary\u003d\"saveDataRoot\")\n\n\t"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Button_Apply_0"
-            },
-            "position": {
-              "basis": "100px",
-              "shrink": 0
-            },
-            "props": {
-              "image": {
-                "height": 30,
-                "width": 15
-              },
-              "primary": false,
-              "style": {
-                "classes": "button-1"
-              },
-              "text": "Guardar"
-            },
-            "type": "ia.input.button"
           }
         ],
         "meta": {
@@ -1351,7 +1176,7 @@
     ],
     "custom": {
       "flexCount": [
-        1
+        2
       ],
       "flexGroupCount": 1
     },
@@ -1362,7 +1187,9 @@
       "direction": "column",
       "style": {
         "classes": "container-borders-dautom-widget",
-        "overflow": "scroll"
+        "marginLeft": 10,
+        "overflow": "scroll",
+        "paddingLeft": 10
       }
     },
     "scripts": {
@@ -1389,7 +1216,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")",
+          "script": "\t\n\n\t# ---- Context ----\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"En Proceso\"\n\tnow \u003d system.date.now()\n\n\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\n\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\tquery_last_code \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\tregCode \u003d int(last_code) # + 1\n\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\n\t# ---- Insert template ----\n\tfrom java.lang import String\n\tinsert_sql \u003d \"\"\"\n\t\tINSERT INTO registerhistory (\n\t\t\t[Timestamp],\n\t\t\tDataAnswer,\n\t\t\tStatus,\n\t\t\tPapoID,\n\t\t\tRegisterTypeID,\n\t\t\t[User],\n\t\t\tWorkstationNodeID,\n\t\t\tNodeID,\n\t\t\tWorkstationID,\n\t\t\tRegisterCode\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\"\"\"\n\n\tdef _infer_register_type(answers_obj):\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\treturn 7\n\n\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\n\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t# Skip if empty\n\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\tif not items:\n\t\t\tcontinue\n\n\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\n\t\tparams \u003d [\n\t\t\tnow,                # [Timestamp]\n\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\tstatus,             # Status\n\t\t\tpapoID,             # PapoID\n\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\tuser,               # [User]\n\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\tnodeID,             # NodeID\n\t\t\tworkstationID,      # WorkstationID\n\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t]\n\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\n\t# ---- UI refresh (same convention you used) ----\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
           "sessionScope": false,
           "viewScope": false
         }
