@@ -1,0 +1,3767 @@
+{
+  "custom": {
+    "actualRun": {
+      "times": {}
+    },
+    "currentEventType": "Corriendo",
+    "currentReason": "Produciendo",
+    "dbConnection": "mes_core",
+    "endDateTime": {
+      "$": [
+        "ts",
+        192,
+        1759345451899
+      ],
+      "$ts": 1759345451899
+    },
+    "lastRun": {},
+    "refreshSec": 8
+  },
+  "params": {
+    "nodeID": 4
+  },
+  "propConfig": {
+    "custom.actualRun": {
+      "persistent": true
+    },
+    "custom.actualRun.availability": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn None\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,3) * 100\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.dataset": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tnodeID \u003d value[\"nodeID\"]\n\t\tdb \u003d value[\"dbConnection\"]\n\t\ttableRun \u003d mes_core.run.RunTable(db)\n\t\t\n\t\tcolumns \u003d [\"TOP (1) ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\",\"ScheduleTime\",\"OEE\", \"EstimatedFinishedTime\"]\n\t\twhere_clause \u003d \"Closed \u003d 0 ORDER BY ID DESC\"\n\t\twhere_args \u003d None\n\t\t\n\t\tds \u003d tableRun.selectCustom(columns, where_clause, where_args)\n\t\t\n\t\tif ds.getRowCount() \u003d\u003d 0:\n\t\t\treturn -1\n\t\t\t\n\t\treturn ds\n\t\t\n\texcept:\n\t\treturn -1",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.dsDurationEvents": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "endDateTime": "if({view.custom.actualRun.runID} !\u003d -1, now(10000),0)",
+            "nodeID": "{view.params.nodeID}",
+            "runID": "{view.custom.actualRun.runID}",
+            "startDateTime": "{view.custom.actualRun.startDateTime}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdb \u003d value[\"dbConnection\"]\n\tnodeID \u003d value[\"nodeID\"]\n\tstartDateTime \u003d value[\"startDateTime\"]\n\tendDateTime \u003d value[\"endDateTime\"]\n\trunID \u003d value[\"runID\"]\n\t\n\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\tcolumns \u003d [\n\t\t\"TOP 5 ReasonName\",  # \u003c- TOP 5 aquí\n\t\t(\n\t\t\t\"SUM(DATEDIFF(MINUTE, \"\n\t\t\t\"  CASE WHEN StartDateTime \u003e ? THEN StartDateTime ELSE ? END, \"\n\t\t\t\"  CASE WHEN (EndDateTime IS NULL OR EndDateTime \u003e ?) THEN ? ELSE EndDateTime END \"\n\t\t\t\")) AS total_minutes\"\n\t\t)\n\t]\n\t\n\twhere_clause \u003d (\n\t\t\"NodeID \u003d ? \"\n\t\t\"AND RunID \u003d ? \"\n\t\t\"AND StartDateTime \u003c ? \"\n\t\t\"AND (EndDateTime IS NULL OR EndDateTime \u003e ?) \"\n\t\t\"GROUP BY ReasonName \"\n\t\t\"ORDER BY total_minutes DESC\"\n\t)\n\twhere_args \u003d [startDateTime, startDateTime, endDateTime, endDateTime, nodeID, runID, endDateTime, startDateTime]\n\tds \u003d stateHistoryTable.selectCustom(columns, where_clause, where_args)\n\t\n\tif runID \u003d\u003d -1:\n\t\treturn None\n\t\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.dsFrecuencyEvents": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "endDateTime": "now()",
+            "nodeID": "{view.params.nodeID}",
+            "refresh": "if({view.custom.actualRun.runID} !\u003d -1, now(10000),0)",
+            "runID": "{view.custom.actualRun.runID}",
+            "startDateTime": "{view.custom.actualRun.startDateTime}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdb \u003d value[\"dbConnection\"]\n\tnodeID \u003d value[\"nodeID\"]\n\tstartDateTime \u003d value[\"startDateTime\"]\n\tendDateTime \u003d value[\"endDateTime\"]\n\trunID \u003d value[\"runID\"]\n\t\n\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\tcolumns \u003d [\n\t\t\"TOP 5 ReasonName\",            # inyecta TOP 5 aquí\n\t\t\"COUNT(ID) AS count\"\n\t]\n\twhere_clause \u003d (\n\t\t\"nodeID \u003d ? \"\n\t\t\"AND RunID \u003d ? \"\n\t\t\"AND StartDateTime \u003c ? \"\n\t\t\"AND (EndDateTime IS NULL OR EndDateTime \u003e ?) \"\n\t\t\"GROUP BY ReasonName \"\n\t\t\"ORDER BY COUNT(ID) DESC\"\n\t)\n\twhere_args \u003d [nodeID,runID, endDateTime, startDateTime]\n\tds \u003d stateHistoryTable.selectCustom(columns, where_clause, where_args)\n\t\n\tif runID \u003d\u003d -1:\n\t\treturn None\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.endDateTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn ds\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,8)\t\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.oee": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn None\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,6)\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.runID": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn ds\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,0)\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.runTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn None\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,4)\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.startDateTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn None\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,1)\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.times.plannedDT": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "refresh": "if({view.custom.actualRun.runID} !\u003d -1, now(10000), 0)",
+            "runID": "{view.custom.actualRun.runID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\tdb \u003d value[\"db\"]\t\n\trunID \u003d value[\"runID\"]\n\t\n\t#Si no hay corrida activa\n\tif runID \u003d\u003d -1:\n\t\treturn -1\n\t\t\n\tnodeID \u003d int(value[\"nodeID\"])\t\n\ttry:\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(DATEDIFF(SECOND, s.StartDateTime, s.EndDateTime)) AS [Total in Seconds]\n\t\t\t\tFROM statehistory s\n\t\t\t\tLEFT JOIN statereason st ON s.StateReasonID \u003d st.ID\n\t\t\t\tWHERE st.ReasonCode IN (10001,10002,10003)\n\t\t\t\tAND s.NodeID \u003d ?\n\t\t\t\tAND s.RunID IN ({})\n\t\t\t\u0027\u0027\u0027.format(runID)\n\t\t\n\t\targs \u003d [nodeID]\n\t\tdata \u003d system.db.runPrepQuery(query, args, db)\n\t\t\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn -1",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.times.runDT": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "refresh": "if({view.custom.actualRun.runID} !\u003d -1, now(10000), 0)",
+            "runID": "{view.custom.actualRun.runID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\tdb \u003d value[\"db\"]\t\n\trunID \u003d value[\"runID\"]\n\t\n\t#Si no hay corrida activa\n\tif runID \u003d\u003d -1:\n\t\treturn -1\n\t\t\n\tnodeID \u003d int(value[\"nodeID\"])\t\n\ttry:\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(DATEDIFF(SECOND, s.StartDateTime, s.EndDateTime)) AS [Total in Seconds]\n\t\t\t\tFROM statehistory s\n\t\t\t\tLEFT JOIN statereason st ON s.StateReasonID \u003d st.ID\n\t\t\t\tWHERE st.ReasonCode IN (3,4)\n\t\t\t\tAND s.NodeID \u003d ?\n\t\t\t\tAND s.RunID IN ({})\n\t\t\t\u0027\u0027\u0027.format(runID)\n\t\t\n\t\targs \u003d [nodeID]\n\t\tdata \u003d system.db.runPrepQuery(query, args, db)\n\t\t\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn -1",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.times.unplannedDT": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "refresh": "if({view.custom.actualRun.runID} !\u003d -1, now(10000), 0)",
+            "runID": "{view.custom.actualRun.runID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\tdb \u003d value[\"db\"]\t\n\trunID \u003d value[\"runID\"]\n\t\n\t#Si no hay corrida activa\n\tif runID \u003d\u003d -1:\n\t\treturn -1\n\t\t\n\tnodeID \u003d int(value[\"nodeID\"])\t\n\ttry:\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(DATEDIFF(SECOND, s.StartDateTime, s.EndDateTime)) AS [Total in Seconds]\n\t\t\t\tFROM statehistory s\n\t\t\t\tLEFT JOIN statereason st ON s.StateReasonID \u003d st.ID\n\t\t\t\tWHERE st.ReasonCode IN (0,1,2,10000,10004,10005,10006,10007)\n\t\t\t\tAND s.NodeID \u003d ?\n\t\t\t\tAND s.RunID IN ({})\n\t\t\t\u0027\u0027\u0027.format(runID)\n\t\t\n\t\targs \u003d [nodeID]\n\t\tdata \u003d system.db.runPrepQuery(query, args, db)\n\t\t\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn -1",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.actualRun.totalTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tif ds \u003d\u003d -1:\n\t\treturn None\n\telse:\n\t\tvalue \u003d ds.getValueAt(0,6)\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.currentEventType": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "nodeId": "{view.params.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\t\"\"\"\n\t\tResolve current event type for an open statehistory event on a node using statereason flags\n\t\t(RecordDowntime / PlannedDowntime), without relying on ReasonCode.\n\t\n\t\tInputs (from value):\n\t\t\tvalue[\"nodeId\"] (int)\n\t\t\tvalue[\"dbConnection\"] (str)\n\t\n\t\tUI context:\n\t\t\tself.custom.currentReason may be \"Produciendo\" / \"Lista para producir\"\n\t\n\t\tReturns:\n\t\t\tstr: \"Corriendo\" | \"Planeado\" | \"No Planeado\"\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\timport system\n\t\tnodeId \u003d value[\"nodeId\"]\n\t\tdbConnection \u003d value[\"dbConnection\"]\n\t\n\t\t# Short-circuit by currentReason if provided\n\t\ttry:\n\t\t\tcurrentReason \u003d self.custom.currentReason\n\t\texcept:\n\t\t\tcurrentReason \u003d None\n\t\n\t\tif currentReason in (\"Produciendo\", \"Lista para producir\"):\n\t\t\t# Return\n\t\t\treturn \"Corriendo\"\n\t\n\t\t# Logic: fetch flags of the OPEN event (EndDateTime IS NULL) for this node\n\t\t# Use StateReasonID -\u003e statereason.ID join to read flags directly\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT TOP 1\n\t\t\t\tsr.RecordDowntime,\n\t\t\t\tsr.PlannedDowntime,\n\t\t\t\tsh.ReasonName\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr\n\t\t\t\tON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.NodeID \u003d ?\n\t\t\t  AND sh.EndDateTime IS NULL\n\t\t\tORDER BY sh.StartDateTime DESC\n\t\t\"\"\"\n\t\trows \u003d system.db.runPrepQuery(query, [nodeId], dbConnection)\n\t\n\t\t# If no open event, assume running\n\t\tif rows is None or rows.getRowCount() \u003d\u003d 0:\n\t\t\t# Return\n\t\t\treturn \"Corriendo\"\n\t\n\t\trecordDowntime \u003d rows.getValueAt(0, \"RecordDowntime\")\n\t\tplannedDowntime \u003d rows.getValueAt(0, \"PlannedDowntime\")\n\t\t# reasonName \u003d rows.getValueAt(0, \"ReasonName\")  # opcional, por si quieres log/depurar\n\t\n\t\t# Decision mapping\n\t\tif int(recordDowntime or 0) \u003d\u003d 1:\n\t\t\t# Return\n\t\t\treturn \"No Planeado\"\n\t\tif int(plannedDowntime or 0) \u003d\u003d 1:\n\t\t\t# Return\n\t\t\treturn \"Planeado\"\n\t\n\t\t# Ambos \u003d 0 → produciendo/corriendo\n\t\t# Return\n\t\treturn \"Corriendo\"\n\t\n\texcept:\n\t\t# Return (fallback seguro)\n\t\treturn \"NA\"",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.currentReason": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "runID": "{view.custom.actualRun.runID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"dbConnection\"]\n\tnodeID \u003d value[\"nodeID\"]\n\t\n\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\tcolumns \u003d [\n\t\t\"TOP 1 ReasonName\"\n\t]\n\twhere_clause \u003d (\n\t\t\"nodeID \u003d ? \"\n\t\t\"ORDER BY ID DESC\"\n\t)\n\twhere_args \u003d [nodeID]\n\tds \u003d stateHistoryTable.selectCustom(columns, where_clause, where_args)\n\t\n\treason \u003d ds[0][0]\n\t\n\treturn reason",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.endDateTime": {
+      "binding": {
+        "config": {
+          "expression": "now()"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.lastRun": {
+      "persistent": true
+    },
+    "custom.lastRun.availability": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,3) * 100\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.dataset": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tnodeID \u003d value[\"nodeID\"]\n\tdb \u003d value[\"dbConnection\"]\n\ttableRun \u003d mes_core.run.RunTable(db)\n\t\n\tcolumns \u003d [\"TOP (1) ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\",\"ScheduleTime\",\"OEE\"]\n\twhere_clause \u003d \"Closed \u003d 1 ORDER BY ID DESC\"\n\twhere_args \u003d None\n\t\n\tds \u003d tableRun.selectCustom(columns, where_clause, where_args)\n\t\n\treturn ds\n\t\n\t",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.dsDurationEvents": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "endDateTime": "{view.custom.lastRun.endDateTime}",
+            "nodeID": "{view.params.nodeID}",
+            "runID": "{view.custom.lastRun.runID}",
+            "startDateTime": "{view.custom.lastRun.startDateTime}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdb \u003d value[\"dbConnection\"]\n\tnodeID \u003d value[\"nodeID\"]\n\tstartDateTime \u003d value[\"startDateTime\"]\n\tendDateTime \u003d value[\"endDateTime\"]\n\trunID \u003d value[\"runID\"]\n\t\n\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\tcolumns \u003d [\n\t\t\"TOP 5 ReasonName\",  # \u003c- TOP 5 aquí\n\t\t(\n\t\t\t\"SUM(DATEDIFF(MINUTE, \"\n\t\t\t\"  CASE WHEN StartDateTime \u003e ? THEN StartDateTime ELSE ? END, \"\n\t\t\t\"  CASE WHEN (EndDateTime IS NULL OR EndDateTime \u003e ?) THEN ? ELSE EndDateTime END \"\n\t\t\t\")) AS total_minutes\"\n\t\t)\n\t]\n\t\n\twhere_clause \u003d (\n\t\t\"NodeID \u003d ? \"\n\t\t\"AND RunID \u003d ? \"\n\t\t\"AND StartDateTime \u003c ? \"\n\t\t\"AND (EndDateTime IS NULL OR EndDateTime \u003e ?) \"\n\t\t\"GROUP BY ReasonName \"\n\t\t\"ORDER BY total_minutes DESC\"\n\t)\n\twhere_args \u003d [startDateTime, startDateTime, endDateTime, endDateTime, nodeID, runID, endDateTime, startDateTime]\n\tds \u003d stateHistoryTable.selectCustom(columns, where_clause, where_args)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.dsFrecuencyEvents": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "endDateTime": "{view.custom.lastRun.endDateTime}",
+            "nodeID": "{view.params.nodeID}",
+            "runID": "{view.custom.lastRun.runID}",
+            "startDateTime": "{view.custom.lastRun.startDateTime}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdb \u003d value[\"dbConnection\"]\n\tnodeID \u003d value[\"nodeID\"]\n\tstartDateTime \u003d value[\"startDateTime\"]\n\tendDateTime \u003d value[\"endDateTime\"]\n\trunID \u003d value[\"runID\"]\n\t\n\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\tcolumns \u003d [\n\t\t\"TOP 5 ReasonName\",            # inyecta TOP 5 aquí\n\t\t\"COUNT(ID) AS count\"\n\t]\n\twhere_clause \u003d (\n\t\t\"NodeID \u003d ? \"\n\t\t\"AND RunID \u003d ? \"\n\t\t\"AND StartDateTime \u003c ? \"\n\t\t\"AND (EndDateTime IS NULL OR EndDateTime \u003e ?) \"\n\t\t\"GROUP BY ReasonName \"\n\t\t\"ORDER BY COUNT(ID) DESC\"\n\t)\n\twhere_args \u003d [nodeID,runID, endDateTime, startDateTime]\n\tds \u003d stateHistoryTable.selectCustom(columns, where_clause, where_args)\n\t\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.endDateTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,2)\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.oee": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,6)\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.runID": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,0)\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.runTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,4)\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.startDateTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,1)\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.lastRun.totalTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.lastRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tds \u003d value[\"dataset\"]\n\tvalue \u003d ds.getValueAt(0,6)\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.refreshSec": {
+      "binding": {
+        "config": {
+          "expression": "dateExtract(now(10000),\"second\")"
+        },
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tlistCustom \u003d [\n\t\t\"actualRun.dataset\",\n\t\t\"actualRun.runTime\",\n\t\t\"actualRun.availability\",\n\t\t\"actualRun.totalTime\",\n\t\t\"actualRun.startDateTime\",\n\t\t\"actualRun.endDateTime\",\n\t\t\"actualRun.oee\",\n\t\t\"actualRun.dsFrecuencyEvents\",\n\t\t\"actualRun.dsDurationEvents\",\n\t\t\n\t\t\"lastRun.dataset\",\n\t\t\"lastRun.runTime\",\n\t\t\"lastRun.availability\",\n\t\t\"lastRun.totalTime\",\n\t\t\"lastRun.startDateTime\",\n\t\t\"lastRun.endDateTime\",\n\t\t\"lastRun.oee\",\n\t\t\n\t\t\"currentReason\",\n\t\t\"currentEventType\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\t\t\n"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1022,
+      "width": 1660
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "EmbeddedView"
+        },
+        "position": {
+          "basis": "49px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.params.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.nodeID"
+              },
+              "transforms": [
+                {
+                  "fallback": null,
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": 4,
+                      "output": 15
+                    },
+                    {
+                      "input": "4",
+                      "output": 15
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                },
+                {
+                  "code": "\treturn \u0027Disponibilidad Inyectora \u0027 + str(value)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "params": {
+            "icon": "material/assessment"
+          },
+          "path": "Page/Embedded/Title_Large"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_Spacer_1"
+            },
+            "position": {
+              "basis": "10px"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_currentEventTittle"
+                },
+                "position": {
+                  "basis": "25vw",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles"
+                  },
+                  "text": "Evento actual:  ",
+                  "textStyle": {
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_currentEventValue"
+                },
+                "position": {
+                  "basis": "25vw",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.currentReason"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-description",
+                    "margin": 1,
+                    "paddingLeft": 10
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_currentEventTypeTittle"
+                },
+                "position": {
+                  "basis": "25vw",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles"
+                  },
+                  "text": "Tipo de evento actual: ",
+                  "textStyle": {
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_currentEventTypeValue"
+                },
+                "position": {
+                  "basis": "25vw",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.currentEventType"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-description",
+                    "margin": 1,
+                    "paddingLeft": 10
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_widgetCurrentEvent"
+            },
+            "position": {
+              "basis": "120xp",
+              "grow": 1,
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Label_Spacer_5"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Banner_0"
+        },
+        "position": {
+          "basis": "40px"
+        },
+        "props": {
+          "style": {
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "classes": "container-borders-dautom-widget-2",
+            "margin": 10,
+            "marginBottom": 10,
+            "marginTop": 10
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_Spacer_0"
+                },
+                "position": {
+                  "basis": "20px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "400px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "endDateTime": "{view.custom.actualRun.endDateTime}",
+                          "runID": "{view.custom.actualRun.runID}",
+                          "startDateTime": "{view.custom.actualRun.startDateTime}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\trunID \u003d value[\"runID\"]\n\tstartDateTime \u003d value[\"startDateTime\"]\t\n\tendDateTime \u003d value[\"endDateTime\"]\n\t\n\tif runID !\u003d -1:\n\t\tvalue \u003d \u0027Corrida Actual. ID: \u0027 + str(runID) + \", \" + \"Desde: \" + str(startDateTime) + \", Hasta: \" +  str(endDateTime)\n\t\treturn value\n\telse:\n\t\tvalue \u003d \"No hay corridas\"\n\t\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-subtitle-widget"
+                  },
+                  "textStyle": {
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_1"
+                },
+                "position": {
+                  "basis": "20px",
+                  "grow": 1
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "40px"
+            },
+            "props": {
+              "style": {
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "classes": "container-borders-dautom-widget-2",
+                "marginBottom": 10,
+                "marginLeft": 10,
+                "marginRight": 10
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "availability": 22
+                },
+                "meta": {
+                  "name": "EmbeddedView"
+                },
+                "position": {
+                  "basis": "300px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.params.availability": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.actualRun.availability"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.runTime": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.actualRun.runTime"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.scheduledTime": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.actualRun.totalTime"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\tNone",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Page/Embedded/GaugeAvailability",
+                  "style": {
+                    "marginLeft": 10
+                  }
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refresh",
+                      "pageScope": true,
+                      "script": "\n\tself.refreshBinding(\"props.params.scheduledTime\")\n\tself.refreshBinding(\"props.params.runTime\")\n\tself.refreshBinding(\"props.params.availability\")",
+                      "sessionScope": false,
+                      "viewScope": false
+                    }
+                  ]
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_0"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "text-titles-2"
+                      },
+                      "text": "Top 5 eventos por frecuencia"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "XYChart_3"
+                    },
+                    "position": {
+                      "basis": "350px",
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.dataSources.example": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.actualRun.dsFrecuencyEvents"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.fill.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.stroke.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "background": {
+                        "color": "#F4F4F400",
+                        "render": "color"
+                      },
+                      "dataSources": {},
+                      "legend": {
+                        "enabled": false
+                      },
+                      "series": [
+                        {
+                          "candlestick": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "color": "",
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "stacked": false,
+                              "stroke": {
+                                "color": "",
+                                "opacity": 1,
+                                "width": 1
+                              }
+                            },
+                            "high": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "low": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "column": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "ColorPerformance",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "height": null,
+                              "stacked": false,
+                              "stroke": {
+                                "opacity": 1,
+                                "width": 1
+                              },
+                              "width": null
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "data": {
+                            "source": "example",
+                            "x": "ReasonName",
+                            "y": "count"
+                          },
+                          "defaultState": {
+                            "visible": true
+                          },
+                          "hiddenInLegend": false,
+                          "label": {
+                            "text": "Frecuencia"
+                          },
+                          "line": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": false,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "name": "Top 5 by Frecuency",
+                          "render": "column",
+                          "stepLine": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": true,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": "{name}: [bold]{valueY}[/]"
+                          },
+                          "visible": true,
+                          "xAxis": "Events Description",
+                          "yAxis": "Events Count",
+                          "zIndex": 0
+                        }
+                      ],
+                      "style": {
+                        "fontFamily": "Arial"
+                      },
+                      "xAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": 60,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 330,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": true,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "HH:mm:ss a",
+                            "inputFormat": "HH:mm:ss a",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": false,
+                            "text": "Descripción de eventos"
+                          },
+                          "name": "Events Description",
+                          "render": "category",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ],
+                      "yAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": null,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 0,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": false,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "M/d/yyyy HH:mm:ss",
+                            "inputFormat": "yyyy-MM-dd kk:mm:ss",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": true,
+                            "text": "Recuento de eventos"
+                          },
+                          "name": "Events Count",
+                          "render": "value",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": 0,
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ]
+                    },
+                    "type": "ia.chart.xy"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_Frecuency"
+                },
+                "position": {
+                  "basis": "200px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "borderStyle": "solid",
+                    "borderWidth": 1,
+                    "classes": "container-borders-dautom-widget-2",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_1"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "text-titles-2"
+                      },
+                      "text": "Top 5 eventos por duración"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "XYChart_1"
+                    },
+                    "position": {
+                      "basis": "350px",
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.background.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "enabled": false,
+                          "transforms": [
+                            {
+                              "fallback": "null",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "light",
+                                  "output": "#f4f4f4"
+                                },
+                                {
+                                  "input": "light-cool",
+                                  "output": "#dde1e6"
+                                },
+                                {
+                                  "input": "light-warm",
+                                  "output": "#e5e0df"
+                                },
+                                {
+                                  "input": "dark",
+                                  "output": "#323232"
+                                },
+                                {
+                                  "input": "dark-cool",
+                                  "output": "#21272a"
+                                },
+                                {
+                                  "input": "dark-warm",
+                                  "output": "#272525"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.dataSources.example": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.actualRun.dsDurationEvents"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.fill.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.stroke.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "background": {
+                        "color": "#F4F4F400",
+                        "render": "color"
+                      },
+                      "dataSources": {},
+                      "legend": {
+                        "enabled": false
+                      },
+                      "series": [
+                        {
+                          "candlestick": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "color": "",
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "stacked": false,
+                              "stroke": {
+                                "color": "",
+                                "opacity": 1,
+                                "width": 1
+                              }
+                            },
+                            "high": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "low": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "column": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "ColorPerformance",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "height": null,
+                              "stacked": false,
+                              "stroke": {
+                                "opacity": 1,
+                                "width": 1
+                              },
+                              "width": null
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "data": {
+                            "source": "example",
+                            "x": "ReasonName",
+                            "y": "total_minutes"
+                          },
+                          "defaultState": {
+                            "visible": true
+                          },
+                          "hiddenInLegend": false,
+                          "label": {
+                            "text": "Duración (min)"
+                          },
+                          "line": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": false,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "name": "Top 5 by Duration",
+                          "render": "column",
+                          "stepLine": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": true,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": "{name}: [bold]{valueY}[/]"
+                          },
+                          "visible": true,
+                          "xAxis": "Events Description",
+                          "yAxis": "Events Count",
+                          "zIndex": 0
+                        }
+                      ],
+                      "style": {
+                        "fontFamily": "Arial"
+                      },
+                      "xAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": 60,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 330,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": true,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "HH:mm:ss a",
+                            "inputFormat": "HH:mm:ss a",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": false,
+                            "text": "Events Description"
+                          },
+                          "name": "Events Description",
+                          "render": "category",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ],
+                      "yAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": null,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 0,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": false,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "M/d/yyyy HH:mm:ss",
+                            "inputFormat": "yyyy-MM-dd kk:mm:ss",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": true,
+                            "text": "Duración de eventos"
+                          },
+                          "name": "Events Count",
+                          "render": "value",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": 0,
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ]
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.dataSources.example\")",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.chart.xy"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_Druration"
+                },
+                "position": {
+                  "basis": "200px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "borderStyle": "solid",
+                    "borderWidth": 1,
+                    "classes": "container-borders-dautom-widget-2",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_2"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "360px",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Spacer"
+            },
+            "position": {
+              "basis": "10px"
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Shift"
+        },
+        "position": {
+          "basis": "420px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_Spacer_3"
+        },
+        "position": {
+          "basis": "10px",
+          "display": false
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px",
+          "display": false
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "parent.custom.selectedAreaLabel"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "basis": "32px",
+          "display": false
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{parent.custom.selectedLineLabel}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "basis": "32px",
+          "display": false
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainer_Banner/Dropdown Area.props.value"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_2"
+        },
+        "position": {
+          "basis": "32px",
+          "display": false
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainer_Banner/Dropdown Line.props.value"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_Spacer_0"
+                },
+                "position": {
+                  "basis": "20px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "400px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "endDateTime": "{view.custom.lastRun.endDateTime}",
+                          "runID": "{view.custom.lastRun.runID}",
+                          "startDateTime": "{view.custom.lastRun.startDateTime}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\trunID \u003d value[\"runID\"]\n\tstartDateTime \u003d value[\"startDateTime\"]\n\tendDateTime \u003d value[\"endDateTime\"]\n\ttry:\n\t\tvalue \u003d \u0027Corrida Anterior. ID: \u0027 + str(runID) + \", \" + \"Desde: \" + mes_core.misc.format_datetime(startDateTime, \"yyyy-MM-dd HH:mm\") + \", Hasta: \" +  mes_core.misc.format_datetime(endDateTime, \"yyyy-MM-dd HH:mm\")\n\t\treturn value\n\texcept:\n\t\tvalue \u003d \"No hay penultima corrida\"\n\t\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-subtitle-widget",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_1"
+                },
+                "position": {
+                  "basis": "20px",
+                  "grow": 1
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "40px"
+            },
+            "props": {
+              "style": {
+                "borderStyle": "solid",
+                "borderWidth": 1,
+                "classes": "container-borders-dautom-widget-2",
+                "marginBottom": 10,
+                "marginLeft": 10,
+                "marginRight": 10
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "EmbeddedView"
+                },
+                "position": {
+                  "basis": "300px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.params.availability": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.lastRun.availability"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.runTime": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.lastRun.runTime"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.scheduledTime": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.lastRun.totalTime"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "path": "Page/Embedded/GaugeAvailability",
+                  "style": {
+                    "marginLeft": 10
+                  }
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refresh",
+                      "pageScope": true,
+                      "script": "\tself.refreshBinding(\"props.params.scheduledTime\")\n\tself.refreshBinding(\"props.params.runTime\")\n\tself.refreshBinding(\"props.params.availability\")",
+                      "sessionScope": false,
+                      "viewScope": false
+                    }
+                  ]
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_0"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "text-titles-2"
+                      },
+                      "text": "Top 5 eventos por frecuencia"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "XYChart_3"
+                    },
+                    "position": {
+                      "basis": "350px",
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.background.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "enabled": false,
+                          "transforms": [
+                            {
+                              "fallback": "null",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "light",
+                                  "output": "#f4f4f4"
+                                },
+                                {
+                                  "input": "light-cool",
+                                  "output": "#dde1e6"
+                                },
+                                {
+                                  "input": "light-warm",
+                                  "output": "#e5e0df"
+                                },
+                                {
+                                  "input": "dark",
+                                  "output": "#323232"
+                                },
+                                {
+                                  "input": "dark-cool",
+                                  "output": "#21272a"
+                                },
+                                {
+                                  "input": "dark-warm",
+                                  "output": "#272525"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.dataSources.example": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.lastRun.dsFrecuencyEvents"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.fill.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.stroke.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "background": {
+                        "color": "#F4F4F400",
+                        "render": "color"
+                      },
+                      "dataSources": {},
+                      "legend": {
+                        "enabled": false
+                      },
+                      "series": [
+                        {
+                          "candlestick": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "color": "",
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "stacked": false,
+                              "stroke": {
+                                "color": "",
+                                "opacity": 1,
+                                "width": 1
+                              }
+                            },
+                            "high": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "low": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "column": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "ColorPerformance",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "height": null,
+                              "stacked": false,
+                              "stroke": {
+                                "opacity": 1,
+                                "width": 1
+                              },
+                              "width": null
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "data": {
+                            "source": "example",
+                            "x": "ReasonName",
+                            "y": "count"
+                          },
+                          "defaultState": {
+                            "visible": true
+                          },
+                          "hiddenInLegend": false,
+                          "label": {
+                            "text": "Frecuencia"
+                          },
+                          "line": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": false,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "name": "Top 5 by Frecuency",
+                          "render": "column",
+                          "stepLine": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": true,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": "{name}: [bold]{valueY}[/]"
+                          },
+                          "visible": true,
+                          "xAxis": "Events Description",
+                          "yAxis": "Events Count",
+                          "zIndex": 0
+                        }
+                      ],
+                      "style": {
+                        "fontFamily": "Arial"
+                      },
+                      "xAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": 60,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 330,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": true,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "HH:mm:ss a",
+                            "inputFormat": "HH:mm:ss a",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": false,
+                            "text": "Events Description"
+                          },
+                          "name": "Events Description",
+                          "render": "category",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ],
+                      "yAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": null,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 0,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": false,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "M/d/yyyy HH:mm:ss",
+                            "inputFormat": "yyyy-MM-dd kk:mm:ss",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": true,
+                            "text": "Recuento de eventos"
+                          },
+                          "name": "Events Count",
+                          "render": "value",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": 0,
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ]
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.dataSources.example\")",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.chart.xy"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_Frecuency"
+                },
+                "position": {
+                  "basis": "200px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "borderStyle": "solid",
+                    "borderWidth": 1,
+                    "classes": "container-borders-dautom-widget-2",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_1"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "28px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "text-titles-2"
+                      },
+                      "text": "Top 5 eventos por duración"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "XYChart_1"
+                    },
+                    "position": {
+                      "basis": "350px",
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.background.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "enabled": false,
+                          "transforms": [
+                            {
+                              "fallback": "null",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "light",
+                                  "output": "#f4f4f4"
+                                },
+                                {
+                                  "input": "light-cool",
+                                  "output": "#dde1e6"
+                                },
+                                {
+                                  "input": "light-warm",
+                                  "output": "#e5e0df"
+                                },
+                                {
+                                  "input": "dark",
+                                  "output": "#323232"
+                                },
+                                {
+                                  "input": "dark-cool",
+                                  "output": "#21272a"
+                                },
+                                {
+                                  "input": "dark-warm",
+                                  "output": "#272525"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.dataSources.example": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.lastRun.dsDurationEvents"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.fill.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.series[0].column.appearance.stroke.color": {
+                        "binding": {
+                          "config": {
+                            "path": "session.props.theme"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": null,
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "cla-light",
+                                  "output": "#0F7F9A"
+                                },
+                                {
+                                  "input": "cla-dark",
+                                  "output": "#0F7F9A"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            },
+                            {
+                              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "background": {
+                        "color": "#F4F4F400",
+                        "render": "color"
+                      },
+                      "dataSources": {},
+                      "legend": {
+                        "enabled": false
+                      },
+                      "series": [
+                        {
+                          "candlestick": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "color": "",
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "stacked": false,
+                              "stroke": {
+                                "color": "",
+                                "opacity": 1,
+                                "width": 1
+                              }
+                            },
+                            "high": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "low": {
+                              "x": "",
+                              "y": ""
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "column": {
+                            "appearance": {
+                              "deriveFieldsFromData": {
+                                "fill": {
+                                  "color": "ColorPerformance",
+                                  "opacity": ""
+                                },
+                                "stroke": {
+                                  "color": "",
+                                  "opacity": "",
+                                  "width": ""
+                                }
+                              },
+                              "fill": {
+                                "opacity": 1
+                              },
+                              "heatRules": {
+                                "dataField": "",
+                                "enabled": false,
+                                "max": "",
+                                "min": ""
+                              },
+                              "height": null,
+                              "stacked": false,
+                              "stroke": {
+                                "opacity": 1,
+                                "width": 1
+                              },
+                              "width": null
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "data": {
+                            "source": "example",
+                            "x": "ReasonName",
+                            "y": "total_minutes"
+                          },
+                          "defaultState": {
+                            "visible": true
+                          },
+                          "hiddenInLegend": false,
+                          "label": {
+                            "text": "Duración (min)"
+                          },
+                          "line": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": false,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "name": "Top 5 by Duration",
+                          "render": "column",
+                          "stepLine": {
+                            "appearance": {
+                              "bullets": [
+                                {
+                                  "deriveFieldsFromData": {
+                                    "fill": {
+                                      "color": "",
+                                      "opacity": ""
+                                    },
+                                    "rotation": "",
+                                    "stroke": {
+                                      "color": "",
+                                      "opacity": "",
+                                      "width": ""
+                                    }
+                                  },
+                                  "enabled": true,
+                                  "fill": {
+                                    "color": "",
+                                    "opacity": 1
+                                  },
+                                  "heatRules": {
+                                    "dataField": "",
+                                    "enabled": false,
+                                    "max": 100,
+                                    "min": 2
+                                  },
+                                  "height": 10,
+                                  "label": {
+                                    "position": {
+                                      "dx": 0,
+                                      "dy": 0
+                                    },
+                                    "text": "{value}"
+                                  },
+                                  "render": "circle",
+                                  "rotation": 0,
+                                  "stroke": {
+                                    "color": "",
+                                    "opacity": 1,
+                                    "width": 1
+                                  },
+                                  "tooltip": {
+                                    "background": {
+                                      "color": "",
+                                      "opacity": 1
+                                    },
+                                    "cornerRadius": 3,
+                                    "enabled": true,
+                                    "pointerLength": 4,
+                                    "text": "{name}: [bold]{valueY}[/]"
+                                  },
+                                  "width": 10
+                                }
+                              ],
+                              "connect": true,
+                              "fill": {
+                                "color": "",
+                                "opacity": 0
+                              },
+                              "minDistance": 0.5,
+                              "stroke": {
+                                "color": "",
+                                "dashArray": "",
+                                "opacity": 1,
+                                "width": 3
+                              },
+                              "tensionX": 1,
+                              "tensionY": 1
+                            },
+                            "open": {
+                              "x": "",
+                              "y": ""
+                            }
+                          },
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": "{name}: [bold]{valueY}[/]"
+                          },
+                          "visible": true,
+                          "xAxis": "Events Description",
+                          "yAxis": "Events Count",
+                          "zIndex": 0
+                        }
+                      ],
+                      "style": {
+                        "fontFamily": "Arial"
+                      },
+                      "xAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": 60,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 330,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": true,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "HH:mm:ss a",
+                            "inputFormat": "HH:mm:ss a",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": false,
+                            "text": "Events Description"
+                          },
+                          "name": "Events Description",
+                          "render": "category",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ],
+                      "yAxes": [
+                        {
+                          "appearance": {
+                            "font": {
+                              "size": "",
+                              "weight": 500
+                            },
+                            "grid": {
+                              "color": "",
+                              "dashArray": "",
+                              "minDistance": null,
+                              "opacity": 1,
+                              "position": 0.5
+                            },
+                            "inside": false,
+                            "labels": {
+                              "color": "",
+                              "horizontalCenter": "middle",
+                              "opacity": 1,
+                              "rotation": 0,
+                              "verticalCenter": "middle",
+                              "wrap": true
+                            },
+                            "opposite": false
+                          },
+                          "category": {
+                            "break": {
+                              "enabled": false,
+                              "endCategory": "",
+                              "size": 0.05,
+                              "startCategory": ""
+                            }
+                          },
+                          "date": {
+                            "baseInterval": {
+                              "count": 1,
+                              "enabled": false,
+                              "skipEmptyPeriods": false,
+                              "timeUnit": "hour"
+                            },
+                            "break": {
+                              "enabled": false,
+                              "endDate": "",
+                              "size": 0.05,
+                              "startDate": ""
+                            },
+                            "format": "M/d/yyyy HH:mm:ss",
+                            "inputFormat": "yyyy-MM-dd kk:mm:ss",
+                            "range": {
+                              "max": "",
+                              "min": "",
+                              "useStrict": false
+                            }
+                          },
+                          "inversed": false,
+                          "label": {
+                            "color": "",
+                            "enabled": true,
+                            "text": "Duración de eventos"
+                          },
+                          "name": "Events Count",
+                          "render": "value",
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": ""
+                          },
+                          "value": {
+                            "break": {
+                              "enabled": false,
+                              "endValue": 100,
+                              "size": 0.05,
+                              "startValue": 0
+                            },
+                            "format": "#,###.##",
+                            "logarithmic": false,
+                            "range": {
+                              "max": "",
+                              "min": 0,
+                              "useStrict": false
+                            }
+                          },
+                          "visible": true
+                        }
+                      ]
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.dataSources.example\")",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.chart.xy"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_Duration"
+                },
+                "position": {
+                  "basis": "200px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "borderStyle": "solid",
+                    "borderWidth": 1,
+                    "classes": "container-borders-dautom-widget-2",
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Label_Spacer_2"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "360px",
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Spacer"
+            },
+            "position": {
+              "basis": "10px"
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Hour"
+        },
+        "position": {
+          "basis": "420px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-page"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

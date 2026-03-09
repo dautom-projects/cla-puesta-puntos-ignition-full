@@ -1,0 +1,1061 @@
+{
+  "custom": {
+    "endDate": "--",
+    "goodCount": "--",
+    "lineName": "--",
+    "mldName": "--",
+    "proCode": "--",
+    "quantity": "--",
+    "refresh": {
+      "$": [
+        "ts",
+        192,
+        1759881140371
+      ],
+      "$ts": 1759881140371
+    },
+    "runData": {
+      "$": [
+        "ds",
+        192,
+        1758904701650
+      ],
+      "$columns": [
+        {
+          "data": [],
+          "name": "WorkOrderID",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "ProductCode",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "RunStartDateTime",
+          "type": "Date"
+        },
+        {
+          "data": [],
+          "name": "ScheduleFinishDateTime",
+          "type": "Date"
+        },
+        {
+          "data": [],
+          "name": "MoldeCode",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "MoldeName",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "StandardRate",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "RunID",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "Waste",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "EstimatedFinishedTime",
+          "type": "Date"
+        },
+        {
+          "data": [],
+          "name": "Quantity",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "StartOutfeed",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "CurrentOutfeed",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "GoodCount",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "TotalCount",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "nodeName",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "rnOrder",
+          "type": "Long"
+        }
+      ]
+    },
+    "schQuantity": 3216,
+    "startDate": "--",
+    "waste": "--"
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})\n\tself.custom.refresh \u003d 0"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "class_gauge": "gauge-fill-1",
+    "fontZise": 4,
+    "gauge1": {
+      "label": "g1",
+      "value": 29
+    },
+    "gauge2": {
+      "label": "g2",
+      "value": 50
+    },
+    "gauge3": {
+      "label": "g3",
+      "value": 60
+    },
+    "gauge4": {
+      "label": "g4",
+      "value": 40
+    },
+    "gaugeAvailabilityName": "OEE",
+    "lapset": "8D",
+    "nodeID": 4,
+    "previous": 0
+  },
+  "propConfig": {
+    "custom.endDate": {
+      "persistent": true
+    },
+    "custom.goodCount": {
+      "persistent": true
+    },
+    "custom.lineName": {
+      "persistent": true
+    },
+    "custom.mldName": {
+      "persistent": true
+    },
+    "custom.proCode": {
+      "persistent": true
+    },
+    "custom.quantity": {
+      "persistent": true
+    },
+    "custom.refresh": {
+      "binding": {
+        "config": {
+          "expression": "now(10000)"
+        },
+        "transforms": [
+          {
+            "code": "\tsystem.perspective.sendMessage(\"refreshRun\")\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.runData": {
+      "persistent": true
+    },
+    "custom.schQuantity": {
+      "persistent": true
+    },
+    "custom.startDate": {
+      "persistent": true
+    },
+    "custom.waste": {
+      "persistent": true
+    },
+    "params.class_gauge": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.fontZise": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.gauge1": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.gauge2": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.gauge3": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.gauge4": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.gaugeAvailabilityName": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.lapset": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.previous": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 374,
+      "width": 643
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.gaugeAvailabilityName"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "margin": 0,
+                    "padding": 0
+                  },
+                  "textStyle": {
+                    "classes": "text-titles-2"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "SimpleGauge_0"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.arc.color": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\n\tif self.session.props.theme\u003d\u003d\"cla-light\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"\n\tif self.session.props.theme\u003d\u003d\"cla-dark\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.arc.width": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 8",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.label.size": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "expression": "{value} * 7.5",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.classes": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.class_gauge"
+                      },
+                      "enabled": false,
+                      "type": "property"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge1.value}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "arc": {},
+                  "arcBackground": {
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  },
+                  "label": {
+                    "color": "",
+                    "maxDecimal": 2,
+                    "size": 16,
+                    "units": "%",
+                    "visible": false
+                  }
+                },
+                "type": "ia.chart.simple-gauge"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "5%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge1.value}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn str(value) + \" %\"\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "textStyle": {
+                    "classes": "text-titles-2",
+                    "fontSize": 24,
+                    "marginBottom": 120
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "100%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Gauge_0"
+        },
+        "position": {
+          "basis": "60%",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "center",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "25%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge2.label}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "alignVertical": "top",
+                  "style": {
+                    "classes": "text-titles-2",
+                    "fontSize": 24,
+                    "marginLeft": 60,
+                    "marginTop": 5
+                  },
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "SimpleGauge_2"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.arc.color": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\n\tif self.session.props.theme\u003d\u003d\"cla-light\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"\n\tif self.session.props.theme\u003d\u003d\"cla-dark\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.arc.width": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 8",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.label.size": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "expression": "{value} * 7.5",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.classes": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.class_gauge"
+                      },
+                      "enabled": false,
+                      "type": "property"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge2.value}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "arc": {},
+                  "arcBackground": {
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  },
+                  "label": {
+                    "maxDecimal": 1,
+                    "size": 35,
+                    "units": "%",
+                    "visible": false
+                  },
+                  "style": {
+                    "marginLeft": 32
+                  }
+                },
+                "type": "ia.chart.simple-gauge"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "25%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "page.props.dimensions.screen.width"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value \u003c\u003d 600:\n\t\tsize \u003d 16\n\telse :\n\t\tsize \u003d 20\n\treturn size",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge2.value}+\"%\""
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "alignVertical": "top",
+                  "style": {
+                    "classes": "text-data-2",
+                    "marginLeft": 60,
+                    "marginTop": -50
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "33.3%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "25%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge3.label}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "alignVertical": "top",
+                  "style": {
+                    "classes": "text-titles-2",
+                    "fontSize": 24,
+                    "marginLeft": 0,
+                    "marginTop": 5
+                  },
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "SimpleGauge_2"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.arc.color": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\n\tif self.session.props.theme\u003d\u003d\"cla-light\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"\n\tif self.session.props.theme\u003d\u003d\"cla-dark\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.arc.width": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 8",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.label.size": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 7.5",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.classes": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.class_gauge"
+                      },
+                      "enabled": false,
+                      "type": "property"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge3.value}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "arc": {},
+                  "arcBackground": {
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  },
+                  "label": {
+                    "maxDecimal": 1,
+                    "units": "%",
+                    "visible": false
+                  }
+                },
+                "type": "ia.chart.simple-gauge"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "25%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "page.props.dimensions.screen.width"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value \u003c\u003d 600:\n\t\tsize \u003d 16\n\telse :\n\t\tsize \u003d 20\n\treturn size",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge3.value}+\"%\""
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "alignVertical": "top",
+                  "style": {
+                    "classes": "text-data-2",
+                    "marginTop": -50
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "basis": "33.3%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "25%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge4.label}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "alignVertical": "top",
+                  "style": {
+                    "classes": "text-titles-2",
+                    "fontSize": 24,
+                    "marginLeft": -60
+                  },
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "SimpleGauge_2"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.arc.color": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\n\tif self.session.props.theme\u003d\u003d\"cla-light\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"\n\tif self.session.props.theme\u003d\u003d\"cla-dark\":\n\t\tif value\u003c\u003d30:\n\t\t\treturn \"#F00C2D\"\n\t\tif value\u003e30 and value\u003c\u003d60:\n\t\t\treturn \"#FFCD06\"\n\t\tif value\u003e60:\n\t\t\treturn \"#0F7F9A\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.arc.width": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 8",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.label.size": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 7.5",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.classes": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.class_gauge"
+                      },
+                      "enabled": false,
+                      "type": "property"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge4.value}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "arc": {},
+                  "arcBackground": {
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  },
+                  "label": {
+                    "maxDecimal": 1,
+                    "units": "%",
+                    "visible": false
+                  },
+                  "style": {
+                    "marginLeft": -32
+                  }
+                },
+                "type": "ia.chart.simple-gauge"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "25%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "page.props.dimensions.screen.width"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tif value \u003c\u003d 600:\n\t\tsize \u003d 16\n\telse :\n\t\tsize \u003d 20\n\treturn size",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.gauge4.value}+\"%\""
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "alignVertical": "top",
+                  "style": {
+                    "classes": "text-data-2",
+                    "marginLeft": -60,
+                    "marginTop": -50
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_2"
+            },
+            "position": {
+              "basis": "33.3%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "40%",
+          "grow": 1
+        },
+        "props": {
+          "alignItems": "baseline",
+          "justify": "center",
+          "style": {
+            "marginTop": -40,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "borderStyle": "solid",
+        "borderWidth": "1px",
+        "classes": "container-borders-dautom-widget-2",
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

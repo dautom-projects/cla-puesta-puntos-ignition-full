@@ -1,0 +1,1586 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 1080,
+      "width": 1920
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "EmbeddedView"
+        },
+        "position": {
+          "basis": "72px"
+        },
+        "props": {
+          "params": {
+            "titulo": "ESTADO DE CAMARAS DE CURADO"
+          },
+          "path": "OREC/Curado/Camaras/Page Header"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "79px"
+                },
+                "props": {
+                  "text": "DIA :",
+                  "textStyle": {
+                    "color": "#000000",
+                    "textAlign": "center"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "NumericEntryField"
+                },
+                "position": {
+                  "basis": "85px"
+                },
+                "props": {
+                  "align": "left",
+                  "inputBounds": {
+                    "minimum": 1
+                  },
+                  "mode": "button",
+                  "style": {
+                    "backgroundColor": "#000000",
+                    "fontSize": 20,
+                    "textAlign": "center"
+                  },
+                  "value": 3
+                },
+                "type": "ia.input.numeric-entry-field"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "48.5px"
+            },
+            "props": {
+              "justify": "center"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "XYChart_1"
+            },
+            "position": {
+              "basis": "643px"
+            },
+            "propConfig": {
+              "custom.datos1": {
+                "binding": {
+                  "config": {
+                    "aggregate": "MinMax",
+                    "avoidScanClassValidation": true,
+                    "dateRange": {
+                      "mostRecent": "{../FlexContainer/NumericEntryField.props.value}",
+                      "mostRecentUnits": "DAY"
+                    },
+                    "enableValueCache": true,
+                    "ignoreBadQuality": false,
+                    "polling": {
+                      "enabled": true,
+                      "rate": "120"
+                    },
+                    "preventInterpolation": false,
+                    "returnFormat": "Wide",
+                    "returnSize": {
+                      "numRows": "1000",
+                      "type": "FIXED"
+                    },
+                    "tags": [
+                      {
+                        "alias": "camara 12",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 12/status/stage status"
+                      },
+                      {
+                        "alias": "camara 11",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 11/status/stage status"
+                      },
+                      {
+                        "alias": "camara 10",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 10/status/stage status"
+                      },
+                      {
+                        "alias": "camara 9",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 9/status/stage status"
+                      },
+                      {
+                        "alias": "camara 8",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 8/status/stage status"
+                      },
+                      {
+                        "alias": "camara 6",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 6/status/stage status"
+                      },
+                      {
+                        "alias": "camara 5",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 5/status/stage status"
+                      },
+                      {
+                        "alias": "camara 4",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 4/status/stage status"
+                      },
+                      {
+                        "alias": "camara 3",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 3/status/stage status"
+                      },
+                      {
+                        "alias": "camara 2",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 2/status/stage status"
+                      },
+                      {
+                        "alias": "camara 1",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 1/status/stage status"
+                      }
+                    ],
+                    "valueFormat": "DATASET"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t\tstart \u003d timestamp\n\t\t\n\t\tdata \u003d value\n\t\t\n\t\tprevmode \u003d -1\n\t\tprevstart \u003d 0\n\t\tprevtime \u003d 0\n\t\tevents\u003d[]\n\t\tpaso \u003d {0:\"sin programa\", 1:\"hold\", 2:\"curado\", 3:\"rampa 1\", 4:\"secado 1\", 5:\"ramapa 2\", 6:\"secado 2\", 7:\"rampa 3\", 8:\"secado 3\", 9:\"enfriamiento\"}\n\t\tcolor \u003d {0:\"#FFFFFF\", 1:\"#AAAAAA\", 2:\"#FF4747\", 3:\"#FFAC47\", 4:\"#FFFF47\", 5:\"#47FF47\", 6:\"#47FFFF\", 7:\"#4747FF\", 8:\"#FF47FF\", 9:\"#FF8A8A\"}\n\t\tfor column in range(1,data.getColumnCount()):\n\t\t\ttag_name \u003d data.getColumnName(column)\n\t\t\t\n\t\t\tfor row in range(data.getRowCount()):\n\t\t\t\tmode \u003d data.getValueAt(row,column)\n\t\t\t\ttime \u003d  system.date.toMillis(data.getValueAt(row,0))\n\t\t\t\t\n\t\t\t\tif row \u003d\u003d 0:\n\t\t\t\t\tprevmode \u003d mode\n\t\t\t\t\tprevstart \u003d  system.date.toMillis(start)\n\t\t\t\t\t\n\t\t\t\tif (mode !\u003d prevmode or row\u003d\u003ddata.getRowCount() -1) and time !\u003d prevtime:\n\t\t\t\t\t\tfromDate \u003d system.date.fromMillis(prevstart)\n\t\t\t\t\t\ttoDate \u003d system.date.fromMillis(time)\n\t\t\t\t\t\ttotalTimeInSeconds \u003d (toDate.getTime() - fromDate.getTime()) / 1000\n\t\t\t\t\t\tif totalTimeInSeconds \u003e\u003d0:\n\t\t\t\t\t\t hours, remainder \u003d divmod(totalTimeInSeconds, 3600)\n\t\t\t\t\t\t minutes, seconds \u003d divmod(remainder, 60)\n\t\t\t\t\t\t totalTime \u003d \"{:02}:{:02}:{:02}\".format(int(hours), int(minutes), int(seconds))\n\t\t\t\t\t\t events.append({\n\t\t\t\t\t\t\t\"paso\": paso[prevmode],\n\t\t\t\t\t\t\t\"fromDate\": system.date.format(fromDate, \"yyyy-MM-dd HH:mm:ss\"),#system.date.format(system.date.fromMillis(prevstart), \"yyyy-MM-dd HH:mm:ss\"),prevstart,\n\t\t\t\t\t\t\t\"toDate\": system.date.format(toDate, \"yyyy-MM-dd HH:mm:ss\"),#system.date.format(system.date.fromMillis(time), \"yyyy-MM-dd HH:mm:ss\"),time,\n\t\t\t\t\t\t\t\"name\": tag_name,\n\t\t\t\t\t\t\t\"TotalTime\": totalTime,\n\t\t\t\t\t\t\t\"color\": color[prevmode]\n\t\t\t\t\t\t})\n\t\t\t\t\t\tprevmode \u003d mode\n\t\t\t\t\t\tprevstart \u003d time\n\t\t\t\tprevtime \u003d time\n\t\treturn events",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "tag-history"
+                }
+              },
+              "props.dataSources.schedule_data": {
+                "binding": {
+                  "config": {
+                    "aggregate": "MinMax",
+                    "avoidScanClassValidation": true,
+                    "dateRange": {
+                      "mostRecent": "{../FlexContainer/NumericEntryField.props.value}",
+                      "mostRecentUnits": "DAY"
+                    },
+                    "enableValueCache": true,
+                    "ignoreBadQuality": false,
+                    "polling": {
+                      "enabled": true,
+                      "rate": "120"
+                    },
+                    "preventInterpolation": false,
+                    "returnFormat": "Wide",
+                    "returnSize": {
+                      "numRows": "80000",
+                      "type": "FIXED"
+                    },
+                    "tags": [
+                      {
+                        "alias": "camara 1",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 1/status/stage status"
+                      },
+                      {
+                        "alias": "camara 2",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 2/status/stage status"
+                      },
+                      {
+                        "alias": "camara 3",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 3/status/stage status"
+                      },
+                      {
+                        "alias": "camara 4",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 4/status/stage status"
+                      },
+                      {
+                        "alias": "camara 5",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 5/status/stage status"
+                      },
+                      {
+                        "alias": "camara 6",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 6/status/stage status"
+                      },
+                      {
+                        "alias": "camara 8",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 8/status/stage status"
+                      },
+                      {
+                        "alias": "camara 9",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 9/status/stage status"
+                      },
+                      {
+                        "alias": "camara 10",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 10/status/stage status"
+                      },
+                      {
+                        "alias": "camara 11",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 11/status/stage status"
+                      },
+                      {
+                        "alias": "camara 12",
+                        "path": "[SQL_MainDataServer/ignition-b9586s28:default]orec/curado/camaras/camara 12/status/stage status"
+                      }
+                    ],
+                    "valueFormat": "DATASET"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tstart \u003d timestamp\n\t\n\tdata \u003d value\n\t\n\tprevmode \u003d -1\n\tprevstart \u003d 0\n\tprevtime \u003d 0\n\tevents\u003d[]\n\tcolor \u003d {0:\"#FFFFFF\", 1:\"#AAAAAA\", 2:\"#FF4747\", 3:\"#FFAC47\", 4:\"#FFFF47\", 5:\"#47FF47\", 6:\"#47FFFF\", 7:\"#4747FF\", 8:\"#FF47FF\", 9:\"#FF8A8A\"}\n\tfor column in range(1,data.getColumnCount()):\n\t\ttag_name \u003d data.getColumnName(column)\n\t\t\n\t\tfor row in range(data.getRowCount()):\n\t\t\tmode \u003d data.getValueAt(row,column)\n\t\t\ttime \u003d  system.date.toMillis(data.getValueAt(row,0))\n\t\t\t\n\t\t\tif row \u003d\u003d 0:\n\t\t\t\tprevmode \u003d mode\n\t\t\t\tprevstart \u003d  system.date.toMillis(start)\n\t\t\t\t\n\t\t\tif (mode !\u003d prevmode or row\u003d\u003ddata.getRowCount() -1) and time !\u003d prevtime:\n\t\t\t\t\tevents.append({\n\t\t\t\t\t\t\"color\": color[prevmode],\n\t\t\t\t\t\t\"fromDate\": system.date.format(system.date.fromMillis(prevstart), \"yyyy-MM-dd HH:mm:ss\"),#prevstart,\n\t\t\t\t\t\t\"toDate\": system.date.format(system.date.fromMillis(time), \"yyyy-MM-dd HH:mm:ss\"),#time,\n\t\t\t\t\t\t\"name\": tag_name,\n\t\t\t\t\t})\n\t\t\t\t\tprevmode \u003d mode\n\t\t\t\t\tprevstart \u003d time\n\t\t\tprevtime \u003d time\n\treturn events",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "tag-history"
+                }
+              },
+              "props.series[0].tooltip.text": {
+                "binding": {
+                  "config": {
+                    "expression": "\"{name}: [bold]{fromDate} - {toDate}[/]\""
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "cursor": {
+                "series": "schedule data"
+              },
+              "dataSources": {},
+              "enableTransitions": true,
+              "legend": {
+                "enabled": false,
+                "labels": {
+                  "font": {
+                    "size": 20
+                  }
+                },
+                "markers": {
+                  "height": 40,
+                  "stroke": {
+                    "color": "#FAFAFB"
+                  },
+                  "width": 40
+                },
+                "position": "right"
+              },
+              "scrollBars": {
+                "horizontal": {
+                  "series": "schedule data"
+                }
+              },
+              "series": [
+                {
+                  "candlestick": {
+                    "appearance": {
+                      "deriveFieldsFromData": {
+                        "fill": {
+                          "color": "",
+                          "opacity": ""
+                        },
+                        "stroke": {
+                          "color": "",
+                          "opacity": "",
+                          "width": ""
+                        }
+                      },
+                      "fill": {
+                        "color": "",
+                        "opacity": 1
+                      },
+                      "heatRules": {
+                        "dataField": "",
+                        "enabled": false,
+                        "max": "",
+                        "min": ""
+                      },
+                      "stacked": false,
+                      "stroke": {
+                        "color": "",
+                        "opacity": 1,
+                        "width": 1
+                      }
+                    },
+                    "high": {
+                      "x": "",
+                      "y": ""
+                    },
+                    "low": {
+                      "x": "",
+                      "y": ""
+                    },
+                    "open": {
+                      "x": "",
+                      "y": ""
+                    }
+                  },
+                  "column": {
+                    "appearance": {
+                      "deriveFieldsFromData": {
+                        "fill": {
+                          "color": "color",
+                          "opacity": ""
+                        },
+                        "stroke": {
+                          "color": "",
+                          "opacity": "",
+                          "width": ""
+                        }
+                      },
+                      "fill": {
+                        "color": "#AAAAAA",
+                        "opacity": 1
+                      },
+                      "heatRules": {
+                        "dataField": "",
+                        "enabled": false,
+                        "max": "",
+                        "min": ""
+                      },
+                      "height": 60,
+                      "stacked": false,
+                      "stroke": {
+                        "color": "#AAAAAA",
+                        "opacity": 1,
+                        "width": 1
+                      },
+                      "width": null
+                    },
+                    "open": {
+                      "x": "fromDate",
+                      "y": ""
+                    }
+                  },
+                  "data": {
+                    "source": "schedule_data",
+                    "x": "toDate",
+                    "y": "name"
+                  },
+                  "defaultState": {
+                    "visible": true
+                  },
+                  "hiddenInLegend": false,
+                  "label": {
+                    "text": "camaras"
+                  },
+                  "label_1": {
+                    "text": "hold"
+                  },
+                  "line": {
+                    "appearance": {
+                      "bullets": [
+                        {
+                          "deriveFieldsFromData": {
+                            "fill": {
+                              "color": "",
+                              "opacity": ""
+                            },
+                            "rotation": "",
+                            "stroke": {
+                              "color": "",
+                              "opacity": "",
+                              "width": ""
+                            }
+                          },
+                          "enabled": false,
+                          "fill": {
+                            "color": "",
+                            "opacity": 1
+                          },
+                          "heatRules": {
+                            "dataField": "",
+                            "enabled": false,
+                            "max": 100,
+                            "min": 2
+                          },
+                          "height": 10,
+                          "label": {
+                            "position": {
+                              "dx": 0,
+                              "dy": 0
+                            },
+                            "text": "{value}"
+                          },
+                          "render": "circle",
+                          "rotation": 0,
+                          "stroke": {
+                            "color": "",
+                            "opacity": 1,
+                            "width": 1
+                          },
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": "{name}: [bold]{valueY}[/]"
+                          },
+                          "width": 10
+                        }
+                      ],
+                      "connect": true,
+                      "fill": {
+                        "color": "",
+                        "opacity": 0
+                      },
+                      "minDistance": 0.5,
+                      "stroke": {
+                        "color": "",
+                        "dashArray": "",
+                        "opacity": 1,
+                        "width": 3
+                      },
+                      "tensionX": 1,
+                      "tensionY": 1
+                    },
+                    "open": {
+                      "x": "",
+                      "y": ""
+                    }
+                  },
+                  "name": "schedule data",
+                  "render": "column",
+                  "stepLine": {
+                    "appearance": {
+                      "bullets": [
+                        {
+                          "deriveFieldsFromData": {
+                            "fill": {
+                              "color": "",
+                              "opacity": ""
+                            },
+                            "rotation": "",
+                            "stroke": {
+                              "color": "",
+                              "opacity": "",
+                              "width": ""
+                            }
+                          },
+                          "enabled": true,
+                          "fill": {
+                            "color": "",
+                            "opacity": 1
+                          },
+                          "heatRules": {
+                            "dataField": "",
+                            "enabled": false,
+                            "max": 100,
+                            "min": 2
+                          },
+                          "height": 10,
+                          "label": {
+                            "position": {
+                              "dx": 0,
+                              "dy": 0
+                            },
+                            "text": "{value}"
+                          },
+                          "render": "circle",
+                          "rotation": 0,
+                          "stroke": {
+                            "color": "",
+                            "opacity": 1,
+                            "width": 1
+                          },
+                          "tooltip": {
+                            "background": {
+                              "color": "",
+                              "opacity": 1
+                            },
+                            "cornerRadius": 3,
+                            "enabled": true,
+                            "pointerLength": 4,
+                            "text": "{name}: [bold]{valueY}[/]"
+                          },
+                          "width": 10
+                        }
+                      ],
+                      "connect": true,
+                      "fill": {
+                        "color": "",
+                        "opacity": 0
+                      },
+                      "minDistance": 0.5,
+                      "stroke": {
+                        "color": "",
+                        "dashArray": "",
+                        "opacity": 1,
+                        "width": 3
+                      },
+                      "tensionX": 1,
+                      "tensionY": 1
+                    },
+                    "open": {
+                      "x": "",
+                      "y": ""
+                    }
+                  },
+                  "tooltip": {
+                    "background": {
+                      "color": "",
+                      "opacity": 1
+                    },
+                    "cornerRadius": 10,
+                    "enabled": true,
+                    "pointerLength": 10
+                  },
+                  "visible": true,
+                  "xAxis": "time",
+                  "yAxis": "name",
+                  "zIndex": 0.5
+                }
+              ],
+              "style": {
+                "backgroundColor": "#AAAAAA"
+              },
+              "title": {
+                "appearance": {
+                  "color": "#D5D5D5"
+                }
+              },
+              "xAxes": [
+                {
+                  "appearance": {
+                    "font": {
+                      "size": "",
+                      "weight": 800
+                    },
+                    "grid": {
+                      "color": "#000000",
+                      "dashArray": "",
+                      "minDistance": 95,
+                      "opacity": 1,
+                      "position": 1
+                    },
+                    "inside": false,
+                    "labels": {
+                      "color": "",
+                      "horizontalCenter": "middle",
+                      "opacity": 1,
+                      "rotation": 0,
+                      "verticalCenter": "middle"
+                    },
+                    "opposite": false
+                  },
+                  "category": {
+                    "break": {
+                      "enabled": false,
+                      "endCategory": "",
+                      "size": 0.05,
+                      "startCategory": ""
+                    }
+                  },
+                  "date": {
+                    "baseInterval": {
+                      "count": 1,
+                      "enabled": true,
+                      "skipEmptyPeriods": false,
+                      "timeUnit": "second"
+                    },
+                    "break": {
+                      "enabled": false,
+                      "endDate": "",
+                      "size": 0.05,
+                      "startDate": ""
+                    },
+                    "format": "HH:mm:ss a",
+                    "inputFormat": "HH:mm:ss a",
+                    "range": {
+                      "max": "",
+                      "min": "",
+                      "useStrict": false
+                    }
+                  },
+                  "inversed": false,
+                  "label": {
+                    "color": "#000000",
+                    "enabled": true,
+                    "text": "Time"
+                  },
+                  "name": "time",
+                  "render": "date",
+                  "tooltip": {
+                    "background": {
+                      "color": "",
+                      "opacity": 1
+                    },
+                    "cornerRadius": 3,
+                    "enabled": true,
+                    "pointerLength": 10,
+                    "text": ""
+                  },
+                  "value": {
+                    "break": {
+                      "enabled": false,
+                      "endValue": 100,
+                      "size": 0.05,
+                      "startValue": 0
+                    },
+                    "format": "#,###.##",
+                    "logarithmic": false,
+                    "range": {
+                      "max": "",
+                      "min": "",
+                      "useStrict": false
+                    }
+                  },
+                  "visible": true
+                }
+              ],
+              "yAxes": [
+                {
+                  "appearance": {
+                    "font": {
+                      "size": "",
+                      "weight": 100
+                    },
+                    "grid": {
+                      "color": "",
+                      "dashArray": "",
+                      "minDistance": null,
+                      "opacity": 1,
+                      "position": 0
+                    },
+                    "inside": false,
+                    "labels": {
+                      "color": "",
+                      "horizontalCenter": "middle",
+                      "opacity": 1,
+                      "rotation": 0,
+                      "verticalCenter": "middle"
+                    },
+                    "opposite": false
+                  },
+                  "category": {
+                    "break": {
+                      "enabled": false,
+                      "endCategory": "",
+                      "size": 0.05,
+                      "startCategory": ""
+                    }
+                  },
+                  "date": {
+                    "baseInterval": {
+                      "count": 1,
+                      "enabled": false,
+                      "skipEmptyPeriods": false,
+                      "timeUnit": "minute"
+                    },
+                    "break": {
+                      "enabled": false,
+                      "endDate": "",
+                      "size": 0.05,
+                      "startDate": ""
+                    },
+                    "format": "HH:mm:ss a",
+                    "inputFormat": "HH:mm:ss a",
+                    "range": {
+                      "max": "",
+                      "min": "",
+                      "useStrict": false
+                    }
+                  },
+                  "inversed": false,
+                  "label": {
+                    "color": "",
+                    "enabled": false,
+                    "text": "Process Temp"
+                  },
+                  "name": "name",
+                  "render": "category",
+                  "tooltip": {
+                    "background": {
+                      "color": "",
+                      "opacity": 1
+                    },
+                    "cornerRadius": 3,
+                    "enabled": true,
+                    "pointerLength": 4,
+                    "text": ""
+                  },
+                  "value": {
+                    "break": {
+                      "enabled": false,
+                      "endValue": 100,
+                      "size": 0.05,
+                      "startValue": 0
+                    },
+                    "format": "#,###.##",
+                    "logarithmic": false,
+                    "range": {
+                      "max": "",
+                      "min": "",
+                      "useStrict": false
+                    }
+                  },
+                  "visible": true
+                }
+              ]
+            },
+            "type": "ia.chart.xy"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "SIN PROGRAMA",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#AAAAAA",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "HOLD",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_4"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#FF4747",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_3"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "CURADO",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_6"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#FFAC47",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_5"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "RAMPA 1",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_7"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#FFFF47",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_8"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "SECADO 1",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_9"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#47FF47",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_10"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "RAMPA 2",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_11"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#47FFFF",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_12"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "SECADO 2",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_13"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#4747FF",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_14"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "RAMPA 3",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_15"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#FF47FF",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_16"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "SECADO 3",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_17"
+                },
+                "position": {
+                  "basis": "69px"
+                },
+                "props": {
+                  "style": {
+                    "backgroundColor": "#FF8A8A",
+                    "borderBottomLeftRadius": 20,
+                    "borderBottomRightRadius": 20,
+                    "borderColor": "#000000",
+                    "borderStyle": "solid",
+                    "borderTopLeftRadius": 20,
+                    "borderTopRightRadius": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_18"
+                },
+                "position": {
+                  "basis": "131px"
+                },
+                "props": {
+                  "text": "ENFRIAMIENTO",
+                  "textStyle": {
+                    "color": "#000000",
+                    "fontWeight": "bold"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "35px"
+            },
+            "props": {
+              "justify": "space-evenly"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "968px"
+        },
+        "props": {
+          "direction": "column",
+          "justify": "space-evenly"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "basis": "400px"
+        },
+        "propConfig": {
+          "custom.datos": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainer/XYChart_1.custom.datos1"
+              },
+              "transforms": [
+                {
+                  "code": "    data \u003d []\n    for row in value:  \n        keys \u003d row.keys()  \n        formatted_rows \u003d []\n        for key, v in row.items():\n            if key \u003d\u003d \"color\":\n                style \u003d {\"backgroundColor\": v, \"color\": v} \n                formatted_rows.append({\"value\": v, \"style\": style})\n            else:\n                formatted_rows.append({\"value\": v, \"style\": {}}) \n\n        row_dict \u003d dict(zip(keys, formatted_rows))\n        data.append(row_dict) \n    return data",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.data": {
+            "binding": {
+              "config": {
+                "path": "this.custom.datos"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "columns": [
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "name",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Camara"
+              },
+              "justify": "auto",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "fromDate",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Inicio "
+              },
+              "justify": "auto",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "toDate",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Final"
+              },
+              "justify": "auto",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "TotalTime",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Tiempo Total"
+              },
+              "justify": "auto",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "paso",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Etapa"
+              },
+              "justify": "auto",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "color",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Color"
+              },
+              "justify": "auto",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            }
+          ],
+          "footerGroupStyle": {
+            "backgroundColor": "#D5D5D5"
+          },
+          "footerStyle": {
+            "backgroundColor": "#D5D5D5"
+          },
+          "style": {
+            "backgroundColor": "#D5D5D5"
+          }
+        },
+        "type": "ia.display.table"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

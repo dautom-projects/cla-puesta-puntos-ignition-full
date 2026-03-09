@@ -1,0 +1,1324 @@
+{
+  "custom": {
+    "db": "mes_core",
+    "lineDisable": 0,
+    "lineIdMap": null,
+    "lineName": "IMM 15",
+    "selEndTime": "2/12/2025, 1:16:36 p. m.",
+    "selMatCode": null,
+    "selQty": null,
+    "selSchID": null,
+    "selStartTime": "2/12/2025, 1:16:36 p. m.",
+    "selWO": null,
+    "selWOID": null,
+    "stationStatus": 4,
+    "tableData": {
+      "$": [
+        "ds",
+        192,
+        1764699396269
+      ],
+      "$columns": [
+        {
+          "data": [
+            96,
+            97,
+            95,
+            94,
+            93,
+            92
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            109,
+            110,
+            108,
+            107,
+            106,
+            105
+          ],
+          "name": "WorkOrderID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "122000070",
+            "122000042",
+            "122000059",
+            "122000071",
+            "121000187",
+            "122000404"
+          ],
+          "name": "ProductCode",
+          "type": "String"
+        },
+        {
+          "data": [
+            "CUBIERTA 34R PMV SD GRIS BGLOBAL",
+            "CUBIERTA 34R PMV NEGRA BGLOBAL",
+            "CUBIERTA 34 PMV SD GRIS BGLOBAL",
+            "CUBIERTA 34R PMV SD AMARILLO BGLOBAL",
+            "CUBIERTA 34 PMV SD AMARILLO BGLOBAL",
+            "CUBIERTA 34R PMV SD ROJA BGLOBAL"
+          ],
+          "name": "Description",
+          "type": "String"
+        },
+        {
+          "data": [
+            1764820800000,
+            1764759600000,
+            1764707512303,
+            1764706380227,
+            1764702000000,
+            1764679770343
+          ],
+          "name": "StartTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            1764840950943,
+            1764817200000,
+            1764723281123,
+            1764707512303,
+            1764706380227,
+            1764681522433
+          ],
+          "name": "FinishTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            "MOL-2",
+            "MOL-2",
+            "MOL-2",
+            "MOL-2",
+            "MOL-2",
+            "MOL-2"
+          ],
+          "name": "MoldeCode",
+          "type": "String"
+        },
+        {
+          "data": [
+            890,
+            2544,
+            720,
+            50,
+            200,
+            80
+          ],
+          "name": "Quantity",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "IMM 15",
+            "IMM 15",
+            "IMM 15",
+            "IMM 15",
+            "IMM 15",
+            "IMM 15"
+          ],
+          "name": "nodeName",
+          "type": "String"
+        }
+      ]
+    }
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tsystem.perspective.sendMessage(\u0027refreshSchWO\u0027, payload\u003d{})\n\t\n\t\u0027\u0027\u0027\n\ttable\u003dmes_core.schedule.scheduleTable(\"mes_core\")\n\tself.view.custom.tableData \u003d table.selectCustom(columns\u003d[\"ID\",\"NodeID\", \"Quantity\" , \"MoldID\" , \"WorkOrderID\", \"ScheduleStartDateTime\",\n\t\"ScheduleFinishDateTime\"] , where_clause\u003d \"RunID is Null\")\n"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "nodeID": 4
+  },
+  "propConfig": {
+    "custom.db": {
+      "persistent": true
+    },
+    "custom.lineDisable": {
+      "persistent": true
+    },
+    "custom.lineIdMap": {
+      "binding": {
+        "config": {
+          "path": "view.params.lineID"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.lineName": {
+      "binding": {
+        "config": {
+          "path": "view.params.nodeID"
+        },
+        "transforms": [
+          {
+            "code": "\tid \u003d value\n\tdb \u003d self.custom.db\n\tquery \u003d  \"\"\"\n\t\tSELECT Name FROM node WHERE ID \u003d ?\n\t\"\"\"\n\tdataset \u003d system.db.runPrepQuery(query, [id], db)\n\tname \u003d dataset[0][\"Name\"]\n\treturn name",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tsystem.perspective.sendMessage(\u0027refreshSchWO\u0027, payload\u003d{})"
+      },
+      "persistent": true
+    },
+    "custom.selEndTime": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].ScheduleFinishDateTime"
+        },
+        "transforms": [
+          {
+            "formatType": "datetime",
+            "formatValue": {
+              "date": "medium",
+              "time": "medium"
+            },
+            "type": "format"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selMatCode": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].MoldeID"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selQty": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].Quantity"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selSchID": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].ID"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selStartTime": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].ScheduleStartDateTime"
+        },
+        "transforms": [
+          {
+            "formatType": "datetime",
+            "formatValue": {
+              "date": "medium",
+              "time": "medium"
+            },
+            "type": "format"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selWO": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].WorkOrderID"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selWOID": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].WorkOrderID"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.stationStatus": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.db}",
+            "lineID": "{view.params.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\ttry:\n\t\ttableStH\u003d mes_core.model.statehistoryTable(value[\"db\"])\n\t\tcolumns \u003d [\"TOP 1 ReasonCode\"]\n\t\twhere_clause \u003d (\n\t\t\t\"NodeID \u003d ? \"\n\t\t\t\"ORDER BY ID DESC \"\n\t\t)\n\t\twhere_args \u003d [value[\"lineID\"]]\n\t\tresult\u003dtableStH.selectCustom(columns, where_clause, where_args)\n\t\t\n\t\tvalue \u003d result.getValueAt(0,0)\n\t\treturn value\n\texcept:\n\t\treturn 1",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.tableData": {
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 1920
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label Title"
+            },
+            "position": {
+              "basis": "371px",
+              "grow": 1
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "expression": "\"Órdenes Agendadas en la linea \" + {view.custom.lineName} + \" (Ordenadas por fecha de inicio)\""
+                  },
+                  "enabled": false,
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "text-titles"
+              },
+              "text": "Órdenes Agendadas"
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "71px"
+        },
+        "props": {
+          "justify": "center",
+          "style": {
+            "classes": "container-borders-dautom-widget",
+            "margin-bottom": 15
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.data": {
+            "binding": {
+              "config": {
+                "path": "view.custom.tableData"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "cells": {
+            "style": {
+              "borderBottomWidth": 1,
+              "fontFamily": "Arial",
+              "fontSize": 24
+            }
+          },
+          "columns": [
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "nodeName",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Linea"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 40
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "WorkOrderID",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Orden de Produccion"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": 50
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "ProductCode",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "SKU"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 70
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Description",
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Descripcion"
+              },
+              "justify": "center",
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 200
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY HH:mm:ss",
+              "editable": false,
+              "field": "MoldeCode",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Molde"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": 30
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Quantity",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Cantidad"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 50
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY HH:mm:ss",
+              "editable": false,
+              "field": "StartTime",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Fecha Inicio"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY HH:mm:ss",
+              "editable": false,
+              "field": "FinishTime",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Fecha Fin"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "ID",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": ""
+            }
+          ],
+          "dragOrderable": false,
+          "emptyMessage": {
+            "noData": {
+              "text": "No hay ordenes agendadas para la linea"
+            }
+          },
+          "headerStyle": {
+            "fontSize": 18
+          },
+          "pager": {
+            "bottom": false
+          },
+          "resizeMode": "fixed",
+          "selection": {
+            "style": {
+              "backgroundColor": "#4A0E704D",
+              "borderStyle": "none"
+            }
+          },
+          "style": {
+            "borderStyle": "none",
+            "classes": "table",
+            "margin-bottom": 10
+          }
+        },
+        "type": "ia.display.table"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": [
+                  {
+                    "config": {
+                      "script": "\t\u0027\u0027\u0027\u0027\t\n\t\n\truleMsg \u003d self.checkRunRules()\n\tif not self.parent.parent.getChild(\"Table\").props.selection.data:\n\t\talerts.noSelectionTable(\"orden para iniciar\")\n\telif ruleMsg:\n\t\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\t\ttitle\u003d\u0027No se puede iniciar\u0027, \n\t\t\t\t\t\tmessage\u003druleMsg, \n\t\t\t\t\t\tbtnTextPrimary\u003d\u0027OK\u0027, \n\t\t\t\t\tbtnActionPrimary\u003d\u0027\u0027)\n\t\t\t\t\t\n\telse:\n\t\u0027\u0027\u0027\n\t\n\t\u0027\u0027\u0027\n\talerts.confirmAction(title\u003d\u0027Iniciar Orden\u0027, \n\t\t\t\t\t\t\tmessage\u003d\u0027iniciar la orden \"{}\" en la linea \"{}\"?\u0027.format(self.view.custom.selWO, self.view.custom.lineName),\n\t\t\t\t\t\t\taction\u003d\u0027startWORun\u0027)\n\t\t\t\t\t\t\t\n\t\u0027\u0027\u0027\n\t#mes_core.run.writeData2Database(self.view.custom.selSchID)\n\t\n\talerts.confirmAction(title\u003d\u0027Iniciar Orden\u0027, message\u003d\u0027iniciar la orden \"{}\" en la linea \"{}\"?\u0027.format(self.view.custom.selWO, self.view.custom.lineName),action\u003d\u0027startWORun\u0027)"
+                    },
+                    "scope": "G",
+                    "type": "script"
+                  },
+                  {
+                    "config": {
+                      "script": "\tif not self.parent.parent.getChild(\"Table\").props.selection.data:\n\t\talerts.noSelectionTable(\"orden para iniciar\")\n\telif self.view.custom.lineName \u003d\u003d \u0027Recibo\u0027:\n\t\tview \u003d \u0027Page/PopUps/InsertTruckPlate\u0027\n\t\ttitle \u003d \u0027Asignar placa de vehiculo a la corrida\u0027\n\t\tparams \u003d {\"workOrder\":self.view.custom.selWO}\n\t\tsystem.perspective.openPopup(\"insertplate\", view, params\u003dparams, title\u003dtitle, draggable\u003d0,resizable\u003d0,modal\u003d1)\n\telse:\n\t\talerts.confirmAction(title\u003d\u0027Iniciar Orden\u0027, \n\t\t\t\t\t\t\tmessage\u003d\u0027iniciar la orden \"{}\" en la linea \"{}\"?\u0027.format(self.view.custom.selWO, self.view.custom.lineName),\n\t\t\t\t\t\t\taction\u003d\u0027startWORun\u0027)\n\t\t\t\t\t\t\t\n\t\t\n"
+                    },
+                    "enabled": false,
+                    "scope": "G",
+                    "type": "script"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "name": "Button_Start"
+            },
+            "position": {
+              "basis": "150px"
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.lineDisable"
+                  },
+                  "enabled": false,
+                  "transforms": [
+                    {
+                      "code": "\treturn not value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-2",
+                  "path": "material/not_started"
+                }
+              },
+              "style": {
+                "classes": "button-1",
+                "fontSize": 20,
+                "marginBottom": 5,
+                "marginTop": 0
+              },
+              "text": "Iniciar"
+            },
+            "scripts": {
+              "customMethods": [
+                {
+                  "name": "checkRunRules",
+                  "params": [],
+                  "script": "\t# implement your method here\n\t\n\t\u0027\u0027\u0027\n\t\n\tlineName \u003d self.view.custom.lineName\n\t\n\tselSchID \u003d self.view.custom.selSchID\n\t#[actualSrc, actualDst] \u003d order.getSrcDst(selSchID)\n\tactualWOID \u003d self.view.custom.selWOID\n\t\n\trecRun \u003d run.getRunByLine(\u0027Recibo\u0027)\n\tif recRun:\n\t\trecRunSrc \u003d recRun.getValueAt(0, \"SourceStorage\")\n\t\trecRunDst \u003d recRun.getValueAt(0, \"DestinationStorage\")\n\t\trecWOID \u003d recRun.getValueAt(0, \"WorkOrderID\")\n\t\tif set ([actualDst]) \u0026 set([recRunDst]):\n\t\t\treturn \u0027Silos en uso\u0027\n\ttrsRun \u003d run.getRunByLine(\u0027Trasiego\u0027)\n\tif trsRun:\n\t\ttrsRunSrc \u003d trsRun.getValueAt(0, \"SourceStorage\")\n\t\ttrsRunDst \u003d trsRun.getValueAt(0, \"DestinationStorage\")\n\t\ttrsWOID \u003d trsRun.getValueAt(0, \"WorkOrderID\")\n\t\tif set ([actualDst]) \u0026 set([trsRunDst]):\n\t\t\treturn \u0027Silos en uso\u0027\n\ttmlRun \u003d run.getRunByLine(\u0027Trasiego Molino\u0027)\n\tif tmlRun:\n\t\ttmlRunSrc \u003d tmlRun.getValueAt(0, \"SourceStorage\")\n\t\ttmlRunDst \u003d tmlRun.getValueAt(0, \"DestinationStorage\")\n\t\ttmlWOID \u003d tmlRun.getValueAt(0, \"WorkOrderID\")\n\t\tif set ([actualDst]) \u0026 set([tmlRunDst]):\n\t\t\treturn \u0027Silos en uso\u0027\n\n\t\n\t\n\t\n\tif lineName \u003d\u003d \u0027Recibo\u0027:\n\t\tif recRun: #\tOrder recibo activa verificar \n\t\t\tif recWOID !\u003d actualWOID:\n\t\t\t\tlogging.log(\u0027Actual {} progreso {}\u0027.format(recWOID,actualWOID), \u0027info\u0027)\n\t\t\t\treturn \u0027La orden actual no coincide con la orden en progreso\u0027\n\t\t\telif (system.tag.readBlocking(\"[DAUTOM_Provider]D_obj/Process01_Ctrl/Out_FeedOn\")[0].value) \u003d\u003d True:\n\t\t\t\treturn \u0027Se esta alimentando la linea de Recibo, no se puede iniciar la corrida\u0027\n\t\t\telif system.tag.readBlocking(\"[DAUTOM_Provider]D_obj/Process01_Ctrl/Out_eState\")[0].value !\u003d 6:\n\t\t\t\treturn \u0027No se puede concatenar las corridas porque el SCADA no esta en estado execute\u0027\n\t\telse:\n\t\t\tif trsRun:\n\t\t\t\tif actualDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027] and trsRunDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027, \u0027Silo A\u0027, \u0027Silo B\u0027]:\n\t\t\t\t\treturn \u0027Linea recibo bloqueada por transportadora T5 en uso\u0027\n\t\t\t\telif actualDst in [\u0027Silo A\u0027, \u0027Silo B\u0027] and trsRunDst in [\u0027Silo A\u0027, \u0027Silo B\u0027]:\n\t\t\t\t\treturn \u0027Linea recibo bloqueada por transportadora T12\u0027\n\t\t\tif tmlRun:\n\t\t\t\treturn None\n\t\n\tif lineName \u003d\u003d \u0027Trasiego\u0027:\n\t\tif trsRun: # Orden de trasiego activa\n\t\t\tif trsWOID !\u003d actualWOID:\n\t\t\t\treturn \u0027La orden actual no coincide con la orden en progreso\u0027\n\t\t\telif (system.tag.readBlocking(\"[DAUTOM_Provider]D_obj/Process02_Ctrl/Out_FeedOn\")[0].value) \u003d\u003d True:\n\t\t\t\treturn \u0027Se esta alimentando la linea de Trasiego, no se puede iniciar la corrida\u0027\n\t\t\telif system.tag.readBlocking(\"[DAUTOM_Provider]D_obj/Process02_Ctrl/Out_eState\")[0].value !\u003d 6:\n\t\t\t\treturn \u0027No se puede concatenar las corridas porque el SCADA no esta en estado execute\u0027\n\t\t\tif actualSrc in [\u0027Silo 1\u0027, \u0027Silo 2\u0027]:\n\t\t\t\tif not (actualSrc in [\u0027Silo 1\u0027, \u0027Silo 2\u0027] and trsRunSrc in [\u0027Silo 1\u0027, \u0027Silo 2\u0027] and actualDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027, \u0027Silo A\u0027, \u0027Silo B\u0027] and trsRunDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027, \u0027Silo A\u0027, \u0027Silo B\u0027]):\n\t\t\t\t\treturn \u0027No es posible hacer el empalme para estas corridas\u0027\n\t\t\tif actualSrc in [\u0027Silo 3\u0027, \u0027Silo 4\u0027 ,\u0027Silo 5\u0027 ,\u0027Silo 6\u0027]:\n\t\t\t\tif not (actualSrc in [\u0027Silo 3\u0027, \u0027Silo 4\u0027 ,\u0027Silo 5\u0027 ,\u0027Silo 6\u0027] and trsRunSrc in [\u0027Silo 3\u0027, \u0027Silo 4\u0027 ,\u0027Silo 5\u0027 ,\u0027Silo 6\u0027] and actualDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027, \u0027Silo A\u0027, \u0027Silo B\u0027] and trsRunDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027, \u0027Silo A\u0027, \u0027Silo B\u0027]):\n\t\t\t\t\treturn \u0027No es posible hacer el empalme para estas corridas\u0027\n\t\telse:\n\t\t\tif recRun:\n\t\t\t\tif actualDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027,\u0027Silo A\u0027, \u0027Silo B\u0027] and recRunDst in [\u0027Silo 3\u0027, \u0027Silo 6\u0027, \u0027Silo 7\u0027, \u0027Silo 8\u0027]:\n\t\t\t\t\treturn \u0027Linea trasiego bloqueada por transportadora T5 en uso\u0027\n\t\t\t\telif actualDst in [\u0027Silo A\u0027, \u0027Silo B\u0027] and recRunDst in [\u0027Silo A\u0027, \u0027Silo B\u0027]:\n\t\t\t\t\treturn \u0027Linea trasiego bloqueada por transportadora T12\u0027\n\t\t\t\t\t\n\t\t\tif tmlRun:\n\t\t\t\tif actualSrc in [\u0027Silo 1\u0027, \u0027Silo 2\u0027]:\n\t\t\t\t\treturn \u0027Linea trasiego bloqueada por transportadora T13\u0027\n\t\n\tif lineName \u003d\u003d \u0027Trasiego Molino\u0027:\n\t\tif tmlRun: # Orden de trasiego molino activa\n\t\t\tif tmlWOID !\u003d actualWOID:\n\t\t\t\treturn \u0027La orden actual no coincide con la orden en progreso\u0027\n\t\t\telif (system.tag.readBlocking(\"[DAUTOM_Provider]D_obj/Process03_Ctrl/Out_FeedOn\")[0].value) \u003d\u003d True:\n\t\t\t\treturn \u0027Se esta alimentando la linea de Trasiego Molino, no se puede iniciar la corrida\u0027\n\t\t\telif system.tag.readBlocking(\"[DAUTOM_Provider]D_obj/Process03_Ctrl/Out_eState\")[0].value !\u003d 6:\n\t\t\t\treturn \u0027No se puede concatenar las corridas porque el SCADA no esta en estado execute\u0027\n\t\telse:\n\t\t\tif trsRun:\n\t\t\t\tif  trsRunSrc in [\u0027Silo 1\u0027, \u0027Silo 2\u0027]:\n\t\t\t\t\treturn \u0027Linea trasiego molino bloqueada por transportadora T13\u0027\n\t"
+                }
+              ],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "startWORun",
+                  "pageScope": false,
+                  "script": "\t# implement your handler here\n\timport time\n\t\n\tcurrentrun \u003d mes_core.run.getRunBynode(self.view.params.nodeID)\n\t\n\tlogger \u003d system.util.getLogger(\"Button run order\")\n\tlogger.info(\"Mensaje recibido\")\n\t\n\tif len(currentrun)\u003d\u003d0:\n\t\t\n\t\n\t\t\n\t\t\n\t\t\n\t\tscheduleID \u003d self.view.custom.selSchID\n\t\tlineID \u003d self.view.params.nodeID\n\t\trunID \u003d mes_core.run.IDRun(lineID)\n\t\tif runID:\n\t\t\tmes_core.run.stopRun(runID, lineID, writeTags\u003dTrue)\n\t\t\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})\n\t\t\tsystem.perspective.sendMessage(\u0027refreshSchWO\u0027, payload\u003d{})\n\t\t\n\t\tif payload: logging.log(\u0027Plate received\u0027, \u0027info\u0027)\n\t\n\t\tif not payload:\n\t\t\tmes_core.run.startRun(scheduleID, lineID)\n\t\telse:\n\t\t\tmes_core.run.startRun(scheduleID, lineID, truckPlate\u003dpayload[\"plate\"])\n\t\t\t\t\t\n\t\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})\n\t\tsystem.perspective.sendMessage(\u0027refreshSchWO\u0027, payload\u003d{})\n\t\t\n\t\tlogger.info(\"Mensaje refresh Run enviado\")\n\t\t\n\t\talerts.actionSuccess(title\u003d\u0027Orden Iniciada\u0027, \n\t\t\t\t\t\t\t\tmessage\u003d\u0027La orden \"{}\" fue iniciada\u0027.format(self.view.custom.selWO))\n\t\t\t\t\t\t\t\t\n\t\t\n\t\ttime.sleep(10)\n\t\t\n\t\tstationStatus \u003d self.view.custom.stationStatus\n\t\t\n\t\tif stationStatus!\u003d3 and stationStatus!\u003d4:\n\t\t\talerts.showAlert(\"warning\", title\u003d\"Linea Inactiva\", message\u003d \"Actualmente la linea se encuenrtra detenida.\", btnTextPrimary\u003d\"Ok\", btnActionPrimary\u003d\"closePopup\")\n\t\n\telse:\n\t\talerts.showAlert(state\u003d\"info\", title\u003d\"Accion no valida\", message\u003d\"Ya hay una corrida activa en esta linea\", btnTextPrimary\u003d\"OK\", btnActionPrimary\u003d\"closePopup\")\n\t\t\n\tlogger.info(\"Accion iniciar orden realizada\")",
+                  "sessionScope": true,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "ButtonContainer"
+        },
+        "position": {
+          "basis": "56px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "center"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-page"
+      }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "refreshSchWO",
+          "pageScope": true,
+          "script": "\t# implement your handler here\n\t\u0027\u0027\u0027\n\ttable\u003dmes_core.schedule.scheduleTable(\"mes_core\")\n\tself.view.custom.tableData \u003d table.selectCustom(columns\u003d[\"ID\",\"NodeID\", \"Quantity\" , \"MoldID\" , \"WorkOrderID\", \"ScheduleStartDateTime\",\n\t\"ScheduleFinishDateTime\"] , where_clause\u003d \"RunID is Null\")\n\t#self.view.custom.lineDisable \u003d 1 if run.getRunByLine(lineName) else 0\n\t\u0027\u0027\u0027\n\tquery \u003d \"\"\"\n\t\t\n\t\t\tSELECT \n\t\t\t\tsch.ID AS ID,\n\t\t\t\tsch.WorkOrderID AS WorkOrderID,\n\t\t\t\tpc.ProductCode,\n\t\t\t\tpc.Description,\n\t\t\t\tsch.ScheduleStartDateTime AS StartTime,\n\t\t\t\tsch.ScheduleFinishDateTime AS FinishTime,\n\t\t\t\tmld.MoldCode AS MoldeCode,\n\t\t\t\tsch.Quantity AS Quantity,\n\t\t\t\tn.name AS nodeName\n\t\t\tFROM schedule sch\n\t\t\n\t\t\tINNER JOIN workorder wo \n\t\t\t\tON wo.ID \u003d sch.WorkOrderID\n\t\t\tINNER JOIN productcode pc \n\t\t\t\tON pc.ID \u003d wo.ProductCodeID\n\t\t\tINNER JOIN mold mld \n\t\t\t\tON mld.ID \u003d sch.MoldID\n\t\t\tINNER JOIN node n \n\t\t\t\tON n.ID \u003d sch.NodeID\n\t\t\t\n\t\t\tWHERE n.ID \u003d ? AND sch.RunID is Null\n\t\t\tORDER BY sch.ScheduleStartDateTime DESC\n\n\t\"\"\"\n\t\n\tself.view.custom.tableData \u003d system.db.runPrepQuery(query, [self.view.params.nodeID])\n\t",
+          "sessionScope": true,
+          "viewScope": true
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

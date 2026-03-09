@@ -1,0 +1,724 @@
+{
+  "custom": {
+    "EndDateTime": {
+      "$": [
+        "ts",
+        192,
+        1759281221143
+      ],
+      "$ts": 1758678467000
+    },
+    "Name": "IMM 15",
+    "NodeID": 4,
+    "ReasonName": "Produciendo",
+    "dbConnection": "mes_core",
+    "duration": "00:01:56",
+    "eventID": null,
+    "lineName": "IMM 15",
+    "nodeName": "IMM 15",
+    "note": null,
+    "runID": 10,
+    "startDateTime": {
+      "$": [
+        "ts",
+        192,
+        1759281221143
+      ],
+      "$ts": 1758678351000
+    },
+    "stateReasonID": 6
+  },
+  "params": {
+    "eventId": 44
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.eventID": {
+      "binding": {
+        "config": {
+          "path": "view.params.eventId"
+        },
+        "transforms": [
+          {
+            "code": "\tfrom java.util import Date\n\t\t\n\tdbConnetion \u003d self.custom.dbConnection\n\ttable \u003d mes_core.model.statehistoryTable(dbConnetion)\n\tds \u003d table.selectCustom(columns \u003d [\u0027StartDateTime\u0027,\u0027EndDateTime\u0027,\u0027ReasonName\u0027,\u0027Note\u0027,\u0027RunID\u0027,\u0027NodeID\u0027,\u0027StateReasonID\u0027], where_clause \u003d \u0027ID \u003d ?\u0027, where_args \u003d[value])\n\tself.custom.startDateTime \u003d ds.getValueAt(0,0)\n\tself.custom.EndDateTime \u003d ds.getValueAt(0,1)\n\tself.custom.ReasonName \u003d ds.getValueAt(0,2)\n\tself.custom.note \u003d ds.getValueAt(0,3)\n\tself.custom.runID \u003d ds.getValueAt(0,4)\n\tself.custom.NodeID \u003d ds.getValueAt(0,5)\n\tself.custom.stateReasonID \u003d ds.getValueAt(0,6)\n\t\n\t\n\tnode \u003d mes_core.model.nodeTable(dbConnetion)\n\t\n\tds1 \u003d node.selectCustom(columns \u003d [\u0027Name\u0027], where_clause\u003d \u0027ID \u003d ?\u0027,where_args \u003d [ds.getValueAt(0,5)])\n\tself.custom.lineName \u003d ds1.getValueAt(0,0)\n\t\n\t\n\tstartDate \u003d ds.getValueAt(0,0)\n\tendDate \u003d ds.getValueAt(0,1)\n\t\n\t# Calculate difference in milliseconds\n\tdiffMillis \u003d system.date.toMillis(endDate) - system.date.toMillis(startDate)\n\t\n\t# Convert to hours, minutes, seconds\n\thours \u003d diffMillis // (1000 * 60 * 60)\n\tminutes \u003d (diffMillis // (1000 * 60)) % 60\n\tseconds \u003d (diffMillis // 1000) % 60\n\t\n\t# Format as HH:MM:SS\n\ttimeDiff \u003d \"%02d:%02d:%02d\" % (hours, minutes, seconds)\n\t\n\tself.custom.duration \u003d timeDiff\n\t\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.eventId": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 600,
+      "width": 600
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "120px",
+                  "shrink": 0
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_title"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "text": "Detalles del evento",
+                  "textStyle": {
+                    "classes": "text-titles",
+                    "textAlign": "center"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "tooltip": "Editar evento"
+                    },
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tlogger \u003d system.util.getLogger(\"EventManagement.Test\")\n\tlogger.info(\"Inicio de apertura de popUp edicion evento\")\n\t\n\teventID \u003d self.view.custom.eventID\n\tlineName \u003d self.view.custom.lineName\n\treasonID \u003d self.view.custom.stateReasonID\n\tstartDate \u003d self.view.custom.startDateTime\n\tendDate \u003d self.view.custom.EndDateTime\n\tduration \u003d self.view.custom.duration\n\tnote \u003d self.view.custom.note\n\t\n\told \u003d {\u0027old\u0027:\n\t\t\t{\t\u0027eventID\u0027:eventID,\n\t\t\t\t\u0027lineName\u0027:lineName,\n\t\t\t\t\u0027startDate\u0027:startDate,\n\t\t\t\t\u0027endDate\u0027:endDate,\n\t\t\t\t\u0027reasonID\u0027:reasonID,\n\t\t\t\t\u0027duration\u0027:duration,\n\t\t\t\t\u0027note\u0027:note\n\t}}\n\t\n\tlogger.info(\"Parametros del popUp guardados\")\")\n\t\n\tparams \u003d old\n\tsystem.perspective.openPopup(id \u003d \"eventEdit\", view \u003d \"Page/Embedded/EventEdit\", params\u003dparams, showCloseIcon\u003dFalse, draggable\u003dFalse, resizable\u003dFalse, modal\u003dTrue, overlayDismiss\u003dTrue, btnActionPrimary\u003d\"closePopup\")\n\tlogger.info(\"Peticion apertura del popUp enviada\")\n\tlogger.info(\"Parametros enviados: \" + str(params))"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "EditButton",
+                      "tooltip": {
+                        "enabled": true,
+                        "location": "top",
+                        "style": {
+                          "borderBottomLeftRadius": 5,
+                          "borderBottomRightRadius": 5,
+                          "borderTopLeftRadius": 5,
+                          "borderTopRightRadius": 5
+                        },
+                        "text": "Editar evento"
+                      }
+                    },
+                    "position": {
+                      "height": 0.6,
+                      "width": 0.3,
+                      "x": 0.57,
+                      "y": 0.2297
+                    },
+                    "propConfig": {
+                      "meta.visible": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.adminPermissions"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "color": "--cla-button-2",
+                      "path": "material/edit",
+                      "style": {
+                        "backgroundColor": "--cla-button-1",
+                        "borderBottomLeftRadius": 5,
+                        "borderBottomRightRadius": 5,
+                        "borderColor": "--neutral-60",
+                        "borderStyle": "solid",
+                        "borderTopLeftRadius": 5,
+                        "borderTopRightRadius": 5,
+                        "borderWidth": 1
+                      }
+                    },
+                    "type": "ia.display.icon"
+                  },
+                  {
+                    "custom": {
+                      "tooltip": "Editar evento"
+                    },
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tlogger \u003d system.util.getLogger(\"EventManagement.Test\")\n\tlogger.info(\"Inicio de apertura de popUp edicion evento\")\n\t\n\teventID \u003d self.view.custom.eventID\n\tlineName \u003d self.view.custom.lineName\n\treasonID \u003d self.view.custom.stateReasonID\n\tstartDate \u003d self.view.custom.startDateTime\n\tendDate \u003d self.view.custom.EndDateTime\n\tduration \u003d self.view.custom.duration\n\tnote \u003d self.view.custom.note\n\trunID \u003d self.view.custom.runID\n\tnodeID \u003d self.view.custom.NodeID\n\t\n\told \u003d {\u0027old\u0027:\n\t\t\t{\t\u0027eventID\u0027:eventID,\n\t\t\t\t\u0027lineName\u0027:lineName,\n\t\t\t\t\u0027startDate\u0027:startDate,\n\t\t\t\t\u0027endDate\u0027:endDate,\n\t\t\t\t\u0027reasonID\u0027:reasonID,\n\t\t\t\t\u0027duration\u0027:duration,\n\t\t\t\t\u0027note\u0027:note,\n\t\t\t\t\u0027runID\u0027:runID,\n\t\t\t\t\u0027nodeID\u0027:nodeID\n\t}}\n\t\n\tlogger.info(\"Parametros del popUp guardados\")\")\n\t\n\tparams \u003d old\n\tsystem.perspective.openPopup(id \u003d \"eventEditDivision\", view \u003d \"Page/Embedded/EventDivision\", params\u003dparams, showCloseIcon\u003dFalse, draggable\u003dFalse, resizable\u003dFalse, modal\u003dTrue, overlayDismiss\u003dTrue, btnActionPrimary\u003d\"closePopup\")\n\tlogger.info(\"Peticion apertura del popUp enviada\")\n\tlogger.info(\"Parametros enviados: \" + str(params))"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "CutButton",
+                      "tooltip": {
+                        "enabled": true,
+                        "location": "top",
+                        "style": {
+                          "borderBottomLeftRadius": 5,
+                          "borderBottomRightRadius": 5,
+                          "borderTopLeftRadius": 5,
+                          "borderTopRightRadius": 5
+                        },
+                        "text": "Editar evento"
+                      }
+                    },
+                    "position": {
+                      "height": 0.6,
+                      "width": 0.3,
+                      "x": 0.1,
+                      "y": 0.2297
+                    },
+                    "propConfig": {
+                      "meta.visible": {
+                        "binding": {
+                          "config": {
+                            "path": "session.custom.adminPermissions"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "color": "--cla-button-2",
+                      "path": "material/content_cut",
+                      "style": {
+                        "backgroundColor": "--cla-button-1",
+                        "borderBottomLeftRadius": 5,
+                        "borderBottomRightRadius": 5,
+                        "borderColor": "--neutral-60",
+                        "borderStyle": "solid",
+                        "borderTopLeftRadius": 5,
+                        "borderTopRightRadius": 5,
+                        "borderWidth": 1
+                      }
+                    },
+                    "type": "ia.display.icon"
+                  }
+                ],
+                "meta": {
+                  "name": "CoordinateContainer_buttons"
+                },
+                "position": {
+                  "basis": "100px",
+                  "shrink": 0
+                },
+                "props": {
+                  "mode": "percent"
+                },
+                "type": "ia.container.coord"
+              },
+              {
+                "children": [
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tsystem.perspective.closePopup(\u0027eventDetails\u0027)"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "iconClose"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "path": "material/close",
+                      "style": {
+                        "classes": "Alerts/alertClose"
+                      }
+                    },
+                    "type": "ia.display.icon"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_close"
+                },
+                "position": {
+                  "basis": "20px",
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "overflow": "hidden",
+                    "paddingRight": 5,
+                    "paddingTop": 10
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_title"
+            },
+            "position": {
+              "basis": "40px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "container-borders-dautom-widget"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Dashboard"
+            },
+            "position": {
+              "basis": "100%"
+            },
+            "propConfig": {
+              "props.widgets[0].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.eventID"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.widgets[1].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.note"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.widgets[2].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.startDateTime"
+                  },
+                  "transforms": [
+                    {
+                      "formatType": "datetime",
+                      "formatValue": "yyyy-MM-dd HH:mm:ss",
+                      "type": "format"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.widgets[3].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.EndDateTime"
+                  },
+                  "transforms": [
+                    {
+                      "formatType": "datetime",
+                      "formatValue": "yyyy-MM-dd HH:mm:ss",
+                      "type": "format"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.widgets[4].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.duration"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.widgets[5].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.lineName"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.widgets[6].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.ReasonName"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.widgets[7].viewParams.contend": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.line"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "availableWidgets": [
+                {
+                  "body": {
+                    "style": {
+                      "classes": ""
+                    }
+                  },
+                  "category": "",
+                  "defaultSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 4
+                  },
+                  "header": {
+                    "enabled": true,
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 1,
+                    "rowSpan": 2
+                  },
+                  "name": "Event ID",
+                  "style": {
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "contend": "value",
+                    "title": "value"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                }
+              ],
+              "editingToggle": false,
+              "stretch": {
+                "columnCount": 4,
+                "rowCount": 13
+              },
+              "style": {
+                "borderStyle": "none"
+              },
+              "widgets": [
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 2
+                  },
+                  "name": "Event ID",
+                  "position": {
+                    "columnEnd": 2,
+                    "columnStart": 1,
+                    "rowEnd": 2,
+                    "rowStart": 1
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "center",
+                    "textAlign": "center",
+                    "title": "Evento ID"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                },
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 4,
+                    "rowSpan": 6
+                  },
+                  "name": "Comment",
+                  "position": {
+                    "columnEnd": 5,
+                    "columnStart": 1,
+                    "rowEnd": 14,
+                    "rowStart": 7
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "top",
+                    "textAlign": "start",
+                    "title": "Comentario"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                },
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 2
+                  },
+                  "name": "Start",
+                  "position": {
+                    "columnEnd": 2,
+                    "columnStart": 1,
+                    "rowEnd": 4,
+                    "rowStart": 3
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "center",
+                    "textAlign": "center",
+                    "title": "Inicio"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                },
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 2
+                  },
+                  "name": "End",
+                  "position": {
+                    "columnEnd": 4,
+                    "columnStart": 3,
+                    "rowEnd": 4,
+                    "rowStart": 3
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "center",
+                    "textAlign": "center",
+                    "title": "Fin"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                },
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 2
+                  },
+                  "name": "Time",
+                  "position": {
+                    "columnEnd": 5,
+                    "columnStart": 3,
+                    "rowEnd": 3,
+                    "rowStart": 1
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "center",
+                    "textAlign": "center",
+                    "title": "Duración (hh:mm:ss)"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                },
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "borderStyle": "none",
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 2
+                  },
+                  "name": "line",
+                  "position": {
+                    "columnEnd": 2,
+                    "columnStart": 1,
+                    "rowEnd": 6,
+                    "rowStart": 5
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "center",
+                    "textAlign": "center",
+                    "title": "Línea"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                },
+                {
+                  "body": {
+                    "style": {
+                      "classes": "container-borders-dautom-page"
+                    }
+                  },
+                  "header": {
+                    "enabled": false,
+                    "style": {
+                      "borderStyle": "none",
+                      "classes": ""
+                    },
+                    "title": ""
+                  },
+                  "isConfigurable": false,
+                  "minSize": {
+                    "columnSpan": 2,
+                    "rowSpan": 2
+                  },
+                  "name": "reason",
+                  "position": {
+                    "columnEnd": 5,
+                    "columnStart": 3,
+                    "rowEnd": 7,
+                    "rowStart": 5
+                  },
+                  "style": {
+                    "borderStyle": "none",
+                    "classes": ""
+                  },
+                  "viewParams": {
+                    "alignVertical": "center",
+                    "textAlign": "center",
+                    "title": "Razón"
+                  },
+                  "viewPath": "Page/Embedded/GenericWidget_1"
+                }
+              ]
+            },
+            "type": "ia.display.dashboard"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "606px"
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "borderBottomLeftRadius": 15,
+        "borderBottomRightRadius": 15,
+        "borderStyle": "none",
+        "borderTopLeftRadius": 15,
+        "borderTopRightRadius": 15,
+        "classes": "container-borders-dautom-page",
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

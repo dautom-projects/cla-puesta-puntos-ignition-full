@@ -1,0 +1,1005 @@
+{
+  "custom": {
+    "dbConnection": "mes_core",
+    "filter": "",
+    "selMoldeCode": null,
+    "selMoldeID": null,
+    "tableData": {
+      "$": [
+        "ds",
+        192,
+        1760025977830
+      ],
+      "$columns": [
+        {
+          "data": [
+            1,
+            2,
+            4
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "MOL-1",
+            "MOL-2",
+            "MOL-QA"
+          ],
+          "name": "MoldCode",
+          "type": "String"
+        },
+        {
+          "data": [
+            "Molde",
+            "Molde",
+            "QA"
+          ],
+          "name": "Description",
+          "type": "String"
+        },
+        {
+          "data": [
+            1,
+            2,
+            3
+          ],
+          "name": "Slot",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            1,
+            1,
+            1
+          ],
+          "name": "Disable",
+          "type": "Short"
+        },
+        {
+          "data": [
+            1758633925120,
+            1758633925120,
+            1758650938323
+          ],
+          "name": "TimeStamp",
+          "type": "Date"
+        }
+      ]
+    }
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tsystem.perspective.sendMessage(\u0027refreshTableMoldes\u0027)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "moldID": null
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.filter": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer/TextField.props.text"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selMoldeCode": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].MoldCode"
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selMoldeID": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].ID"
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.moldID": {
+      "binding": {
+        "config": {
+          "path": "view.custom.selMoldeID"
+        },
+        "type": "property"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 863
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Spacer table_0"
+        },
+        "position": {
+          "basis": "10px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Spacer final"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label Title"
+            },
+            "position": {
+              "basis": "70px",
+              "shrink": 0
+            },
+            "props": {
+              "text": "Moldes",
+              "textStyle": {
+                "classes": "text-titles",
+                "margin": 0,
+                "padding": 0,
+                "textAlign": "start"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Spacer2"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Spacer final_0"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onKeyPress": {
+                  "config": {
+                    "script": "\tsystem.perspective.sendMessage(\u0027refreshTableMoldes\u0027)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "TextField"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "props": {
+              "placeholder": "Buscar...",
+              "style": {
+                "backgroundColor": "#FFFFFF",
+                "classes": "dropdown"
+              }
+            },
+            "type": "ia.input.text-field"
+          },
+          {
+            "meta": {
+              "name": "Spacer4"
+            },
+            "position": {
+              "basis": "10px",
+              "grow": 1
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": [
+                  {
+                    "config": {
+                      "script": "\tparams \u003d {\n\t\t\t\"function\":\"Crear\"\n\t\t}\n\tview \u003d \"Page/PopUps/CreateOrEditMolde-Clarios\"\n\ttitle \u003d \u0027Crear Molde\u0027\n\tsystem.perspective.openPopup(\"createedit\", view, draggable\u003d0,resizable\u003d0,modal\u003d1,params\u003dparams)"
+                    },
+                    "scope": "G",
+                    "type": "script"
+                  },
+                  {
+                    "config": {
+                      "draggable": false,
+                      "id": "createedit",
+                      "modal": true,
+                      "overlayDismiss": true,
+                      "resizable": false,
+                      "showCloseIcon": true,
+                      "title": "{view.custom.createTitle}",
+                      "type": "open",
+                      "viewParams": {
+                        "function": "Crear",
+                        "materials": "{view.custom.existingMaterials}",
+                        "selection": ""
+                      },
+                      "viewPath": "{view.params.popUp.viewPath}",
+                      "viewportBound": false
+                    },
+                    "enabled": false,
+                    "scope": "C",
+                    "type": "popup"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "name": "Button Create"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.adminPermissions"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-2",
+                  "path": "material/add"
+                }
+              },
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Crear"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Spacer1"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tif not self.parent.parent.getChild(\"Table\").props.selection.data:\n\t\talerts.noSelectionTable(\"Seleccionar molde para editar\")\n\telse:\n\t\tselection \u003d self.parent.parent.getChild(\"Table\").props.selection.data[0]\n\t\tparams \u003d {\n\t\t\t\"function\":\"Editar\",\n\t\t\t\"selection\":{\n\t\t\t\t\"selCode\": selection.MoldCode,\n\t\t\t\t\"selDescrip\": selection.Description,\n\t\t\t\t\"selEnable\": selection.Disable,\n\t\t\t\t\"selSlot\": selection.Slot,\n\t\t\t\t\"selid\": selection.ID\n\t\t\t\t}\n\t\t}\n\t\tview \u003d \"Page/PopUps/CreateOrEditMolde-Clarios\"\n\t\ttitle \u003d \"Editar Molde\"\n\t\tsystem.perspective.openPopup(\"createedit\", view,draggable\u003d0,resizable\u003d0,modal\u003d1,params\u003dparams)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button Edit"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.adminPermissions"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-2",
+                  "path": "material/edit"
+                }
+              },
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Editar"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Spacer3"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tif not self.parent.parent.getChild(\"Table\").props.selection.data:\n\t\talerts.noSelectionTable(\"Selecione un molde para eliminar\")\n\telse:\n\t\talerts.confirmDelete(title\u003d\u0027Eliminar Molde\u0027, \n\t\t\t\t\t\t\tmessage\u003d\u0027el Molde \"{}\"?\u0027.format(self.view.custom.selMoldeCode), \n\t\t\t\t\t\t\tdeleteAction\u003d\u0027deleteMolde\u0027)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button Delete"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.adminPermissions"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-1",
+                  "path": "material/delete"
+                }
+              },
+              "style": {
+                "classes": "button-2"
+              },
+              "text": "Borrar"
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "deleteMolde",
+                  "pageScope": true,
+                  "script": "    import java.lang.Exception\n\t# implement your handler here\n    try:\n\t\tdb \u003d self.view.custom.dbConnection\n\t\ttable \u003d mes_core.model.moldeTable(db)\n\t\tMoldeCode \u003d self.view.custom.selMoldeCode\n\t\tMoldeID\u003dself.view.custom.selMoldeID\n\t\ttable.deleteID(MoldeID)\n\t\t\n\t\t\n\t\t# Refresh table after query\n\t\tsystem.perspective.sendMessage(\"refreshTableMoldes\", payload\u003d{})\n\t\t\n\t\t# confirm Popup\n\t\talerts.actionSuccess(title\u003d\"Molde eliminado\", \n\t\t\t\t\t\t\tmessage\u003d\u0027Molde \"{}\" eliminado correctamente\u0027.format(MoldeCode))\n\t\n\n    except (Exception, java.lang.Exception), e:   # atrapa Python y Java\n        alerts.actionDeleteError(\n            title\u003d\u0027Error al eliminar\u0027, \n            message\u003d\u0027No es posible eliminar el molde porque esta relacionado en otra tabla.\u0027\n        )",
+                  "sessionScope": true,
+                  "viewScope": true
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Spacer5"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "56px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "borderBottomColor": "--cla-text-title",
+            "classes": "container-borders-dautom-widget",
+            "overflow": "hidden",
+            "padding": 8
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Spacer table"
+        },
+        "position": {
+          "basis": "10px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "basis": "400px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.data": {
+            "binding": {
+              "config": {
+                "path": "view.custom.tableData"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "cells": {
+            "style": {
+              "borderBottomWidth": 1,
+              "fontFamily": "Arial",
+              "fontSize": 24
+            }
+          },
+          "columns": [
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "ID",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "ID"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 30
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "MoldCode",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Molde"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": false,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Description",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Descripción"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": false,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": ""
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Slot",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Ranuras"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": false,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 40
+            },
+            {
+              "align": "center",
+              "boolean": "toggle",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Disable",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Habilitado"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": false,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": 40
+            }
+          ],
+          "headerStyle": {
+            "backgroundColor": "--cla-page-bg",
+            "fontSize": 18
+          },
+          "pager": {
+            "bottom": false
+          },
+          "selection": {
+            "style": {
+              "backgroundColor": "#4A0E704D"
+            }
+          },
+          "style": {
+            "classes": "table"
+          }
+        },
+        "scripts": {
+          "customMethods": [],
+          "extensionFunctions": null,
+          "messageHandlers": [
+            {
+              "messageType": "refreshTableMoldes",
+              "pageScope": true,
+              "script": "\t# implement your handler here\n\tsystem.perspective.sendMessage(\u0027refreshTableRelationLine\u0027)\n\tdb \u003d self.view.custom.dbConnection\n\ttable \u003d mes_core.model.moldeTable(db)\n\tfilter \u003d self.view.custom.filter\n\t\n\tif filter \u003d\u003d None or filter \u003d\u003d \u0027\u0027:\n\t\tself.view.custom.tableData \u003d table.selectAll()\n\telse:\n\t\tcolumns \u003d None\n\t\twhere_clause\u003d\"MoldCode LIKE ? or Description LIKE ?\"\n\t\twhere_args \u003d [\"%\" + filter + \"%\", \"%\" + filter + \"%\"]\n\t\t#where_args \u003d [filter , filter]\n\t\tself.view.custom.tableData \u003d table.selectCustom(columns,where_clause,where_args)",
+              "sessionScope": true,
+              "viewScope": true
+            }
+          ]
+        },
+        "type": "ia.display.table"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-page"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

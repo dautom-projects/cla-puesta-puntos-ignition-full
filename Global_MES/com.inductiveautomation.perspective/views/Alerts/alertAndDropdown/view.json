@@ -1,0 +1,982 @@
+{
+  "custom": {},
+  "params": {
+    "btnActionClose": "closePopup",
+    "btnActionPrimary": "closePopup",
+    "btnActionSecondary": "closePopup",
+    "btnIconAlignment": "right",
+    "btnIconPrimary": "chevron_right",
+    "btnIconSecondary": "",
+    "btnTextPrimary": "Primary",
+    "btnTextSecondary": "Secondary",
+    "comment": 0,
+    "message": "Alert message goes here.",
+    "options": [
+      {
+        "label": 0,
+        "value": 0
+      }
+    ],
+    "showCloseBtn": true,
+    "state": "info",
+    "title": "title"
+  },
+  "propConfig": {
+    "params.btnActionClose": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.btnActionPrimary": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.btnActionSecondary": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.btnIconAlignment": {
+      "paramDirection": "inout"
+    },
+    "params.btnIconPrimary": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.btnIconSecondary": {
+      "paramDirection": "inout",
+      "persistent": true
+    },
+    "params.btnIconSecondary_1": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.btnIconSecondary_2": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.btnIconSecondary_3": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.btnTextPrimary": {
+      "paramDirection": "inout"
+    },
+    "params.btnTextSecondary": {
+      "paramDirection": "inout"
+    },
+    "params.buttons.key": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.comment": {
+      "binding": {
+        "config": {
+          "struct": {
+            "key": "{/dialog/comment/Dropdown.props.value}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdata \u003d value[\u0027key\u0027]\n\treturn data\n\t\n#",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.message": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.options": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.showCloseBtn": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.state": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.title": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 332,
+      "width": 561
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "iconMain"
+            },
+            "position": {
+              "basis": "40px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.color": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.params.state}"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "var(--info)",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "warning",
+                          "output": "var(--cla-orange)"
+                        },
+                        {
+                          "input": "success",
+                          "output": "var(--cla-green)"
+                        },
+                        {
+                          "input": "error",
+                          "output": "var(--cla-red)"
+                        },
+                        {
+                          "input": "info",
+                          "output": "var(--cla-blue)"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.path": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.params.state}"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "material/info",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "warning",
+                          "output": "material/warning"
+                        },
+                        {
+                          "input": "info",
+                          "output": "material/info"
+                        },
+                        {
+                          "input": "error",
+                          "output": "material/error"
+                        },
+                        {
+                          "input": "success",
+                          "output": "material/check_circle"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "alert-icons-margin"
+              }
+            },
+            "type": "ia.display.icon"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "title"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{this.props.text}"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": true,
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": "",
+                              "output": false
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.title"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.textStyle.color": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.state}"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "var(--info)",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": "warning",
+                              "output": "var(--cla-orange)"
+                            },
+                            {
+                              "input": "success",
+                              "output": "var(--cla-green)"
+                            },
+                            {
+                              "input": "error",
+                              "output": "var(--cla-red)"
+                            },
+                            {
+                              "input": "info",
+                              "output": "var(--cla-blue)"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles",
+                    "margin": 6,
+                    "paddingBottom": 0,
+                    "paddingLeft": 0,
+                    "paddingTop": 0,
+                    "textAlign": "center"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "message"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.message"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.textStyle.color": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.params.state}"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "var(--info)",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": "warning",
+                              "output": "var(--cla-orange)"
+                            },
+                            {
+                              "input": "success",
+                              "output": "var(--cla-green)"
+                            },
+                            {
+                              "input": "error",
+                              "output": "var(--cla-red)"
+                            },
+                            {
+                              "input": "info",
+                              "output": "var(--cla-blue)"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-description",
+                    "margin": 0,
+                    "padding": 0,
+                    "textAlign": "center"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "content"
+            },
+            "position": {
+              "basis": "50px",
+              "grow": 1
+            },
+            "props": {
+              "alignContent": "flex-start",
+              "direction": "column",
+              "justify": "center",
+              "style": {
+                "classes": "Utilities/m-r-16",
+                "marginBottom": 6,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "body"
+        },
+        "position": {
+          "basis": "120px",
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "justify": "space-around",
+          "style": {
+            "classes": "container-alarms",
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "title"
+            },
+            "position": {
+              "basis": "40px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "expression": "{this.props.text}"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": true,
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "",
+                          "output": false
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "Alerts/alertTitle",
+                "color": "#2B2B2B"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "TextArea_0"
+            },
+            "position": {
+              "basis": "160px",
+              "display": false
+            },
+            "props": {
+              "text": "test"
+            },
+            "type": "ia.input.text-area"
+          },
+          {
+            "meta": {
+              "name": "Dropdown"
+            },
+            "position": {
+              "basis": "212px"
+            },
+            "propConfig": {
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.options"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "placeholder": {
+                "text": "Seleccione..."
+              },
+              "style": {
+                "classes": "dropdown"
+              },
+              "value": 0
+            },
+            "type": "ia.input.dropdown"
+          }
+        ],
+        "meta": {
+          "name": "comment"
+        },
+        "position": {
+          "basis": "67px",
+          "shrink": 0
+        },
+        "props": {
+          "alignItems": "flex-start",
+          "justify": "center",
+          "style": {
+            "paddingLeft": 50,
+            "paddingRight": 50
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tmessageType \u003d self.view.params.btnActionSecondary\t\n\tsystem.perspective.sendMessage(messageType, scope \u003d \"session\")"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "actionSecondary"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.text"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": true,
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "",
+                          "output": false
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.image.icon.path": {
+                "binding": {
+                  "config": {
+                    "expression": "\"material/\" + {view.params.btnIconSecondary}"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif str(value) \u003d\u003d \"material/\":\n\t\treturn \"\"\n\telse:\n\t\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.image.position": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.btnIconAlignment"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.image.style.fill": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.state"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "#222222",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "info",
+                          "output": "#17599C"
+                        },
+                        {
+                          "input": "success",
+                          "output": "#117539"
+                        },
+                        {
+                          "input": "warning",
+                          "output": "#C26700"
+                        },
+                        {
+                          "input": "error",
+                          "output": "#A62D19"
+                        }
+                      ],
+                      "outputType": "color",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.classes": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.state"
+                  },
+                  "enabled": false,
+                  "transforms": [
+                    {
+                      "fallback": "Alerts/alertBtn1 Utilities/p-rl-8",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "error",
+                          "output": "button-error-2"
+                        },
+                        {
+                          "input": "warning",
+                          "output": "button-warning-2"
+                        },
+                        {
+                          "input": "info",
+                          "output": "button-info-2"
+                        },
+                        {
+                          "input": "success",
+                          "output": "button-success-2"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.params.btnTextSecondary}"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "height": 20,
+                "icon": {},
+                "width": 20
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-2",
+                "margin": 1
+              }
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "closePopup",
+                  "pageScope": false,
+                  "script": "\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "basis": "9px"
+            },
+            "props": {
+              "text": "\n"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tlogger \u003d system.util.getLogger(\u0027Enviar comentario\u0027)\n\tmessageType \u003d self.view.params.btnActionPrimary\t\n\tsystem.perspective.sendMessage(messageType, scope \u003d \"session\", payload \u003d {\"comment\": self.view.params.comment})\n\t#system.perspective.sendMessage(\"commentText\",payload \u003d {\"comment\": self.view.params.comment})\n\t#system.perspective.sendMessage(\"commentText\", payload \u003d {\"comment\": self.view.params.comment})\n\tlogger.info(\u0027Mensaje Enviado {}\u0027.format(self.view.params.comment))"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "actionPrimary"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.image.icon.path": {
+                "binding": {
+                  "config": {
+                    "expression": "\"material/\" + {view.params.btnIconPrimary}"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif str(value) \u003d\u003d \"material/\":\n\t\treturn \"\"\n\telse:\n\t\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.image.position": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.btnIconAlignment"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.style.classes": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.state"
+                  },
+                  "enabled": false,
+                  "transforms": [
+                    {
+                      "fallback": "Alerts/alertBtn1 Utilities/p-rl-8",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": "error",
+                          "output": "button-error"
+                        },
+                        {
+                          "input": "warning",
+                          "output": "button-warning"
+                        },
+                        {
+                          "input": "info",
+                          "output": "button-info"
+                        },
+                        {
+                          "input": "success",
+                          "output": "button-success"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.btnTextPrimary"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "height": 20,
+                "icon": {},
+                "width": 20
+              },
+              "style": {
+                "classes": "button-1",
+                "margin": 1
+              }
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "closePopup",
+                  "pageScope": false,
+                  "script": "\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "logout",
+                  "pageScope": false,
+                  "script": "\tsystem.perspective.logout()",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "updateDowntimeEvent",
+                  "pageScope": false,
+                  "script": "\t\n\t# Update the reason for the event\t\n\tsystem.perspective.sendMessage(\u0027updateDowntimeEvent\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "insertEquipment",
+                  "pageScope": false,
+                  "script": "\t\n\t# Update the reason for the event\t\n\tsystem.perspective.sendMessage(\u0027insertEquipment\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "deleteEquipment",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Delete the selected equipment\t\n\tsystem.perspective.sendMessage(\u0027deleteEquipment\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "insertReason",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Inser reason for the event\t\n\tsystem.perspective.sendMessage(\u0027insertReason\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "deleteReason",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Delete the selected equipment\t\n\tsystem.perspective.sendMessage(\u0027deleteReason\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "insertRelation",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Inser reason for the event\t\n\tsystem.perspective.sendMessage(\u0027insertRelation\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "deleteRelation",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Delete the selected relation equipoment - event\t\n\tsystem.perspective.sendMessage(\u0027deleteRelation\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "deleteArea",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Delete the selected relation equipoment - event\t\n\tsystem.perspective.sendMessage(\u0027deleteArea\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "deleteLine",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Delete the selected relation line - event\t\n\tsystem.perspective.sendMessage(\u0027deleteLine\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "deletePlant",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t# Delete the selected relation plant\n\tsystem.perspective.sendMessage(\u0027deletePlant\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)\n",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "insertArea",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t#insertArea\n\tsystem.perspective.sendMessage(\u0027insertArea\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "insertLine",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t#insertLine\n\tsystem.perspective.sendMessage(\u0027insertLine\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "insertPlant",
+                  "pageScope": false,
+                  "script": "\t\n\t\n\t#insertPlant\n\tsystem.perspective.sendMessage(\u0027insertPlant\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "updateDowntimeEventAndComment",
+                  "pageScope": false,
+                  "script": "\t\n\t# Update the reason for the event\t\n\tsystem.perspective.sendMessage(\u0027updateDowntimeEventAndComment\u0027)\n\t# closes the last focused popup\n\tsystem.perspective.closePopup(\u0027\u0027)",
+                  "sessionScope": true,
+                  "viewScope": false
+                },
+                {
+                  "messageType": "updateWaste",
+                  "pageScope": false,
+                  "script": "\tsystem.perspective.closePopup(\u0027\u0027)\n\t# implement your handler here",
+                  "sessionScope": false,
+                  "viewScope": true
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "footer"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "space-around",
+          "style": {
+            "classes": "container-padding-30 container-borders-dautom-alert",
+            "margin": 0,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "events": {
+      "dom": {
+        "onFocus": {
+          "config": {
+            "script": "\tmessageType \u003d \u0027alertFocus\u0027\n\tsystem.perspective.sendMessage(messageType)"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      }
+    },
+    "meta": {
+      "name": "dialog"
+    },
+    "propConfig": {
+      "props.style.classes": {
+        "binding": {
+          "config": {
+            "expression": "{view.params.state}"
+          },
+          "transforms": [
+            {
+              "fallback": "Alerts/alertDefault",
+              "inputType": "scalar",
+              "mappings": [
+                {
+                  "input": "info",
+                  "output": "alerts-info"
+                },
+                {
+                  "input": "warning",
+                  "output": "alerts-warning"
+                },
+                {
+                  "input": "error",
+                  "output": "Alerts/states/error"
+                },
+                {
+                  "input": "success",
+                  "output": "Alerts/states/success"
+                }
+              ],
+              "outputType": "scalar",
+              "type": "map"
+            }
+          ],
+          "type": "expr"
+        }
+      }
+    },
+    "props": {
+      "direction": "column",
+      "justify": "space-evenly",
+      "style": {
+        "maxHeight": "none",
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

@@ -1,0 +1,943 @@
+{
+  "custom": {
+    "dbConnection": "mes_core",
+    "filter": "",
+    "selID": null,
+    "selProductCode": null,
+    "tableData": {
+      "$": [
+        "ds",
+        192,
+        1759701426729
+      ],
+      "$columns": [
+        {
+          "data": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "122000631",
+            "122000632",
+            "122000630",
+            "122000005",
+            "122000655",
+            "122000654",
+            "122000661",
+            "122000629",
+            "122000542",
+            "122000635",
+            "122000636"
+          ],
+          "name": "ProductCode",
+          "type": "String"
+        },
+        {
+          "data": [
+            "CUBIERTA 27RPMV SD (- +) ROJA BG",
+            "CUBIERTA 27PMV SD (+-) ROJA BG",
+            "CUBIERTA 27PMV SD (+ -) GRIS BG",
+            "T",
+            "CUBIERTA 4D-4DLT INV SD BUJE ALTO",
+            "CUBIERTA 4D-4DLT  SD BUJE ALTO",
+            "CUBIERTA 8D SD NEGRA BG ALTO 2024 (-+)",
+            "CUBIERTA 27RPMV SD (- +) GRIS BG",
+            "CUBIERTA 27RPMV SD (- +) NEGRA BG",
+            "CUBIERTA 27RPMV SD (- +) AMARILLA BG",
+            "CUBIERTA 27PMV SD (+ -) AMARILLA BG"
+          ],
+          "name": "Description",
+          "type": "String"
+        },
+        {
+          "data": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "name": "Disable",
+          "type": "Short"
+        },
+        {
+          "data": [
+            1758633907460,
+            1758633907473,
+            1758664115867,
+            1758671812783,
+            1758671812783,
+            1758671812787,
+            1758671812787,
+            1758671812787,
+            1758671812787,
+            1758671812790,
+            1758671812790
+          ],
+          "name": "TimeStamp",
+          "type": "Date"
+        }
+      ]
+    }
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tsystem.perspective.sendMessage(\u0027refreshTableSKU\u0027)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "productID": null
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.filter": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer/TextField.props.text"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selID": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].ID"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.selProductCode": {
+      "binding": {
+        "config": {
+          "path": "/root/Table.props.selection.data[0].ProductCode"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.tableData": {
+      "persistent": true
+    },
+    "params.productID": {
+      "binding": {
+        "config": {
+          "path": "view.custom.selID"
+        },
+        "type": "property"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "width": 863
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Spacer table"
+        },
+        "position": {
+          "basis": "10px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Spacer4"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label Title"
+            },
+            "position": {
+              "basis": "60px"
+            },
+            "props": {
+              "style": {
+                "classes": "text-titles",
+                "padding": 0
+              },
+              "text": "SKU",
+              "textStyle": {
+                "margin": 0,
+                "padding": 0,
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Spacer5"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onKeyPress": {
+                  "config": {
+                    "script": "\tsystem.perspective.sendMessage(\u0027refreshTableSKU\u0027)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "TextField"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "props": {
+              "placeholder": "Buscar...",
+              "style": {
+                "backgroundColor": "#FFFFFF",
+                "classes": "dropdown"
+              }
+            },
+            "type": "ia.input.text-field"
+          },
+          {
+            "meta": {
+              "name": "Spacer1"
+            },
+            "position": {
+              "basis": "10px",
+              "grow": 1
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": [
+                  {
+                    "config": {
+                      "script": "\tview \u003d \"Page/PopUps/CreateOrEditSKU-Clarios\"\n\tparams \u003d {\"function\": \"Crear\"}\n\ttitle \u003d \"Crear SKU\"\n\tsystem.perspective.openPopup(\"createedit\", view,params\u003dparams, draggable\u003d0,resizable\u003d0,modal\u003d1)\n\t#system.util.invokeAsynchronous(function)"
+                    },
+                    "scope": "G",
+                    "type": "script"
+                  },
+                  {
+                    "config": {
+                      "draggable": false,
+                      "id": "createedit",
+                      "modal": true,
+                      "overlayDismiss": true,
+                      "resizable": false,
+                      "showCloseIcon": true,
+                      "title": "{view.custom.createTitle}",
+                      "type": "open",
+                      "viewParams": {
+                        "function": "Crear"
+                      },
+                      "viewPath": "{view.params.popUp.viewPath}",
+                      "viewportBound": false
+                    },
+                    "enabled": false,
+                    "scope": "C",
+                    "type": "popup"
+                  }
+                ]
+              }
+            },
+            "meta": {
+              "name": "Button Create"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.adminPermissions"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-2",
+                  "path": "material/add"
+                }
+              },
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Crear"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Spacer2"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tif not self.parent.parent.getChild(\"Table\").props.selection.data:\n\t\talerts.noSelectionTable(\"material para editar\")\n\telse:\n\t\tselection \u003d self.parent.parent.getChild(\"Table\").props.selection.data[0]\n\t\tparams \u003d {\n\t\t\t\"function\":\"Editar\",\n\t\t\t\"selection\":{\n\t\t\t\t\"selDescrip\":selection.Description,\n\t\t\t\t\"selDisable\":selection.Disable,\n\t\t\t\t\"selProductCode\":selection.ProductCode,\n\t\t\t\t\"selID\":selection.ID\n\t\t\t}\n\t\t}\n\t\tview \u003d \"Page/PopUps/CreateOrEditSKU-Clarios\"\n\t\ttitle \u003d \"Editar SKU\"\n\t\tsystem.perspective.openPopup(\"createedit\",view ,draggable\u003d0,resizable\u003d0,modal\u003d1,params\u003dparams)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button Edit"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.adminPermissions"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-2",
+                  "path": "material/edit"
+                }
+              },
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Editar"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Spacer3"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tif not self.parent.parent.getChild(\"Table\").props.selection.data:\n\t\talerts.noSelectionTable(\"SKU para eliminar\")\n\telse:\n\t\talerts.confirmDelete(title\u003d\u0027Eliminar SKU\u0027, \n\t\t\t\t\t\t\tmessage\u003d\u0027el producto \"{}\"?\u0027.format(self.view.custom.selProductCode), \n\t\t\t\t\t\t\tdeleteAction\u003d\u0027deleteSKU\u0027)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button Delete"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "path": "session.custom.adminPermissions"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "icon": {
+                  "color": "--cla-button-1",
+                  "path": "material/delete"
+                }
+              },
+              "style": {
+                "classes": "button-2"
+              },
+              "text": "Borrar"
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "deleteSKU",
+                  "pageScope": true,
+                  "script": "\timport java.lang.Exception\n\t\n\ttry:\n\t    db \u003d self.view.custom.dbConnection \n\t    table \u003d mes_core.model.productcodeTable(db)\n\t    selID \u003d self.view.custom.selID\n\t    \n\t    table.deleteID(selID)\n\t\n\t    alerts.actionSuccess(\n\t        title\u003d\"SKU eliminado\", \n\t        message\u003d\u0027SKU \"{}\" eliminado correctamente\u0027.format(selID)\n\t    )\n\t\n\t    # Refresca la tabla\n\t    system.perspective.sendMessage(\"refreshTableSKU\", payload\u003d{})\n\t\n\texcept (Exception, java.lang.Exception), e:   # atrapa Python y Java\n\t\talerts.actionDeleteError(\n\t\t\ttitle\u003d\u0027Error\u0027, \n\t\t\tmessage\u003d\u0027No es posible eliminar el producto porque esta relacionado en otra tabla.\u0027\n\t\t)\n",
+                  "sessionScope": true,
+                  "viewScope": true
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "meta": {
+              "name": "Spacer final"
+            },
+            "position": {
+              "basis": "20px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "56px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "borderBottomColor": "--cla-text-title",
+            "classes": "container-borders-dautom-widget",
+            "padding": 8
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "basis": "10px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "borderStyle": "none"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Table"
+        },
+        "position": {
+          "basis": "400px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.data": {
+            "binding": {
+              "config": {
+                "path": "view.custom.tableData"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "cells": {
+            "style": {
+              "borderBottomWidth": 1,
+              "fontFamily": "Arial",
+              "fontSize": 24
+            }
+          },
+          "columns": [
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "ID",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "ID"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 30
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "ProductCode",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Codigo"
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": false,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 90
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Description",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "justify": "center",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "auto",
+              "resizable": true,
+              "sort": "none",
+              "sortable": false,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": true,
+              "width": 300
+            },
+            {
+              "align": "center",
+              "boolean": "checkbox",
+              "dateFormat": "MM/DD/YYYY",
+              "editable": false,
+              "field": "Disable",
+              "filter": {
+                "boolean": {
+                  "condition": ""
+                },
+                "date": {
+                  "condition": "",
+                  "value": ""
+                },
+                "enabled": false,
+                "number": {
+                  "condition": "",
+                  "value": ""
+                },
+                "string": {
+                  "condition": "",
+                  "value": ""
+                },
+                "visible": "on-hover"
+              },
+              "footer": {
+                "align": "center",
+                "justify": "left",
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "header": {
+                "align": "center",
+                "justify": "center",
+                "style": {
+                  "classes": ""
+                },
+                "title": "Habilitado"
+              },
+              "justify": "auto",
+              "nullFormat": {
+                "includeNullStrings": false,
+                "nullFormatValue": "",
+                "strict": false
+              },
+              "number": "value",
+              "numberFormat": "0,0.##",
+              "progressBar": {
+                "bar": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "max": 100,
+                "min": 0,
+                "track": {
+                  "color": "",
+                  "style": {
+                    "classes": ""
+                  }
+                },
+                "value": {
+                  "enabled": true,
+                  "format": "0,0.##",
+                  "justify": "center",
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              },
+              "render": "number",
+              "resizable": true,
+              "sort": "none",
+              "sortable": true,
+              "strictWidth": false,
+              "style": {
+                "classes": ""
+              },
+              "toggleSwitch": {
+                "color": {
+                  "selected": "",
+                  "unselected": ""
+                }
+              },
+              "viewParams": {},
+              "viewPath": "",
+              "visible": false,
+              "width": ""
+            }
+          ],
+          "headerStyle": {
+            "backgroundColor": "--cla-page-bg",
+            "fontSize": 18
+          },
+          "pager": {
+            "bottom": false
+          },
+          "selection": {
+            "selectedRow": "",
+            "style": {
+              "backgroundColor": "#4A0E704D",
+              "borderStyle": "none"
+            }
+          },
+          "style": {
+            "classes": "table"
+          }
+        },
+        "type": "ia.display.table"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-page"
+      }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "refreshTableSKU",
+          "pageScope": true,
+          "script": "\t# implement your handler here\n\tdb \u003d self.view.custom.dbConnection\n\ttable \u003d mes_core.model.productcodeTable(db)\n\tfilter \u003d self.view.custom.filter\n\t\n\tif filter \u003d\u003d None or filter \u003d\u003d \u0027\u0027:\n\t\tself.view.custom.tableData \u003d table.selectAll()\n\telse:\n\t\tcolumns \u003d None\n\t\twhere_clause\u003d\"ProductCode LIKE ? or Description LIKE ?\"\n\t\twhere_args \u003d [\"%\" + filter + \"%\", \"%\" + filter + \"%\"]\n\t\t#where_args \u003d [filter , filter]\n\t\tself.view.custom.tableData \u003d table.selectCustom(columns,where_clause,where_args)\n",
+          "sessionScope": true,
+          "viewScope": true
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

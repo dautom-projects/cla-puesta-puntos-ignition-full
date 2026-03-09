@@ -1,0 +1,1380 @@
+{
+  "custom": {
+    "dataReason": {
+      "$": [
+        "ds",
+        192,
+        1760115198355
+      ],
+      "$columns": [
+        {
+          "data": [
+            80,
+            73,
+            77,
+            78,
+            79,
+            81,
+            82,
+            83,
+            84,
+            85,
+            87,
+            88,
+            89,
+            90,
+            92
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "Falla",
+            "Ajuste",
+            "Arranque",
+            "Calidad",
+            "Cambios",
+            "RRHH",
+            "Inventario",
+            "Materia Prima",
+            "MTTO",
+            "Seguridad",
+            "Servicios",
+            "Calibraciones",
+            "Validaciones",
+            "Velocidad Reducida",
+            "Otro"
+          ],
+          "name": "ReasonName",
+          "type": "String"
+        }
+      ]
+    },
+    "dbConnection": "mes_core",
+    "inCode": "",
+    "inName": "",
+    "inPlanned": false,
+    "inRecordDownTime": false,
+    "inSelOpetator": false,
+    "inSelReason": false,
+    "inSelReasonID": "",
+    "inSelSubreason": false,
+    "inSubfun": "",
+    "labelText": "",
+    "recomendedReasonCode": "",
+    "refresh": false,
+    "textLabel": ""
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.refresh \u003d True"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "function": "Create Add",
+    "nodeID": 4,
+    "selection": {
+      "selCode": "",
+      "selName": "",
+      "selOperator": false,
+      "selPlanned": false,
+      "selReason": false,
+      "selReasonID": "",
+      "selRecord": false,
+      "selSubreason": false
+    }
+  },
+  "propConfig": {
+    "custom.dataReason": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "selSubreason": "{view.custom.inSelSubreason}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdbConnection \u003d value[\"db\"]\n\tnodeID \u003d int(value[\"nodeID\"])\n\t\n\treason \u003d mes_core.model.statereasonTable(dbConnection)\n\t\n\tds \u003d reason.selectCustom(columns \u003d[\u0027ID\u0027,\u0027ReasonName\u0027] , where_clause\u003d \u0027SubReasonOf \u003d -1 AND NodeID \u003d ? order by ReasonCode asc\u0027, where_args \u003d [nodeID])\n\t#mes_core.logging.log(\"Dautom\", \"nodeID: {}\".format(nodeID), \"info\")\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.inCode": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/UpContainer/RightContainer/TextField_Type.props.text"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.inName": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/UpContainer/LeftContainer/TextField_Name.props.text"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.inPlanned": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/CapWeight_Container/Checkbox_Enable_1.props.selected"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tif currentValue.value:\n\t\tself.custom.inRecordDownTime \u003d False"
+      },
+      "persistent": true
+    },
+    "custom.inRecordDownTime": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/CapWeight_Container/Checkbox_Enable_0.props.selected"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tif currentValue.value:\n\t\tself.custom.inPlanned \u003d False"
+      },
+      "persistent": true
+    },
+    "custom.inSelOpetator": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/CapWeight_Container/Checkbox_Enable.props.selected"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.inSelReason": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/CapWeight_Container/Checkbox_Enable_2.props.selected"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tif currentValue.value:\n\t\tself.custom.inSelSubreason \u003d False\n\t\tself.custom.inPlanned \u003d False\n\t\tself.custom.inRecordDownTime \u003d False\n\t\tself.custom.inSubfun \u003d -1"
+      },
+      "persistent": true
+    },
+    "custom.inSelReasonID": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/UpContainer/LeftContainer_0/Dropdown_Assign.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tif currentValue.value \u003e 0:\n\t\tself.custom.inSubfun \u003d currentValue.value\n\telse:\n\t\tself.custom.inSubfun \u003d -1"
+      },
+      "persistent": true
+    },
+    "custom.inSelSubreason": {
+      "binding": {
+        "config": {
+          "bidirectional": true,
+          "path": "/root/FlexContainer/CapWeight_Container/Checkbox_Enable_3.props.selected"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tif currentValue.value:\n\t\tself.custom.inSelReason \u003d False"
+      },
+      "persistent": true
+    },
+    "custom.inSubfun": {
+      "persistent": true
+    },
+    "custom.recomendedReasonCode": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "refresh": "{view.custom.refresh}",
+            "subReasonOf": "{view.custom.inSubfun}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\"\"\"\n\tScript: recommendReasonOrSubreasonCode (Transform)\n\t\n\tBrief:\n\t\tRecommends the next ReasonCode based on table contents and your block rules:\n\t\t- If subReasonOf \u003d\u003d -1 (new Reason): next 10k-block for the NodeID (10000, 20000, ... 990000 cap).\n\t\t- If subReasonOf !\u003d -1 (new SubReason): parent\u0027s block + next incremental code (e.g., 10001, 10002, ...),\n\t\t  capped to the block upper bound (base + 9999).\n\t\n\tReturns:\n\t\tstr: Recommended ReasonCode (as text), or \"\" if not possible.\n\t\n\tParameters\n\t\tvalue (dict):\n\t\t\tdb (str):\n\t\t\t\tNamed DB connection for mes_core.model.statereasonTable.\n\t\t\t\tDefault: binding-provided.\n\t\t\tsubReasonOf (int):\n\t\t\t\t-1 for new Reason; otherwise parent Reason ID for a new SubReason.\n\t\t\t\tDefault: binding-provided.\n\t\t\tnodeID (int):\n\t\t\t\tTarget NodeID to scope the search.\n\t\t\t\tDefault: binding-provided.\n\t\n\tExample:\n\t\t# New Reason:\n\t\t# value \u003d {\"db\":\"MES_SQLSERVER\",\"subReasonOf\":-1,\"nodeID\":4}  -\u003e e.g. \"150000\"\n\t\t# New SubReason under parent ID\u003d80 (parent ReasonCode \u003d 10000):\n\t\t# value \u003d {\"db\":\"MES_SQLSERVER\",\"subReasonOf\":80,\"nodeID\":4}   -\u003e e.g. \"10017\"\n\t\"\"\"\n\t\n\t# Imports\n\t# import system\n\t\n\ttry:\n\t\t# Initialization of variables\n\t\toutput \u003d \"\"\n\t\n\t\t# Inputs\n\t\tdb \u003d value[\"db\"]\n\t\tsubReasonOf \u003d int(value[\"subReasonOf\"])\n\t\tnodeID \u003d int(value[\"nodeID\"])\n\t\n\t\t# Table model\n\t\ttable \u003d mes_core.model.statereasonTable(db)\n\t\n\t\t# Helper: first row value\n\t\tdef firstRow(ds, col):\n\t\t\tif ds is not None and ds.getRowCount() \u003e 0:\n\t\t\t\ttry:\n\t\t\t\t\treturn ds.getValueAt(0, col)\n\t\t\t\texcept:\n\t\t\t\t\treturn None\n\t\t\treturn None\n\t\n\t\t# Constants\n\t\tBLOCK_SIZE \u003d 10000\n\t\tMAX_BLOCK_CODE \u003d 990000  # cap para razones padre\n\t\n\t\tif subReasonOf \u003d\u003d -1:\n\t\t\t# ---- New Reason: siguiente bloque de 10k para este NodeID ----\n\t\t\t# Busca el mayor ReasonCode de los padres (SubReasonOf \u003d -1) de este NodeID, distinto de 990000.\n\t\t\tcolumns \u003d [\u0027ReasonCode\u0027]\n\t\t\twhereClause \u003d \u0027SubReasonOf \u003d -1 AND NodeID \u003d ? AND ReasonCode \u003c\u003e 990000 ORDER BY ReasonCode DESC\u0027\n\t\t\twhereArgs \u003d [nodeID]\n\t\t\tdsMaxParent \u003d table.selectCustom(columns\u003dcolumns, where_clause\u003dwhereClause, where_args\u003dwhereArgs)\n\t\n\t\t\tmaxParentCode \u003d firstRow(dsMaxParent, \u0027ReasonCode\u0027)\n\t\t\tif maxParentCode is None:\n\t\t\t\t# Si no hay ninguno, arrancamos en 10000\n\t\t\t\tnextBlock \u003d 10000\n\t\t\telse:\n\t\t\t\tmaxParentCode \u003d int(maxParentCode)\n\t\t\t\tnextBlock \u003d ((maxParentCode // BLOCK_SIZE) + 1) * BLOCK_SIZE\n\t\t\t\tif nextBlock \u003c 10000:\n\t\t\t\t\tnextBlock \u003d 10000\n\t\n\t\t\t# Cap a 990000\n\t\t\tif nextBlock \u003e MAX_BLOCK_CODE:\n\t\t\t\t# Sin bloque disponible\n\t\t\t\treturn \"\"\n\t\n\t\t\toutput \u003d str(nextBlock)\n\t\t\treturn output\n\t\n\t\telse:\n\t\t\t# ---- New SubReason: debajo del padre \u0027subReasonOf\u0027 ----\n\t\t\t# 1) Obtener ReasonCode del padre por ID\n\t\t\tdsParent \u003d table.selectCustom(\n\t\t\t\tcolumns\u003d[\u0027ReasonCode\u0027, \u0027NodeID\u0027],\n\t\t\t\twhere_clause\u003d\u0027ID \u003d ?\u0027,\n\t\t\t\twhere_args\u003d[subReasonOf]\n\t\t\t)\n\t\t\tparentCode \u003d firstRow(dsParent, \u0027ReasonCode\u0027)\n\t\t\tif parentCode is None:\n\t\t\t\treturn \"\"\n\t\n\t\t\tparentCode \u003d int(parentCode)\n\t\t\t# El bloque base es múltiplo inferior de 10k\n\t\t\tblockBase \u003d (parentCode // BLOCK_SIZE) * BLOCK_SIZE\n\t\t\tblockTop \u003d blockBase + (BLOCK_SIZE - 1)\n\t\n\t\t\t# 2) Buscar mayor ReasonCode entre las subrazones del padre, en este NodeID\n\t\t\tdsMaxChild \u003d table.selectCustom(\n\t\t\t\tcolumns\u003d[\u0027ReasonCode\u0027],\n\t\t\t\twhere_clause\u003d\u0027SubReasonOf \u003d ? AND NodeID \u003d ? ORDER BY ReasonCode DESC\u0027,\n\t\t\t\twhere_args\u003d[subReasonOf, nodeID]\n\t\t\t)\n\t\t\tmaxChildCode \u003d firstRow(dsMaxChild, \u0027ReasonCode\u0027)\n\t\n\t\t\tif maxChildCode is None:\n\t\t\t\t# Primera subrazón → parentCode si el padre ya está formateado con base exacta (10000, 120000, etc.)\n\t\t\t\t# y la primera subrazón debe ser +1\n\t\t\t\tnextCode \u003d blockBase + 1\n\t\t\telse:\n\t\t\t\tnextCode \u003d int(maxChildCode) + 1\n\t\n\t\t\t# 3) Validar rango dentro del bloque\n\t\t\tif nextCode \u003c (blockBase + 1):\n\t\t\t\tnextCode \u003d blockBase + 1\n\t\t\tif nextCode \u003e blockTop:\n\t\t\t\t# bloque lleno\n\t\t\t\treturn \"\"\n\t\n\t\t\toutput \u003d str(nextCode)\n\t\t\treturn output\n\t\n\texcept:\n\t\t# Return\n\t\treturn \"\"",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.custom.inCode \u003d currentValue.value"
+      },
+      "persistent": true
+    },
+    "custom.refresh": {
+      "onChange": {
+        "enabled": null,
+        "script": "\timport time\n\tif currentValue:\n\t\ttime.sleep(1)\n\t\tself.custom.refresh \u003d False"
+      },
+      "persistent": true
+    },
+    "custom.textLabel": {
+      "persistent": true
+    },
+    "params.function": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.selection": {
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 300,
+      "width": 624
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Spacer_0"
+        },
+        "position": {
+          "basis": "10px"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_Name"
+            },
+            "position": {
+              "basis": "32px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "marginLeft": 5
+              },
+              "text": "Caracteristicas",
+              "textStyle": {
+                "classes": "text-titles-2",
+                "textAlign": "left"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Spacer_3"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "!{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable_2"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "!{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.selected": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.selection.selReason"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn bool(value)",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "--cla-text-data"
+                    }
+                  },
+                  "style": {
+                    "color": "--cla-text-data"
+                  },
+                  "text": "Razón",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_4"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "enabled": false,
+                      "type": "expr"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable_3"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "!{../Checkbox_Enable_2.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.selected": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.selection.selSubreason"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn bool(value)",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "--cla-text-data"
+                    }
+                  },
+                  "style": {
+                    "color": "--cla-text-data"
+                  },
+                  "text": "Subrazón",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_7"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable_1"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.selected": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.selection.selPlanned"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn bool(value)",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "--cla-text-data"
+                    }
+                  },
+                  "style": {
+                    "color": "--cla-text-data"
+                  },
+                  "text": "Planeada",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_1"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable_0"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{../Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.selected": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.selection.selRecord"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn bool(value)",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "--cla-text-data"
+                    }
+                  },
+                  "style": {
+                    "color": "--cla-text-data"
+                  },
+                  "text": "No Planeada",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_5"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "!{../Checkbox_Enable_2.props.selected}"
+                      },
+                      "enabled": false,
+                      "type": "expr"
+                    }
+                  },
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.selected": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.selection.selOperator"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn bool(value)",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "--cla-text-data"
+                    }
+                  },
+                  "style": {
+                    "color": "--cla-text-data"
+                  },
+                  "text": "Sel Operador",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_6"
+                },
+                "position": {
+                  "basis": "10px",
+                  "grow": 1
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "CapWeight_Container"
+            },
+            "position": {
+              "basis": "20%",
+              "grow": 1
+            },
+            "props": {
+              "justify": "space-evenly",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Spacer_1"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "textStyle": {
+                        "color": "#FF0000"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Name"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "text": "Razón",
+                      "textStyle": {
+                        "classes": "text-titles-2",
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tself.view.custom.labelText \u003d \u0027\u0027"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown_Assign"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dataReason"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.selection.selReasonID"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "dropdown-downoptions"
+                      },
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vh"
+                          }
+                        },
+                        "text": "Seleccione..."
+                      },
+                      "showClearIcon": true,
+                      "style": {
+                        "classes": "dropdown",
+                        "marginBottom": 5,
+                        "marginLeft": 5,
+                        "marginRight": 5,
+                        "marginTop": 5
+                      }
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_4"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "textStyle": {
+                        "color": "#FF0000"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "LeftContainer_0"
+                },
+                "position": {
+                  "basis": "33%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "position.display": {
+                    "binding": {
+                      "config": {
+                        "expression": "{.../CapWeight_Container/Checkbox_Enable_3.props.selected}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Spacer_1"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "textStyle": {
+                        "color": "#FF0000"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Name"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginLeft": 5
+                      },
+                      "text": "Nombre",
+                      "textStyle": {
+                        "classes": "text-titles-2",
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tself.view.custom.textLabel \u003d \u0027\u0027"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "TextField_Name"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.selection.selName"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "placeholder": "Ingrese el nombre",
+                      "style": {
+                        "backgroundColor": "--cla-page-bg",
+                        "borderBottomLeftRadius": 5,
+                        "borderBottomRightRadius": 5,
+                        "borderTopLeftRadius": 5,
+                        "borderTopRightRadius": 5,
+                        "color": "000000",
+                        "marginBottom": 5,
+                        "marginLeft": 5,
+                        "marginRight": 5,
+                        "marginTop": 5
+                      }
+                    },
+                    "type": "ia.input.text-field"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_4"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "textStyle": {
+                        "color": "#FF0000"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "LeftContainer"
+                },
+                "position": {
+                  "basis": "33%",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Spacer_1"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "textStyle": {
+                        "color": "#FF0000"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Type"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "marginLeft": 5
+                      },
+                      "text": "Código",
+                      "textStyle": {
+                        "classes": "text-titles-2",
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tself.view.custom.textLabel \u003d \u0027\u0027"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "TextField_Type"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.selection.selCode"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "placeholder": "Ingrese el codigo",
+                      "style": {
+                        "backgroundColor": "--cla-page-bg",
+                        "borderBottomLeftRadius": 5,
+                        "borderBottomRightRadius": 5,
+                        "borderTopLeftRadius": 5,
+                        "borderTopRightRadius": 5,
+                        "color": "000000",
+                        "marginBottom": 5,
+                        "marginLeft": 5,
+                        "marginRight": 5,
+                        "marginTop": 5
+                      }
+                    },
+                    "type": "ia.input.text-field"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_4"
+                    },
+                    "position": {
+                      "basis": "16px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "textStyle": {
+                        "color": "#FF0000"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "RightContainer"
+                },
+                "position": {
+                  "basis": "33%",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "UpContainer"
+            },
+            "position": {
+              "basis": "40%",
+              "grow": 1
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Spacer_L"
+                    },
+                    "position": {
+                      "basis": "50px",
+                      "grow": 1
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "draggable": false,
+                            "id": "createedit-reason",
+                            "modal": true,
+                            "overlayDismiss": true,
+                            "resizable": false,
+                            "showCloseIcon": true,
+                            "type": "close",
+                            "viewPath": "Page/PopUps/CreateOrEditReason-Clarios",
+                            "viewportBound": false
+                          },
+                          "scope": "C",
+                          "type": "popup"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Button_Cancel"
+                    },
+                    "position": {
+                      "basis": "100px",
+                      "grow": 1
+                    },
+                    "props": {
+                      "image": {
+                        "icon": {
+                          "color": "#555555",
+                          "path": "material/cancel_presentation"
+                        },
+                        "width": 15
+                      },
+                      "style": {
+                        "classes": "button-2"
+                      },
+                      "text": "Cancelar"
+                    },
+                    "type": "ia.input.button"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_M"
+                    },
+                    "position": {
+                      "basis": "50px"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tdb \u003d self.view.custom.dbConnection\n\ttableReason \u003d mes_core.model.statereasonTable(db)\n\tds \u003d tableReason.selectCustom(columns \u003d [\u0027ID\u0027], where_clause \u003d \u0027NodeID \u003d ? AND ReasonName \u003d ?\u0027, where_args \u003d [self.view.params.nodeID,self.view.custom.inName] )\n\tmes_core.logging.log(\"Dautom\", \"[Popup anadir Razon/Subrazon] nodeID:{}\".format(self.view.params.nodeID), \"warn\")\n\tif self.view.params.function \u003d\u003d \u0027Crear\u0027:\n\t\n\t\tif ds.getRowCount()\u003e0:\n\t\t\tself.view.custom.textLabel \u003d \u0027Ya existe una Razon/Subrazon con ese nombre para el nodo selecionado\u0027\n\t\telse:\n\t\t\ttableReason.insert(nodeid \u003d self.view.params.nodeID,\n\t\t\t\t\t\t\t\t\t\treasonname \u003d self.view.custom.inName,\n\t\t\t\t\t\t\t\t\t\treasoncode \u003d self.view.custom.inCode,\n\t\t\t\t\t\t\t\t\t\trecorddowntime \u003d self.view.custom.inRecordDownTime,\n\t\t\t\t\t\t\t\t\t\tplanneddowntime \u003d self.view.custom.inPlanned,\n\t\t\t\t\t\t\t\t\t\toperatorselectable \u003dself.view.custom.inSelOpetator,\n\t\t\t\t\t\t\t\t\t\tsubreasonof\u003dself.view.custom.inSubfun)\n\t\t\talerts.actionSuccess(\u0027Razon/Subrazon Creada\u0027, \u0027Razon/Subrazon creada exitosamente\u0027)\n\t\t\tsystem.perspective.closePopup(\u0027createedit-reason\u0027)\n\t\t\n\t\t\n\t\t# Refresh (verifica que el message handler exista con ese nombre)\n\t\t\tsystem.perspective.sendMessage(\"refreshTableReason\", payload\u003d{})\n\t\n\telse :\n\t\tif ds.getRowCount()\u003e0:\n\t\t\tself.view.custom.textLabel \u003d \u0027Ya existe una Razon/Subrazon con ese nombre para el nodo selecionado\u0027\n\t\telse:\n\t\t\ttableReason.updateID(self.view.params.selection.selID,{\n\t\t\t\u0027ReasonName\u0027: self.view.custom.inName,\n\t\t\t\u0027ReasonCode\u0027: self.view.custom.inCode,\n\t\t\t\u0027RecordDowntime\u0027: self.view.custom.inRecordDownTime,\n\t\t\t\u0027PlannedDowntime\u0027: self.view.custom.inPlanned,\n\t\t\t\u0027OperatorSelectable\u0027: self.view.custom.inSelOpetator,\n\t\t\t\u0027SubReasonOf\u0027: self.view.custom.inSubfun\n\t\t})\n\t\t\talerts.actionSuccess(\u0027Razon/Subrazon actualizada\u0027, \u0027Razon/Subrazon actualizada exitosamente\u0027)\n\t\t\tsystem.perspective.closePopup(\u0027createedit-reason\u0027)\n\t\t\tsystem.perspective.sendMessage(\"refreshTableReason\", payload\u003d{})\n\t\t"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Button_CreateAdd"
+                    },
+                    "position": {
+                      "basis": "100px",
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.image.icon.path": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.function"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "material/access_time",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": "Crear",
+                                  "output": "material/add"
+                                },
+                                {
+                                  "input": "Editar",
+                                  "output": "material/create"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.function"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "image": {
+                        "icon": {},
+                        "width": 15
+                      },
+                      "style": {
+                        "classes": "button-1"
+                      }
+                    },
+                    "scripts": {
+                      "customMethods": [
+                        {
+                          "name": "alertMessage",
+                          "params": [
+                            "message"
+                          ],
+                          "script": "\t# change label for message\n\tself.parent.parent.getChild(\"Label Message\").props.text \u003d message"
+                        }
+                      ],
+                      "extensionFunctions": null,
+                      "messageHandlers": []
+                    },
+                    "type": "ia.input.button"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_R"
+                    },
+                    "position": {
+                      "basis": "50px",
+                      "grow": 1
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "Button_Container"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "justify": "center",
+                  "style": {
+                    "classes": "Utilities/p-8"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Spacer"
+                },
+                "position": {
+                  "basis": "10px",
+                  "shrink": 0
+                },
+                "props": {
+                  "textStyle": {
+                    "color": "#FF0000"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_Message"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.textLabel"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "textStyle": {
+                    "color": "#FF0000",
+                    "textAlign": "center"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_2"
+                },
+                "position": {
+                  "basis": "16px",
+                  "shrink": 0
+                },
+                "props": {
+                  "textStyle": {
+                    "color": "#FF0000"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "DownContainer"
+            },
+            "position": {
+              "basis": "30%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Spacer"
+        },
+        "position": {
+          "basis": "10px"
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "classes": "container-borders-dautom-widget"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

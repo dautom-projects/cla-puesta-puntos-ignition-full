@@ -1,0 +1,1329 @@
+{
+  "custom": {
+    "dbConnection": "mes_core",
+    "metrics": {},
+    "path": "Clarios/Pacifico/Cubiertas/IMM 15",
+    "runID": 45,
+    "statusLine": {},
+    "viewOn": true
+  },
+  "events": {
+    "system": {
+      "onShutdown": {
+        "config": {
+          "script": "\tself.custom.viewOn \u003d False"
+        },
+        "scope": "G",
+        "type": "script"
+      },
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.viewOn \u003d True"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "nodeID": 4
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.metrics": {
+      "persistent": true
+    },
+    "custom.metrics.cycle": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Edge/Jobs/ActiveJobValues/LastCycleTime"
+        },
+        "transforms": [
+          {
+            "code": "\tpath \u003d self.custom.path\n\tpathQlty \u003d \"[UNS]\" + path + \"/Edge/Jobs/ActiveJobValues/LastCycleTime.Quality\"\n\tqlty \u003d str(system.tag.readBlocking([pathQlty])[0].value)\n\tif qlty !\u003d \"Good\":\n\t\treturn \"OPC UA en fallo\"\n\t\n\n\treturn str(round((value/1000),2)) + \" seg\"",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      }
+    },
+    "custom.metrics.numCavities": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Line/Cavities"
+        },
+        "type": "tag"
+      }
+    },
+    "custom.metrics.production": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Line/OEE/Good Count"
+        },
+        "transforms": [
+          {
+            "formatType": "numeric",
+            "formatValue": "number",
+            "type": "format"
+          },
+          {
+            "code": "\treturn str(value) + \" piezas\"",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      }
+    },
+    "custom.metrics.realStandardRate": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "endTime": "now()",
+            "runID": "{view.custom.runID}",
+            "viewOn": true,
+            "windowMinutes": 10
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\"\"\"\n\tScript: standardRateFromCountHistory (Transform)\n\t\n\tBrief:\n\t\tComputes hourly production rate (units/hour) from counthistory by summing the \u0027Count\u0027\n\t\tin the last N minutes and scaling linearly to 60 minutes. Uses counthistoryTable.selectCustom().\n\t\n\tReturns:\n\t\tfloat: Estimated units per hour (UND/H).\n\t\n\tParameters\n\t\tvalue (dict):\n\t\t\tInput dict from binding. Must include:\n\t\t\t\t- runID (int): Target RunID.\n\t\t\t\t- db (str): Named SQL Server connection.\n\t\t\t\t- endTime (Date): Window end timestamp.\n\t\t\t\t- windowMinutes (int): Lookback window in minutes (e.g., 10).\n\t\t\tDefault: Binding-provided.\n\t\n\tExample:\n\t\t# value \u003d {\n\t\t#\t\"runID\": 39,\n\t\t#\t\"db\": \"MES_SQLSERVER\",\n\t\t#\t\"endTime\": system.date.now(),\n\t\t#\t\"windowMinutes\": 10\n\t\t# }\n\t\"\"\"\n\t\n\t# Imports\n\timport system\n\tviewOn \u003d value[\"viewOn\"]\n\tif viewOn:\n\t\ttry:\n\t\t\t# Initialization of variables\n\t\t\toutput \u003d 0.0\n\t\t\n\t\t\t# Inputs\n\t\t\trunID \u003d int(value[\"runID\"])\n\t\t\tdb \u003d value[\"db\"]\n\t\t\tendTime \u003d value[\"endTime\"]\n\t\t\twindowMinutes \u003d int(value[\"windowMinutes\"])\n\t\t\n\t\t\t# Guard\n\t\t\tif windowMinutes \u003c\u003d 0:\n\t\t\t\treturn 0.0\n\t\t\n\t\t\t# Time window\n\t\t\tstartTime \u003d system.date.addMinutes(endTime, -windowMinutes)\n\t\t\n\t\t\t# Table model\n\t\t\ttable \u003d mes_core.model.counthistoryTable(db)\n\t\t\n\t\t\t# Aggregate within window (TagID fijo \u003d 2; ajusta si necesitas parametrizar)\n\t\t\tds \u003d table.selectCustom(\n\t\t\t\tcolumns\u003d[\n\t\t\t\t\t\"SUM([Count]) AS Units\",\n\t\t\t\t\t\"MIN([TimeStamp]) AS MinTs\",\n\t\t\t\t\t\"MAX([TimeStamp]) AS MaxTs\"\n\t\t\t\t],\n\t\t\t\twhere_clause\u003d\"RunID \u003d ? AND TagID \u003d 2 AND TimeStamp \u003e\u003d ? AND TimeStamp \u003c\u003d ?\",\n\t\t\t\twhere_args\u003d[runID, startTime, endTime]\n\t\t\t)\n\t\t\n\t\t\t# No data\n\t\t\tif ds is None or ds.getRowCount() \u003d\u003d 0:\n\t\t\t\treturn 0\n\t\t\n\t\t\t# Extract aggregation\n\t\t\tunits \u003d ds.getValueAt(0, \"Units\")\n\t\t\tif units is None:\n\t\t\t\treturn 0\n\t\t\n\t\t\ttry:\n\t\t\t\tunits \u003d float(units)\n\t\t\texcept:\n\t\t\t\treturn -1\t\n\t\t\n\t\t\t# Scale to units/hour: (units in window) * (60 / windowMinutes)\n\t\t\trateUph \u003d (units / float(windowMinutes)) * 60.0\n\t\t\n\t\t\t# Return (redondeo opcional: round(rateUph, 2))\n\t\t\toutput \u003d rateUph\n\t\t\treturn str(output) + \" und/hr\"\n\t\t\n\t\texcept:\n\t\t\t# Return\n\t\t\treturn -1\t\n\telse:\n\t\tpass",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.metrics.scrap": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Line/OEE/Bad Count"
+        },
+        "transforms": [
+          {
+            "formatType": "numeric",
+            "formatValue": "number",
+            "type": "format"
+          },
+          {
+            "code": "\treturn str(value) + \" piezas\"",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      }
+    },
+    "custom.metrics.standardRate": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Line/OEE/Standard Rate"
+        },
+        "transforms": [
+          {
+            "code": "\tnumCavities \u003d self.custom.metrics.numCavities\n\treturn str(round((value * 3600 * numCavities),2))# + \" und/hr\"",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      }
+    },
+    "custom.path": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tnodeID \u003d value[\"nodeID\"]\t\n\tdb \u003d value[\"db\"]\n\t\n\ttablenode \u003d mes_core.model.nodeTable(db)\n\tcolumns \u003d [\"Topic\"]\n\twhere_clause \u003d \"ID \u003d ?\"\n\twhere_args \u003d [nodeID]\n\tds \u003d tablenode.selectCustom(columns,where_clause,where_args)\n\t\n\ttopic \u003d ds.getValueAt(0,0)\n\t\n\t\n\treturn topic",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.runID": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Line/OEE/RunID"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "custom.statusLine": {
+      "persistent": true
+    },
+    "custom.statusLine.mode": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Edge/MachineMode"
+        },
+        "transforms": [
+          {
+            "fallback": "Codigo no identificado",
+            "inputType": "scalar",
+            "mappings": [
+              {
+                "input": 0,
+                "output": "Otro"
+              },
+              {
+                "input": 1,
+                "output": "Automatico"
+              },
+              {
+                "input": 2,
+                "output": "Semiautomatico"
+              },
+              {
+                "input": 3,
+                "output": "Manual"
+              },
+              {
+                "input": 4,
+                "output": "Configuracion"
+              },
+              {
+                "input": 5,
+                "output": "Modo reposo"
+              }
+            ],
+            "outputType": "scalar",
+            "type": "map"
+          },
+          {
+            "code": "\tpath \u003d self.custom.path\n\tpathQlty \u003d \"[UNS]\" + path + \"/Edge/MachineMode.Quality\"\n\tqlty \u003d str(system.tag.readBlocking([pathQlty])[0].value)\n\tif qlty !\u003d \"Good\":\n\t\treturn \"OPC UA en fallo\"\n\t\n\treturn value\n",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      }
+    },
+    "custom.statusLine.state": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "indirect",
+          "references": {
+            "path": "{view.custom.path}"
+          },
+          "tagPath": "{path}/Edge/Status"
+        },
+        "transforms": [
+          {
+            "fallback": "Codigo no identificado",
+            "inputType": "scalar",
+            "mappings": [
+              {
+                "input": 0,
+                "output": "Otro"
+              },
+              {
+                "input": 1,
+                "output": "No produciendo"
+              },
+              {
+                "input": 2,
+                "output": "Arranque"
+              },
+              {
+                "input": 3,
+                "output": "Lista para producir"
+              },
+              {
+                "input": 4,
+                "output": "Produciendo"
+              },
+              {
+                "input": 5,
+                "output": "Ciclo en vacio"
+              }
+            ],
+            "outputType": "scalar",
+            "type": "map"
+          },
+          {
+            "code": "\tpath \u003d self.custom.path\n\tpathQlty \u003d \"[UNS]\" + path + \"/Edge/Status.Quality\"\n\tqlty \u003d str(system.tag.readBlocking([pathQlty])[0].value)\n\t#return qlty\n\tif qlty !\u003d \"Good\":\n\t\treturn \"OPC UA en fallo\"\n\t\n\treturn value\n\t\n\t",
+            "type": "script"
+          }
+        ],
+        "type": "tag"
+      }
+    },
+    "custom.viewOn": {
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "basis": "28px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-titles-2"
+              },
+              "text": "Estado linea"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Spacer_0"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_4"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2",
+                            "fontSize": 24,
+                            "marginLeft": 10
+                          },
+                          "text": "Estado",
+                          "textStyle": {
+                            "fontWeight": "normal",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_5"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2",
+                            "fontSize": 24,
+                            "marginLeft": 10
+                          },
+                          "text": "Modo",
+                          "textStyle": {
+                            "fontWeight": "normal",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_2"
+                    },
+                    "position": {
+                      "basis": "30px",
+                      "shrink": 0
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_0"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.statusLine.state"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 24
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "justify": "space-between",
+                          "style": {
+                            "borderBottomLeftRadius": 5,
+                            "borderBottomRightRadius": 5,
+                            "borderTopLeftRadius": 5,
+                            "borderTopRightRadius": 5,
+                            "marginBottom": 0,
+                            "marginLeft": 10,
+                            "marginRight": 10,
+                            "overflow": "hidden",
+                            "paddingLeft": 0,
+                            "paddingRight": 0
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_0"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.statusLine.mode"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 24
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "justify": "space-between",
+                          "style": {
+                            "borderBottomLeftRadius": 5,
+                            "borderBottomRightRadius": 5,
+                            "borderTopLeftRadius": 5,
+                            "borderTopRightRadius": 5,
+                            "marginBottom": 0,
+                            "marginLeft": 10,
+                            "marginRight": 10,
+                            "overflow": "hidden",
+                            "paddingLeft": 0,
+                            "paddingRight": 0
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_3"
+                    },
+                    "position": {
+                      "basis": "50px",
+                      "shrink": 0
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "20px"
+                    },
+                    "props": {
+                      "text": "\n"
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_0"
+                    },
+                    "position": {
+                      "basis": "20px"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "70%",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "justify": "center"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "28%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Label_0"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-titles-2"
+              },
+              "text": "Metricas"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_4"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2",
+                            "fontSize": 24,
+                            "marginLeft": 0
+                          },
+                          "text": "Producido",
+                          "textStyle": {
+                            "fontWeight": "normal",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_5"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2",
+                            "fontSize": 24,
+                            "marginLeft": 0
+                          },
+                          "text": "Scrap",
+                          "textStyle": {
+                            "fontWeight": "normal",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_2"
+                    },
+                    "position": {
+                      "basis": "50px"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_0"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.metrics.production"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 24
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "justify": "space-between",
+                          "style": {
+                            "backgroundColor": "",
+                            "borderBottomLeftRadius": 5,
+                            "borderBottomRightRadius": 5,
+                            "borderTopLeftRadius": 5,
+                            "borderTopRightRadius": 5,
+                            "marginBottom": 0,
+                            "marginLeft": 10,
+                            "marginRight": 10,
+                            "overflow": "hidden",
+                            "paddingLeft": 0,
+                            "paddingRight": 0
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_0"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.metrics.scrap"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 24
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "justify": "space-between",
+                          "style": {
+                            "borderBottomLeftRadius": 5,
+                            "borderBottomRightRadius": 5,
+                            "borderTopLeftRadius": 5,
+                            "borderTopRightRadius": 5,
+                            "classes": "container-borders-dautom-widget-2",
+                            "marginBottom": 0,
+                            "marginLeft": 10,
+                            "marginRight": 10,
+                            "overflow": "hidden",
+                            "paddingLeft": 0,
+                            "paddingRight": 0
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_3"
+                    },
+                    "position": {
+                      "basis": "50px",
+                      "shrink": 0
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_4"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2",
+                            "fontSize": 24,
+                            "marginLeft": 0
+                          },
+                          "text": "Ciclo",
+                          "textStyle": {
+                            "fontWeight": "normal",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_5"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2",
+                            "fontSize": 24,
+                            "marginLeft": 0
+                          },
+                          "text": "Production Rate",
+                          "textStyle": {
+                            "fontWeight": "normal",
+                            "textAlign": "center"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_4"
+                    },
+                    "position": {
+                      "basis": "50px"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_0"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.metrics.cycle"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 24
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "props": {
+                          "justify": "space-between",
+                          "style": {
+                            "borderBottomLeftRadius": 5,
+                            "borderBottomRightRadius": 5,
+                            "borderTopLeftRadius": 5,
+                            "borderTopRightRadius": 5,
+                            "marginBottom": 0,
+                            "marginLeft": 10,
+                            "marginRight": 10,
+                            "overflow": "hidden",
+                            "paddingLeft": 0,
+                            "paddingRight": 0
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_0"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "enabled": false,
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.metrics.realStandardRate"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "backgroundColor": "transparent",
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 24,
+                                "paddingRight": ""
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "right"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label"
+                            },
+                            "position": {
+                              "basis": "10px"
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label_1"
+                            },
+                            "position": {
+                              "basis": "80px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.style.backgroundColor": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "enabled": false,
+                                  "transforms": [
+                                    {
+                                      "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.metrics.standardRate"
+                                  },
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "session.props.theme"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": "cla-dark",
+                                          "output": "--cla-page-bg"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "backgroundColor": "transparent",
+                                "classes": "container-borders-dautom-widget-2 text-subtitle-widget",
+                                "fontSize": 20,
+                                "fontWeight": "normal",
+                                "marginBottom": 0,
+                                "paddingBottom": 20
+                              },
+                              "textStyle": {
+                                "paddingRight": 0,
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "50%",
+                          "grow": 1
+                        },
+                        "propConfig": {
+                          "props.style.backgroundColor": {
+                            "binding": {
+                              "config": {
+                                "path": "session.props.theme"
+                              },
+                              "transforms": [
+                                {
+                                  "code": "\n\t\n\tif value\u003d\u003d\"cla-light\":\n\t\treturn \"#FFFFFF\"\n\telse:\n\t\treturn \"#EAEBEB\"",
+                                  "type": "script"
+                                }
+                              ],
+                              "type": "property"
+                            }
+                          }
+                        },
+                        "props": {
+                          "justify": "space-between",
+                          "style": {
+                            "borderBottomLeftRadius": 15,
+                            "borderBottomRightRadius": 15,
+                            "borderTopLeftRadius": 15,
+                            "borderTopRightRadius": 15,
+                            "classes": "container-borders-dautom-widget-2",
+                            "marginBottom": 0,
+                            "marginLeft": 10,
+                            "marginRight": 10,
+                            "overflow": "hidden",
+                            "paddingLeft": 0,
+                            "paddingRight": 0
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_5"
+                    },
+                    "position": {
+                      "basis": "50px",
+                      "shrink": 0
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "70%",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column",
+                  "justify": "center"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "68%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "justify": "center"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Druration"
+        },
+        "position": {
+          "basis": "200px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "justify": "center",
+          "style": {
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "classes": "container-borders-dautom-widget-2",
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-widget-2"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

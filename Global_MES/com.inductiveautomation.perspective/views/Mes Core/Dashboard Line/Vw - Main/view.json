@@ -1,0 +1,961 @@
+{
+  "custom": {
+    "db_reasons": {
+      "$": [
+        "ds",
+        192,
+        1765517163968
+      ],
+      "$columns": [
+        {
+          "data": [
+            8,
+            8,
+            8
+          ],
+          "name": "itemId",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            60032,
+            60432,
+            60034
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            1765491835000,
+            1765504508000,
+            1765491857000
+          ],
+          "name": "startDate",
+          "type": "Date"
+        },
+        {
+          "data": [
+            1765491857000,
+            1765517158438,
+            1765504508000
+          ],
+          "name": "endDate",
+          "type": "Date"
+        },
+        {
+          "data": [
+            "Produciendo",
+            "Produciendo",
+            "No produciendo"
+          ],
+          "name": "label",
+          "type": "String"
+        },
+        {
+          "data": [
+            "#8AFF8A",
+            "#8AFF8A",
+            "#FF8A8A"
+          ],
+          "name": "color",
+          "type": "String"
+        },
+        {
+          "data": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "name": "opacity",
+          "type": "Double"
+        }
+      ]
+    },
+    "endDate": {
+      "$": [
+        "ts",
+        192,
+        1765517158438
+      ],
+      "$ts": 1765517158438
+    },
+    "endDateTime": {
+      "$": [
+        "ts",
+        192,
+        1758842279999
+      ],
+      "$ts": 1758842279999
+    },
+    "history": {
+      "pathCicleHistory": "value",
+      "pathStatusHistory": "value"
+    },
+    "items": [
+      {
+        "headerStyle": {
+          "classes": ""
+        },
+        "iconConfig": {
+          "color": "",
+          "path": "",
+          "style": {}
+        },
+        "id": 8,
+        "label": "IMM 3",
+        "rowStyle": {
+          "classes": ""
+        }
+      }
+    ],
+    "nodeID": 8,
+    "oee": {
+      "actualRun": {}
+    },
+    "path": "Clarios/Pacifico/Cubiertas/IMM 3",
+    "startDate": {
+      "$": [
+        "ts",
+        192,
+        1765517163961
+      ],
+      "$ts": 1765488363961
+    },
+    "startDateTime": {
+      "$": [
+        "ts",
+        192,
+        1758842285408
+      ],
+      "$ts": 1758813485408
+    },
+    "viewOn": false
+  },
+  "events": {
+    "system": {
+      "onStartup": [
+        {
+          "config": {
+            "script": "\tself.custom.viewOn \u003d True"
+          },
+          "scope": "G",
+          "type": "script"
+        },
+        {
+          "config": {
+            "script": "\t\tself.custom.viewOn \u003d False"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      ]
+    }
+  },
+  "params": {
+    "nodeID": 8
+  },
+  "propConfig": {
+    "custom.db_reasons": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "endDateTime": "{view.custom.endDate}",
+            "nodeID": "{view.custom.nodeID}",
+            "startDateTime": "{view.custom.startDate}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\t\"\"\"\n\t\tReturn statehistory events that overlap a given range, clipped to that range.\n\t\n\t\tColor:\n\t\t  - \u0027#6ABCE2\u0027 if ReasonCode \u003d 1001 (highest priority).\n\t\t  - \u0027#FF8A8A\u0027 if RecordDowntime \u003d 1 in statereason.\n\t\t  - \u0027#FFFF8A\u0027 if PlannedDowntime \u003d 1 (and RecordDowntime !\u003d 1).\n\t\t  - \u0027#8AFF8A\u0027 if both \u003d 0.\n\t\n\t\tInputs:\n\t\t\tvalue[\"dbConnection\"] (str)\n\t\t\tvalue[\"startDateTime\"] (datetime)\n\t\t\tvalue[\"endDateTime\"] (datetime)\n\t\t\tvalue[\"nodeID\"] (int or str)\n\t\n\t\tReturns:\n\t\t\tDataset: [itemId, ID, startDate, endDate, label, color, opacity]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tstartDateTime \u003d value[\"startDateTime\"]\n\t\tendDateTime \u003d value[\"endDateTime\"]\n\t\tnodeID \u003d value[\"nodeID\"]\n\t\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\t\n\t\tcolumns \u003d [\n\t\t\t\"NodeID AS itemId\",\n\t\t\t\"ID\",\n\t\t\t# start clipped to range start\n\t\t\t\"CASE WHEN StartDateTime \u003c ? THEN ? ELSE StartDateTime END AS startDate\",\n\t\t\t# end clipped to range end (considering open-ended)\n\t\t\t(\n\t\t\t\t\"CASE WHEN COALESCE(EndDateTime, GETDATE()) \u003e ? THEN ? \"\n\t\t\t\t\"ELSE COALESCE(EndDateTime, GETDATE()) END AS endDate\"\n\t\t\t),\n\t\t\t\"ReasonName AS label\",\n\t\t\t# color: priority 1001 \u003e RecordDowntime \u003e PlannedDowntime \u003e green\n\t\t\t(\n\t\t\t\t\"CASE \"\n\t\t\t\t\" WHEN ReasonCode \u003d 1001 THEN \u0027#6ABCE2\u0027 \"\n\t\t\t\t\" WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"               WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"                 AND sr.RecordDowntime \u003d 1) THEN \u0027#FF8A8A\u0027 \"\n\t\t\t\t\" WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"               WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"                 AND sr.PlannedDowntime \u003d 1) THEN \u0027#FFFF8A\u0027 \"\n\t\t\t\t\" ELSE \u0027#8AFF8A\u0027 \"\n\t\t\t\t\"END AS color\"\n\t\t\t),\n\t\t\t\"0.5 AS opacity\"\n\t\t]\n\t\n\t\t# Overlap: [Start, End] with [startDateTime, endDateTime]\n\t\twhere_clause \u003d (\n\t\t\t\"StartDateTime \u003c ? \"\n\t\t\t\"AND COALESCE(EndDateTime, GETDATE()) \u003e ? \"\n\t\t\t\"AND NodeID \u003d ?\"\n\t\t)\n\t\n\t\t# Parameter order:\n\t\t# 1-2: CASE startDate\n\t\t# 3-4: CASE endDate\n\t\t# 5-6: WHERE overlap\n\t\t# 7: NodeID filter\n\t\twhere_args \u003d [\n\t\t\tstartDateTime, startDateTime,\n\t\t\tendDateTime,   endDateTime,\n\t\t\tendDateTime,   startDateTime,\n\t\t\tnodeID\n\t\t]\n\t\n\t\tds \u003d stateHistoryTable.selectCustom(columns\u003dcolumns, where_clause\u003dwhere_clause, where_args\u003dwhere_args)\n\t\treturn ds\n\t\n\texcept:\n\t\timport system\n\t\treturn system.dataset.toDataSet([\u0027itemId\u0027,\u0027ID\u0027,\u0027startDate\u0027,\u0027endDate\u0027,\u0027label\u0027,\u0027color\u0027,\u0027opacity\u0027], [])",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.endDate": {
+      "binding": {
+        "config": {
+          "expression": "now(10000)"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.history": {
+      "persistent": true
+    },
+    "custom.history.nodeID": {
+      "binding": {
+        "config": {
+          "path": "view.params.nodeID"
+        },
+        "transforms": [
+          {
+            "code": "\treturn int(value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.items": {
+      "binding": {
+        "config": {
+          "struct": {
+            "nodeID": "{view.custom.nodeID}",
+            "path": "{view.custom.path}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tnodeID \u003d value[\"nodeID\"]\n\tpath \u003d value[\"path\"]\n\tlineName \u003d str(system.tag.readBlocking([path + \"/Line/Line Name\"])[0].value)\n\tvalue \u003d [\n\t  {\n\t    \"id\": nodeID,\n\t    \"label\": lineName,\n\t    \"iconConfig\": {\n\t      \"path\": \"\",\n\t      \"color\": \"\",\n\t      \"style\": {}\n\t    },\n\t    \"headerStyle\": {\n\t      \"classes\": \"\"\n\t    },\n\t    \"rowStyle\": {\n\t      \"classes\": \"\"\n\t    }\n\t  }\n\t]\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.nodeID": {
+      "binding": {
+        "config": {
+          "path": "view.params.nodeID"
+        },
+        "transforms": [
+          {
+            "code": "\treturn int(value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.oee": {
+      "persistent": true
+    },
+    "custom.oee.activeRun": {
+      "binding": {
+        "config": {
+          "struct": {
+            "nodeID": "{view.params.nodeID}",
+            "refresh": "now(10000)"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tnodeID \u003d value[\"nodeID\"]\n\tcurrentRun \u003d mes_core.run.getRunBynode(int(nodeID))\n\n\ttry: \n\t\tcurrentRun.getValueAt(0,0)\n\t\treturn 1\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.availability": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,3)\n\t\treturn value\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.dataset": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "path": "{view.custom.path}",
+            "refresh": "if({view.custom.oee.activeRun} \u003d 1,now(10000),0)"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tnodeID \u003d int(value[\"nodeID\"])\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tpath \u003d value[\"path\"]\n\t\trunID \u003d system.tag.readBlocking([path + \u0027/Line/OEE/RunID\u0027])[0].value\n\t\t#return runID\n\t\ttableSch \u003d mes_core.schedule.scheduleTable(db)\n\t\tcolumnsSch  \u003d [\"ID\"]\n\t\twhere_clouseSch \u003d \"NodeID \u003d ? AND RunID \u003d ?\"\n\t\twhere_argsSch \u003d [nodeID, runID]\n\t\tdsSch \u003d tableSch.selectCustom(columns \u003d columnsSch,where_clause \u003d where_clouseSch, where_args \u003d where_argsSch)\t\n\t\tschID \u003d dsSch.getValueAt(0,0)\n\t\t\n\t\ttableRun \u003d mes_core.run.RunTable(db)\n\t\tcolumns \u003d [\"ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\", \"OEE\", \"Quality\", \"Performance\",\"EstimatedFinishedTime\"]\n\t\twhere_clause \u003d \"Closed \u003d ? AND ScheduleID \u003d ? \"\n\t\twhere_args \u003d [0, schID]\n\t\tds \u003d tableRun.selectCustom(columns,where_clause,where_args)\n\t\treturn ds\n\texcept:\n\t\tNone",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.endDateTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\t#ds \u003d value[\"dataset\"]\n\t\t#value \u003d ds.getValueAt(0,9)\n\t\treturn system.date.now(10000)\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.oee": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,6)\n\t\treturn value\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.performance": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,8)\n\t\treturn value\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.quality": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,7)\n\t\treturn value\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.runID": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,0)\n\t\treturn value\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.runTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,4)\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.startDateTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,1)\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.oee.actualRun.totalTime": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dataset": "{view.custom.oee.actualRun.dataset}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\tds \u003d value[\"dataset\"]\n\t\tvalue \u003d ds.getValueAt(0,5)\n\t\treturn value\n\texcept:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      }
+    },
+    "custom.path": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.custom.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tnodeID \u003d value[\"nodeID\"]\t\n\tdb \u003d value[\"db\"]\n\t\n\ttablenode \u003d mes_core.model.nodeTable(db)\n\tcolumns \u003d [\"Topic\"]\n\twhere_clause \u003d \"ID \u003d ?\"\n\twhere_args \u003d [nodeID]\n\tds \u003d tablenode.selectCustom(columns,where_clause,where_args)\n\t\n\ttopic \u003d ds.getValueAt(0,0)\n\t\n\t\n\treturn topic",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.startDate": {
+      "binding": {
+        "config": {
+          "expression": "dateArithmetic(now(),-8,\u0027hours\u0027)"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.viewOn": {
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1080,
+      "width": 1920
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "params": {
+            "icon": "material/visibility",
+            "text": "Dashboard IMM 15"
+          },
+          "path": "Page/Embedded/Title_Large"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "meta": {
+          "name": "Dashboard"
+        },
+        "position": {
+          "basis": "90%"
+        },
+        "propConfig": {
+          "props.widgets[0].viewParams.nodeID": {
+            "binding": {
+              "config": {
+                "path": "view.custom.nodeID"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[1].viewParams.nodeID": {
+            "binding": {
+              "config": {
+                "path": "view.custom.nodeID"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[2].viewParams.nodeID": {
+            "binding": {
+              "config": {
+                "path": "view.custom.nodeID"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.activeRun": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.activeRun"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.dataset": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.dataset"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.gauge1.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.oee"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round(value * 100,2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.gauge2.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.availability"
+              },
+              "transforms": [
+                {
+                  "code": "\t\n\treturn round(value * 100,2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.gauge3.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.performance"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round(value * 100,2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.gauge4.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.quality"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round(value * 100,2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[3].viewParams.nodeID": {
+            "binding": {
+              "config": {
+                "path": "view.custom.nodeID"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[4].viewParams.gauge1.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.oee"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round((value * 100),2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[4].viewParams.gauge2.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.availability"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round((value * 100),2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[4].viewParams.gauge3.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.performance"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round((value * 100),2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[4].viewParams.gauge4.value": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.actualRun.quality"
+              },
+              "transforms": [
+                {
+                  "code": "\treturn round((value * 100),2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.widgets[4].viewParams.nodeID": {
+            "binding": {
+              "config": {
+                "path": "view.custom.nodeID"
+              },
+              "type": "property"
+            }
+          },
+          "props.widgets[4].viewParams.previous": {
+            "binding": {
+              "config": {
+                "path": "view.custom.oee.activeRun"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "editingToggle": false,
+          "pack": false,
+          "stretch": {
+            "columnCount": 13,
+            "columnGutterSize": 10,
+            "rowGutterSize": 10
+          },
+          "style": {
+            "borderStyle": "none"
+          },
+          "widgets": [
+            {
+              "body": {
+                "style": {
+                  "classes": "container-borders-dautom-page"
+                }
+              },
+              "header": {
+                "enabled": false,
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "isConfigurable": false,
+              "minSize": {
+                "columnSpan": 1,
+                "rowSpan": 1
+              },
+              "name": "NodeState",
+              "position": {
+                "columnEnd": 9,
+                "columnStart": 5,
+                "rowEnd": 5,
+                "rowStart": 1
+              },
+              "style": {
+                "borderStyle": "none",
+                "classes": ""
+              },
+              "viewParams": {},
+              "viewPath": "Mes Core/Dashboard Line/Emb - NodeState"
+            },
+            {
+              "body": {
+                "style": {
+                  "classes": "container-borders-dautom-page"
+                }
+              },
+              "header": {
+                "enabled": false,
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "isConfigurable": false,
+              "minSize": {
+                "columnSpan": 1,
+                "rowSpan": 1
+              },
+              "name": "OrderState",
+              "position": {
+                "columnEnd": 5,
+                "columnStart": 1,
+                "rowEnd": 5,
+                "rowStart": 1
+              },
+              "style": {
+                "borderStyle": "none",
+                "classes": ""
+              },
+              "viewParams": {},
+              "viewPath": "Mes Core/Dashboard Line/Emb - OrderState"
+            },
+            {
+              "body": {
+                "style": {
+                  "classes": "container-borders-dautom-page"
+                }
+              },
+              "header": {
+                "enabled": false,
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "isConfigurable": false,
+              "minSize": {
+                "columnSpan": 1,
+                "rowSpan": 1
+              },
+              "name": "History",
+              "position": {
+                "columnEnd": 9,
+                "columnStart": 1,
+                "rowEnd": 9,
+                "rowStart": 5
+              },
+              "style": {
+                "borderStyle": "none",
+                "classes": ""
+              },
+              "viewParams": {
+                "path": ""
+              },
+              "viewPath": "Mes Core/Dashboard Line/Emb - powerChart"
+            },
+            {
+              "body": {
+                "style": {
+                  "classes": "container-borders-dautom-page"
+                }
+              },
+              "header": {
+                "enabled": false,
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "isConfigurable": false,
+              "minSize": {
+                "columnSpan": 1,
+                "rowSpan": 1
+              },
+              "name": "Events",
+              "position": {
+                "columnEnd": 14,
+                "columnStart": 9,
+                "rowEnd": 9,
+                "rowStart": 5
+              },
+              "style": {
+                "borderStyle": "none",
+                "classes": ""
+              },
+              "viewParams": {},
+              "viewPath": "Mes Core/Dashboard Line/Emb - eventDuration"
+            },
+            {
+              "body": {
+                "style": {
+                  "classes": "container-borders-dautom-page"
+                }
+              },
+              "header": {
+                "enabled": false,
+                "style": {
+                  "classes": ""
+                },
+                "title": ""
+              },
+              "isConfigurable": false,
+              "minSize": {
+                "columnSpan": 1,
+                "rowSpan": 1
+              },
+              "name": "oee",
+              "position": {
+                "columnEnd": 14,
+                "columnStart": 9,
+                "rowEnd": 5,
+                "rowStart": 1
+              },
+              "style": {
+                "borderStyle": "none",
+                "classes": ""
+              },
+              "viewParams": {
+                "availabilityPerc": 1.5,
+                "class_gauge": "gauge-fill-1",
+                "fontZise": 4,
+                "gauge1": {
+                  "label": "OEE"
+                },
+                "gauge2": {
+                  "label": "Disponibilidad"
+                },
+                "gauge3": {
+                  "label": "Rendimiento"
+                },
+                "gauge4": {
+                  "label": "Calidad"
+                },
+                "gaugeAvailabilityName": "OEE",
+                "lapset": "8D"
+              },
+              "viewPath": "Mes Core/Dashboard Line/Emb -  OEE v2"
+            }
+          ]
+        },
+        "type": "ia.display.dashboard"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "EquipmentSchedule"
+            },
+            "position": {
+              "basis": "100%",
+              "grow": 1
+            },
+            "propConfig": {
+              "props.dateRange.endDate": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.custom.endDate}"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.dateRange.startDate": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.custom.startDate}"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.downtimeEvents": {
+                "binding": {
+                  "config": {
+                    "expression": "{view.custom.db_reasons}"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.items": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.items"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dateRange": {},
+              "defaultZoom": "15-min",
+              "rowStyle": {
+                "backgroundColor": "--cla-page-bg"
+              },
+              "style": {
+                "borderStyle": "none"
+              }
+            },
+            "type": "ia.display.equipmentschedule"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "200px"
+        },
+        "props": {
+          "style": {
+            "borderStyle": "solid",
+            "borderWidth": "1px",
+            "classes": "container-borders-dautom-widget-2",
+            "marginBottom": 10,
+            "marginLeft": 10,
+            "marginRight": 10,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

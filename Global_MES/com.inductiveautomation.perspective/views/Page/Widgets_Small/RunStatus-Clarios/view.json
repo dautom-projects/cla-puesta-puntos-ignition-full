@@ -1,0 +1,1644 @@
+{
+  "custom": {
+    "activeOrder": 81,
+    "db": "mes_core",
+    "estimatedFinishTime": "2025-10-23 23:19:25",
+    "finishTime": "--",
+    "lineIdMap": 15,
+    "lineName": "IMM 15",
+    "mldCavities": 1,
+    "mldCode": "MOL-1",
+    "mldName": "Molde",
+    "now": {
+      "$": [
+        "ts",
+        192,
+        1761322954353
+      ],
+      "$ts": 1761322954353
+    },
+    "orderStatus": 1,
+    "proCode": "122000661",
+    "proDesc": "CUBIERTA 8D SD NEGRA BG ALTO 2024 (-+)",
+    "progressValue": 47.07379134860051,
+    "quantity": 786,
+    "refreshSec": 29,
+    "runData": {
+      "$": [
+        "ds",
+        192,
+        1761322954354
+      ],
+      "$columns": [
+        {
+          "data": [
+            81
+          ],
+          "name": "WorkOrderID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "122000661"
+          ],
+          "name": "ProductCode",
+          "type": "String"
+        },
+        {
+          "data": [
+            "CUBIERTA 8D SD NEGRA BG ALTO 2024 (-+)"
+          ],
+          "name": "ProductCodeDescription",
+          "type": "String"
+        },
+        {
+          "data": [
+            1761237332903
+          ],
+          "name": "RunStartDateTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            1761187432837
+          ],
+          "name": "ScheduleFinishDateTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            "MOL-1"
+          ],
+          "name": "MoldeCode",
+          "type": "String"
+        },
+        {
+          "data": [
+            "Molde"
+          ],
+          "name": "MoldeName",
+          "type": "String"
+        },
+        {
+          "data": [
+            1
+          ],
+          "name": "Cavities",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            73
+          ],
+          "name": "StandardRate",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            56
+          ],
+          "name": "RunID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            3
+          ],
+          "name": "Waste",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            1761279565753
+          ],
+          "name": "EstimatedFinishedTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            786
+          ],
+          "name": "Quantity",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            18560
+          ],
+          "name": "StartOutfeed",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            18930
+          ],
+          "name": "CurrentOutfeed",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            367
+          ],
+          "name": "GoodCount",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            370
+          ],
+          "name": "TotalCount",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "IMM 15"
+          ],
+          "name": "nodeName",
+          "type": "String"
+        },
+        {
+          "data": [
+            1
+          ],
+          "name": "rnOrder",
+          "type": "Long"
+        }
+      ]
+    },
+    "runID": 56,
+    "startTime": "2025-10-23 11:35:32",
+    "stationStatus": 4,
+    "updateWasteHour": {
+      "$": [
+        "ts",
+        192,
+        1761322954467
+      ],
+      "$ts": 1761322920000
+    }
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})\n\t"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "nodeID": 4
+  },
+  "propConfig": {
+    "custom.activeOrder": {
+      "persistent": true
+    },
+    "custom.db": {
+      "persistent": true
+    },
+    "custom.estimatedFinishTime": {
+      "persistent": true
+    },
+    "custom.lineIdMap": {
+      "binding": {
+        "config": {
+          "path": "view.params.nodeID"
+        },
+        "transforms": [
+          {
+            "fallback": null,
+            "inputType": "scalar",
+            "mappings": [
+              {
+                "input": 4,
+                "output": 15
+              }
+            ],
+            "outputType": "scalar",
+            "type": "map"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.lineName": {
+      "binding": {
+        "config": {
+          "path": "view.params.nodeID"
+        },
+        "transforms": [
+          {
+            "code": "\tid \u003d value\n\tdb \u003d self.custom.db\n\tquery \u003d  \"\"\"\n\t\tSELECT Name FROM node WHERE ID \u003d ?\n\t\"\"\"\n\tdataset \u003d system.db.runPrepQuery(query, [id], db)\n\tname \u003d dataset[0][\"Name\"]\n\treturn name",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": false,
+        "script": "\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})"
+      },
+      "persistent": true
+    },
+    "custom.mldCavities": {
+      "persistent": true
+    },
+    "custom.now": {
+      "binding": {
+        "config": {
+          "expression": "now(5000)"
+        },
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tsystem.perspective.sendMessage(\u0027refreshRun\u0027)\n\t"
+      },
+      "persistent": true
+    },
+    "custom.orderStatus": {
+      "persistent": true
+    },
+    "custom.proDesc": {
+      "persistent": true
+    },
+    "custom.progressValue": {
+      "persistent": true
+    },
+    "custom.quantity": {
+      "persistent": true
+    },
+    "custom.refreshSec": {
+      "binding": {
+        "config": {
+          "expression": "dateExtract(now(10000),\"second\")"
+        },
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tlistCustom \u003d [\n\t\t\"stationStatus\",\t\t\n\t\t\"lineName\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))"
+      },
+      "persistent": true
+    },
+    "custom.runData": {
+      "persistent": true
+    },
+    "custom.runID": {
+      "persistent": true
+    },
+    "custom.startTime": {
+      "persistent": true
+    },
+    "custom.stationStatus": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.db}",
+            "nodeID": "{view.params.nodeID}",
+            "runID": "{view.custom.runID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\ttry:\n\t\ttableStH\u003d mes_core.model.statehistoryTable(value[\"db\"])\n\t\tcolumns \u003d [\"TOP 1 ReasonCode\"]\n\t\twhere_clause \u003d (\n\t\t\t\"NodeID \u003d ? \"\n\t\t\t\"AND RunID \u003d ? \"\n\t\t\t\"ORDER BY ID DESC \"\n\t\t)\n\t\twhere_args \u003d [value[\"nodeID\"],value[\"runID\"]]\n\t\tresult\u003dtableStH.selectCustom(columns, where_clause, where_args)\n\t\t\n\t\tvalue \u003d result.getValueAt(0,0)\n\t\treturn value\n\texcept:\n\t\treturn 1",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.updateWasteHour": {
+      "binding": {
+        "config": {
+          "struct": {
+            "now": "now()"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdate \u003d value[\"now\"]\n\tformatTime \u003d mes_core.misc.makeDateTime(dateTime\u003ddate, ss\u003d0, ms\u003d0, output\u003d\u0027datetime\u0027)\n\treturn formatTime\n\t",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\t\n\tgetMin \u003d str(system.date.getMinute(system.date.now()))\n\tgetSec \u003d str(system.date.getSecond(system.date.now()))\n\t\n\tif getMin \u003d\u003d \"30\" and getSec \u003d\u003d \"0\":\n\t\t\n\t\tNodeID \u003d int(self.view.params.nodeID)\n\t\t\t\n\t\t# Trae una sola vez el run actual por NodeID\n\t\tresult \u003d mes_core.run.getRunBynode(NodeID)\n\t\t\n\t\t# Coerciones seguras\n\t\tdef _to_int_safe(x, default\u003d0):\n\t\t    \"\"\"Convertir a int; si es None o falla, devolver default.\"\"\"\n\t\t    try:\n\t\t        if x is None:\n\t\t            return default\n\t\t        return int(x)\n\t\t    except:\n\t\t        return default\n\t\t\n\t\tQuantity \u003d _to_int_safe(result.getValueAt(0, \"Quantity\"), 0)\n\t\twaste    \u003d _to_int_safe(result.getValueAt(0, \"Waste\"), 0)\n\t\t\n\t\tdef build_options(n, include_zero\u003dTrue):\n\t\t    \"\"\"Crear opciones tipo [{\u0027value\u0027: i, \u0027label\u0027: i}, ...].\n\t\t\n\t\t    Args:\n\t\t        n (int): Límite superior (inclusivo).\n\t\t        include_zero (bool): Si True, arranca en 0; de lo contrario, en 1.\n\t\t\n\t\t    Returns:\n\t\t        list[dict]: Opciones para dropdown.\n\t\t    \"\"\"\n\t\t    n \u003d _to_int_safe(n, 0)\n\t\t    if n \u003c 0:\n\t\t        n \u003d 0\n\t\t    start \u003d 0 if include_zero else 1\n\t\t    if n \u003c start:\n\t\t        # Si piden incluir 0 y n \u003c 0, devolvemos al menos [0]\n\t\t        return [{\"value\": 0, \"label\": 0}] if include_zero else []\n\t\t    return [{\"value\": i, \"label\": i} for i in range(start, n + 1)]\n\t\t\n\t\t# Ahora sí: incluye 0..Quantity\n\t\toptions \u003d build_options(Quantity, include_zero\u003dTrue)\n\t\t\n\t\talerts.showAlertAndDropdown(\n\t\t    state\u003d\"info\",\n\t\t    title\u003d\"Digitalizacion de Scrap\",\n\t\t    message\u003d\"Ingrese el valor de scrap en la corrida, Scrap actual: {} piezas\".format(waste),\n\t\t    showCloseBtn\u003dFalse,\n\t\t    btnTextPrimary\u003d\"Actualizar\",\n\t\t    btnTextSecondary\u003d\"Cancelar\",\n\t\t    btnIconPrimary\u003d\"Primary\",\n\t\t    btnIconSecondary\u003d\"\",\n\t\t    btnIconAlignment\u003d\"right\",\n\t\t    btnActionPrimary\u003d\"updateWaste\",\n\t\t    btnActionSecondary\u003d\"closePopup\",\n\t\t    btnActionClose\u003d\"closePopup\",\n\t\t    dropdownoptions\u003doptions\n\t\t)\n\telse:\n\t\tNone"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 405,
+      "width": 1575
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label Title"
+                },
+                "position": {
+                  "basis": "371px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "\"Estado de la Corrida Linea \" + {view.custom.lineName}"
+                      },
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "textStyle": {
+                    "classes": "text-titles"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "TitleContainer"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "justify": "center",
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "marginBottom": 10,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelOrder"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Orden Activa",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "LabelShowOrder"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.activeOrder"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexOrder"
+                        },
+                        "position": {
+                          "basis": "158px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelMat"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Producto",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "LabelShowMat"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.proCode"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "borderBottomRightRadius": 10,
+                                "borderTopLeftRadius": 10,
+                                "borderTopRightRadius": 10
+                              },
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexProduct"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelSrc"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Cavidades",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "LabelShowSrc"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.mldCavities"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "borderBottomLeftRadius": 10,
+                                "borderBottomRightRadius": 10,
+                                "borderTopLeftRadius": 10,
+                                "borderTopRightRadius": 10
+                              },
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexMolde"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelOrder"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Cantidad",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "LabelShowOrder"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.quantity"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexQuantity"
+                        },
+                        "position": {
+                          "basis": "158px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Descripcion",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Value"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.proDesc"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexDescription"
+                        },
+                        "position": {
+                          "basis": "400px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelStart"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Hora Inicio",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "LabelShowStart"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.startTime"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexStart"
+                        },
+                        "position": {
+                          "basis": "208px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "overflow": "hidden",
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelFinish"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "style": {
+                                "classes": "text-titles-2",
+                                "margin": 0
+                              },
+                              "text": "Hora Final Estimada",
+                              "textStyle": {
+                                "fontSize": 20,
+                                "fontWeight": "normal"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "LabelShowFinish"
+                            },
+                            "position": {
+                              "basis": "32px",
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.estimatedFinishTime"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "style": {
+                                "borderTopRightRadius": 10
+                              },
+                              "textStyle": {
+                                "classes": "text-data-2",
+                                "fontFamily": "Arial"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexEstimateEnd"
+                        },
+                        "position": {
+                          "basis": "220px"
+                        },
+                        "props": {
+                          "direction": "column",
+                          "style": {
+                            "overflow": "hidden",
+                            "padding": 5
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "OrderContainer"
+                    },
+                    "position": {
+                      "basis": "50%",
+                      "grow": 1
+                    },
+                    "props": {
+                      "justify": "space-evenly",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "WOContainer"
+                },
+                "position": {
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "props": {
+                  "justify": "space-between",
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "Label",
+                                  "visible": false
+                                },
+                                "position": {
+                                  "basis": "50px",
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "text": "Label"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "meta": {
+                                      "name": "OrderStatus"
+                                    },
+                                    "position": {
+                                      "shrink": 0
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "classes": "text-titles-2",
+                                        "margin": 0
+                                      },
+                                      "text": "Corrida:",
+                                      "textStyle": {
+                                        "fontSize": 20,
+                                        "textAlign": "right"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  },
+                                  {
+                                    "meta": {
+                                      "name": "LabelOrderStatus"
+                                    },
+                                    "position": {
+                                      "grow": 1
+                                    },
+                                    "propConfig": {
+                                      "props.text": {
+                                        "binding": {
+                                          "config": {
+                                            "path": "view.custom.orderStatus"
+                                          },
+                                          "transforms": [
+                                            {
+                                              "fallback": null,
+                                              "inputType": "scalar",
+                                              "mappings": [
+                                                {
+                                                  "input": 0,
+                                                  "output": "Inactiva"
+                                                },
+                                                {
+                                                  "input": 1,
+                                                  "output": " Activa"
+                                                }
+                                              ],
+                                              "outputType": "scalar",
+                                              "type": "map"
+                                            }
+                                          ],
+                                          "type": "property"
+                                        }
+                                      },
+                                      "props.textStyle.color": {
+                                        "binding": {
+                                          "config": {
+                                            "path": "view.custom.orderStatus"
+                                          },
+                                          "transforms": [
+                                            {
+                                              "fallback": null,
+                                              "inputType": "scalar",
+                                              "mappings": [
+                                                {
+                                                  "input": 0,
+                                                  "output": "#7D7D7D"
+                                                },
+                                                {
+                                                  "input": 1,
+                                                  "output": "--cla-progress-bar"
+                                                }
+                                              ],
+                                              "outputType": "scalar",
+                                              "type": "map"
+                                            }
+                                          ],
+                                          "type": "property"
+                                        }
+                                      }
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "borderBottomLeftRadius": 5,
+                                        "borderBottomRightRadius": 5,
+                                        "borderTopLeftRadius": 5,
+                                        "borderTopRightRadius": 5
+                                      },
+                                      "textStyle": {
+                                        "borderBottomLeftRadius": 10,
+                                        "borderBottomRightRadius": 10,
+                                        "borderStyle": "none",
+                                        "borderTopLeftRadius": 10,
+                                        "borderTopRightRadius": 10,
+                                        "classes": "text-titles-2",
+                                        "fontFamily": "Arial",
+                                        "fontSize": 20,
+                                        "fontWeight": "bold",
+                                        "marginLeft": 10,
+                                        "outlineStyle": "none",
+                                        "textAlign": "left"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  }
+                                ],
+                                "meta": {
+                                  "name": "OrderContainer"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "justify": "flex-end",
+                                  "style": {
+                                    "overflow": "hidden",
+                                    "paddingLeft": 10
+                                  }
+                                },
+                                "type": "ia.container.flex"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "meta": {
+                                      "name": "LineStatus"
+                                    },
+                                    "position": {
+                                      "shrink": 0
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "classes": "text-titles-2",
+                                        "margin": 0
+                                      },
+                                      "text": "Linea:",
+                                      "textStyle": {
+                                        "fontSize": 20,
+                                        "textAlign": "left"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  },
+                                  {
+                                    "meta": {
+                                      "name": "LabelStationStatus"
+                                    },
+                                    "position": {
+                                      "grow": 1
+                                    },
+                                    "propConfig": {
+                                      "props.text": {
+                                        "binding": {
+                                          "config": {
+                                            "path": "view.custom.stationStatus"
+                                          },
+                                          "transforms": [
+                                            {
+                                              "fallback": "Inactiva",
+                                              "inputType": "scalar",
+                                              "mappings": [
+                                                {
+                                                  "input": 3,
+                                                  "output": "Activa"
+                                                },
+                                                {
+                                                  "input": 4,
+                                                  "output": "Activa"
+                                                }
+                                              ],
+                                              "outputType": "scalar",
+                                              "type": "map"
+                                            }
+                                          ],
+                                          "type": "property"
+                                        }
+                                      },
+                                      "props.textStyle.color": {
+                                        "binding": {
+                                          "config": {
+                                            "path": "view.custom.stationStatus"
+                                          },
+                                          "transforms": [
+                                            {
+                                              "fallback": "#7D7D7D",
+                                              "inputType": "scalar",
+                                              "mappings": [
+                                                {
+                                                  "input": 3,
+                                                  "output": "--cla-progress-bar"
+                                                },
+                                                {
+                                                  "input": 4,
+                                                  "output": "--cla-progress-bar"
+                                                }
+                                              ],
+                                              "outputType": "scalar",
+                                              "type": "map"
+                                            }
+                                          ],
+                                          "type": "property"
+                                        }
+                                      }
+                                    },
+                                    "props": {
+                                      "style": {
+                                        "borderBottomLeftRadius": 5,
+                                        "borderBottomRightRadius": 5,
+                                        "borderTopLeftRadius": 5,
+                                        "borderTopRightRadius": 5
+                                      },
+                                      "textStyle": {
+                                        "borderBottomLeftRadius": 2,
+                                        "borderBottomRightRadius": 2,
+                                        "borderTopLeftRadius": 2,
+                                        "borderTopRightRadius": 2,
+                                        "classes": "Button/Text",
+                                        "fontFamily": "Arial",
+                                        "fontSize": 20,
+                                        "fontWeight": "bold",
+                                        "marginLeft": 10,
+                                        "textAlign": "left"
+                                      }
+                                    },
+                                    "type": "ia.display.label"
+                                  }
+                                ],
+                                "meta": {
+                                  "name": "LineContainer"
+                                },
+                                "position": {
+                                  "grow": 1
+                                },
+                                "props": {
+                                  "style": {
+                                    "overflow": "hidden",
+                                    "paddingLeft": 10
+                                  }
+                                },
+                                "type": "ia.container.flex"
+                              }
+                            ],
+                            "meta": {
+                              "name": "StatusContainer"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "props": {
+                              "alignItems": "center",
+                              "justify": "center",
+                              "style": {
+                                "overflow": "hidden",
+                                "padding": 1,
+                                "paddingTop": 0
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer_0"
+                        },
+                        "position": {
+                          "basis": "40%",
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "LabelFinish"
+                            },
+                            "position": {
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.progressValue"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\t\t\n\ttry:\n\t\treturn \"Progreso: \" + str(int(value)) + \" %\" \n\texcept:\n\t\treturn \"Progreso\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              },
+                              "props.textStyle.color": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.orderStatus"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "fallback": null,
+                                      "inputType": "scalar",
+                                      "mappings": [
+                                        {
+                                          "input": 0,
+                                          "output": "#7D7D7D"
+                                        },
+                                        {
+                                          "input": 1,
+                                          "output": "--cla-progress-bar"
+                                        }
+                                      ],
+                                      "outputType": "scalar",
+                                      "type": "map"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "textStyle": {
+                                "classes": "text-title-2",
+                                "fontSize": 20,
+                                "fontWeight": "bold",
+                                "textAlign": "center"
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Progress"
+                            },
+                            "position": {
+                              "basis": "60%",
+                              "grow": 1
+                            },
+                            "propConfig": {
+                              "props.value": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.progressValue"
+                                  },
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "bar": {
+                                "color": "--cla-progress-bar"
+                              },
+                              "track": {
+                                "color": "#FFFFFF"
+                              }
+                            },
+                            "type": "ia.display.progress"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "60%",
+                          "grow": 1,
+                          "shrink": 0
+                        },
+                        "props": {
+                          "justify": "flex-end",
+                          "style": {
+                            "paddingBottom": 100,
+                            "paddingTop": 100
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "ProgressContainer"
+                    },
+                    "position": {
+                      "basis": "60%",
+                      "grow": 1,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "justify": "flex-end"
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_0"
+                        },
+                        "position": {
+                          "basis": "32px"
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "meta": {
+                                  "name": "Label_0"
+                                },
+                                "position": {
+                                  "basis": "218px"
+                                },
+                                "props": {
+                                  "text": "\n"
+                                },
+                                "type": "ia.display.label"
+                              },
+                              {
+                                "events": {
+                                  "dom": {
+                                    "onClick": {
+                                      "config": {
+                                        "script": "\n\t\n\tNodeID \u003d int(self.view.params.nodeID)\n\t\n\t# Trae una sola vez el run actual por NodeID\n\tresult \u003d mes_core.run.getRunBynode(NodeID)\n\t\n\t# Coerciones seguras\n\tdef _to_int_safe(x, default\u003d0):\n\t    \"\"\"Convertir a int; si es None o falla, devolver default.\"\"\"\n\t    try:\n\t        if x is None:\n\t            return default\n\t        return int(x)\n\t    except:\n\t        return default\n\t\n\tQuantity \u003d _to_int_safe(result.getValueAt(0, \"Quantity\"), 0)\n\twaste    \u003d _to_int_safe(result.getValueAt(0, \"Waste\"), 0)\n\t\n\tdef build_options(n, include_zero\u003dTrue):\n\t    \"\"\"Crear opciones tipo [{\u0027value\u0027: i, \u0027label\u0027: i}, ...].\n\t\n\t    Args:\n\t        n (int): Límite superior (inclusivo).\n\t        include_zero (bool): Si True, arranca en 0; de lo contrario, en 1.\n\t\n\t    Returns:\n\t        list[dict]: Opciones para dropdown.\n\t    \"\"\"\n\t    n \u003d _to_int_safe(n, 0)\n\t    if n \u003c 0:\n\t        n \u003d 0\n\t    start \u003d 0 if include_zero else 1\n\t    if n \u003c start:\n\t        # Si piden incluir 0 y n \u003c 0, devolvemos al menos [0]\n\t        return [{\"value\": 0, \"label\": 0}] if include_zero else []\n\t    return [{\"value\": i, \"label\": i} for i in range(start, n + 1)]\n\t\n\t# Ahora sí: incluye 0..Quantity\n\toptions \u003d build_options(Quantity, include_zero\u003dTrue)\n\t\n\talerts.showAlertAndDropdown(\n\t    state\u003d\"info\",\n\t    title\u003d\"Digitalizacion de Scrap\",\n\t    message\u003d\"Ingrese el valor de scrap en la corrida, Scrap actual: {} piezas\".format(waste),\n\t    showCloseBtn\u003dFalse,\n\t    btnTextPrimary\u003d\"Actualizar\",\n\t    btnTextSecondary\u003d\"Cancelar\",\n\t    btnIconPrimary\u003d\"Primary\",\n\t    btnIconSecondary\u003d\"\",\n\t    btnIconAlignment\u003d\"right\",\n\t    btnActionPrimary\u003d\"updateWasteEndRun\",\n\t    btnActionSecondary\u003d\"closePopup\",\n\t    btnActionClose\u003d\"closePopup\",\n\t    dropdownoptions\u003doptions\n\t)"
+                                      },
+                                      "scope": "G",
+                                      "type": "script"
+                                    }
+                                  }
+                                },
+                                "meta": {
+                                  "name": "ButtonFinishOrder"
+                                },
+                                "position": {
+                                  "basis": "120px",
+                                  "shrink": 0
+                                },
+                                "propConfig": {
+                                  "props.enabled": {
+                                    "binding": {
+                                      "config": {
+                                        "path": "view.custom.activeOrder"
+                                      },
+                                      "transforms": [
+                                        {
+                                          "fallback": null,
+                                          "inputType": "scalar",
+                                          "mappings": [
+                                            {
+                                              "input": "--",
+                                              "output": false
+                                            }
+                                          ],
+                                          "outputType": "scalar",
+                                          "type": "map"
+                                        }
+                                      ],
+                                      "type": "property"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "style": {
+                                    "classes": "button-1",
+                                    "fontSize": 20
+                                  },
+                                  "text": "Terminar"
+                                },
+                                "scripts": {
+                                  "customMethods": [],
+                                  "extensionFunctions": null,
+                                  "messageHandlers": [
+                                    {
+                                      "messageType": "openQty",
+                                      "pageScope": true,
+                                      "script": "\t# implement your handler here\n\tparams \u003d {\"runID\":self.view.custom.runID}\n\t\n\t\n\t\u0027\u0027\u0027\n\tsystem.perspective.openPopup(id\u003d\u0027insertqty\u0027, \n\t\t\t\t\t\t\t\ttitle\u003d\u0027Insertar cantidad de la corrida\u0027,\n\t\t\t\t\t\t\t\tview\u003d\u0027Page/PopUps/InsertRunQty\u0027, \n\t\t\t\t\t\t\t\tparams\u003dparams, resizable\u003d0, draggable\u003d0, modal\u003d1,\n\t\t\t\t\t\t\t\tshowCloseIcon\u003d0)",
+                                      "sessionScope": false,
+                                      "viewScope": false
+                                    },
+                                    {
+                                      "messageType": "updateWasteEndRun",
+                                      "pageScope": false,
+                                      "script": "\tlogger \u003d system.util.getLogger(\"Terminar orden\")\n\tlogger.info(\"Mensaje recibido\")\n\t\n\trunID \u003d self.view.custom.runID\n\twaste \u003d payload[\"comment\"]\n\tdb\u003dself.session.custom.dbConnection\n\t\n\twaste \u003d int(float(waste))\n\ttable \u003d mes_core.run.RunTable(self.session.custom.dbConnection) \n\t\n\tquery \u003d \"\"\"\n\t\tSELECT \n\t\t    CONCAT(\u0027[UNS]\u0027, n.Topic, \u0027/edge\u0027) AS nodePath\n\t\tFROM\n\t\t    run r\n\t\tLEFT JOIN\n\t\t    schedule sch ON r.ScheduleID \u003d sch.ID\n\t\tLEFT JOIN\n\t\t    node n ON sch.NodeID \u003d n.ID\n\t\tWHERE r.ID \u003d ?\n\t\t\"\"\"\n\n\tresult \u003d system.db.runPrepQuery(query, [runID], db)\n\t\n\tmes_core.misc.printDatasetresultado(result)\n\t\n\tfor row in result:\n\t\t\n\t\t\tnodePath \u003d row[\u0027nodePath\u0027]\n\t\t\t\n\t\n\tpath \u003d nodePath + \"/Waste\"\n\t\n\tlogger.info(path)\n\t#currentCount \u003d system.tag.readBlocking(\"[default]Clarios/Pacifico/Cubiertas/IMM 15/Edge/Waste\")[0].value\n\tlogger \u003d system.util.getLogger(\"Trying to updateWaste\")\n\tlogger.info(\"Empece el waste\")\n\tcurrentCount \u003d system.tag.readBlocking(path)[0].value\n\tvalue\u003dcurrentCount+waste\n\tlogger.info(\"Termine el waste\")\n\t\n\tsystem.tag.writeBlocking(\"[UNS]Clarios/Pacifico/Cubiertas/IMM 15/Edge/Waste\", value)\n\t\n\tmes_core.run.updateRun(runID)\n\tsystem.perspective.closePopup(\u0027\u0027)\n\tsystem.perspective.sendMessage(\"closePopup\", payload\u003d{})\n\t\n\tsystem.perspective.sendMessage(\"endRun\", payload\u003d{})\n\t\n\tlogger.info(\"Accion termanar orden realizada\")\n\t\"\"\"\n\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\t\ttitle\u003d\u0027Terminar Orden\u0027, \n\t\t\t\t\t\tmessage\u003d\u0027Seguro que desea terminar la orden \"{}\"\u0027.format(self.view.custom.activeOrder), \n\t\t\t\t\t\tbtnTextPrimary\u003d\u0027Terminar\u0027, \n\t\t\t\t\t\tbtnActionPrimary\u003d\u0027endRun\u0027,\n\t\t\t\t\t\tbtnTextSecondary\u003d\u0027Cancelar\u0027)\n\t\n\t\n\t\n\t",
+                                      "sessionScope": true,
+                                      "viewScope": false
+                                    }
+                                  ]
+                                },
+                                "type": "ia.input.button"
+                              },
+                              {
+                                "events": {
+                                  "dom": {
+                                    "onClick": {
+                                      "config": {
+                                        "script": "\t\u0027\u0027\u0027\n\tlineName \u003d self.view.custom.lineName\n\tprocessDict \u003d {\"Recibo\":\"Process01\", \"Trasiego\":\"Process02\", \"Trasiego Molino\":\"Process03\"}\n\ttagPaths \u003d \"[DAUTOM_Provider]D_obj/{}_Ctrl/Out_eState\".format(processDict[lineName])\n\tif system.tag.readBlocking(tagPaths)[0].value in [2,4]:\n\t\tlogging.log(\u0027Tag is 4\u0027, \u0027info\u0027)\n\t\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\ttitle\u003d\u0027Cancelar Orden\u0027, \n\t\t\t\t\tmessage\u003d\u0027Seguro que desea cancelar la orden \"{}\"\u0027.format(self.view.custom.activeOrder), \n\t\t\t\t\tbtnTextPrimary\u003d\u0027Si\u0027, \n\t\t\t\t\tbtnActionPrimary\u003d\u0027cancelRun\u0027,\n\t\t\t\t\tbtnTextSecondary \u003d \u0027No\u0027)\n\telse:\n\t\tlogging.log(\u0027Tag is not 4\u0027, \u0027info\u0027)\n\t\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\t\ttitle\u003d\u0027SCADA en ejecucion\u0027, \n\t\t\t\t\t\tmessage\u003d\u0027La corrida no puede ser cancelada mientras se esta ejecutando el SCADA\u0027, \n\t\t\t\t\t\tbtnTextPrimary\u003d\u0027OK\u0027,\n\t\t\t\t\t\tbtnActionPrimary\u003d\u0027\u0027)\n\t\u0027\u0027\u0027\n\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\ttitle\u003d\u0027Cancelar Orden\u0027, \n\t\t\t\t\tmessage\u003d\u0027Seguro que desea cancelar la orden \"{}\"\u0027.format(self.view.custom.activeOrder), \n\t\t\t\t\tbtnTextPrimary\u003d\u0027Continuar\u0027, \n\t\t\t\t\tbtnActionPrimary\u003d\u0027cancelRun\u0027,\n\t\t\t\t\tbtnTextSecondary\u003d\u0027Cancelar\u0027)"
+                                      },
+                                      "scope": "G",
+                                      "type": "script"
+                                    }
+                                  }
+                                },
+                                "meta": {
+                                  "name": "ButtonCancelOrder"
+                                },
+                                "position": {
+                                  "basis": "120px",
+                                  "shrink": 0
+                                },
+                                "propConfig": {
+                                  "props.enabled": {
+                                    "binding": {
+                                      "config": {
+                                        "path": "view.custom.activeOrder"
+                                      },
+                                      "transforms": [
+                                        {
+                                          "fallback": null,
+                                          "inputType": "scalar",
+                                          "mappings": [
+                                            {
+                                              "input": "--",
+                                              "output": false
+                                            }
+                                          ],
+                                          "outputType": "scalar",
+                                          "type": "map"
+                                        }
+                                      ],
+                                      "type": "property"
+                                    }
+                                  }
+                                },
+                                "props": {
+                                  "style": {
+                                    "classes": "button-2",
+                                    "fontSize": 20
+                                  },
+                                  "text": "Cancelar"
+                                },
+                                "scripts": {
+                                  "customMethods": [],
+                                  "extensionFunctions": null,
+                                  "messageHandlers": [
+                                    {
+                                      "messageType": "cancelRun",
+                                      "pageScope": false,
+                                      "script": "\t# implement your handler here\n\t\n\tlogger \u003d system.util.getLogger(\"Button cancel order\")\n\tlogger.info(\"Mensaje recibido\")\n\trunID \u003d self.view.custom.runID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\tmes_core.run.cancelRun(runID, nodeID, \u0027mes_core\u0027)\n\n\t\n\talerts.showAlert(state\u003d\u0027success\u0027, \n\t\t\t\ttitle\u003d\u0027Orden Cancelada\u0027, \n\t\t\t\tmessage\u003d\u0027Orden \"{}\" cancelada correctamente.\u0027.format(self.view.custom.activeOrder), \n\t\t\t\tbtnTextPrimary\u003d\u0027OK\u0027, \n\t\t\t\tbtnActionPrimary\u003d None)\n\t\n\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})\n\tsystem.perspective.sendMessage(\u0027refreshSchWO\u0027, payload\u003d{})\n\tlogger.info(\"Accion cancelar orden realizada\")",
+                                      "sessionScope": true,
+                                      "viewScope": false
+                                    }
+                                  ]
+                                },
+                                "type": "ia.input.button"
+                              },
+                              {
+                                "meta": {
+                                  "name": "Label"
+                                },
+                                "position": {
+                                  "basis": "50px"
+                                },
+                                "type": "ia.display.label"
+                              }
+                            ],
+                            "meta": {
+                              "name": "FlexContainer"
+                            },
+                            "position": {
+                              "basis": "100%",
+                              "shrink": 0
+                            },
+                            "props": {
+                              "alignContent": "flex-end",
+                              "alignItems": "center",
+                              "justify": "space-evenly",
+                              "style": {
+                                "overflow": "hidden"
+                              }
+                            },
+                            "type": "ia.container.flex"
+                          }
+                        ],
+                        "meta": {
+                          "name": "OrderBtnContainer"
+                        },
+                        "position": {
+                          "basis": "315px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "alignContent": "center",
+                          "alignItems": "center",
+                          "justify": "flex-end",
+                          "style": {
+                            "overflow": "hidden"
+                          }
+                        },
+                        "type": "ia.container.flex"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label"
+                        },
+                        "position": {
+                          "basis": "39px"
+                        },
+                        "props": {
+                          "text": "\n"
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "ButtonsContainer"
+                    },
+                    "position": {
+                      "basis": "40%",
+                      "grow": 1,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "alignItems": "center",
+                      "justify": "center",
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  }
+                ],
+                "meta": {
+                  "name": "BottomContainer"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "props": {
+                  "alignItems": "center",
+                  "justify": "center",
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "ProcessContainer"
+            },
+            "position": {
+              "basis": "90%",
+              "grow": 1
+            },
+            "props": {
+              "direction": "column",
+              "justify": "center",
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "overflow": "hidden",
+                "paddingTop": 10
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "MainContainer"
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "custom": {
+      "key": "value"
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "overflow": "hidden"
+      },
+      "wrap": "wrap"
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "refreshRun",
+          "pageScope": true,
+          "script": "\t#  implement your handler here\n\tfrom java.text import SimpleDateFormat\n\tlogger \u003d system.util.getLogger(\"Root run status\")\n\t#logger.info(\"Mensaje refreshRun recibido\")\n\tdateFormat \u003d SimpleDateFormat(\"yyyy-MM-dd HH:mm:ss\") \n\tdataset \u003d mes_core.run.getRunBynode(self.view.params.nodeID)\n\tself.view.custom.runData \u003d dataset\n\t\n\t\n\ttry:\n\t\t\n\t\tself.view.custom.startTime \u003d dateFormat.format(dataset.getValueAt(0,\"RunStartDateTime\"))\n\t\t#logger.info(str(dateFormat.format(dataset.getValueAt(0,\"RunStartDateTime\"))))\n\t\tself.view.custom.estimatedFinishTime \u003d dateFormat.format(dataset.getValueAt(0,\"EstimatedFinishedTime\"))\n\t\tself.view.custom.activeOrder \u003d dataset.getValueAt(0,\"WorkOrderID\")\n\t\tself.view.custom.proCode \u003d dataset.getValueAt(0,\"ProductCode\")\n\t\tself.view.custom.mldCode \u003d dataset.getValueAt(0,\"MoldeCode\")\n\t\tself.view.custom.mldName \u003d dataset.getValueAt(0,\"MoldeName\")\n\t\tself.view.custom.runID \u003d dataset.getValueAt(0,\"RunID\")\n\t\tself.view.custom.proDesc \u003d dataset.getValueAt(0,\"ProductCodeDescription\")\n\t\tself.view.custom.mldCavities \u003d dataset.getValueAt(0,\"Cavities\")\n\t\tself.view.custom.quantity \u003d dataset.getValueAt(0,\"Quantity\")\n\t\tquantity \u003d dataset.getValueAt(0,\"Quantity\")\n\t\tcurrentOutfeed \u003d dataset.getValueAt(0,\"CurrentOutfeed\")\n\t\tstartOutfeed \u003d dataset.getValueAt(0,\"StartOutfeed\")\n\t\ttotalCount \u003d dataset.getValueAt(0,\"TotalCount\")\n\t\t\n\t\t\n\t\t\n\n\t\t\n\t\tcount \u003d totalCount\n\t\t#logger.info(str(count))\n\t\t\n\t\t#self.view.custom.lineName \u003d dataset.getValueAt(0,\"LineName\")\n\t\tself.view.custom.orderStatus \u003d 1\n\t\t\n\n\t\t#processDict \u003d {\"Recibo\":\"Process01\", \"Trasiego\":\"Process02\", \"Trasiego Molino\":\"Process03\"}\n\t\t#tagPaths \u003d \"[DAUTOM_Provider]D_obj/{}_Ctrl/Out_eState\".format(processDict[lineName])\n\t\t#self.view.custom.stationStatus \u003d system.tag.readBlocking(tagPaths)[0].value\n\t\t\n\t\tstartTime \u003d dataset.getValueAt(0,\"RunStartDateTime\")\n\t\testimatedFinish \u003d dataset.getValueAt(0,\"EstimatedFinishedTime\")\n\t\t\n\t\t\n\t\t\n\t\tnowTimeMillis \u003d system.date.toMillis(system.date.now())\n\t\tstartTimeMillis \u003d system.date.toMillis(startTime)\n\t\testimatedFinishMillis \u003d system.date.toMillis(estimatedFinish)\n\t\t\n\t\t#self.view.custom.progressValue \u003d float(nowTimeMillis-startTimeMillis)/float(estimatedFinishMillis-startTimeMillis)*100\n\t\tself.view.custom.progressValue \u003d float(count)*100/float(quantity)\n\t\n\t\t\n\t\t\n\texcept:\n\t\t#logger.info(\"Ingreso al except\")\n\t\tself.view.custom.activeOrder \u003d \"--\"\n\t\tself.view.custom.proCode \u003d \"--\"\n\t\tself.view.custom.startTime \u003d \"--\"\n\t\tself.view.custom.estimatedFinishTime \u003d \"--\"\n\t\tself.view.custom.progressValue \u003d 0\n\t\tself.view.custom.mldCode \u003d \"--\"\n\t\tself.view.custom.mldName \u003d \"--\"\n\t\tself.view.custom.orderStatus \u003d 0\n\t\tself.view.custom.runID \u003d -1\n\t\tself.view.custom.proDesc \u003d \"--\"\n\t\tself.view.custom.mldCavities \u003d \"--\"\n\t\tself.view.custom.quantity \u003d \"--\"\n\t\t#self.view.custom.stationStatus \u003d 0",
+          "sessionScope": true,
+          "viewScope": true
+        },
+        {
+          "messageType": "endRun",
+          "pageScope": true,
+          "script": "\timport time\n\t# implement your handler here\n\t#alerts.actionSuccess(title\u003d\u0027Orden Terminada\u0027, \n\t#\t\t\t\t\tmessage\u003d\u0027Orden \"{}\" terminada correctamente.\u0027.format(self.view.custom.activeOrder))\n\t\n\tlogger \u003d system.util.getLogger(\"Button stop order\")\n\tlogger.info(\"Mensaje stop run recibido\")\n\trunID \u003d self.view.custom.runID\n\tnodeID \u003d self.view.params.nodeID \n\t\n\t\n\t\n\t#system.perspective.sendMessage(\"finishRun\", payload\u003d{})\n\t# implement your handler here\n\trunID \u003d self.view.custom.runID\n\tnodeID \u003d self.view.params.nodeID \n\t\n\tmes_core.run.stopRun(runID, nodeID, \u0027mes_core\u0027)\n\t\n\t\n\t\n\t\n\talerts.showAlert(state\u003d\u0027success\u0027, \n\t\t\t\t\ttitle\u003d\u0027Orden Terminada\u0027, \n\t\t\t\t\tmessage\u003d\u0027Orden \"{}\" terminada correctamente.\u0027.format(self.view.custom.activeOrder), \n\t\t\t\t\tbtnTextPrimary\u003d\u0027OK\u0027, \n\t\t\t\t\tbtnActionPrimary\u003d\u0027openQty\u0027)\n\t\t\t\t\t\n\tsystem.perspective.sendMessage(\u0027refreshRun\u0027, payload\u003d{})\n\tsystem.perspective.sendMessage(\u0027refreshSchWO\u0027, payload\u003d{})\n\tlogger.info(\"Fin\")\n\t\n\ttime.sleep(10)\n\t\n\tmachinestatus \u003d self.view.custom.stationStatus\n\t\n\tif machinestatus!\u003d1 and self.view.custom.startTime\u003d\u003d\"--\":\n\t\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\ttitle\u003d\u0027Linea activa\u0027, \n\t\t\t\t\tmessage\u003d\u0027No hay actualmente una orden activa, asegurate de que la maquina este apagada.\u0027, \n\t\t\t\t\tbtnTextPrimary\u003d\u0027OK\u0027, \n\t\t\t\t\tbtnActionPrimary\u003d\u0027closePopup\u0027)\n\t\n\t",
+          "sessionScope": false,
+          "viewScope": false
+        },
+        {
+          "messageType": "updateWaste",
+          "pageScope": true,
+          "script": "\tlogger \u003d system.util.getLogger(\"Trying to updateWaste\")\n\tlogger.info(\"Mensaje recibido\")\n\t\n\trunID \u003d self.view.custom.runID\n\twaste \u003d payload[\"comment\"]\n\tdb\u003dself.session.custom.dbConnection\n\t\n\twaste \u003d int(float(waste))\n\ttable \u003d mes_core.run.RunTable(self.session.custom.dbConnection) \n\t\n\tquery \u003d \"\"\"\n\t\tSELECT \n\t\t    CONCAT(\u0027[UNS]\u0027, n.Topic, \u0027/edge\u0027) AS nodePath\n\t\tFROM\n\t\t    run r\n\t\tLEFT JOIN\n\t\t    schedule sch ON r.ScheduleID \u003d sch.ID\n\t\tLEFT JOIN\n\t\t    node n ON sch.NodeID \u003d n.ID\n\t\tWHERE r.ID \u003d ?\n\t\t\"\"\"\n\n\tresult \u003d system.db.runPrepQuery(query, [runID], db)\n\t\n\tmes_core.misc.printDatasetresultado(result)\n\t\n\tfor row in result:\n\t\t\n\t\t\tnodePath \u003d row[\u0027nodePath\u0027]\n\t\t\t\n\t\n\tpath \u003d nodePath + \"/Waste\"\n\t\n\tlogger.info(path)\n\t#currentCount \u003d system.tag.readBlocking(\"[default]Clarios/Pacifico/Cubiertas/IMM 15/Edge/Waste\")[0].value\n\tlogger \u003d system.util.getLogger(\"Trying to updateWaste\")\n\tlogger.info(\"Empece el waste\")\n\tcurrentCount \u003d system.tag.readBlocking(path)[0].value\n\tvalue\u003dcurrentCount+waste\n\tlogger.info(\"Termine el waste\")\n\t\n\tsystem.tag.writeBlocking(\"[UNS]Clarios/Pacifico/Cubiertas/IMM 15/Edge/Waste\", value)\n\t\n\tmes_core.run.updateRun(runID)\n\tsystem.perspective.closePopup(\u0027\u0027)\n\tsystem.perspective.sendMessage(\"closePopup\", payload\u003d{})\n\t\n\n\t\"\"\"\n\talerts.showAlert(state\u003d\u0027warning\u0027, \n\t\t\t\t\t\ttitle\u003d\u0027Terminar Orden\u0027, \n\t\t\t\t\t\tmessage\u003d\u0027Seguro que desea terminar la orden \"{}\"\u0027.format(self.view.custom.activeOrder), \n\t\t\t\t\t\tbtnTextPrimary\u003d\u0027Terminar\u0027, \n\t\t\t\t\t\tbtnActionPrimary\u003d\u0027endRun\u0027,\n\t\t\t\t\t\tbtnTextSecondary\u003d\u0027Cancelar\u0027)\n\t\n\t\n\t\n\t",
+          "sessionScope": true,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

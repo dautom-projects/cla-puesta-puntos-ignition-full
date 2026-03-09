@@ -1,0 +1,149 @@
+{
+  "custom": {
+    "gwName": "Ignition-B9586S28"
+  },
+  "params": {},
+  "propConfig": {
+    "custom.gwName": {
+      "binding": {
+        "config": {
+          "fallbackDelay": 2.5,
+          "mode": "direct",
+          "tagPath": "[System]Gateway/SystemName"
+        },
+        "type": "tag"
+      },
+      "persistent": true
+    },
+    "params.feature": {
+      "paramDirection": "input"
+    },
+    "params.tier1": {
+      "paramDirection": "input"
+    },
+    "params.tier2": {
+      "paramDirection": "input"
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1022,
+      "width": 1770
+    },
+    "dropConfig": {
+      "udts": [
+        {
+          "action": "bind",
+          "param": "instance",
+          "type": "Jembacher/Dashboard_Gen"
+        }
+      ]
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "params": {
+            "icon": "material/alarm",
+            "text": "Alarmas"
+          },
+          "path": "Page/Embedded/Title_Large"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "AlarmStatusTable"
+            },
+            "position": {
+              "basis": "800px",
+              "grow": 1
+            },
+            "props": {
+              "columns": {
+                "active": {
+                  "displayPath": {
+                    "order": 2
+                  },
+                  "label": {
+                    "enabled": true,
+                    "order": 1
+                  },
+                  "priority": {
+                    "order": 3
+                  },
+                  "source": {
+                    "order": 5
+                  },
+                  "state": {
+                    "order": 4
+                  }
+                }
+              },
+              "filters": {
+                "active": {
+                  "conditions": {
+                    "provider": "UNS"
+                  },
+                  "priorities": {
+                    "critical": false,
+                    "high": false,
+                    "low": false,
+                    "medium": false
+                  },
+                  "states": {
+                    "activeAcked": false,
+                    "activeUnacked": false,
+                    "clearUnacked": false
+                  }
+                }
+              },
+              "style": {
+                "backgroundColor": "transparent",
+                "borderStyle": "none"
+              }
+            },
+            "type": "ia.display.alarmstatustable"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Main"
+        },
+        "position": {
+          "basis": "200px",
+          "grow": 1
+        },
+        "props": {
+          "justify": "space-between",
+          "style": {
+            "classes": "container-borders-dautom-widget",
+            "margin": 10
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "backgroundColor": "--neutral-10",
+        "classes": "container-borders-dautom-page",
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

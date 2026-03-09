@@ -1,0 +1,3397 @@
+{
+  "custom": {
+    "AvailabilityCalculation": {},
+    "RunIDs": [],
+    "actualDateTime": {
+      "$": [
+        "ts",
+        192,
+        1760130546216
+      ],
+      "$ts": 1760130546216
+    },
+    "areaId": null,
+    "areaPath": null,
+    "availabilityData": {
+      "$": [
+        "ds",
+        192,
+        1756254132727
+      ],
+      "$columns": [
+        {
+          "data": [
+            69,
+            62
+          ],
+          "name": "downtime_event",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "Corriendo",
+            "No Planeada"
+          ],
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "data": [
+            1382400,
+            1382400
+          ],
+          "name": "total_seconds",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            358811,
+            13269
+          ],
+          "name": "down_secs",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            0.74044343171,
+            0.99040147569
+          ],
+          "name": "availability",
+          "type": "Double"
+        }
+      ]
+    },
+    "datasetRunID": {
+      "$": [
+        "ds",
+        192,
+        1760130546225
+      ],
+      "$columns": [
+        {
+          "data": [],
+          "name": "ID",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "RunStartDateTime",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "RunStopDateTime",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "RunTime",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "UnplannedDowntime",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "PlannedDowntime",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "ScheduleTime",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "TotalCount",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "GoodCount",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "WasteCount",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "Availability",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "Performance",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "Quality",
+          "type": "String"
+        },
+        {
+          "data": [],
+          "name": "OEE",
+          "type": "String"
+        }
+      ]
+    },
+    "dbConnection": "mes_core",
+    "dsTableScaleInterval": null,
+    "endSelData": {
+      "$": [
+        "ts",
+        192,
+        1760130546219
+      ],
+      "$ts": 1760130540000
+    },
+    "endTime": {
+      "$": [
+        "ts",
+        192,
+        1760130546218
+      ],
+      "$ts": 1760130540000
+    },
+    "generalEquipmentId": 8,
+    "lineId": 6,
+    "oee": 0,
+    "performance": 0,
+    "quality": 0,
+    "selectionRun": [],
+    "shift": "B",
+    "startSelData": {
+      "$": [
+        "ts",
+        192,
+        1760130546220
+      ],
+      "$ts": 1759316400000
+    },
+    "startTime": {
+      "$": [
+        "ts",
+        192,
+        1760130546218
+      ],
+      "$ts": 1759316400000
+    },
+    "widgetEvents": {
+      "blocked": {},
+      "idle": {},
+      "planned": {},
+      "running": {},
+      "starved": {},
+      "total": {},
+      "unplanned": {},
+      "unscheduled": {}
+    }
+  },
+  "params": {
+    "nodeID": 4,
+    "refresh": 33
+  },
+  "propConfig": {
+    "custom.AvailabilityCalculation": {
+      "persistent": true
+    },
+    "custom.AvailabilityCalculation.availability": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.AvailabilityCalculation.scheduledTime} !\u003d 0, \r\n\tround(({view.custom.AvailabilityCalculation.runTime}/{view.custom.AvailabilityCalculation.scheduledTime} * 100),1),\r\n\t0)"
+        },
+        "type": "expr"
+      }
+    },
+    "custom.AvailabilityCalculation.elapsedTime": {
+      "binding": {
+        "config": {
+          "expression": "secondsBetween({view.custom.startTime},{view.custom.endTime})"
+        },
+        "type": "expr"
+      }
+    },
+    "custom.AvailabilityCalculation.plannedTime": {
+      "binding": {
+        "config": {
+          "expression": "{view.custom.widgetEvents.planned.seconds}"
+        },
+        "type": "expr"
+      }
+    },
+    "custom.AvailabilityCalculation.runTime": {
+      "binding": {
+        "config": {
+          "expression": "{view.custom.widgetEvents.running.seconds}"
+        },
+        "type": "expr"
+      }
+    },
+    "custom.AvailabilityCalculation.scheduledTime": {
+      "binding": {
+        "config": {
+          "expression": "{view.custom.widgetEvents.total.seconds} - {view.custom.widgetEvents.planned.seconds}"
+        },
+        "type": "expr"
+      }
+    },
+    "custom.RunIDs": {
+      "binding": {
+        "config": {
+          "struct": {
+            "data": "{/root/FlexContainer/FlexContainer_0/Table_Scales.props.selection.data}",
+            "startTime": "{view.custom.startTime}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tselectionRun \u003d value.get(\u0027data\u0027)\n\ttableInterval \u003d self.view.custom.dsTableScaleInterval\n\t\n\tif selectionRun \u003d\u003d []:\n\t    selectionRun \u003d tableInterval\n\t    pyds \u003d system.dataset.toPyDataSet(selectionRun)\n\t    RunIDs \u003d [row[\"RunID\"] for row in pyds]\n\t    \n\telse:\n\t    RunIDs \u003d [item[\"RunID\"] for item in selectionRun]\n\t\n\treturn RunIDs",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.actualDateTime": {
+      "binding": {
+        "config": {
+          "expression": "{[System]Gateway/CurrentDateTime}\r\n"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.areaId": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer/FlexContainer_dropdown/Dropdown Area.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.areaPath": {
+      "binding": {
+        "config": {
+          "path": "page.props.path"
+        },
+        "transforms": [
+          {
+            "code": "\ttry:\n\t\treturn int(self.page.props.path[-1])\n\texcept ValueError:\n\t\treturn None",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Area\").props.value  \u003d currentValue.value\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)"
+      },
+      "persistent": true
+    },
+    "custom.datasetRunID": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "runIds": "{view.custom.RunIDs}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tdb \u003d value[\"db\"]\n\trunIds \u003d value[\"runIds\"]\n\ttbl \u003d mes_core.run.RunTable(db)\n\t\n\t\n\t# Columnas que te interesan (lista, no string)\n\tcolumns \u003d [\n\t\t\u0027ID\u0027,\n\t\t\u0027RunStartDateTime\u0027,\u0027RunStopDateTime\u0027,\n\t\t\u0027RunTime\u0027,\u0027UnplannedDowntime\u0027,\u0027PlannedDowntime\u0027,\u0027ScheduleTime\u0027,\n\t\t\u0027TotalCount\u0027,\u0027GoodCount\u0027,\u0027WasteCount\u0027,\n\t\t\u0027Availability\u0027,\u0027Performance\u0027,\u0027Quality\u0027,\u0027OEE\u0027\n\t]\n\n\t# Si no hay IDs -\u003e dataset vacío con las columnas esperadas\n\tif not runIds:\n\t\treturn system.dataset.toDataSet(columns, [])\n\n\t# Construir IN (?, ?, ?, ...)\n\tplaceholders \u003d \",\".join([\"?\"] * len(runIds))\n\twhere_clause \u003d \"ID IN ({})\".format(placeholders)\n\twhere_args \u003d list(runIds)  # tal cual, en el mismo orden\n\n\t# Llamamos a tu selectCustom (no modificamos SQLTableBase)\n\tds \u003d tbl.selectCustom(columns, where_clause, where_args)\n\treturn ds",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.dsTableScaleInterval": {
+      "binding": {
+        "config": {
+          "path": "view.custom.startTime"
+        },
+        "transforms": [
+          {
+            "code": "\tquery \u003d \"\"\"\n\tSELECT \n\t    s.RunID,\n\t    s.WorkOrderID,\n\t    p.ProductCode,\n\t    r.RunStartDateTime AS StartTime,\n\t    r.RunStopDateTime AS EndTime\n\tFROM run r\n\tINNER JOIN schedule s \n\t    ON r.ID \u003d s.RunID\n\tINNER JOIN workorder w\n\t    ON s.WorkorderID \u003d w.ID\n\tINNER JOIN productcode p\n\t    ON w.ProductCodeID \u003d p.ID\n\tWHERE r.RunStartDateTime \u003e\u003d ?\n\t  AND r.RunStopDateTime \u003c\u003d ?;\n\t\"\"\"\n\t\n\t# Ejecutar la query con los parámetros\n\tresults \u003d system.db.runPrepQuery(query, [self.custom.startTime, self.custom.endTime])\n\t\t\n\treturn results",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.endSelData": {
+      "binding": {
+        "config": {
+          "path": "view.custom.endTime"
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\tselData \u003d self.custom.selectionRun\n\ttry: \n\t\t\n\t\t\n\t\ts \u003d unicode(selData[0][\"EndTime\"]).replace(\u0027,\u0027, \u0027\u0027).strip()\n\t\tif not s:\n\t\t\treturn None\n\t\tn \u003d long(s)\n\t\t# Si viniera en segundos (10 dígitos), pásalo a ms:\n\t\tif len(s) \u003c\u003d 10:\n\t\t\tn *\u003d 1000\n\t\treturn system.date.fromMillis(n)\n\t\n\t\t\n\t\t\n\texcept:\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.endTime": {
+      "binding": {
+        "config": {
+          "expression": "{view.custom.actualDateTime}"
+        },
+        "transforms": [
+          {
+            "code": "\t\"\"\"\n\tTransforms the provided date value based on user-selected options for \n\tperiod and shift.\n\t\n\tArgs:\n\t    value (Date): The date value to transform.\n\t    quality (Quality): The quality of the data (not used in this function).\n\t    timestamp (Timestamp): The timestamp of the value (not used in this function).\n\t\n\tReturns:\n\t    Date: The transformed date based on the selected options.\n\t\"\"\"\n\t\n\tdef set_datetime(year, month, day, hour, minute\u003d0, second\u003d0):\n\t    \"\"\"Helper function to set the date and time.\"\"\"\n\t    date \u003d system.date.getDate(year, month, day)\n\t    return system.date.setTime(date, hour, minute, second)\n\t\"\"\"\n\t# Test hour\n\tvalue \u003d set_datetime(2024, 9, 22, 15)\n\tprint value\n\tshift \u003d \"B\"\n\tdropDownPeriod \u003d 5  # 0: Turno A, 1: Turno B, 2: Turno C, 3: Previous Day, 4: Current Day, 5: Weeks, 6: Months, 7: Custom\n\tendTime \u003d set_datetime(2020, 10, 2, 21)\n\t\"\"\"\n\t\n\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\tMin \u003d system.date.getMinute(value)\n\t\n\t\n\t# Variables to hold user selections\n\t\n\tdropDownPeriod \u003d self.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Period\").props.value\n\tshift \u003d self.custom.shift\n\tendTime \u003d self.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"FlexContainer_dropdown\").getChild(\"DateTimeInput_EndTime\").props.value\n\t\n\t\n\t# Process the selected period\n\tif dropDownPeriod \u003d\u003d 7:  # Custom selected\n\t    return endTime\n\t\n\telif dropDownPeriod \u003d\u003d 0:  # Selecting Shift A\n\t    # Siempre termina a las 05:59:59 del siguiente día\n\t    if shift \u003d\u003d \u0027A\u0027:\n\t        if Hour \u003e\u003d 22:  # Parte inicial del turno A (22-23h)\n\t            value \u003d set_datetime(Year, Month, Day + 1, 5, 59, 59)\n\t        else:  # Parte final del turno A (00-05h)\n\t            value \u003d set_datetime(Year, Month, Day, 5, 59, 59)\n\t    elif shift \u003d\u003d \u0027B\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 5, 59, 59)\n\t    elif shift \u003d\u003d \u0027C\u0027:\n\t\t\tvalue \u003d set_datetime(Year, Month, Day, 5, 59, 59)\n\t\n\telif dropDownPeriod \u003d\u003d 1:  # Selecting Shift B\n\t    # Siempre termina a las 13:59:59 del mismo día\n\t    if shift \u003d\u003d \u0027A\u0027:\n\t        if Hour \u003e\u003d 22:\n\t            value \u003d set_datetime(Year, Month, Day, 13, 59, 59)\n\t        else:\n\t            value \u003d set_datetime(Year, Month, Day-1, 13, 59, 59)\n\t    elif shift \u003d\u003d \u0027B\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 13, 59, 59)\n\t    elif shift \u003d\u003d \u0027C\u0027:\n\t        if Hour \u003c 6:\n\t            value \u003d set_datetime(Year, Month, Day - 1, 13, 59, 59)\n\t        else:\n\t            value \u003d set_datetime(Year, Month, Day, 13, 59, 59)\n\t\n\telif dropDownPeriod \u003d\u003d 2:  # Selecting Shift C\n\t    # Siempre termina a las 21:59:59 del mismo día\n\t    if shift \u003d\u003d \u0027A\u0027:\n\t        if Hour \u003e\u003d 22:\n\t            value \u003d set_datetime(Year, Month, Day, 21, 59, 59)\n\t        else:\n\t            value \u003d set_datetime(Year, Month, Day-1, 21, 59, 59)\n\t    elif shift \u003d\u003d \u0027B\u0027:\n\t        value \u003d set_datetime(Year, Month, Day, 21, 59, 59)\n\t    elif shift \u003d\u003d \u0027C\u0027:\n\t        if Hour \u003c 6:\n\t            value \u003d set_datetime(Year, Month, Day - 1, 21, 59, 59)\n\t        else:\n\t            value \u003d set_datetime(Year, Month, Day, 21, 59, 59)\n\t\n\telif dropDownPeriod \u003d\u003d 3:  # Selecting Previous Day\n\t    # Fin de día \u003d 05:59:59\n\t    if Hour \u003c 6:  # Entre 0:00 y 5:59\n\t        value \u003d set_datetime(Year, Month, Day - 1, 5, 59, 59)\n\t    else:\n\t        value \u003d set_datetime(Year, Month, Day, 5, 59, 59)\n\t\n\telse:  # Default case, usar hora y minuto actual\n\t    value \u003d set_datetime(Year, Month, Day, Hour, Min, 0)\n\t\t    \n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.generalEquipmentId": {
+      "binding": {
+        "config": {
+          "expression": "{view.params.refresh}"
+        },
+        "transforms": [
+          {
+            "code": "\t\u0027\u0027\u0027\n\timport time\n\ttime.sleep(0.01)\n\t\n\tareaSelected \u003d self.custom.areaId\n\tlineSelected \u003d self.custom.lineId\n\t\n\tif areaSelected !\u003d 1:\n\t\tif lineSelected \u003d\u003d 6:\n\t\t\tvalue \u003d 12\n\t\t\t\n\t\telif lineSelected \u003d\u003d 7:\n\t\t\tvalue \u003d 13\n\t\t\n\t\telif lineSelected \u003d\u003d 9:\n\t\t\tvalue \u003d 20\n\t\t\t\n\t\telif lineSelected \u003d\u003d 10:\n\t\t\tvalue \u003d 21\n\t\t\t\n\t\telse:\n\t\t\tvalue \u003d None\n\t\t\t\n\telse:\n\t\tvalue \u003d None\n\t\u0027\u0027\u0027\n\tvalue \u003d self.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Equipment\").props.value\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.lineId": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer/FlexContainer_dropdown/Dropdown Line.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.oee": {
+      "binding": {
+        "config": {
+          "struct": {
+            "ava": "{view.custom.AvailabilityCalculation.availability} /100",
+            "perf": "{view.custom.performance}",
+            "qlty": "{view.custom.quality}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tperf \u003d value[\"perf\"]\n\tqlty \u003d value[\"qlty\"]\n\tava \u003d value[\"ava\"]\n\toee \u003d perf * qlty * ava * 100\n\treturn oee",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.performance": {
+      "binding": {
+        "config": {
+          "struct": {
+            "ds": "{view.custom.datasetRunID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "    \"\"\"Calcular Performance global (0..1) como promedio ponderado por RunTime.\n\t\n    Espera value[\"dataset\"] con columnas:\n    [\u0027ID\u0027,\u0027RunStartDateTime\u0027,\u0027RunStopDateTime\u0027,\u0027RunTime\u0027,\u0027UnplannedDowntime\u0027,\n     \u0027PlannedDowntime\u0027,\u0027ScheduleTime\u0027,\u0027TotalCount\u0027,\u0027GoodCount\u0027,\u0027WasteCount\u0027,\n     \u0027Availability\u0027,\u0027Performance\u0027,\u0027Quality\u0027,\u0027OEE\u0027]\n    \"\"\"\n    ds \u003d value[\"ds\"]\n    if not ds or ds.getRowCount() \u003d\u003d 0:\n        return 0.0\n\n    def f(x):\n        try:\n            return float(x or 0)\n        except:\n            return 0.0\n\n    sum_rt \u003d 0.0\n    sum_w  \u003d 0.0\n    n \u003d ds.getRowCount()\n\n    for r in range(n):\n        rt \u003d f(ds.getValueAt(r, \"RunTime\"))\n        p  \u003d f(ds.getValueAt(r, \"Performance\"))  # esperado 0..1\n        sum_rt +\u003d rt\n        sum_w  +\u003d p * rt\n\n    if sum_rt \u003e 0:\n        return sum_w / sum_rt\n\n    # Fallback: promedio simple si no hay tiempo acumulado\n    total_p \u003d 0.0\n    for r in range(n):\n        total_p +\u003d f(ds.getValueAt(r, \"Performance\"))\n    return (total_p / n) if n \u003e 0 else 0.0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.quality": {
+      "binding": {
+        "config": {
+          "struct": {
+            "ds": "{view.custom.datasetRunID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "    \"\"\"Calcular Quality global (0..1) como ΣGoodCount / ΣTotalCount.\"\"\"\n    ds \u003d value[\"ds\"]\n    if not ds or ds.getRowCount() \u003d\u003d 0:\n        return 0.0\n\n    def f(x):\n        try:\n            return float(x or 0)\n        except:\n            return 0.0\n\n    sum_good \u003d 0.0\n    sum_tot  \u003d 0.0\n    n \u003d ds.getRowCount()\n\n    for r in range(n):\n        sum_good +\u003d f(ds.getValueAt(r, \"GoodCount\"))\n        sum_tot  +\u003d f(ds.getValueAt(r, \"TotalCount\"))\n\n    if sum_tot \u003e 0:\n        return sum_good / sum_tot\n\n    # Fallback: promedio simple de Quality por corrida si no hay totales\n    total_q \u003d 0.0\n    for r in range(n):\n        good \u003d f(ds.getValueAt(r, \"GoodCount\"))\n        tot  \u003d f(ds.getValueAt(r, \"TotalCount\"))\n        total_q +\u003d (good / tot) if tot \u003e 0 else 0.0\n    return (total_q / n) if n \u003e 0 else 0.0",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.selectionRun": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer/FlexContainer_0/Table_Scales.props.selection.data"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.shift": {
+      "binding": {
+        "config": {
+          "expression": "if(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 22 || dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 6,\r\n\t\u0027C\u0027, \r\n\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 6 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 14,\r\n\t\t\t\u0027A\u0027, \r\n\t\t\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 14 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 22, \r\n\t\t\t\t\t\u0027B\u0027, \r\n\t\t\t\t\u0027none\u0027\r\n\t\t\t\t)\r\n\t\t\t)\r\n\t)\r\n"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.startSelData": {
+      "binding": {
+        "config": {
+          "path": "view.custom.startTime"
+        },
+        "transforms": [
+          {
+            "code": "\t\t\n\tselData \u003d self.custom.selectionRun\n\ttry: \n\t\t\n\t\t\n\t\ts \u003d unicode(selData[0][\"StartTime\"]).replace(\u0027,\u0027, \u0027\u0027).strip()\n\t\tif not s:\n\t\t\treturn None\n\t\tn \u003d long(s)\n\t\t# Si viniera en segundos (10 dígitos), pásalo a ms:\n\t\tif len(s) \u003c\u003d 10:\n\t\t\tn *\u003d 1000\n\t\treturn system.date.fromMillis(n)\n\t\t\n\t\t\n\t\t\n\texcept:\n\t\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.startTime": {
+      "binding": {
+        "config": {
+          "expression": "{view.custom.actualDateTime}"
+        },
+        "transforms": [
+          {
+            "code": "\t# startTime\n\t\n\t\"\"\"\n\tTransforms the provided date value based on user-selected options for \n\tperiod and shift.\n\t\n\tArgs:\n\t    value (Date): The date value to transform.\n\t    quality (Quality): The quality of the data (not used in this function).\n\t    timestamp (Timestamp): The timestamp of the value (not used in this function).\n\t\n\tReturns:\n\t    Date: The transformed date based on the selected options.\n\t\"\"\"\n\t\n\tdef set_datetime(year, month, day, hour):\n\t\t\"\"\"Helper function to set the date and time.\"\"\"\n\t\tdate \u003d system.date.getDate(year, month, day)\n\t\treturn system.date.setTime(date, hour, 0, 0)\n\t\"\"\"\n\t# Test hour\n\tvalue \u003d set_datetime(2024, 9, 22, 7)\n\tprint value\n\tshift \u003d \"A\"\n\tdropDownPeriod \u003d 5  # 0: Turno A, 1: Turno B, 2: Turno C, 3: Previous Day, 4: Current Day, 5: Weeks, 6: Months, 7: Custom\n\tstartTime \u003d set_datetime(2020, 10, 2, 21)\n\t\"\"\"\n\tyear \u003d system.date.getYear(value)\n\tmonth \u003d system.date.getMonth(value)\n\tday \u003d system.date.getDayOfMonth(value)\n\thour \u003d system.date.getHour24(value)\n\tdayOfWeek \u003d system.date.getDayOfWeek(value)\n\t#print dayOfWeek\n\t\n\t# Variables to hold user selections\n\tdropDownPeriod \u003d self.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Period\").props.value\n\tshift \u003d self.custom.shift\n\tstartTime \u003d self.getChild(\"root\").getChild(\"FlexContainer\").getChild(\"FlexContainer_dropdown\").getChild(\"DateTimeInput_StartTime\").props.value\n\n\t# Process the selected period\n\tif dropDownPeriod !\u003d 7:  # Assuming \u00277\u0027 represents a custom option\n\t\tif dropDownPeriod \u003d\u003d 4:  # Current Day\n\t\t\t# Use current day\u0027s start time if after 6 AM; otherwise, use the previous day\u0027s\n\t\t\tnewDate \u003d set_datetime(year, month, day if hour \u003e\u003d 6 else day - 1, 6)\n\t\t\tvalue \u003d newDate\n\t\n\t\telif dropDownPeriod \u003d\u003d 3:  # Previous Day\n\t\t\t# Use the previous day\u0027s start time based on current hour\n\t\t\tnewDate \u003d set_datetime(year, month, day - (1 if hour \u003e\u003d 6 else 2), 6)\n\t\t\tvalue \u003d newDate\n\t\t\t\n\t\telif dropDownPeriod \u003d\u003d -1:  # No specific selection (consider using a different value)\n\t\t\tvalue \u003d set_datetime(year, month, day, hour)\n\t\t\t\n\t\telif dropDownPeriod \u003d\u003d 6:  # Months\n\t\t\tvalue \u003d set_datetime(year, month, 1, 6)\n\t\t\n\t\telif dropDownPeriod \u003d\u003d 5:  # Weeks\n\t\t\t# Calculate the day of the week (1: Sunday, 7: Saturday)\n\t\t\tdayOfWeek \u003d system.date.getDayOfWeek(system.date.getDate(year, month, day))\n\t\t\n\t\t\t# Calculate the previous Monday\n\t\t\tif dayOfWeek \u003d\u003d 2:  # If it is Monday (Day 2)\t\n\t\t\t\tif hour \u003e\u003d 6:\n\t\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -dayOfWeek + 2)\n\t\t\t\telse:\n\t\t\t\t\t# Go back one week (7 days)\n\t\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -7)\n\t\t    \n\t\n\t\t\telif dayOfWeek \u003e 2:\n\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -dayOfWeek + 2)\n\t\t\t\t\n\t\t\telse:\n\t\t\t\tpreviousMonday \u003d system.date.addDays(system.date.getDate(year, month, day), -6)\n\t\t\n\t\t\t# Set the time to 6:00:00\n\t\t\tvalue \u003d set_datetime(system.date.getYear(previousMonday), system.date.getMonth(previousMonday), system.date.getDayOfMonth(previousMonday), 6)\n\t\t    \n\t# Nuevo esquema de turnos\n\t# A: 22:00 - 05:59\n\t# B: 06:00 - 13:59\n\t# C: 14:00 - 21:59\n\t\n\t\tif shift \u003d\u003d \u0027A\u0027:\n\t\t    if dropDownPeriod \u003d\u003d 0:  # Seleccionando A mientras estoy en A\n\t\t        # 22:00 del día actual si \u003e\u003d 22h, sino del día anterior\n\t\t        if hour \u003e\u003d 22:\n\t\t            value \u003d set_datetime(year, month, day, 22)\n\t\t        else:\n\t\t            value \u003d set_datetime(year, month, day - 1, 22)\n\t\t\n\t\t    elif dropDownPeriod \u003d\u003d 1:  # Seleccionando B mientras estoy en A\n\t\t        # 06:00 del día actual si ya pasó medianoche, sino día anterior\n\t\t        if hour \u003e\u003d 22:  # estoy en la parte \"del mismo día\" del turno A\n\t\t            value \u003d set_datetime(year, month, day, 6)\n\t\t        else:\n\t\t            value \u003d set_datetime(year, month, day-1, 6)\n\t\t\n\t\t    elif dropDownPeriod \u003d\u003d 2:  # Seleccionando C mientras estoy en A\n\t\t        if hour \u003e\u003d 22:\n\t\t            value \u003d set_datetime(year, month, day, 14)\n\t\t        else:\n\t\t            value \u003d set_datetime(year, month, day-1, 14)\n\t\t\n\t\telif shift \u003d\u003d \u0027B\u0027:\n\t\t    if dropDownPeriod \u003d\u003d 0:  # Seleccionando A mientras estoy en B\n\t\t\t\t\tvalue \u003d set_datetime(year, month, day-1, 22)\n\t\t\n\t\t    elif dropDownPeriod \u003d\u003d 1:  # Seleccionando B mientras estoy en B\n\t\t        value \u003d set_datetime(year, month, day, 6)\n\t\t\n\t\t    elif dropDownPeriod \u003d\u003d 2:  # Seleccionando C mientras estoy en B\n\t\t        value \u003d set_datetime(year, month, day-1, 14)\n\t\t\n\t\telif shift \u003d\u003d \u0027C\u0027:\n\t\t    if dropDownPeriod \u003d\u003d 0:  # Seleccionando A mientras estoy en C\n\t\t        value \u003d set_datetime(year, month, day-1, 22)\n\t\t\n\t\t    elif dropDownPeriod \u003d\u003d 1:  # Seleccionando B mientras estoy en C\n\t\t        value \u003d set_datetime(year, month, day, 6)\n\t\t\n\t\t    elif dropDownPeriod \u003d\u003d 2:  # Seleccionando C mientras estoy en C\n\t\t        value \u003d set_datetime(year, month, day, 14)\n\t\n\telse:\n\t    # Si el dropdown period es 7, usar la hora de inicio como valor\n\t   return startTime\n\t   \n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.widgetEvents": {
+      "persistent": true
+    },
+    "custom.widgetEvents.blocked.events": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})\r\n\t"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.blocked\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\n\tvalue \u003d _ds.getValueAt(newRow,0)\t\n\t\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.blocked.seconds": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.blocked\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\t\t\t\t\t\n\tvalue \u003d _ds.getValueAt(newRow,3)\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.idle.events": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.idle\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\n\tvalue \u003d _ds.getValueAt(newRow,0)\t\n\t\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.idle.seconds": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.idle\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\t\t\t\t\t\n\tvalue \u003d _ds.getValueAt(newRow,3)\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.planned.events": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\tquery \u003d \"\"\"\n\t    SELECT\n\t        sr.ReasonCode\n\t    FROM\n\t        statehistory sh\n\t        LEFT JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t    WHERE\n\t        sh.RunID IN ({})\n\t        AND sr.PlannedDowntime \u003d 1\n\t\"\"\".format(placeholders)\n\t\n\tparams \u003d value\n\tresults \u003d system.db.runPrepQuery(query, params, \"mes_core\")\n\t\n\t\n\treturn results.getRowCount()",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.planned.seconds": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\t\n\t\n\ttry:\n\t\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\t\tstartTime \u003d self.custom.startTime\n\t\tendTime \u003d self.custom.endTime\n\t\tid \u003d int(self.params.nodeID)\n\t\t\n\t\t\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(DATEDIFF(SECOND, s.StartDateTime, s.EndDateTime)) AS [Total in Seconds]\n\t\t\t\tFROM statehistory s\n\t\t\t\tLEFT JOIN statereason st ON s.StateReasonID \u003d st.ID\n\t\t\t\tWHERE st.PlannedDowntime \u003d 1\n\t\t\t\tAND s.NodeID \u003d ?\n\t\t\t\tAND s.RunID IN ({})\n\t\t\t\u0027\u0027\u0027.format(placeholders)\n\t\t\n\t\t#fecha formateada a str\n\t\tdata \u003d system.db.runPrepQuery(query,[id]+value,self.session.custom.dbConnection)\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.running.events": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\tquery \u003d \"\"\"\n\t    SELECT\n\t        sr.ReasonCode\n\t    FROM\n\t        statehistory sh\n\t        LEFT JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t    WHERE\n\t        sh.RunID IN ({})\n\t        AND sh.RunID !\u003d -1\n\t\"\"\".format(placeholders)\n\t\n\tparams \u003d value\n\tresults \u003d system.db.runPrepQuery(query, params, \"mes_core\")\n\t\n\t\n\treturn results.getRowCount()",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.running.seconds": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\t\n\t\n\ttry:\n\t\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\t\tstartTime \u003d self.custom.startTime\n\t\tendTime \u003d self.custom.endTime\n\t\tid \u003d int(self.params.nodeID)\n\t\t\n\t\t\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(DATEDIFF(SECOND, s.StartDateTime, s.EndDateTime)) AS [Total in Seconds]\n\t\t\t\tFROM statehistory s\n\t\t\t\tLEFT JOIN statereason st ON s.StateReasonID \u003d st.ID\n\t\t\t\tWHERE st.RecordDowntime \u003d 0\n\t\t\t\tAND st.PlannedDowntime \u003d 0\n\t\t\t\tAND s.NodeID \u003d ?\n\t\t\t\tAND s.RunID IN ({})\n\t\t\t\u0027\u0027\u0027.format(placeholders)\n\t\t\n\t\t#fecha formateada a str\n\t\tdata \u003d system.db.runPrepQuery(query,[id]+value,self.session.custom.dbConnection)\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.starved.events": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.starved\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\n\tvalue \u003d _ds.getValueAt(newRow,0)\t\n\t\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.starved.seconds": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.starved\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\t\t\t\t\t\n\tvalue \u003d _ds.getValueAt(newRow,3)\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.total.seconds": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\ttry:\n\t\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\t\tstartTime \u003d self.custom.startTime\n\t\tendTime \u003d self.custom.endTime\n\t\tid \u003d int(self.params.nodeID)\n\t\t\n\t\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(r.TotalTime) AS [Total in Seconds]\n\t\t\t\tFROM run r\n\t\t\t\tWHERE r.ID IN ({})\n\t\t\t\u0027\u0027\u0027.format(placeholders)\n\t\t\n\t\t#fecha formateada a str\n\t\tdata \u003d system.db.runPrepQuery(query,value,self.session.custom.dbConnection)\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.unplanned.events": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\tquery \u003d \"\"\"\n\t    SELECT\n\t        sr.ReasonCode\n\t    FROM\n\t        statehistory sh\n\t        LEFT JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t    WHERE\n\t        sh.RunID IN ({})\n\t        AND sr.RecordDowntime \u003d 1\n\t\"\"\".format(placeholders)\n\t\n\tparams \u003d value\n\tresults \u003d system.db.runPrepQuery(query, params, \"mes_core\")\n\t\n\t\n\treturn results.getRowCount()",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.unplanned.seconds": {
+      "binding": {
+        "config": {
+          "path": "view.custom.RunIDs"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\ttry:\n\t\tplaceholders \u003d \",\".join([\"?\"] * len(value))  # \"?, ?, ?, ...\"\n\t\tstartTime \u003d self.custom.startTime\n\t\tendTime \u003d self.custom.endTime\n\t\tid \u003d int(self.params.nodeID)\n\t\t\n\t\n\t\t\n\t\t# SQL Server compatible query\n\t\tquery \u003d \u0027\u0027\u0027SELECT SUM(DATEDIFF(SECOND, s.StartDateTime, s.EndDateTime)) AS [Total in Seconds]\n\t\t\t\tFROM statehistory s\n\t\t\t\tLEFT JOIN statereason st ON s.StateReasonID \u003d st.ID\n\t\t\t\tWHERE st.RecordDowntime \u003d 1\n\t\t\t\tAND s.NodeID \u003d ?\n\t\t\t\tAND s.RunID IN ({})\n\t\t\t\u0027\u0027\u0027.format(placeholders)\n\t\t\n\t\t#fecha formateada a str\n\t\tdata \u003d system.db.runPrepQuery(query,[id]+value,self.session.custom.dbConnection)\n\t\t\n\t\tseconds \u003d data.getValueAt(0,0)\n\t\tif seconds \u003d\u003d None or data.getRowCount() \u003c\u003d 0:\n\t\t\tseconds \u003d 0\n\t\treturn seconds\n\texcept:\n\t\treturn 0",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      }
+    },
+    "custom.widgetEvents.unscheduled.events": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.unscheduled\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\n\tvalue \u003d _ds.getValueAt(newRow,0)\t\n\t\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "custom.widgetEvents.unscheduled.seconds": {
+      "binding": {
+        "config": {
+          "expression": "if({view.custom.areaId} \u003d 1, {view.custom.lineAvailabilityData}, {view.custom.generalLineAvailabilityData})"
+        },
+        "transforms": [
+          {
+            "code": "\t_ds \u003d value\n\tevent \u003d self.custom.events.unscheduled\n\tfor row in range(_ds.getRowCount()):         \n\t\t\n\t\tif _ds.getValueAt(row,1) \u003d\u003d event: \n\t\t\tnewRow \u003d row\n\tvalue \u003d _ds.getValueAt(newRow,3)\t\n\n\treturn value",
+            "type": "script"
+          },
+          {
+            "code": "\tif value is None:\n\t\tvalue \u003d 0\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      }
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.refresh": {
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1022,
+      "width": 1660
+    },
+    "value": null
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "EmbeddedView"
+        },
+        "position": {
+          "basis": "49px",
+          "shrink": 0
+        },
+        "props": {
+          "params": {
+            "icon": "material/pie_chart",
+            "text": "Análisis IMM 15"
+          },
+          "path": "Page/Embedded/Title_Large"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "spacer_0"
+            },
+            "position": {
+              "basis": "10px"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_Area"
+                },
+                "position": {
+                  "basis": "3vw",
+                  "display": false,
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "Page/themes",
+                    "fontSize": "1.5vh",
+                    "textAlign": "right",
+                    "whiteSpace": "pre"
+                  },
+                  "text": "Area: ",
+                  "textStyle": {
+                    "color": "--neutral-60"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "selectedLabel": "4 - Empaque Maiz"
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\n\tself.view.params.refresh +\u003d 1\n\t\n\t#Limpiar dropdowns\n\t\n\t#lineas\n\t#self.getSibling(\"Dropdown Line\").props.value \u003d 0\n\t#self.getSibling(\"Dropdown Line\").custom.selectedLabel \u003d None\n\t\n\t#equipos\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d None\n\t\n\t#Tipos\n\tself.getSibling(\"Dropdown Type\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d None\n\n\tsystem.perspective.sendMessage(\u0027updateMicroEvents\u0027)\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)\n\t\n\tareaValue \u003d self.props.value\t\n\tlineCode \u003d None\n\tlineValue \u003d None\n\tlineLabel \u003d None\n\tequipmentValue \u003d None\n\tequipmentLabel \u003d None\n\ttypeValue \u003d None\n\ttypeLabel \u003d None\n\t\n\tif areaValue \u003d\u003d 1:\n\t\tlineCode \u003d \u0027111\u0027\n\t\tlineLabel \u003d \u0027Molino A\u0027\n\t\tlineValue \u003d 2\n\t\tequipmentValue \u003d 100\n\t\tequipmentLabel \u003d \u0027Todos\u0027\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\telif areaValue \u003d\u003d 3:\n\t\tlineCode \u003d \u0027321\u0027\n\t\tlineValue \u003d 6\n\t\tlineLabel \u003d \u0027Empaque A\u0027\n\t\tequipmentValue \u003d 100\n\t\tequipmentLabel \u003d \u0027Todos\u0027\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\telif areaValue \u003d\u003d 4:\n\t\tlineCode \u003d \u0027421\u0027\n\t\tlineValue \u003d 9\n\t\tlineLabel \u003d \u0027Empaque A\u0027\n\t\tequipmentValue \u003d 100\n\t\tequipmentLabel \u003d \u0027Todos\u0027\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\tself.getSibling(\"Dropdown Line\").custom.selectedCode \u003d lineCode\n\tself.getSibling(\"Dropdown Line\").props.value \u003d lineValue\n\tself.getSibling(\"Dropdown Line\").custom.selectedLabel \u003d lineLabel\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d equipmentValue\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d equipmentLabel\n\tself.getSibling(\"Dropdown Type\").props.value \u003d typeValue\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d typeLabel\n\t"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Area"
+                },
+                "position": {
+                  "basis": "10vw",
+                  "display": false,
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "parameters": {
+                          "database": "{view.custom.dbConnection}",
+                          "siteId": "{../Dropdown Site.props.value}"
+                        },
+                        "polling": {
+                          "enabled": true,
+                          "rate": "15"
+                        },
+                        "queryPath": "ALL/getAreasFromSiteDropdown"
+                      },
+                      "type": "query"
+                    }
+                  }
+                },
+                "props": {
+                  "dropdownOptionStyle": {
+                    "classes": "Dropdown/font_v3"
+                  },
+                  "maxMenuHeight": 1000,
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "1vw"
+                      }
+                    },
+                    "text": "Seleccione area"
+                  },
+                  "style": {
+                    "classes": "Dropdown/border Dropdown/font",
+                    "fontWeight": "normal",
+                    "textAlign": "center"
+                  },
+                  "value": null
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "meta": {
+                  "name": "Label_Linea"
+                },
+                "position": {
+                  "basis": "4%",
+                  "display": false,
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "Page/themes",
+                    "fontSize": "1.5vh",
+                    "textAlign": "right",
+                    "whiteSpace": "pre"
+                  },
+                  "text": "Línea: ",
+                  "textStyle": {
+                    "color": "--neutral-60"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "selectedCode": "322",
+                  "selectedLabel": "322 - Empaque B Trigo"
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\timport time \n\t\t\n\ttime.sleep(0.5)\n\t\n\tdata \u003d self.props.options\n\t\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tself.custom.selectedCode \u003d self.custom.selectedLabel[:3]\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\tself.view.params.refresh +\u003d 1\n\t\n\t\t\n\t#Limpiar dropdowns\n\t\n\t#equipos\n\tif self.view.custom.areaPath \u003d\u003d 1:\n\t\tself.getSibling(\"Dropdown Equipment\").props.value \u003d 0\n\t\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d None\n\telif self.view.custom.areaPath \u003d\u003d 3:\n\t\tself.getSibling(\"Dropdown Equipment\").props.value \u003d 6\n\t\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d \u002732000 - General\u0027\n\telif self.view.custom.areaPath \u003d\u003d 4:\n\t\tself.getSibling(\"Dropdown Equipment\").props.value \u003d 14\n\t\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d \u002742000 - General\u0027\n\t\t\n\t\t\n\t\n\t#Tipos\n\tself.getSibling(\"Dropdown Type\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d None\n\t\n\tsystem.perspective.sendMessage(\u0027updateMicroEvents\u0027)\n\t\n\t\n\tlineValue \u003d self.custom.selectedCode\n\tequipmentValue \u003d None\n\tequipmentLabel \u003d None\n\ttypeValue \u003d None\n\ttypeLabel \u003d None\n\t\t\n\tif lineValue \u003d\u003d \u0027321\u0027 or lineValue \u003d\u003d \u0027322\u0027:\n\t\tequipmentValue \u003d 100\n\t\tequipmentLabel \u003d \u0027Todos\u0027\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\telif lineValue \u003d\u003d \u0027421\u0027 or lineValue \u003d\u003d \u0027422\u0027:\n\t\tequipmentValue \u003d 100\n\t\tequipmentLabel \u003d \u0027Todos\u0027\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\telif lineValue \u003d\u003d \u0027111\u0027 or lineValue \u003d\u003d \u0027112\u0027 or lineValue \u003d\u003d \u0027113\u0027:\n\t\tequipmentValue \u003d 100\n\t\tequipmentLabel \u003d \u0027Todos\u0027\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\t\t\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d equipmentValue\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d equipmentLabel\n\tself.getSibling(\"Dropdown Type\").props.value \u003d typeValue\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d typeLabel\n\t\n\t\n\tsystem.perspective.sendMessage(\u0027refreshPie\u0027)"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Line"
+                },
+                "position": {
+                  "basis": "7vw",
+                  "display": false,
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "parameters": {
+                          "areaId": "//{../Dropdown Area.props.value}\r {view.custom.areaPath}",
+                          "database": "{view.custom.dbConnection}"
+                        },
+                        "queryPath": "ALL/getLinesFromAreasDropdown"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\toriginalDataset \u003d system.dataset.toPyDataSet(value)\n\t\n\t# Filtra el dataset\n\tfilteredDataset \u003d [row for row in originalDataset if row[\u0027name\u0027][2] !\u003d \u00270\u0027]\n\t\n\t# Convierte el resultado de nuevo a un dataset de Ignition si es necesario\n\tvalue \u003d system.dataset.toDataSet([\"id\", \"name\"], [[row[\u0027id\u0027], row[\u0027name\u0027]] for row in filteredDataset])\n\t\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "query"
+                    },
+                    "onChange": {
+                      "enabled": null,
+                      "script": "\tdata \u003d self.props.options\n\t# Verifica si el dataset es válido y tiene al menos una fila\n\tif data is not None and data.getRowCount() \u003e 0:\n\t\tvalue \u003d data.getValueAt(0, 0)\n\t\tself.props.value \u003d value"
+                    }
+                  }
+                },
+                "props": {
+                  "dropdownOptionStyle": {
+                    "classes": "Dropdown/font_v3"
+                  },
+                  "maxMenuHeight": 1000,
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "1vw"
+                      }
+                    },
+                    "text": "Seleccione línea"
+                  },
+                  "style": {
+                    "classes": "Dropdown/border Dropdown/font",
+                    "fontWeight": "normal",
+                    "textAlign": "center"
+                  },
+                  "value": 6
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refresh",
+                      "pageScope": true,
+                      "script": "\tself.refreshBinding(\"props.options\")",
+                      "sessionScope": false,
+                      "viewScope": false
+                    }
+                  ]
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "meta": {
+                  "name": "Label_Equipment"
+                },
+                "position": {
+                  "basis": "4%",
+                  "display": false,
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "Page/themes",
+                    "fontSize": "1.5vh",
+                    "textAlign": "right",
+                    "whiteSpace": "pre"
+                  },
+                  "text": "Equipo: ",
+                  "textStyle": {
+                    "color": "--neutral-60"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "selectedLabel": "32010 - Empacadora 2"
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\n\t\n\tsystem.perspective.sendMessage(\u0027refreshPie\u0027)\n\tself.view.params.refresh +\u003d 1\n\t\n\t\t\n\t#Limpiar dropdowns\n\t\n\t#Tipos\n\tself.getSibling(\"Dropdown Type\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d None\n\n\t\n\tequipmentValue \u003d self.props.value\n\ttypeValue \u003d None\n\ttypeLabel \u003d None\n\t\n\tif equipmentValue !\u003d \u00270\u0027:\n\t\ttypeValue \u003d 100\n\t\ttypeLabel \u003d \u0027Eventos\u0027\n\t\t\n\tself.getSibling(\"Dropdown Type\").props.value \u003d typeValue\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d typeLabel\n\t"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Equipment"
+                },
+                "position": {
+                  "basis": "8vw",
+                  "display": false,
+                  "grow": 1,
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "parameters": {
+                          "database": "{view.custom.dbConnection}",
+                          "lineId": "{../Dropdown Line.props.value}"
+                        },
+                        "queryPath": "ALL/getEquipmentFromLineRelationDropdown"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t_ds \u003d value\n\tif self.view.custom.areaPath \u003d\u003d 1:\n\t\tnewRow1 \u003d [100,\"Todos\"]\t\t\n\t\tvalue \u003d system.dataset.addRow(_ds, newRow1)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "query"
+                    }
+                  }
+                },
+                "props": {
+                  "dropdownOptionStyle": {
+                    "classes": "Dropdown/font"
+                  },
+                  "maxMenuHeight": 1000,
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "1vw"
+                      }
+                    },
+                    "text": "Seleccione equipo"
+                  },
+                  "style": {
+                    "classes": "Dropdown/border Dropdown/font",
+                    "fontWeight": "normal",
+                    "textAlign": "center"
+                  },
+                  "value": 8
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refresh",
+                      "pageScope": true,
+                      "script": "\tself.refreshBinding(\"props.options\")",
+                      "sessionScope": false,
+                      "viewScope": false
+                    }
+                  ]
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "meta": {
+                  "name": "Label_type"
+                },
+                "position": {
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "Tipo: ",
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "selectedLabel": "Eventos"
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"description\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\n\n\tsystem.perspective.sendMessage(\u0027refreshPie\u0027)\n\tself.view.params.refresh +\u003d 1"
+                      },
+                      "enabled": false,
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Type"
+                },
+                "position": {
+                  "basis": "150px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "parameters": {
+                          "database": "{view.custom.dbConnection}"
+                        },
+                        "queryPath": "ALL/getReasonTypesDropdown"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\t_ds \u003d value\n\tnewRow1 \u003d [100,\"Eventos\"]\t\t\n\tvalue \u003d system.dataset.addRow(_ds, newRow1)\n\tif self.getSibling(\"Dropdown Equipment\").props.value \u003d\u003d 100:\n\t\tnewRow2\t\u003d [200,\"Equipos\"]\n\t\tvalue \u003d system.dataset.addRow(value, newRow2)\n\t\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "query"
+                    }
+                  }
+                },
+                "props": {
+                  "maxMenuHeight": 1000,
+                  "options": [
+                    {
+                      "label": "0 - Planeado",
+                      "value": 0
+                    },
+                    {
+                      "label": "1 - No Planeado",
+                      "value": 1
+                    },
+                    {
+                      "label": "2 - Produciendo",
+                      "value": 2
+                    },
+                    {
+                      "label": "Eventos",
+                      "value": 3
+                    }
+                  ],
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "1vw"
+                      }
+                    },
+                    "text": "Seleccione tipo"
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "margin": 10
+                  },
+                  "value": 3
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refresh",
+                      "pageScope": false,
+                      "script": "\tself.refreshBinding(\"props.options\")",
+                      "sessionScope": false,
+                      "viewScope": false
+                    }
+                  ]
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "meta": {
+                  "name": "Label_Period"
+                },
+                "position": {
+                  "basis": "4vw",
+                  "shrink": 0
+                },
+                "props": {
+                  "enabled": false,
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "Periodo: ",
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "selectedLabel": ""
+                },
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\n\tsystem.perspective.sendMessage(\u0027refreshPie\u0027)"
+                      },
+                      "enabled": false,
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Period"
+                },
+                "position": {
+                  "basis": "200px",
+                  "shrink": 0
+                },
+                "props": {
+                  "maxMenuHeight": 1000,
+                  "options": [
+                    {
+                      "label": "Turno A",
+                      "value": 0
+                    },
+                    {
+                      "label": "Turno B",
+                      "value": 1
+                    },
+                    {
+                      "label": "Turno C",
+                      "value": 2
+                    },
+                    {
+                      "label": "Día Anterior",
+                      "value": 3
+                    },
+                    {
+                      "label": "Día Actual",
+                      "value": 4
+                    },
+                    {
+                      "label": "Semana",
+                      "value": 5
+                    },
+                    {
+                      "label": "Mes",
+                      "value": 6
+                    },
+                    {
+                      "label": "Personalizado",
+                      "value": 7
+                    }
+                  ],
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "1vw"
+                      }
+                    },
+                    "text": "Seleccione periodo"
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "margin": 10,
+                    "marginRight": 10
+                  },
+                  "value": 6
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "meta": {
+                  "name": "Label_Start_Time"
+                },
+                "position": {
+                  "basis": "4vw",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "Inicio: ",
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "events": {
+                  "system": {
+                    "onStartup": {
+                      "config": {
+                        "script": "\t#from datetime import date\n\t#from datetime import datetime\n\t#today \u003ddate.today()\n\t#midnight \u003d datetime.combine(today, datetime.min.time())\n\t#self.props.value \u003d midnight\n\t#self.props.value \u003d system.date.addDays(today, -1)\n\t#self.props.value \u003d system.date.addDays(system.date.now(),-1)\n\t#self.props.value \u003d system.date.now()\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day-1)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "DateTimeInput_StartTime"
+                },
+                "position": {
+                  "basis": "170px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({../Dropdown Period.props.value} !\u003d 7 ,false,true)"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.maxDate": {
+                    "binding": {
+                      "config": {
+                        "expression": "now(5000)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, 00, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.startTime"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "dismissOnSelect": false,
+                  "format": "YYYY-MM-DD HH:mm:ss",
+                  "formattedValue": "2025-10-01 06:00:00",
+                  "inputProps": {
+                    "style": {
+                      "backgroundColor": "#FFFFFF",
+                      "classes": "dateTime",
+                      "color": "#2B2B2B"
+                    }
+                  },
+                  "locale": "es",
+                  "style": {
+                    "classes": "dropdown",
+                    "margin": 10
+                  }
+                },
+                "type": "ia.input.date-time-input"
+              },
+              {
+                "meta": {
+                  "name": "Label__End_Time"
+                },
+                "position": {
+                  "basis": "2vw",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "Fin: ",
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "selectedLabel": ""
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Site",
+                  "visible": false
+                },
+                "position": {
+                  "basis": "13vw",
+                  "display": false
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "parameters": {
+                          "database": "{view.custom.dbConnection}",
+                          "enterpriseId": "{../Dropdown Enterprise.props.value}"
+                        },
+                        "polling": {
+                          "enabled": true,
+                          "rate": "15"
+                        },
+                        "queryPath": "ALL/getSiteFromEnterpriseDropdown"
+                      },
+                      "type": "query"
+                    }
+                  }
+                },
+                "props": {
+                  "dropdownOptionStyle": {
+                    "classes": "Dropdown/font Dropdown/Tall"
+                  },
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "2vw"
+                      }
+                    },
+                    "text": "Seleccione sitio..."
+                  },
+                  "style": {
+                    "classes": "Dropdown/border Dropdown/font",
+                    "fontWeight": "normal",
+                    "textAlign": "center"
+                  },
+                  "value": 1
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "custom": {
+                  "selectedLabel": ""
+                },
+                "events": {
+                  "component": {
+                    "onActionPerformed": {
+                      "config": {
+                        "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown Enterprise",
+                  "visible": false
+                },
+                "position": {
+                  "basis": "13vw",
+                  "display": false
+                },
+                "propConfig": {
+                  "props.options": {
+                    "binding": {
+                      "config": {
+                        "parameters": {
+                          "database": "{view.custom.dbConnection}"
+                        },
+                        "polling": {
+                          "enabled": true,
+                          "rate": "15"
+                        },
+                        "queryPath": "ALL/getEnterpriseNamesDropdown"
+                      },
+                      "type": "query"
+                    }
+                  }
+                },
+                "props": {
+                  "dropdownOptionStyle": {
+                    "classes": "Dropdown/font Dropdown/Tall"
+                  },
+                  "placeholder": {
+                    "icon": {
+                      "path": "material/search",
+                      "style": {
+                        "height": "2vh",
+                        "width": "2vw"
+                      }
+                    },
+                    "text": "Seleccione empresa..."
+                  },
+                  "style": {
+                    "classes": "Dropdown/border Dropdown/font",
+                    "fontWeight": "normal",
+                    "textAlign": "center"
+                  },
+                  "value": 1
+                },
+                "type": "ia.input.dropdown"
+              },
+              {
+                "meta": {
+                  "name": "Label_Enterprise"
+                },
+                "position": {
+                  "basis": "3vw",
+                  "display": false,
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "Page/themes",
+                    "fontSize": "1.5vh",
+                    "textAlign": "right",
+                    "whiteSpace": "pre"
+                  },
+                  "text": "Empresa:  ",
+                  "textStyle": {
+                    "color": "--neutral-60"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "events": {
+                  "system": {
+                    "onStartup": {
+                      "config": {
+                        "script": "\t#from datetime import date\n\t#from datetime import datetime\n\t#today \u003d date.today()\n\t#midnight \u003d datetime.combine(today, datetime.min.time())\n\t#self.props.value \u003d midnight\n\t#self.props.value \u003d today\n\t#self.props.value \u003d system.date.now()\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "DateTimeInput_EndTime"
+                },
+                "position": {
+                  "basis": "170px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "expression": "if({../Dropdown Period.props.value} !\u003d 7 ,false,true)"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.maxDate": {
+                    "binding": {
+                      "config": {
+                        "expression": "now(5000)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\tMinute \u003d system.date.getMinute(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.endTime"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "dismissOnSelect": false,
+                  "format": "YYYY-MM-DD HH:mm:ss",
+                  "formattedValue": "2025-10-10 16:09:00",
+                  "inputProps": {
+                    "style": {
+                      "backgroundColor": "#FFFFFF",
+                      "classes": "dateTime",
+                      "color": "#2B2B2B"
+                    }
+                  },
+                  "locale": "es",
+                  "style": {
+                    "classes": "dropdown",
+                    "margin": 10
+                  }
+                },
+                "type": "ia.input.date-time-input"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_6"
+                },
+                "position": {
+                  "basis": "10px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_Site"
+                },
+                "position": {
+                  "basis": "3vw",
+                  "display": false,
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "Page/themes",
+                    "fontSize": "1.5vh",
+                    "textAlign": "right",
+                    "whiteSpace": "pre"
+                  },
+                  "text": "Site:  ",
+                  "textStyle": {
+                    "color": "--neutral-60"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_7"
+                },
+                "position": {
+                  "basis": "20px",
+                  "shrink": 0
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_dropdown"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "marginLeft": 10,
+                "marginRight": 10
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "spacer_1"
+            },
+            "position": {
+              "basis": "10px"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_2"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_2"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_tittle"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2"
+                          },
+                          "text": "OEE",
+                          "textStyle": {
+                            "fontWeight": "normal"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_1"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_1"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "struct": {
+                                      "oee": "{view.custom.oee}"
+                                    },
+                                    "waitOnAll": true
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\treturn str(round(value[\"oee\"],2)) + \" %\"",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "expr-struct"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "50vw",
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderRightColor": "#A78BB9",
+                        "borderRightStyle": "None",
+                        "borderRightWidth": 1,
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_4"
+                },
+                "position": {
+                  "basis": "100px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "borderRightColor": "#A78BB9",
+                    "borderRightStyle": "solid",
+                    "borderRightWidth": 1,
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_2"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_2"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_tittle"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2"
+                          },
+                          "text": "Disponibilidad",
+                          "textStyle": {
+                            "fontWeight": "normal"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_1"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_1"
+                            },
+                            "position": {
+                              "basis": "20%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "round({view.custom.AvailabilityCalculation.runTime}/{view.custom.AvailabilityCalculation.scheduledTime}*100,2) + \u0027 %\u0027"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label_2"
+                            },
+                            "position": {
+                              "basis": "40%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "\"Sch Time: \" + round({view.custom.AvailabilityCalculation.scheduledTime}/60.0,1) + \u0027 min\u0027"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label_3"
+                            },
+                            "position": {
+                              "basis": "40%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "expression": "\"Run Time: \" + round({view.custom.AvailabilityCalculation.runTime}/60.0,1) + \u0027 min\u0027"
+                                  },
+                                  "type": "expr"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "50vw",
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderRightColor": "#A78BB9",
+                        "borderRightStyle": "None",
+                        "borderRightWidth": 1,
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_0"
+                },
+                "position": {
+                  "basis": "500px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "borderRightColor": "#A78BB9",
+                    "borderRightStyle": "solid",
+                    "borderRightWidth": 1,
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_2"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_2"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_tittle"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2"
+                          },
+                          "text": "Eventos corriendo",
+                          "textStyle": {
+                            "fontWeight": "normal"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_1"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_1"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.widgetEvents.running.events"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\ttry:\n\t\tif value \u003d\u003d None:\n\t\t\treturn \"Eventos: \" +  str(0)\n\t\telse:\n\t\t\treturn \"Eventos: \" +  str(value)\n\t\t\n\texcept:\n\t\treturn \"Eventos: \" +  str(0)",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label_2"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.widgetEvents.running.seconds"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "expression": "round(runScript(\"mes_core.misc.secondsToMinutes\",1,{value}))",
+                                      "type": "expression"
+                                    },
+                                    {
+                                      "code": "\ttry:\n\t\tif value \u003d\u003d None:\n\t\t\treturn \"Minutos: \" +  str(0)\n\t\telse:\n\t\t\treturn \"Minutos: \" +  str(value)\n\t\t\n\texcept:\n\t\treturn \"Minutos: \" +  str(0)",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "50vw",
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderRightColor": "#A78BB9",
+                        "borderRightStyle": "None",
+                        "borderRightWidth": 1,
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_1"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "borderRightColor": "#A78BB9",
+                    "borderRightStyle": "solid",
+                    "borderRightWidth": 1,
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_2"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_2"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_tittle"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2"
+                          },
+                          "text": "Eventos no planeados",
+                          "textStyle": {
+                            "fontWeight": "normal"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_1"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_1"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.widgetEvents.unplanned.events"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\ttry:\n\t\tif value \u003d\u003d None:\n\t\t\treturn \"Eventos: \" +  str(0)\n\t\telse:\n\t\t\treturn \"Eventos: \" +  str(value)\n\t\t\n\texcept:\n\t\treturn \"Eventos: \" +  str(0)\n\t\t",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label_2"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.widgetEvents.unplanned.seconds"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "expression": "round(runScript(\"mes_core.misc.secondsToMinutes\",1,{value}))",
+                                      "type": "expression"
+                                    },
+                                    {
+                                      "code": "\ttry:\n\t\tif value \u003d\u003d None:\n\t\t\treturn \"Minutos: \" +  str(0)\n\t\telse:\n\t\t\treturn \"Minutos: \" +  str(value)\n\texcept:\n\t\treturn \"Minutos: \" +  str(0)",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "50vw",
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderRightColor": "#A78BB9",
+                        "borderRightStyle": "None",
+                        "borderRightWidth": 1,
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_2"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "borderRightColor": "#A78BB9",
+                    "borderRightStyle": "solid",
+                    "borderRightWidth": 1,
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_2"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_2"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_tittle"
+                        },
+                        "position": {
+                          "basis": "20px",
+                          "shrink": 0
+                        },
+                        "props": {
+                          "style": {
+                            "classes": "text-titles-2"
+                          },
+                          "text": "Eventos planeados",
+                          "textStyle": {
+                            "fontWeight": "normal"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_Spacer_1"
+                        },
+                        "position": {
+                          "basis": "10px",
+                          "shrink": 0
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "children": [
+                          {
+                            "meta": {
+                              "name": "Label_1"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.widgetEvents.planned.events"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "code": "\ttry:\n\t\tif value \u003d\u003d None:\n\t\t\treturn \"Eventos: \" +  str(0)\n\t\telse:\n\t\t\treturn \"Eventos: \" +  str(value)\n\t\t\n\texcept:\n\t\treturn \"Eventos: \" +  str(0)",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          },
+                          {
+                            "meta": {
+                              "name": "Label_2"
+                            },
+                            "position": {
+                              "basis": "50%",
+                              "grow": 1,
+                              "shrink": 0
+                            },
+                            "propConfig": {
+                              "props.text": {
+                                "binding": {
+                                  "config": {
+                                    "path": "view.custom.widgetEvents.planned.seconds"
+                                  },
+                                  "transforms": [
+                                    {
+                                      "expression": "round(runScript(\"mes_core.misc.secondsToMinutes\",1,{value}))\r\n",
+                                      "type": "expression"
+                                    },
+                                    {
+                                      "code": "\ttry:\n\t\tif value \u003d\u003d None:\n\t\t\treturn \"Minutos: \" +  str(0)\n\t\telse:\n\t\t\treturn \"Minutos: \" +  str(value)\n\texcept:\n\t\treturn \"Minutos: \" +  str(0)",
+                                      "type": "script"
+                                    }
+                                  ],
+                                  "type": "property"
+                                }
+                              }
+                            },
+                            "props": {
+                              "alignVertical": "top",
+                              "style": {
+                                "classes": "text-data-2"
+                              },
+                              "textStyle": {
+                                "margin": 0
+                              }
+                            },
+                            "type": "ia.display.label"
+                          }
+                        ],
+                        "meta": {
+                          "name": "FlexContainer"
+                        },
+                        "position": {
+                          "basis": "200px"
+                        },
+                        "type": "ia.container.flex"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer_0"
+                    },
+                    "position": {
+                      "basis": "50vw",
+                      "grow": 1
+                    },
+                    "props": {
+                      "direction": "column",
+                      "style": {
+                        "borderRightColor": "#A78BB9",
+                        "borderRightStyle": "None",
+                        "borderRightWidth": 1,
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_3"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "borderRightColor": "#A78BB9",
+                    "borderRightStyle": "None",
+                    "borderRightWidth": 1,
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_Cards"
+            },
+            "position": {
+              "basis": "75px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "marginLeft": 10,
+                "marginRight": 10,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "events": {
+                  "dom": {
+                    "onDoubleClick": {
+                      "config": {
+                        "script": "\tself.props.selection.selectedRow \u003d None\n\tself.props.selection.selectedColumn \u003d None"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Table_Scales"
+                },
+                "position": {
+                  "basis": "40%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.columns[0].field": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(0)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[0].header.title": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(0)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[1].field": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(1)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[1].header.title": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(1)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[2].field": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(2)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[2].header.title": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(2)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[3].field": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(3)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.columns[3].header.title": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\tvalue \u003d value.getColumnName(3)\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.data": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dsTableScaleInterval"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "columns": [
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "YYYY/MM/DD HH:mm:ss",
+                      "editable": false,
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": null
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "number",
+                      "resizable": false,
+                      "sort": "descending",
+                      "sortable": true,
+                      "strictWidth": true,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 135
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "YYYY/MM/DD HH:mm:ss",
+                      "editable": false,
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        }
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "number",
+                      "resizable": false,
+                      "sort": "descending",
+                      "sortable": true,
+                      "strictWidth": true,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 120
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "footer": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": "",
+                          "marginLeft": 3
+                        }
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "date",
+                      "resizable": false,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 150
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "footer": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": "",
+                          "marginLeft": 3
+                        }
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "date",
+                      "resizable": false,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 150
+                    }
+                  ],
+                  "enableHeaderGroups": true,
+                  "headerStyle": {
+                    "backgroundColor": "--cla-page-bg"
+                  },
+                  "pager": {
+                    "bottom": false,
+                    "initialOption": 31
+                  },
+                  "resizeMode": "fixed",
+                  "selection": {
+                    "mode": "multiple interval"
+                  },
+                  "style": {
+                    "boxShadow": "none",
+                    "classes": "table",
+                    "marginBottom": 10,
+                    "marginLeft": 10,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.display.table"
+              },
+              {
+                "meta": {
+                  "name": "EmbeddedView"
+                },
+                "position": {
+                  "basis": "70%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.params.dbConection": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dbConnection"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.duarationRate": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "endTime": "{view.custom.endSelData}",
+                          "selectionRun": "{view.custom.selectionRun}",
+                          "startTime": "{view.custom.startSelData}",
+                          "typeID": "{.../FlexContainer_dropdown/Dropdown Type.props.value}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tSum minutes by ReasonName for selected runs, using statereason flags:\n\t\t  - typeID \u003d 1 -\u003e Unplanned        -\u003e sr.RecordDowntime \u003d 1\n\t\t  - typeID \u003d 0 -\u003e Planned          -\u003e sr.PlannedDowntime \u003d 1\n\t\t  - typeID \u003d 2 -\u003e Running/Producing-\u003e sr.RecordDowntime \u003d 0 AND sr.PlannedDowntime \u003d 0\n\t\n\t\tInputs:\n\t\t\tvalue[\u0027selectionRun\u0027] (list[dict]) or fallback tableInterval dataset\n\t\t\tvalue[\u0027startTime\u0027] (datetime)  # kept for parity; not used in this exact query\n\t\t\tvalue[\u0027endTime\u0027]   (datetime)  # kept for parity; not used in this exact query\n\t\t\tvalue[\u0027typeID\u0027]    (int: 0,1,2)\n\t\n\t\tReturns:\n\t\t\tPyDataSet: [ReasonName, TotalMinutes]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tselectionRun \u003d value[\"selectionRun\"]\n\t\tstartTime \u003d value[\u0027startTime\u0027]\n\t\tendTime \u003d value[\u0027endTime\u0027]\n\t\ttableInterval \u003d self.view.custom.dsTableScaleInterval\n\t\n\t\timport system\n\t\n\t\t# Build RunIDs from selection or fallback dataset\n\t\tif selectionRun \u003d\u003d []:\n\t\t\tselectionRun \u003d tableInterval\n\t\t\tpyds \u003d system.dataset.toPyDataSet(selectionRun)\n\t\t\tRunIDs \u003d [row[\"RunID\"] for row in pyds]\n\t\telse:\n\t\t\tRunIDs \u003d [item[\"RunID\"] for item in selectionRun]\n\t\n\t\t# Prepare placeholders\n\t\tif len(RunIDs) \u003e 0:\n\t\t\tplaceholders \u003d \",\".join([\"?\"] * len(RunIDs))\n\t\telse:\n\t\t\treturn system.dataset.toDataSet([\"ReasonName\",\"TotalMinutes\"], [])\n\t\n\t\ttypeID \u003d value[\u0027typeID\u0027]\n\t\n\t\t# Logic\n\t\tif typeID \u003d\u003d 2:\n\t\t\t# Running / Producing: both flags \u003d 0\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName,\n\t\t\t       SUM(DATEDIFF(minute, sh.StartDateTime, sh.EndDateTime)) AS TotalMinutes\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND sr.RecordDowntime  \u003d 0\n\t\t\t  AND sr.PlannedDowntime \u003d 0\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\".format(placeholders)\n\t\t\tparams \u003d RunIDs\n\t\n\t\telif typeID \u003d\u003d 1:\n\t\t\t# Unplanned: RecordDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName,\n\t\t\t       SUM(DATEDIFF(minute, sh.StartDateTime, sh.EndDateTime)) AS TotalMinutes\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND sr.RecordDowntime \u003d 1\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\".format(placeholders)\n\t\t\tparams \u003d RunIDs\n\t\n\t\telif typeID \u003d\u003d 0:\n\t\t\t# Planned: PlannedDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName,\n\t\t\t       SUM(DATEDIFF(minute, sh.StartDateTime, sh.EndDateTime)) AS TotalMinutes\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND sr.PlannedDowntime \u003d 1\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\".format(placeholders)\n\t\t\tparams \u003d RunIDs\n\t\n\t\telse:\n\t\t\tquery \u003d \"SELECT \u0027No Data\u0027 AS ReasonName, 0 AS TotalMinutes\"\n\t\t\tparams \u003d []\n\t\n\t\t# Execute\n\t\tresults \u003d system.db.runPrepQuery(query, params)\n\t\n\t\t# Return\n\t\treturn results\n\t\n\texcept:\n\t\t# Return (empty dataset on failure)\n\t\timport system\n\t\treturn system.dataset.toDataSet([\"ReasonName\",\"TotalMinutes\"], [])",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.duarationRate2": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "endTime": "{view.custom.endSelData}",
+                          "startTime": "{view.custom.startSelData}",
+                          "typeID": "{.../FlexContainer_dropdown/Dropdown Type.props.value}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tSummarize minutes by ReasonName within a time window, filtered by typeID using\n\t\tstatereason flags:\n\t\t  - typeID \u003d 1 -\u003e No planeados      -\u003e RecordDowntime \u003d 1\n\t\t  - typeID \u003d 0 -\u003e Planeados         -\u003e PlannedDowntime \u003d 1\n\t\t  - typeID \u003d 2 -\u003e Produciendo/Run   -\u003e RecordDowntime \u003d 0 AND PlannedDowntime \u003d 0\n\t\n\t\tInputs:\n\t\t\tvalue[\u0027startTime\u0027] (datetime)\n\t\t\tvalue[\u0027endTime\u0027]   (datetime)\n\t\t\tvalue[\u0027typeID\u0027]    (int: 0,1,2)\n\t\n\t\tReturns:\n\t\t\tPyDataSet with columns [ReasonName, TotalMinutes]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tstartTime \u003d value[\u0027startTime\u0027]\n\t\tendTime \u003d value[\u0027endTime\u0027]\n\t\ttypeID \u003d value[\u0027typeID\u0027]\n\t\n\t\t# Logic\n\t\tif typeID \u003d\u003d 2:\n\t\t\t# Produciendo / Running: ambos flags \u003d 0\n\t\t\tquery \u003d \"\"\"\n\t\t\t\tSELECT sh.ReasonName,\n\t\t\t\t       SUM(DATEDIFF(minute, sh.StartDateTime, sh.EndDateTime)) AS TotalMinutes\n\t\t\t\tFROM statehistory sh\n\t\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\t\tWHERE sh.StartDateTime \u003e\u003d ?\n\t\t\t\t  AND sh.EndDateTime   \u003c\u003d ?\n\t\t\t\t  AND sr.RecordDowntime  \u003d 0\n\t\t\t\t  AND sr.PlannedDowntime \u003d 0\n\t\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\"\n\t\t\tparams \u003d [startTime, endTime]\n\t\n\t\telif typeID \u003d\u003d 1:\n\t\t\t# No planeados: RecordDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\t\tSELECT sh.ReasonName,\n\t\t\t\t       SUM(DATEDIFF(minute, sh.StartDateTime, sh.EndDateTime)) AS TotalMinutes\n\t\t\t\tFROM statehistory sh\n\t\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\t\tWHERE sh.StartDateTime \u003e\u003d ?\n\t\t\t\t  AND sh.EndDateTime   \u003c\u003d ?\n\t\t\t\t  AND sr.RecordDowntime \u003d 1\n\t\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\"\n\t\t\tparams \u003d [startTime, endTime]\n\t\n\t\telif typeID \u003d\u003d 0:\n\t\t\t# Planeados: PlannedDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\t\tSELECT sh.ReasonName,\n\t\t\t\t       SUM(DATEDIFF(minute, sh.StartDateTime, sh.EndDateTime)) AS TotalMinutes\n\t\t\t\tFROM statehistory sh\n\t\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\t\tWHERE sh.StartDateTime \u003e\u003d ?\n\t\t\t\t  AND sh.EndDateTime   \u003c\u003d ?\n\t\t\t\t  AND sr.PlannedDowntime \u003d 1\n\t\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\"\n\t\t\tparams \u003d [startTime, endTime]\n\t\n\t\telse:\n\t\t\t# Fallback: sin datos\n\t\t\tquery \u003d \"SELECT \u0027No Data\u0027 AS ReasonName, 0 AS TotalMinutes\"\n\t\t\tparams \u003d []\n\t\n\t\timport system\n\t\tresults \u003d system.db.runPrepQuery(query, params)\n\t\n\t\t# Return\n\t\treturn results\n\t\n\texcept:\n\t\t# Return (empty dataset on failure)\n\t\timport system\n\t\treturn system.dataset.toDataSet([\u0027ReasonName\u0027, \u0027TotalMinutes\u0027], [])",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.endTime": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.endSelData"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.freqRate": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "endTime": "{view.custom.endSelData}",
+                          "selectionRun": "{view.custom.selectionRun}",
+                          "startTime": "{view.custom.startSelData}",
+                          "typeID": "{.../FlexContainer_dropdown/Dropdown Type.props.value}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tCount events by ReasonName for selected runs, using statereason flags:\n\t\t  - typeID \u003d 1 -\u003e Unplanned        -\u003e sr.RecordDowntime \u003d 1\n\t\t  - typeID \u003d 0 -\u003e Planned          -\u003e sr.PlannedDowntime \u003d 1\n\t\t  - typeID \u003d 2 -\u003e Running/Producing-\u003e sr.RecordDowntime \u003d 0 AND sr.PlannedDowntime \u003d 0\n\t\n\t\tInputs:\n\t\t\tvalue[\u0027selectionRun\u0027] (list[dict]) or fallback dataset in self.view.custom.dsTableScaleInterval\n\t\t\tvalue[\u0027startTime\u0027] (datetime)  # kept for parity; not used here\n\t\t\tvalue[\u0027endTime\u0027]   (datetime)  # kept for parity; not used here\n\t\t\tvalue[\u0027typeID\u0027]    (int: 0,1,2)\n\t\n\t\tReturns:\n\t\t\tPyDataSet: [ReasonName, count]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tselectionRun \u003d value[\"selectionRun\"]\n\t\tstartTime \u003d value[\u0027startTime\u0027]\n\t\tendTime \u003d value[\u0027endTime\u0027]\n\t\ttableInterval \u003d self.view.custom.dsTableScaleInterval\n\t\n\t\timport system\n\t\n\t\t# Build RunIDs from selection or fallback dataset\n\t\tif selectionRun \u003d\u003d []:\n\t\t\tselectionRun \u003d tableInterval\n\t\t\tpyds \u003d system.dataset.toPyDataSet(selectionRun)\n\t\t\tRunIDs \u003d [row[\"RunID\"] for row in pyds]\n\t\telse:\n\t\t\tRunIDs \u003d [item[\"RunID\"] for item in selectionRun]\n\t\n\t\t# Prepare placeholders\n\t\tif len(RunIDs) \u003e 0:\n\t\t\tplaceholders \u003d \",\".join([\"?\"] * len(RunIDs))  # \"?, ?, ?, ...\"\n\t\telse:\n\t\t\treturn system.dataset.toDataSet([\"ReasonName\",\"count\"], [])  # dataset vacío\n\t\n\t\ttypeID \u003d value[\u0027typeID\u0027]\n\t\n\t\t# Logic\n\t\tif typeID \u003d\u003d 2:\n\t\t\t# Running / Producing: both flags \u003d 0\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName, \n\t\t\t       COUNT(*) AS count\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND sr.RecordDowntime  \u003d 0\n\t\t\t  AND sr.PlannedDowntime \u003d 0\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\".format(placeholders)\n\t\t\tparams \u003d RunIDs\n\t\n\t\telif typeID \u003d\u003d 1:\n\t\t\t# Unplanned: RecordDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName, \n\t\t\t       COUNT(*) AS count\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND sr.RecordDowntime \u003d 1\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\".format(placeholders)\n\t\t\tparams \u003d RunIDs\n\t\n\t\telif typeID \u003d\u003d 0:\n\t\t\t# Planned: PlannedDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName, \n\t\t\t       COUNT(*) AS count\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND sr.PlannedDowntime \u003d 1\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\".format(placeholders)\n\t\t\tparams \u003d RunIDs\n\t\n\t\telse:\n\t\t\tquery \u003d \"SELECT \u0027No Data\u0027 AS ReasonName, 0 AS count\"\n\t\t\tparams \u003d []\n\t\n\t\t# Execute\n\t\tresults \u003d system.db.runPrepQuery(query, params)\n\t\n\t\t# Return\n\t\treturn results\n\t\n\texcept:\n\t\t# Return (empty dataset on failure)\n\t\timport system\n\t\treturn system.dataset.toDataSet([\"ReasonName\",\"count\"], [])",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.freqRate2": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "endTime": "{view.custom.endSelData}",
+                          "startTime": "{view.custom.startSelData}",
+                          "typeID": "{.../FlexContainer_dropdown/Dropdown Type.props.value}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tCount events by ReasonName in a time window using statereason flags:\n\t\t  - typeID \u003d 1 -\u003e Unplanned       -\u003e RecordDowntime \u003d 1\n\t\t  - typeID \u003d 0 -\u003e Planned         -\u003e PlannedDowntime \u003d 1\n\t\t  - typeID \u003d 2 -\u003e Running/Producing -\u003e RecordDowntime \u003d 0 AND PlannedDowntime \u003d 0\n\t\n\t\tInputs:\n\t\t\tvalue[\u0027startTime\u0027] (datetime)\n\t\t\tvalue[\u0027endTime\u0027]   (datetime)\n\t\t\tvalue[\u0027typeID\u0027]    (int: 0,1,2)\n\t\n\t\tReturns:\n\t\t\tPyDataSet with columns [ReasonName, count]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tstartTime \u003d value[\u0027startTime\u0027]\n\t\tendTime \u003d value[\u0027endTime\u0027]\n\t\ttypeID \u003d value[\u0027typeID\u0027]\n\t\n\t\t# Logic\n\t\tif typeID \u003d\u003d 2:\n\t\t\t# Running / Producing: both flags \u003d 0\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName, COUNT(*) AS count\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.StartDateTime \u003e\u003d ?\n\t\t\t  AND sh.EndDateTime   \u003c\u003d ?\n\t\t\t  AND sr.RecordDowntime  \u003d 0\n\t\t\t  AND sr.PlannedDowntime \u003d 0\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\"\n\t\t\tparams \u003d [startTime, endTime]\n\t\n\t\telif typeID \u003d\u003d 1:\n\t\t\t# Unplanned: RecordDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName, COUNT(*) AS count\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.StartDateTime \u003e\u003d ?\n\t\t\t  AND sh.EndDateTime   \u003c\u003d ?\n\t\t\t  AND sr.RecordDowntime \u003d 1\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\"\n\t\t\tparams \u003d [startTime, endTime]\n\t\n\t\telif typeID \u003d\u003d 0:\n\t\t\t# Planned: PlannedDowntime \u003d 1\n\t\t\tquery \u003d \"\"\"\n\t\t\tSELECT sh.ReasonName, COUNT(*) AS count\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr ON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.StartDateTime \u003e\u003d ?\n\t\t\t  AND sh.EndDateTime   \u003c\u003d ?\n\t\t\t  AND sr.PlannedDowntime \u003d 1\n\t\t\tGROUP BY sh.ReasonName;\n\t\t\t\"\"\"\n\t\t\tparams \u003d [startTime, endTime]\n\t\n\t\telse:\n\t\t\t# Fallback: no data\n\t\t\tquery \u003d \"SELECT \u0027No Data\u0027 AS ReasonName, 0 AS count\"\n\t\t\tparams \u003d []\n\t\n\t\timport system\n\t\tresults \u003d system.db.runPrepQuery(query, params)\n\t\n\t\t# Return\n\t\treturn results\n\t\n\texcept:\n\t\t# Return (empty dataset on failure)\n\t\timport system\n\t\treturn system.dataset.toDataSet([\u0027ReasonName\u0027, \u0027count\u0027], [])",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.lineEventsForTypesData": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "RunIDs": "{view.custom.RunIDs}",
+                          "Selection": "{this.props.params.selection}",
+                          "refresh": "{view.custom.startTime}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tDetail statehistory by ReasonName for selected ReasonType, classifying via statereason flags:\n\t\t  - \u0027No Planeado\u0027  when RecordDowntime \u003d 1\n\t\t  - \u0027Planeado\u0027     when PlannedDowntime \u003d 1 (and RecordDowntime !\u003d 1)\n\t\t  - \u0027Produciendo\u0027  when both flags are 0\n\t\n\t\tInputs:\n\t\t\tvalue[\u0027Selection\u0027] (list[dict]): e.g., [{\u0027Name\u0027: \u0027Produciendo\u0027}]\n\t\t\tvalue[\u0027RunIDs\u0027] (list[int]): Run IDs to filter IN (...)\n\t\n\t\tReturns:\n\t\t\tlist[dict]: [{ \"Name\": \u003cReasonName\u003e, \"time\": \u003ccount\u003e }, ...]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tselection \u003d value.get(\u0027Selection\u0027) or []\n\t\trun_ids \u003d value.get(\u0027RunIDs\u0027) or []\n\t\tif not selection or not run_ids:\n\t\t\treturn []\n\t\n\t\treasonType \u003d selection[0].get(\u0027Name\u0027)\n\t\tif reasonType is None:\n\t\t\treturn []\n\t\n\t\timport system\n\t\tplaceholders \u003d \",\".join([\"?\"] * len(run_ids))  # \"?, ?, ?, ...\"\n\t\n\t\t# Logic\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT \n\t\t\t\tsh.ReasonName,\n\t\t\t\tCOUNT(*) AS time\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr\n\t\t\t\tON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\t  AND CASE\n\t\t\t\t\tWHEN sr.RecordDowntime \u003d 1 THEN \u0027No Planeado\u0027\n\t\t\t\t\tWHEN sr.PlannedDowntime \u003d 1 THEN \u0027Planeado\u0027\n\t\t\t\t\tELSE \u0027Produciendo\u0027\n\t\t\t\t  END \u003d ?\n\t\t\tGROUP BY sh.ReasonName\n\t\t\"\"\".format(placeholders)\n\t\n\t\tresults \u003d system.db.runPrepQuery(query, run_ids + [reasonType])\n\t\n\t\t# Return\n\t\toutput \u003d []\n\t\tfor row in results:\n\t\t\toutput.append({\n\t\t\t\t\"Name\": row[\"ReasonName\"],\n\t\t\t\t\"time\": row[\"time\"]\n\t\t\t})\n\t\treturn output\n\t\n\texcept:\n\t\t# Return (fallback safe)\n\t\treturn []",
+                          "type": "script"
+                        },
+                        {
+                          "code": "\n\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.reasonsQuery": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "RunIDs": "{view.custom.RunIDs}",
+                          "Selection": "{this.props.params.selection}",
+                          "refresh": "{view.custom.startTime}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tAggregate statehistory by ReasonType using statereason flags:\n\t\t  - \u0027No Planeado\u0027  when RecordDowntime \u003d 1\n\t\t  - \u0027Planeado\u0027     when PlannedDowntime \u003d 1 (and RecordDowntime !\u003d 1)\n\t\t  - \u0027Produciendo\u0027  when both flags are 0\n\t\n\t\tInputs:\n\t\t\tvalue[\u0027RunIDs\u0027] (list[int]): Run IDs to filter IN (...)\n\t\t\t* Uses default DB connection unless your project injects one.\n\t\n\t\tReturns:\n\t\t\tlist[dict]: [{ \"Name\": \u003cReasonType\u003e, \"time\": \u003ccount\u003e }, ...]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\trun_ids \u003d value.get(\u0027RunIDs\u0027)\n\t\tif not run_ids:\n\t\t\treturn []\n\t\n\t\timport system\n\t\tplaceholders \u003d \",\".join([\"?\"] * len(run_ids))\n\t\n\t\t# Logic\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\tCASE\n\t\t\t\t\tWHEN sr.RecordDowntime \u003d 1 THEN \u0027No Planeado\u0027\n\t\t\t\t\tWHEN sr.PlannedDowntime \u003d 1 THEN \u0027Planeado\u0027\n\t\t\t\t\tELSE \u0027Produciendo\u0027\n\t\t\t\tEND AS ReasonType,\n\t\t\t\tCOUNT(*) AS time\n\t\t\tFROM statehistory sh\n\t\t\tINNER JOIN statereason sr\n\t\t\t\tON sr.ID \u003d sh.StateReasonID\n\t\t\tWHERE sh.RunID IN ({})\n\t\t\tGROUP BY\n\t\t\t\tCASE\n\t\t\t\t\tWHEN sr.RecordDowntime \u003d 1 THEN \u0027No Planeado\u0027\n\t\t\t\t\tWHEN sr.PlannedDowntime \u003d 1 THEN \u0027Planeado\u0027\n\t\t\t\t\tELSE \u0027Produciendo\u0027\n\t\t\t\tEND\n\t\t\"\"\".format(placeholders)\n\t\n\t\tresults \u003d system.db.runPrepQuery(query, run_ids)\n\t\n\t\t# Return\n\t\toutput \u003d []\n\t\tfor row in results:\n\t\t\toutput.append({\n\t\t\t\t\"Name\": row[\"ReasonType\"],\n\t\t\t\t\"time\": row[\"time\"]\n\t\t\t})\n\t\treturn output\n\t\n\texcept:\n\t\t# Return (fallback safe)\n\t\treturn []",
+                          "type": "script"
+                        },
+                        {
+                          "code": "\n\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  },
+                  "props.params.startTime": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.startSelData"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.typeId": {
+                    "binding": {
+                      "config": {
+                        "path": ".../FlexContainer_dropdown/Dropdown Type.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.path": {
+                    "binding": {
+                      "config": {
+                        "expression": "{.../FlexContainer_dropdown/Dropdown Type.props.value}"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\timport time\n\ttime.sleep(0.3)\n\t\n\tif self.parent.parent.getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Type\").props.value \u003d\u003d 3: # Todos equipos y todos los eventos del tipo de razón del equipo\n\t\tvalue \u003d \u0027Page/Embedded/Embeded_Reports_Pies_1\u0027\n\t#elif self.parent.getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Type\").props.value \u003d\u003d 200:  # Todos equipos y todos los equipos que pertenecen a un tipo de razón\n\t#\tvalue \u003d \u0027Page/Embedded/Embeded_Reports_Pies_2\u0027\n\t#elif self.parent.getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Type\").props.value \u003d\u003d 100:  # Equipo específico y todos los eventos del tipo de razón del equipo\n\t#\tvalue \u003d \u0027Page/Embedded/Embeded_Reports_Pies_3\u0027\n\t#elif self.parent.getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Type\").props.value !\u003d 100 and self.parent.getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Type\").props.value !\u003d 200:\n\t#\tvalue \u003d \u0027Page/Embedded/Embeded_Reports_Bars_1\u0027\n\telif self.parent.parent.getChild(\"FlexContainer_dropdown\").getChild(\"Dropdown Type\").props.value !\u003d 3:\n\t\tvalue \u003d\u0027Page/Embedded/Embeded_Reports_Bars_2\u0027\n\telse:\n\t\tvalue \u003d \u0027Page/Embedded/Embeded_Error\u0027\n\treturn value",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "selection": []
+                  },
+                  "style": {
+                    "marginBottom": 0,
+                    "marginLeft": 0,
+                    "marginTop": 0
+                  }
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refreshPie",
+                      "pageScope": true,
+                      "script": "\tself.refreshBinding(\"props.path\")\n\tself.refreshBinding(\"props.params.typeId\")\n\tself.refreshBinding(\"props.params.lineAvailabilityData\")\n\tself.refreshBinding(\"props.params.lineId\")\n\tself.refreshBinding(\"props.params.equipmentAvailabilityData\")\n\tself.refreshBinding(\"props.params.equipmentId\")\n\tself.refreshBinding(\"props.params.endTime\")\n\tself.refreshBinding(\"props.params.startTime\")\n\tself.refreshBinding(\"props.params.dbConection\")\n",
+                      "sessionScope": false,
+                      "viewScope": false
+                    }
+                  ]
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "60%"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "EquipmentSchedule_0"
+                },
+                "position": {
+                  "basis": "100%"
+                },
+                "propConfig": {
+                  "props.dateRange.endDate": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.custom.endTime}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.dateRange.startDate": {
+                    "binding": {
+                      "config": {
+                        "expression": "{view.custom.startTime}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.downtimeEvents": {
+                    "binding": {
+                      "config": {
+                        "struct": {
+                          "dbConnection": "{view.custom.dbConnection}",
+                          "endDateTime": "{view.custom.endTime}",
+                          "startDateTime": "{view.custom.startTime}"
+                        },
+                        "waitOnAll": true
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t\"\"\"\n\t\tDevolver eventos de statehistory solapados con un rango y recortados al rango.\n\t\n\t\tColor:\n\t\t  - \u0027#6ABCE2\u0027 si ReasonCode \u003d 1001 (prioridad máxima).\n\t\t  - \u0027#FF8A8A\u0027 si RecordDowntime \u003d 1 en statereason.\n\t\t  - \u0027#FFFF8A\u0027 si PlannedDowntime \u003d 1 (y RecordDowntime !\u003d 1).\n\t\t  - \u0027#8AFF8A\u0027 si ambos \u003d 0.\n\t\n\t\tInputs:\n\t\t\tvalue[\"dbConnection\"] (str)\n\t\t\tvalue[\"startDateTime\"] (datetime)\n\t\t\tvalue[\"endDateTime\"] (datetime)\n\t\n\t\tReturns:\n\t\t\tDataset: [itemId, ID, startDate, endDate, label, color, opacity]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tstartDateTime \u003d value[\"startDateTime\"]\n\t\tendDateTime \u003d value[\"endDateTime\"]\n\t\n\t\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\t\n\t\tcolumns \u003d [\n\t\t\t\"NodeID AS itemId\",\n\t\t\t\"ID\",\n\t\t\t# start recortado al inicio del rango\n\t\t\t\"CASE WHEN StartDateTime \u003c ? THEN ? ELSE StartDateTime END AS startDate\",\n\t\t\t# end recortado al fin del rango (considerando abiertos)\n\t\t\t(\n\t\t\t\t\"CASE WHEN COALESCE(EndDateTime, GETDATE()) \u003e ? THEN ? \"\n\t\t\t\t\"ELSE COALESCE(EndDateTime, GETDATE()) END AS endDate\"\n\t\t\t),\n\t\t\t\"ReasonName AS label\",\n\t\t\t# color: prioridad 1001 \u003e RecordDowntime \u003e PlannedDowntime \u003e verde\n\t\t\t(\n\t\t\t\t\"CASE \"\n\t\t\t\t\" WHEN ReasonCode \u003d 1001 THEN \u0027#6ABCE2\u0027 \"\n\t\t\t\t\" WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"               WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"                 AND sr.RecordDowntime \u003d 1) THEN \u0027#FF8A8A\u0027 \"\n\t\t\t\t\" WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"               WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"                 AND sr.PlannedDowntime \u003d 1) THEN \u0027#FFFF8A\u0027 \"\n\t\t\t\t\" ELSE \u0027#8AFF8A\u0027 \"\n\t\t\t\t\"END AS color\"\n\t\t\t),\n\t\t\t\"0.5 AS opacity\"\n\t\t]\n\t\n\t\t# Solape: [Start, End] con [startDateTime, endDateTime]\n\t\twhere_clause \u003d (\n\t\t\t\"StartDateTime \u003c ? \"\n\t\t\t\"AND COALESCE(EndDateTime, GETDATE()) \u003e ?\"\n\t\t)\n\t\n\t\t# Orden de parámetros:\n\t\t# 1-2: CASE startDate\n\t\t# 3-4: CASE endDate\n\t\t# 5-6: WHERE de solape\n\t\twhere_args \u003d [\n\t\t\tstartDateTime, startDateTime,\n\t\t\tendDateTime,   endDateTime,\n\t\t\tendDateTime,   startDateTime\n\t\t]\n\t\n\t\tds \u003d stateHistoryTable.selectCustom(columns\u003dcolumns, where_clause\u003dwhere_clause, where_args\u003dwhere_args)\n\t\treturn ds\n\t\n\texcept:\n\t\timport system\n\t\treturn system.dataset.toDataSet([\u0027itemId\u0027,\u0027ID\u0027,\u0027startDate\u0027,\u0027endDate\u0027,\u0027label\u0027,\u0027color\u0027,\u0027opacity\u0027], [])",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr-struct"
+                    }
+                  }
+                },
+                "props": {
+                  "dateRange": {},
+                  "items": [
+                    {
+                      "headerStyle": {
+                        "classes": ""
+                      },
+                      "iconConfig": {
+                        "color": "",
+                        "path": "",
+                        "style": {}
+                      },
+                      "id": 4,
+                      "label": "IMM 15",
+                      "rowStyle": {
+                        "classes": ""
+                      }
+                    }
+                  ],
+                  "rowStyle": {
+                    "backgroundColor": "--sin-page-bg"
+                  },
+                  "style": {
+                    "borderStyle": "none"
+                  }
+                },
+                "type": "ia.display.equipmentschedule"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "basis": "25%"
+            },
+            "props": {
+              "style": {
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "classes": "container-borders-dautom-widget-2",
+                "marginBottom": 10,
+                "marginLeft": 10,
+                "marginRight": 10,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "grow": 1
+        },
+        "props": {
+          "direction": "column"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

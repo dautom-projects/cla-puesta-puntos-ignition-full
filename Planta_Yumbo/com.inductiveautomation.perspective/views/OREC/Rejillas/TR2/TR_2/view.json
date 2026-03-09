@@ -1,0 +1,228 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "height": 1080,
+      "width": 1920
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Progress"
+        },
+        "position": {
+          "height": 37,
+          "rotate": {
+            "angle": -90
+          },
+          "width": 184,
+          "x": 3.3674,
+          "y": 253.796
+        },
+        "propConfig": {
+          "props.bar.color": {
+            "binding": {
+              "config": {
+                "path": "this.props.value"
+              },
+              "transforms": [
+                {
+                  "fallback": "#000000",
+                  "inputType": "range",
+                  "mappings": [
+                    {
+                      "input": {
+                        "max": 50,
+                        "min": 0
+                      },
+                      "output": "#FF4747"
+                    },
+                    {
+                      "input": {
+                        "max": 75,
+                        "min": 51
+                      },
+                      "output": "#FF8C00"
+                    },
+                    {
+                      "input": {
+                        "max": 100,
+                        "min": 75
+                      },
+                      "output": "#00FF00"
+                    }
+                  ],
+                  "outputType": "color",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "expression": "(({[default]OREC/Rejillas/Rej_4/Acumulado})/\r\n({[default]OREC/Rejillas/Rej_4/Objetivo_Turno}))*100"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "bar": {
+            "style": {
+              "borderBottomLeftRadius": 1,
+              "borderBottomRightRadius": 1,
+              "borderTopLeftRadius": 1,
+              "borderTopRightRadius": 1
+            }
+          },
+          "track": {
+            "color": "#AAAAAA",
+            "style": {
+              "borderBottomLeftRadius": 5,
+              "borderBottomRightRadius": 5,
+              "borderColor": "#000000",
+              "borderStyle": "solid",
+              "borderTopLeftRadius": 5,
+              "borderTopRightRadius": 5,
+              "borderWidth": 1
+            }
+          }
+        },
+        "type": "ia.display.progress"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "height": 32,
+          "width": 209,
+          "x": 128.87,
+          "y": 31.239999999999995
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "\"OBJETIVO Turno: \" + {[default]OREC/Rejillas/Rej_4/Objetivo_Turno}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "backgroundColor": "#555555"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "height": 32,
+          "width": 209,
+          "x": 129.00868034362793,
+          "y": 65.00868034362793
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "\"OBJETIVO Hora: \" + {[default]OREC/Rejillas/Rej_4/Objetivo_Hora}"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "backgroundColor": "#555555"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "NumericEntryField"
+        },
+        "position": {
+          "height": 32,
+          "width": 150,
+          "x": 176.86805534362793,
+          "y": 481.24305534362793
+        },
+        "propConfig": {
+          "props.value": {
+            "binding": {
+              "config": {
+                "fallbackDelay": 2.5,
+                "mode": "direct",
+                "tagPath": "[default]OREC/Rejillas/Auxiliares/dato1"
+              },
+              "type": "tag"
+            }
+          }
+        },
+        "type": "ia.input.numeric-entry-field"
+      },
+      {
+        "meta": {
+          "name": "NumericEntryField_0"
+        },
+        "position": {
+          "height": 32,
+          "width": 150,
+          "x": 176.71696850585937,
+          "y": 530.243
+        },
+        "props": {
+          "value": 40
+        },
+        "type": "ia.input.numeric-entry-field"
+      },
+      {
+        "events": {
+          "component": {
+            "onActionPerformed": {
+              "config": {
+                "script": "\t# Leer los valores de los tags\n\tdato1 \u003d system.tag.readBlockingself.getSibling(\"NumericEntryField\").props.value\n\tdato2 \u003d system.tag.readBlockingself.getSibling(\"NumericEntryField_0\").props.value\n\t\n\t# Comparar\n\tmayor \u003d max(dato1, dato2)\n\t\n\t# Escribir el valor en el Label (si lo llamaste \u0027Label\u0027 y tiene custom property \u0027mayorValor\u0027)\n\tself.getSiblingself.getSibling(\"resultado\").props.text \u003d \"El mayor es: {}\".format(mayor)\n\t\n\t# (opcional) también puedes escribirlo a un tag\n\tsystem.tag.writeBlocking([\"[default]mayorDato\"], [mayor])"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Button"
+        },
+        "position": {
+          "height": 34,
+          "rotate": {
+            "anchor": "14% 75%"
+          },
+          "width": 80,
+          "x": 211.93096850585937,
+          "y": 590.243
+        },
+        "type": "ia.input.button"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "type": "ia.container.coord"
+  }
+}

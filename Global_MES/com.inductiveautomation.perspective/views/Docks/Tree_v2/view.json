@@ -1,0 +1,338 @@
+{
+  "custom": {},
+  "params": {},
+  "props": {
+    "defaultSize": {
+      "width": 275
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "custom": {
+          "currentViewPath": "None"
+        },
+        "events": {
+          "dom": {
+            "onDoubleClick": {
+              "config": {
+                "page": "{/root/Tree.custom.urlViewSelected}"
+              },
+              "scope": "C",
+              "type": "nav"
+            }
+          }
+        },
+        "meta": {
+          "name": "Tree"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "propConfig": {
+          "custom.currentViewURL": {
+            "binding": {
+              "config": {
+                "path": "page.props.path"
+              },
+              "type": "property"
+            },
+            "onChange": {
+              "enabled": null,
+              "script": "\tif self.session.custom.adminPermissions:\n\t\tnested_data \u003d treeScriptingMES.tree_data\n\telse:\n\t\tnested_data \u003d treeScriptingMES.tree_data_op\n\t\t\n\ttarget_data \u003d self.custom.currentViewURL\n\t\n\tpath \u003d treeScriptingMES.propagateTree(nested_data, target_data)\n\t\n\tself.custom.currentViewPath \u003d str(path)\n\n\tself.props.items \u003d nested_data"
+            }
+          },
+          "custom.urlViewSelected": {
+            "binding": {
+              "config": {
+                "path": "this.props.selectionData[0].value.url"
+              },
+              "transforms": [
+                {
+                  "code": "\tif value \u003d\u003d None:\n\t\treturn \"0\"\n\treturn value",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            },
+            "onChange": {
+              "enabled": null,
+              "script": "\t\n\tif self.session.custom.adminPermissions:\n\t\tnested_data \u003d treeScriptingMES.tree_data\n\telse:\n\t\tnested_data \u003d treeScriptingMES.tree_data_op\n\t\t\n\ttarget_data \u003d self.custom.urlViewSelected\n\t\n\tpath \u003d treeScriptingMES.propagateTree(nested_data, target_data)\n\t\n\timport time\n\ttime.sleep(0.1)\n\tself.props.items \u003d nested_data"
+            }
+          },
+          "props.selection[0]": {
+            "binding": {
+              "config": {
+                "path": "this.custom.currentViewPath"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "appearance": {
+            "defaultNodeIcons": {
+              "collapsed": {
+                "path": "material/folder"
+              },
+              "empty": {
+                "path": "material/stop"
+              },
+              "expanded": {
+                "path": "material/folder_open"
+              }
+            },
+            "expandIcons": {
+              "collapsed": {
+                "path": "material/arrow_right"
+              },
+              "expanded": {
+                "path": "material/arrow_drop_down"
+              }
+            }
+          },
+          "items": [
+            {
+              "data": {
+                "path": "0",
+                "url": ""
+              },
+              "expanded": true,
+              "items": [
+                {
+                  "data": {
+                    "path": "0/0",
+                    "url": ""
+                  },
+                  "expanded": true,
+                  "items": [
+                    {
+                      "data": {
+                        "path": "0/0/0",
+                        "url": ""
+                      },
+                      "expanded": false,
+                      "items": [
+                        {
+                          "data": {
+                            "path": "0/0/0/0",
+                            "url": "/relations"
+                          },
+                          "expanded": false,
+                          "items": [],
+                          "label": "Modelo"
+                        },
+                        {
+                          "data": {
+                            "path": "0/0/0/1",
+                            "url": "/node"
+                          },
+                          "expanded": false,
+                          "items": [],
+                          "label": "Nodos"
+                        }
+                      ],
+                      "label": "Administracion"
+                    },
+                    {
+                      "data": {
+                        "path": "0/0/1",
+                        "url": ""
+                      },
+                      "expanded": true,
+                      "items": [
+                        {
+                          "data": {
+                            "path": "0/0/1/0",
+                            "url": "/imm/4/overview"
+                          },
+                          "expanded": true,
+                          "items": [
+                            {
+                              "data": {
+                                "path": "0/0/1/0/0",
+                                "url": "/imm/4/OEE"
+                              },
+                              "expanded": false,
+                              "items": [],
+                              "label": "OEE"
+                            },
+                            {
+                              "data": {
+                                "path": "0/0/1/0/1",
+                                "url": "/imm/4/wo"
+                              },
+                              "expanded": false,
+                              "items": [],
+                              "label": "Agendamiento"
+                            },
+                            {
+                              "data": {
+                                "path": "0/0/1/0/2",
+                                "url": "/imm/4/run"
+                              },
+                              "expanded": false,
+                              "items": [],
+                              "label": "Control de corridas"
+                            },
+                            {
+                              "data": {
+                                "path": "0/0/1/0/3",
+                                "url": "/imm/4/availability"
+                              },
+                              "expanded": false,
+                              "items": [],
+                              "label": "Disponibilidad"
+                            },
+                            {
+                              "data": {
+                                "path": "0/0/1/0/4",
+                                "url": "/imm/4/performance"
+                              },
+                              "expanded": false,
+                              "items": [],
+                              "label": "Analisis de rendimiento"
+                            },
+                            {
+                              "data": {
+                                "path": "0/0/1/0/5",
+                                "url": "/imm/4/analysis"
+                              },
+                              "expanded": false,
+                              "items": [],
+                              "label": "Analisis de disponibilidad"
+                            }
+                          ],
+                          "label": "IMM 15"
+                        },
+                        {
+                          "data": {
+                            "path": "0/0/1/1",
+                            "url": "/reason"
+                          },
+                          "expanded": false,
+                          "items": [],
+                          "label": "Asignacion de razones"
+                        },
+                        {
+                          "data": {
+                            "path": "0/0/1/2",
+                            "url": "/manage"
+                          },
+                          "expanded": false,
+                          "items": [],
+                          "label": "Gestion de eventos"
+                        }
+                      ],
+                      "label": "Tapas y cubiertas"
+                    },
+                    {
+                      "data": {
+                        "path": "0/0/2",
+                        "url": "/alarms"
+                      },
+                      "expanded": false,
+                      "items": [],
+                      "label": "Alarmas"
+                    }
+                  ],
+                  "label": "Pacifico"
+                }
+              ],
+              "label": "Clarios"
+            }
+          ],
+          "selection": [
+            null
+          ],
+          "selectionData": [
+            {
+              "itemPath": "0/0/1/0",
+              "value": {
+                "path": "0/0/1/0",
+                "url": "/imm/4/overview"
+              }
+            }
+          ]
+        },
+        "scripts": {
+          "customMethods": [
+            {
+              "name": "createTree",
+              "params": [],
+              "script": "\t# create Navigation Tree\n\ttree_data \u003d []\n\t\n\tsites \u003d [\"Site1\", \"Site2\", \"Site3\"]\n\tareas \u003d [\"Area1\", \"Area2\", \"Area3\"]\n\tdevices \u003d [\"Device1\", \"Device2\", \"Device3\"]\n\t\n\tfor site in sites:\n\t    site_node \u003d {\"label\": site, \"children\": []}\n\t\n\t    for area in areas:\n\t        area_node \u003d {\"label\": area, \"children\": []}\n\t\n\t        for device in devices:\n\t            device_node \u003d {\"label\": device}\n\t            area_node[\"children\"].append(device_node)\n\t\n\t        site_node[\"children\"].append(area_node)\n\t\n\t    tree_data.append(site_node)\n\t\n\treturn tree_data"
+            },
+            {
+              "name": "searchInTree",
+              "params": [
+                "nested_data",
+                "target_data"
+              ],
+              "script": "\t# Search path in tree\n\tif isinstance(nested_data, list):\n\t    for item in nested_data:\n\t        result \u003d searchTree(item, target_data)\n\t        if result:\n\t            return result\n\telif isinstance(nested_data, dict):\n\t    if nested_data.get(\"url\") \u003d\u003d target_data:\n\t        return nested_data.get(\"path\")\n\t    for key in nested_data:\n\t        result \u003d searchTree(nested_data[key], target_data)\n\t        if result:\n\t            return result"
+            },
+            {
+              "name": "propagateTree",
+              "params": [
+                "nested_data",
+                "target_data",
+                "within_target_branch\u003dFalse"
+              ],
+              "script": "\t# It searchs for url \u003d \"target_data\" in a json\n\t# Returns the path instance related and modifies the expanded property in the branch for True\n\tif isinstance(nested_data, list):\n\t    found_path \u003d None\n\t    for i, item in enumerate(nested_data):\n\t        path \u003d propagateTree(item, target_data, within_target_branch)\n\t        if path:\n\t            if \"expanded\" in item:\n\t                item[\"expanded\"] \u003d True\n\t            found_path \u003d path\n\t        else:\n\t            if isinstance(item, dict) and \"expanded\" in item:\n\t                item[\"expanded\"] \u003d False\n\t    return found_path\n\telif isinstance(nested_data, dict):\n\t    if nested_data.get(\"url\") \u003d\u003d target_data:\n\t        if \"expanded\" in nested_data:\n\t            nested_data[\"expanded\"] \u003d True\n\t        within_target_branch \u003d True\n\t        return nested_data.get(\"path\")\n\t    found_path \u003d None\n\t    for key, value in nested_data.items():\n\t        path \u003d propagateTree(value, target_data, within_target_branch)\n\t        if path:\n\t            if \"expanded\" in nested_data:\n\t                nested_data[\"expanded\"] \u003d True\n\t            found_path \u003d path\n\t        elif not within_target_branch:\n\t            if isinstance(value, dict) and \"expanded\" in value:\n\t                value[\"expanded\"] \u003d False\n\t    return found_path\n\treturn None"
+            }
+          ],
+          "extensionFunctions": null,
+          "messageHandlers": []
+        },
+        "type": "ia.display.tree"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "props.style.backgroundColor": {
+        "binding": {
+          "config": {
+            "path": "session.props.theme"
+          },
+          "enabled": false,
+          "transforms": [
+            {
+              "fallback": null,
+              "inputType": "scalar",
+              "mappings": [
+                {
+                  "input": "cla-light",
+                  "output": "--neutral-30"
+                },
+                {
+                  "input": "cla-dark",
+                  "output": "--cla-header"
+                }
+              ],
+              "outputType": "scalar",
+              "type": "map"
+            },
+            {
+              "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+              "type": "script"
+            }
+          ],
+          "type": "property"
+        }
+      }
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "borderBottomLeftRadius": 0,
+        "borderBottomRightRadius": 0,
+        "borderTopLeftRadius": 0,
+        "borderTopRightRadius": 0,
+        "classes": "container-borders-dautom-widget"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

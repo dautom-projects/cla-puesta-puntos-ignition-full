@@ -1,0 +1,2299 @@
+{
+  "custom": {
+    "dataLine": {
+      "$": [
+        "ds",
+        192,
+        1759876610474
+      ],
+      "$columns": [
+        {
+          "data": [
+            4
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "IMM 15"
+          ],
+          "name": "Name",
+          "type": "String"
+        }
+      ]
+    },
+    "dataReason": {
+      "$": [
+        "ds",
+        192,
+        1760121297014
+      ],
+      "$columns": [
+        {
+          "data": [
+            80,
+            73,
+            77,
+            78,
+            79,
+            81,
+            82,
+            83,
+            84,
+            85,
+            87,
+            88,
+            89,
+            90,
+            92
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "Falla",
+            "Ajuste",
+            "Arranque",
+            "Calidad",
+            "Cambios",
+            "RRHH",
+            "Inventario",
+            "Materia Prima",
+            "MTTO",
+            "Seguridad",
+            "Servicios",
+            "Calibraciones",
+            "Validaciones",
+            "Velocidad Reducida",
+            "Otro"
+          ],
+          "name": "ReasonName",
+          "type": "String"
+        }
+      ]
+    },
+    "dataSubreason": {
+      "$": [
+        "ds",
+        192,
+        1760121297015
+      ],
+      "$columns": [
+        {
+          "data": [],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [],
+          "name": "ReasonName",
+          "type": "String"
+        }
+      ]
+    },
+    "dataTable": {
+      "$": [
+        "ds",
+        192,
+        1760125539139
+      ],
+      "$columns": [
+        {
+          "data": [
+            12403,
+            12387
+          ],
+          "name": "ID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "No produciendo",
+            "No produciendo"
+          ],
+          "name": "ReasonName",
+          "type": "String"
+        },
+        {
+          "data": [
+            1,
+            1
+          ],
+          "name": "ReasonCode",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            1760122483000,
+            1760118197000
+          ],
+          "name": "StartDateTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            1760123006000,
+            1760120621000
+          ],
+          "name": "EndDateTime",
+          "type": "Date"
+        },
+        {
+          "data": [
+            523,
+            2424
+          ],
+          "name": "Total in Seconds",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            null,
+            null
+          ],
+          "name": "Note",
+          "type": "String"
+        },
+        {
+          "data": [
+            47,
+            47
+          ],
+          "name": "RunID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            40,
+            40
+          ],
+          "name": "WorkOrderID",
+          "type": "Integer"
+        }
+      ]
+    },
+    "dbConnection": "mes_core",
+    "reasonSel": null,
+    "refresh": {
+      "$": [
+        "ts",
+        192,
+        1760125539135
+      ],
+      "$ts": 1760125539135
+    },
+    "role": "Operator",
+    "test": 80
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\t\n    system.perspective.sendMessage(\n        messageType\u003d\"refreshDropdown\", \n        payload\u003d{},\n        scope\u003d\"page\"\n    )"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {},
+  "propConfig": {
+    "custom.dataLine": {
+      "persistent": true
+    },
+    "custom.dataReason": {
+      "persistent": true
+    },
+    "custom.dataSubreason": {
+      "persistent": true
+    },
+    "custom.dataTable": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.reasonSel": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer_reasonsAssignment/FlexContainer/FlexContainer_function_Type_Reason_Button/Dropdown Reason_0.props.value"
+        },
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\t\t\n    system.perspective.sendMessage(\n        messageType\u003d\"refreshDropdown\", \n        payload\u003d{},\n        scope\u003d\"page\"\n    )"
+      },
+      "persistent": true
+    },
+    "custom.refresh": {
+      "binding": {
+        "config": {
+          "expression": "now(5000)"
+        },
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tsystem.perspective.sendMessage(\u0027getDownTimeEvents\u0027)"
+      },
+      "persistent": true
+    },
+    "custom.role": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.roles[0]"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.test": {
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1022,
+      "width": 1660
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "49px",
+          "shrink": 0
+        },
+        "props": {
+          "params": {
+            "icon": "material/assignment_returned",
+            "text": "Asignación de razones"
+          },
+          "path": "Page/Embedded/Title_Large"
+        },
+        "type": "ia.display.view"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Area"
+                    },
+                    "position": {
+                      "basis": "4%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Area:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": ""
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Enterprise"
+                    },
+                    "position": {
+                      "basis": "13vw",
+                      "display": false
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "parameters": {
+                              "database": "{/root.custom.dbConnection}"
+                            },
+                            "polling": {
+                              "enabled": true,
+                              "rate": "15"
+                            },
+                            "queryPath": "ALL/getEnterpriseNamesDropdown"
+                          },
+                          "type": "query"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font Dropdown/Tall"
+                      },
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione empresa..."
+                      },
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 1
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": "4 - Empaque Maiz"
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\n\t\t#Limpiar dropdowns\n\t\n\t#lineas\n\tself.getSibling(\"Dropdown Line\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Line\").custom.selectedLabel \u003d None\n\t\n\t#equipos\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d None\n\t\n\t#funciones\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason Function\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason Function\").custom.selectedLabel \u003d None\n\t\n\t#Tipos\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Type\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Type\").custom.selectedLabel \u003d None\n\t\n\t#razones\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").custom.selectedLabel \u003d None\n\t\n\tsystem.perspective.sendMessage(\u0027updateMicroEvents\u0027)\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)\n\t\n\tareaValue \u003d self.props.value\t\n\tlineCode \u003d None\n\tlineValue \u003d None\n\tlineLabel \u003d None\n\tequipmentValue \u003d None\n\tequipmentLabel \u003d None\n\t\n\tif areaValue \u003d\u003d 1:\n\t\tlineCode \u003d \u0027111\u0027\n\t\tlineLabel \u003d \u0027Molino A\u0027\n\t\tlineValue \u003d 2\n\t\t\n\telif areaValue \u003d\u003d 3:\n\t\tlineCode \u003d \u0027321\u0027\n\t\tlineValue \u003d 6\n\t\tlineLabel \u003d \u0027Empaque A\u0027\n\t\tequipmentValue \u003d 6\n\t\tequipmentLabel \u003d \u002732000 - General\u0027\n\t\t\n\telif areaValue \u003d\u003d 4:\n\t\tlineCode \u003d \u0027421\u0027\n\t\tlineValue \u003d 9\n\t\tlineLabel \u003d \u0027Empaque A\u0027\n\t\tequipmentValue \u003d 14\n\t\tequipmentLabel \u003d \u002742000 - General\u0027\t\t\n\t\t\n\tself.getSibling(\"Dropdown Line\").custom.selectedCode \u003d lineCode\n\tself.getSibling(\"Dropdown Line\").props.value \u003d lineValue\n\tself.getSibling(\"Dropdown Line\").custom.selectedLabel \u003d lineLabel\n\tself.getSibling(\"Dropdown Equipment\").props.value \u003d equipmentValue\n\tself.getSibling(\"Dropdown Equipment\").custom.selectedLabel \u003d equipmentLabel\n\t\n\t\n\t\n\t\n\t"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Area"
+                    },
+                    "position": {
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "position.basis": {
+                        "binding": {
+                          "config": {
+                            "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                          },
+                          "type": "expr"
+                        }
+                      },
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "parameters": {
+                              "database": "{/root.custom.dbConnection}",
+                              "siteId": "{../Dropdown Site.props.value}"
+                            },
+                            "polling": {
+                              "enabled": true,
+                              "rate": "15"
+                            },
+                            "queryPath": "ALL/getAreasFromSiteDropdown"
+                          },
+                          "type": "query"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione area..."
+                      },
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 1
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Site"
+                    },
+                    "position": {
+                      "basis": "3vw",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Site:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Enterprise"
+                    },
+                    "position": {
+                      "basis": "3vw",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Empresa:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": ""
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, \"name\")\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Site"
+                    },
+                    "position": {
+                      "basis": "13vw",
+                      "display": false
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "parameters": {
+                              "database": "{/root.custom.dbConnection}",
+                              "enterpriseId": "{../Dropdown Enterprise.props.value}"
+                            },
+                            "polling": {
+                              "enabled": true,
+                              "rate": "15"
+                            },
+                            "queryPath": "ALL/getSiteFromEnterpriseDropdown"
+                          },
+                          "type": "query"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font Dropdown/Tall"
+                      },
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione sitio..."
+                      },
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 1
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Equipment"
+                    },
+                    "position": {
+                      "basis": "4%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "meta.visible": {
+                        "binding": {
+                          "config": {
+                            "expression": "if({../Dropdown Area.props.value} \u003d 1, True, False)"
+                          },
+                          "type": "expr"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "if({../Dropdown Area.props.value} \u003d 1, True, False)"
+                          },
+                          "enabled": false,
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Equipo:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": "42000 - General"
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\t\n\t#Limpiar dropdowns\n\t#funciones\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason Function\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason Function\").custom.selectedLabel \u003d None\n\t\n\t#Tipos\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Type\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Type\").custom.selectedLabel \u003d None\n\t\n\t#razones\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").props.value \u003d 0\n\tself.parent.parent.getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").custom.selectedLabel \u003d None\n\t\n\tsystem.perspective.sendMessage(\u0027updateMicroEvents\u0027)\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)\n"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Equipment"
+                    },
+                    "position": {
+                      "basis": "16%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "meta.visible": {
+                        "binding": {
+                          "config": {
+                            "expression": "if({../Dropdown Area.props.value} \u003d 1, True, False)"
+                          },
+                          "type": "expr"
+                        }
+                      },
+                      "position.display": {
+                        "binding": {
+                          "config": {
+                            "expression": "if({../Dropdown Area.props.value} \u003d 1, True, False)"
+                          },
+                          "enabled": false,
+                          "type": "expr"
+                        }
+                      },
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "parameters": {
+                              "database": "{/root.custom.dbConnection}",
+                              "lineId": "{/root.custom.lineId}"
+                            },
+                            "polling": {
+                              "enabled": true,
+                              "rate": "30"
+                            },
+                            "queryPath": "ALL/getEquipmentFromLineRelationDropdown"
+                          },
+                          "type": "query"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione equipo..."
+                      },
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 1
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "Refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.options\")",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "display": false,
+                      "grow": 1
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Shift"
+                    },
+                    "position": {
+                      "basis": "50%"
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "expression": "\u0027TURNO \u0027 + \r\n\r\n{/root.custom.shift}\r\n\t \t\t\r\n + \u0027. \u0027 +\r\n\u0027Razones desde: \u0027 +\r\ntoStr(dateFormat({/root.custom.shiftStarDateTime}, \"yyyy-MM-dd HH:mm\"))\r\n\r\n//dateFormat("
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "text-titles"
+                      },
+                      "textStyle": {
+                        "paddingLeft": 20,
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_line_Equipment_Date"
+                },
+                "position": {
+                  "basis": "40px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "10px",
+                  "shrink": 0
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Part"
+                    },
+                    "position": {
+                      "basis": "4%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Función:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": null
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\n\t#Limpiar dropdowns\n\t#razones\n\tself.getSibling(\"Dropdown Reason\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Reason\").custom.selectedLabel \u003d None\n\t#tipos\n\tself.getSibling(\"Dropdown Type\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Type\").custom.selectedLabel \u003d None\n\t\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Reason Function"
+                    },
+                    "position": {
+                      "basis": "20%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "parameters": {
+                              "database": "{/root.custom.dbConnection}",
+                              "equipmentId": "{/root.custom.equipmentId}"
+                            },
+                            "polling": {
+                              "enabled": true,
+                              "rate": "30"
+                            },
+                            "queryPath": "ALL/getPartsDropdownRelation"
+                          },
+                          "type": "query"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione función..."
+                      },
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontSize": "",
+                        "textAlign": "center"
+                      },
+                      "value": 0
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.options\")\n\t# implement your handler here",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Type"
+                    },
+                    "position": {
+                      "basis": "4%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Tipo:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": null
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n\t\n\t#Limpiar dropdowns\n\t#tipos\n\n\tself.getSibling(\"Dropdown Reason\").props.value \u003d 0\n\tself.getSibling(\"Dropdown Reason\").custom.selectedLabel \u003d None\n\t\n\tsystem.perspective.sendMessage(\u0027refresh\u0027)\n"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Type"
+                    },
+                    "position": {
+                      "basis": "20%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "parameters": {
+                              "database": "{/root.custom.dbConnection}",
+                              "equipmentId": "{/root.custom.equipmentId}",
+                              "functionId": "{/root.custom.functionId}",
+                              "lineId": "{/root.custom.lineId}"
+                            },
+                            "polling": {
+                              "enabled": true,
+                              "rate": "30"
+                            },
+                            "queryPath": "ALL/getReasonTypeByPart"
+                          },
+                          "type": "query"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione tipo..."
+                      },
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 0
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "Refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.options\")",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Reason"
+                    },
+                    "position": {
+                      "basis": "4%",
+                      "display": false,
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "Page/themes",
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Razón:  ",
+                      "textStyle": {
+                        "color": "--neutral-60"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": null
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\""
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Reason"
+                    },
+                    "position": {
+                      "basis": "50%",
+                      "display": false,
+                      "grow": 1
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "expression": "{session.props.auth.user.roles[0]}"
+                          },
+                          "enabled": false,
+                          "transforms": [
+                            {
+                              "code": "\n\n\tdbConnection \u003d self.view.getChild(\"root\").custom.dbConnection\n\tlineId \u003d self.view.getChild(\"root\").custom.lineId\n\tequipmentId \u003d self.view.getChild(\"root\").custom.equipmentId\n\tfunctionId \u003d self.view.getChild(\"root\").custom.functionId\n\ttypeId \u003d self.view.getChild(\"root\").custom.typeId\n\t\n\tif value \u003d\u003d \u0027Root\u0027:\n\t\tnamedQueryPath \u003d \"ALL/getReasonsForEquipment\"        \n\t\tqueryParams \u003d {\u0027lineId\u0027: lineId, \u0027equipmentId\u0027: equipmentId, \u0027functionId\u0027: functionId ,\u0027typeId\u0027:typeId , \u0027database\u0027: dbConnection}\n    \n\telif value \u003d\u003d \u0027Administrator\u0027:\n\t\tnamedQueryPath \u003d \"ALL/getReasonsForEquipment\"        \n\t\tqueryParams \u003d {\u0027lineId\u0027: lineId, \u0027equipmentId\u0027: equipmentId, \u0027functionId\u0027: functionId ,\u0027typeId\u0027:typeId, \u0027database\u0027: dbConnection}\n\t\n\telif value \u003d\u003d \u0027Supervisor\u0027:\n\t\tnamedQueryPath \u003d \"ALL/getReasonsForEquipmentSup\"\n\t\tqueryParams \u003d {\u0027lineId\u0027: lineId, \u0027equipmentId\u0027: equipmentId, \u0027functionId\u0027: functionId ,\u0027typeId\u0027:typeId , \u0027database\u0027: dbConnection}\n    \n\telif value \u003d\u003d \u0027Operator\u0027:\n\t\tnamedQueryPath \u003d \"ALL/getReasonsForEquipmentOpr\"            \n\t\tqueryParams \u003d {\u0027lineId\u0027: lineId, \u0027equipmentId\u0027: equipmentId, \u0027functionId\u0027: functionId ,\u0027typeId\u0027:typeId , \u0027database\u0027: dbConnection}\n\t\n\telse:\n\t\tsystem.util.getLogger(\"MyLogger\").error(\"Value did not match any case: \" + str(value))\n\t\n\tdata \u003d system.db.runNamedQuery(namedQueryPath, queryParams)\n    \n\treturn data",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "Dropdown/font"
+                      },
+                      "maxMenuHeight": 1000,
+                      "options": null,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione razón..."
+                      },
+                      "search": {
+                        "matching": "start"
+                      },
+                      "showClearIcon": true,
+                      "style": {
+                        "classes": "Dropdown/border Dropdown/font",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 0
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Linea"
+                    },
+                    "position": {
+                      "basis": "100px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "text": "Línea:",
+                      "textStyle": {
+                        "classes": "text-subtitles"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedCode": "421",
+                      "selectedLabel": "IMM 15"
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tsystem.perspective.sendMessage(\u0027getDownTimeEvents\u0027)\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\"\n"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Line"
+                    },
+                    "position": {
+                      "basis": "14%"
+                    },
+                    "propConfig": {
+                      "position.basis": {
+                        "binding": {
+                          "config": {
+                            "expression": "if({../Dropdown Area.props.value} \u003d 1, \u002714%\u0027, \u002720%\u0027)"
+                          },
+                          "enabled": false,
+                          "type": "expr"
+                        }
+                      },
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dataLine"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "dropdown-downoptions"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione línea..."
+                      },
+                      "style": {
+                        "classes": "dropdown dropdown-text",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 4
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.options\")\n\t# implement your handler here",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Start_Time"
+                    },
+                    "position": {
+                      "basis": "100px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "text": "Desde: ",
+                      "textStyle": {
+                        "classes": "text-subtitles"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tsystem.perspective.sendMessage(\u0027getDownTimeEvents\u0027)"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      },
+                      "system": {
+                        "onStartup": {
+                          "config": {
+                            "script": "\n\t\"\"\"\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day-7)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate\n\t\"\"\"\n\timport time\n\ttime.sleep(1)\n\tself.props.value \u003d self.view.getChild(\"root\").custom.DateTimes.shiftStartTime"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "DateTimeInput_StartTime"
+                    },
+                    "position": {
+                      "basis": "14%",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.maxDate": {
+                        "binding": {
+                          "config": {
+                            "expression": "now(5000)"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, 00, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dismissOnSelect": false,
+                      "format": "YYYY-MM-DD HH:mm:00",
+                      "formattedValue": "2025-10-09 22:00:00",
+                      "inputProps": {
+                        "style": {
+                          "backgroundColor": "#FFFFFF",
+                          "classes": "dateTime",
+                          "color": "#2B2B2B",
+                          "fontSize": 18
+                        }
+                      },
+                      "locale": "es",
+                      "value": {
+                        "$": [
+                          "ts",
+                          192,
+                          1760121161059
+                        ],
+                        "$ts": 1760065200000
+                      }
+                    },
+                    "type": "ia.input.date-time-input"
+                  },
+                  {
+                    "meta": {
+                      "name": "Spacer_0"
+                    },
+                    "position": {
+                      "basis": "10px",
+                      "shrink": 0
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Reason_0"
+                    },
+                    "position": {
+                      "basis": "100px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Razón:  ",
+                      "textStyle": {
+                        "classes": "text-subtitles"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": "Falla"
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\""
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Reason_0"
+                    },
+                    "position": {
+                      "basis": "15%",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dataReason"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "dropdown-downoptions"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione razón..."
+                      },
+                      "search": {
+                        "matching": "start"
+                      },
+                      "showClearIcon": true,
+                      "style": {
+                        "classes": "dropdown dropdown-text",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": null
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.options\")\n\t# implement your handler here",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_Subreason"
+                    },
+                    "position": {
+                      "basis": "130px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "fontSize": "1.5vh",
+                        "textAlign": "right",
+                        "whiteSpace": "pre"
+                      },
+                      "text": "Subrazón:  ",
+                      "textStyle": {
+                        "classes": "text-subtitles"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "selectedLabel": "Falla eléctrica del equipo"
+                    },
+                    "events": {
+                      "component": {
+                        "onActionPerformed": {
+                          "config": {
+                            "script": "\tdata \u003d self.props.options\n\tvalue_found \u003d False\n\tfor row in range(data.getRowCount()):\n\t\tif (data.getValueAt(row, \"id\") \u003d\u003d self.props.value):\n\t\t\tself.custom.selectedLabel \u003d data.getValueAt(row, 1)\n\t\t\tvalue_found \u003d True\n\t\t\tbreak\n\tif not value_found:\n\t\treturn \"Not Selected\""
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown Subreason"
+                    },
+                    "position": {
+                      "basis": "25%",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dataSubreason"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "dropdown-downoptions"
+                      },
+                      "maxMenuHeight": 1000,
+                      "placeholder": {
+                        "icon": {
+                          "path": "material/search",
+                          "style": {
+                            "height": "2vh",
+                            "width": "2vw"
+                          }
+                        },
+                        "text": "Seleccione subrazón..."
+                      },
+                      "search": {
+                        "matching": "start"
+                      },
+                      "showClearIcon": true,
+                      "style": {
+                        "classes": "dropdown dropdown-text",
+                        "fontWeight": "normal",
+                        "textAlign": "center"
+                      },
+                      "value": 9
+                    },
+                    "scripts": {
+                      "customMethods": [],
+                      "extensionFunctions": null,
+                      "messageHandlers": [
+                        {
+                          "messageType": "refresh",
+                          "pageScope": true,
+                          "script": "\tself.refreshBinding(\"props.options\")\n\t# implement your handler here",
+                          "sessionScope": false,
+                          "viewScope": false
+                        }
+                      ]
+                    },
+                    "type": "ia.input.dropdown"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tlogger \u003d system.util.getLogger(\"AssignedReason.Test\")\n\tlogger.info(\"Inicio solicitud de cambio de razon\")\n\t#Razón seleccionada\n\treasonId \u003d self.view.getChild(\"root\").custom.subreasonId\n\tselectedId \u003d self.parent.parent.parent.getChild(\"FlexContainer_table\").getChild(\"Table\").props.selection.selectedRow\n    # Verificar si no se ha seleccionado ningún evento en la tabla\n\tif selectedId \u003d\u003d None:\n\t\talerts.noSelectionTable(function\u003d\u0027una fila para agregar la razon\u0027)\n    #Verificar que una razón haya sido seleccionada\n\telif reasonId \u003d\u003d None:\n\t\talerts.noSelectionOption(function\u003d\u0027una razon para asignar al evento\u0027)\n\t# Verificar si la razón seleccionada es \"Generic unplanned\"\n\t#elif \"Generico\" in self.getSibling(\"Dropdown ReasonForEquipment\").custom.selectedLabel:\n\t#\tAlerts.showAlert(\"info\", \"Mensaje\", \"La razon \u0027Generic unplanned\u0027 no puede ser asignado, por favor seleccione otra opcion.\", \"true\", \"Continue\", \"Cancel\", \"\", \"\", \"\", \"closePopup\", \"closePopup\", \"closePopup\")\n\telse:\n        # Mostrar advertencia y confirmar la actualización de la razón del evento\n\t\talerts.showAlertAndComment(\"warning\", \"Advertencia\", \"Desea actualizar la razon del evento?\", \"false\", \"Accept\", \"Cancel\", \"\", \"\", \"\", \"updateDowntimeEventAndComment\", \"closePopup\", \"closePopup\")\n\tlogger.info(\"Fin solicitud de cambio de razòn\")\n\t"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Button"
+                    },
+                    "position": {
+                      "basis": "9%",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "button-1"
+                      },
+                      "text": "Aceptar",
+                      "textStyle": {
+                        "fontSize": 17
+                      }
+                    },
+                    "type": "ia.input.button"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_function_Type_Reason_Button"
+                },
+                "position": {
+                  "basis": "56px",
+                  "shrink": 0
+                },
+                "props": {
+                  "justify": "space-between",
+                  "style": {
+                    "overflow": "hidden",
+                    "paddingBottom": 8
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "Auto",
+              "shrink": 0
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "margin": 10
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Table"
+                },
+                "position": {
+                  "grow": 1
+                },
+                "propConfig": {
+                  "custom.rowIdSelected": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selection.data[0].ID"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.data": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dataTable"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t# Input\n\t\timport system\n\t\tds \u003d value  # BasicDataset o PyDataSet\n\t\n\t\t# Normaliza PyDataSet -\u003e BasicDataset\n\t\tif \"PyDataSet\" in str(type(ds)):\n\t\t\tds \u003d system.dataset.toDataSet(ds)\n\t\n\t\t# Columnas e índice de \"ID Corrida\"\n\t\tcols \u003d [ds.getColumnName(i) for i in range(ds.getColumnCount())]\n\t\tif \"RunID\" not in cols:\n\t\t\treturn ds\n\t\tidx \u003d cols.index(\"RunID\")\n\t\n\t\t# Reconstruye filas cambiando -1 -\u003e \"NA\" (la columna queda como str)\n\t\trows \u003d []\n\t\tfor r in range(ds.getRowCount()):\n\t\t\trow \u003d []\n\t\t\tfor c in range(len(cols)):\n\t\t\t\tval \u003d ds.getValueAt(r, c)\n\t\t\t\tif c \u003d\u003d idx:\n\t\t\t\t\trow.append(\"NA\" if val \u003d\u003d -1 else (\"\" if val is None else str(val)))\n\t\t\t\telse:\n\t\t\t\t\trow.append(val)\n\t\t\trows.append(row)\n\t\n\t\t# Output\n\t\treturn system.dataset.toDataSet(cols, rows)\n\t\n\texcept:\n\t\timport system\n\t\treturn system.dataset.toDataSet([\"ID Corrida\"], [[\"NA\"]])",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "cells": {
+                    "style": {
+                      "borderBottomWidth": 1,
+                      "fontFamily": "Arial",
+                      "fontSize": 24
+                    }
+                  },
+                  "columns": [
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "ID",
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Evento ID"
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "none",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": false,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 50
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "WorkOrderID",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "ID Orden"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 40
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "ReasonName",
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Razón"
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": false,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 100
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "none",
+                      "editable": false,
+                      "field": "ReasonCode",
+                      "footer": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Código"
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": false,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 30
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "StartDateTime",
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Inicio"
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "date",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": false,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 120
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "YYYY/MM/DD HH:mm:ss",
+                      "editable": false,
+                      "field": "EndDateTime",
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "title": "Fin"
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "date",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 120
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "none",
+                      "editable": false,
+                      "field": "Total in Seconds",
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": "Table/header"
+                        },
+                        "title": "Tiempo (hh:mm:ss)"
+                      },
+                      "justify": "center",
+                      "number": "value",
+                      "numberFormat": "00:00:00",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 80
+                    }
+                  ],
+                  "headerStyle": {
+                    "backgroundColor": "--cla-page-bg",
+                    "fontSize": 20,
+                    "fontWeight": "normal"
+                  },
+                  "pager": {
+                    "activeOption": 50,
+                    "bottom": false,
+                    "initialOption": 50
+                  },
+                  "rows": {
+                    "style": {
+                      "classes": "Table/body",
+                      "fontSize": "20px"
+                    }
+                  },
+                  "selection": {
+                    "style": {
+                      "backgroundColor": "#4A0E704D",
+                      "borderStyle": "none"
+                    }
+                  },
+                  "style": {
+                    "classes": "table"
+                  }
+                },
+                "scripts": {
+                  "customMethods": [],
+                  "extensionFunctions": null,
+                  "messageHandlers": [
+                    {
+                      "messageType": "refreshTablaReason",
+                      "pageScope": true,
+                      "script": "\tlogger \u003d system.util.getLogger(\u0027Table Event\u0027)\n\tlogger.info(\u0027Mensaje recibido\u0027)\n\tnodeID \u003d self.view.getChild(\"root\").custom.nodeId\n\tstartTime \u003d  self.view.getChild(\"root\").custom.shiftStarDateTime\n\tlogger.info(str(startTime))\n\tdbConnection \u003d self.view.custom.dbConnection\n\tself.view.custom.dataTable \u003d mes_core.model.getDownTimeEvents(startTime, nodeID, dbConnection \u003d dbConnection)\n\tlogger.info(\u0027Ejecutado\u0027)",
+                      "sessionScope": true,
+                      "viewScope": true
+                    },
+                    {
+                      "messageType": "commentText",
+                      "pageScope": false,
+                      "script": "\tlogger \u003d system.util.getLogger(\u0027Comment\u0027)\n\t\n\tlogger.info (\u0027El comentario es: {}\u0027.format(payload[\u0027comment\u0027]))\n\t\n\tif payload[\u0027comment\u0027] \u003d\u003d \"\":\n\t\tself.view.getChild(\"root\").custom.commentText \u003d None\n\t\t\n\t\t\n\telse:\n\t\tself.view.getChild(\"root\").custom.commentText \u003d payload[\u0027comment\u0027]\n\t\t",
+                      "sessionScope": true,
+                      "viewScope": false
+                    },
+                    {
+                      "messageType": "updateDowntimeEventAndComment",
+                      "pageScope": false,
+                      "script": "\tdbConnection \u003d self.view.custom.dbConnection\n\treason \u003d mes_core.model.statereasonTable(dbConnection)\n\tresonHistory \u003d mes_core.model.statehistoryTable(dbConnection)\n\tlogger \u003d system.util.getLogger(\"UpdateReason\")\n\tlogger.info(\"inicio de actualizacion de tabla downtime\")\n\t# Obtener la conexión a la base de datos\n\treasonId \u003d self.view.getChild(\"root\").custom.subreasonId\n\teventIdSelected \u003d self.custom.rowIdSelected\n\tlogger.info(str(eventIdSelected))\n\tdescription \u003d payload[\u0027comment\u0027]\n\tlogger.info(\u0027El mensaje es {}\u0027.format(description))\n\t# Seleccionar el ReasonCode y ReasonName\n\tdata1 \u003d reason.selectCustom(columns \u003d [\u0027ReasonName\u0027, \u0027ReasonCode\u0027],where_clause \u003d \u0027ID \u003d ?\u0027,where_args\u003d[reasonId])\n\treasonName \u003d data1.getValueAt(0,0)\n\treasonCode \u003d data1.getValueAt(0,1)\n\t\n\tresonHistory.updateID(eventIdSelected,{\u0027ReasonName\u0027:reasonName,\u0027ReasonCode\u0027:reasonCode,\u0027Note\u0027:description,\u0027StateReasonID\u0027:reasonId})\n\n\t\t\n\t# Enviar un mensaje para refrescar los datos en la tabla\n\tsystem.perspective.sendMessage(\u0027getDownTimeEvents\u0027)\n\tself.parent.parent.getChild(\"FlexContainer\").getChild(\"FlexContainer_function_Type_Reason_Button\").getChild(\"Dropdown Reason\").props.value \u003d None\n\t\n\t# Restablecer la selección en la tabla\n\tself.props.selection.selectedRow \u003d -1\n\tself.props.selection.selectedColumn \u003d -1\n\t\n\t# Registrar un mensaje de éxito en el log de gateway\n\t\n\tlogger.info(\"Razon cambiada con exito\")",
+                      "sessionScope": true,
+                      "viewScope": false
+                    },
+                    {
+                      "messageType": "updateMicroEvents",
+                      "pageScope": true,
+                      "script": "\tlogger \u003d system.util.getLogger(\u0027Microevento\u0027)\n\tlogger.info(\u0027Mensaje Recibido\u0027)\n\tdataset \u003d self.view.custom.dataTable\n\tdbConnection \u003d self.view.custom.dbConnection\n\tnodeId \u003d self.view.getChild(\"root\").custom.nodeId\n\ttableStateHistory \u003d mes_core.model.statehistoryTable(dbConnection)\n\ttableReason \u003d mes_core.model.statereasonTable(dbConnection)\n\treason \u003d tableReason.selectCustom(columns \u003d [\u0027ID\u0027,\u0027ReasonName\u0027,\u0027ReasonCode\u0027], where_clause \u003d \u0027ReasonName \u003d ?\u0027, where_args \u003d [\u0027Microevento\u0027])\n\treasonName \u003d reason.getValueAt(0,\u0027ReasonName\u0027)\n\treasonCode \u003d reason.getValueAt(0,\u0027ReasonCode\u0027)\n\treasonID \u003d reason.getValueAt(0,\u0027ID\u0027)\n\t\n\t# Recorremos el dataset fila por fila\n\tif dataset.getRowCount() \u003e 0:\n\t\tfor row in range(dataset.getRowCount()):\n\t\t\tid_val \u003d dataset.getValueAt(row, \"ID\")\n\t\n\t\t\tsegundos \u003d dataset.getValueAt(row, \"Total in Seconds\")\n\t\t\tlogger.info (\u0027Evento ID {}, duracion {}, fecha fin {}\u0027.format(id_val,segundos,dataset.getValueAt(row, \"EndDateTime\")))\n\t\t\t\n\t\t\ttry:\n\t\t\t\tif int(segundos) \u003c\u003d 300 and dataset.getValueAt(row, \"EndDateTime\") is not None:\n\t\t\t\t\tlogger.info(\u0027Entra\u0027)\n\t\t\t\t\ttableStateHistory.updateID(id_val,{\u0027ReasonName\u0027: reasonName,\u0027ReasonCode\u0027:reasonCode,\u0027Note\u0027:\u0027Microevento\u0027,\u0027StateReasonID\u0027:reasonID})\n\t\t\t\t\tlogger.info(\u0027Mensaje Ejecutado\u0027)\n\t\t\t\t\tsystem.perspective.sendMessage(\u0027refreshTablaReason\u0027)\n\t\t\t\telse:\n\t\t\t\t\tlogger.info(\u0027Mensaje No Ejecutado\u0027)\n\t\t\texcept Exception as e:\n\t\t\t\tlogger.info(\u0027Error ejecutando el Script {}\u0027.format(e))\t\t\t\t\n\n\t\tsystem.perspective.sendMessage(\u0027refresh\u0027)",
+                      "sessionScope": true,
+                      "viewScope": true
+                    },
+                    {
+                      "messageType": "getDownTimeEvents",
+                      "pageScope": true,
+                      "script": "\tlogger \u003d system.util.getLogger(\u0027Table Event\u0027)\n\tlogger.info(\u0027Mensaje recibido\u0027)\n\tnodeID \u003d self.view.getChild(\"root\").custom.nodeId\n\tstartTime \u003d  self.view.getChild(\"root\").custom.shiftStarDateTime\n\tlogger.info(str(startTime))\n\tdbConnection \u003d self.view.custom.dbConnection\n\tself.view.custom.dataTable \u003d mes_core.model.getDownTimeEvents(startTime, nodeID, dbConnection \u003d dbConnection)\n\tlogger.info(\u0027Ejecutado\u0027)\n\tsystem.perspective.sendMessage(\u0027updateMicroEvents\u0027)",
+                      "sessionScope": true,
+                      "viewScope": true
+                    }
+                  ]
+                },
+                "type": "ia.display.table"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_table"
+            },
+            "position": {
+              "grow": 1
+            },
+            "props": {
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "marginBottom": 10,
+                "marginLeft": 10,
+                "marginRight": 10,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_reasonsAssignment"
+        },
+        "position": {
+          "basis": "200px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "--cla-page-bg"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "custom": {
+      "DateTimes": {},
+      "commentText": null,
+      "dataLine": {
+        "$": [
+          "ds",
+          192,
+          1760121297012
+        ],
+        "$columns": [
+          {
+            "data": [
+              4
+            ],
+            "name": "ID",
+            "type": "Integer"
+          },
+          {
+            "data": [
+              "IMM 15"
+            ],
+            "name": "Name",
+            "type": "String"
+          }
+        ]
+      },
+      "dbConnection": "mes_core",
+      "reasonDescription": "Genérica",
+      "shiftStarDateTimeDefault": {
+        "$": [
+          "ts",
+          192,
+          1759857006006
+        ],
+        "$ts": 1759143600000
+      }
+    },
+    "meta": {
+      "name": "root"
+    },
+    "propConfig": {
+      "custom.DateTimes.shiftStartTime": {
+        "binding": {
+          "config": {
+            "expression": "if( {this.custom.shift} \u003d \u0027A\u0027,\r\n\r\n\tif( dateExtract({this.custom.actualDateTime}, \u0027hour\u0027) \u003e\u003d 22 \u0026\u0026 dateExtract({this.custom.actualDateTime}, \u0027hour\u0027) \u003c\u003d 23,\r\n\t\ttoDate(\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 22:00:00\u0027\r\n\t\t\t),\r\n\t\t\t\r\n\t\tdateArithmetic(\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 22:00:00\u0027,\r\n\t\t\t-1, \u0027day\u0027\r\n\t\t\t)\r\n\t\t),\r\n\t\t\t\r\n\tif( {this.custom.shift} \u003d \u0027B\u0027,\r\n\t\ttoDate(\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 06:00:00\u0027\r\n\t\t\t),\r\n\t\t\r\n\t\tif( {this.custom.shift} \u003d \u0027C\u0027,\r\n\t\t\ttoDate(\r\n\t\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 14:00:00\u0027\r\n\t\t\t\t),\r\n\t\t\t\u0027none\u0027\r\n\t\t\t)\r\n\t\t)\r\n\t)"
+          },
+          "type": "expr"
+        }
+      },
+      "custom.DateTimes.weekStartTime": {
+        "binding": {
+          "config": {
+            "expression": "{this.custom.DateTimes.shiftStartTime}"
+          },
+          "transforms": [
+            {
+              "code": "\t\n\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day - 7)\n\tdatetime \u003d system.date.setTime(date, Hour, 00, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\t\n\t\n\treturn value",
+              "type": "script"
+            }
+          ],
+          "type": "expr"
+        }
+      },
+      "custom.actualDateTime": {
+        "binding": {
+          "config": {
+            "expression": "{[System]Gateway/CurrentDateTime}\r\n\r\n//\u00272021-12-30 16:21:19\u0027"
+          },
+          "type": "expr"
+        }
+      },
+      "custom.dbConnection": {
+        "binding": {
+          "config": {
+            "path": "session.custom.dbConnection"
+          },
+          "enabled": false,
+          "type": "property"
+        }
+      },
+      "custom.nodeId": {
+        "binding": {
+          "config": {
+            "bidirectional": true,
+            "path": "./FlexContainer_reasonsAssignment/FlexContainer/FlexContainer_function_Type_Reason_Button/Dropdown Line.props.value"
+          },
+          "type": "property"
+        }
+      },
+      "custom.shift": {
+        "binding": {
+          "config": {
+            "expression": "if(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 22 || dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 6,\r\n\t\u0027C\u0027, \r\n\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 6 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 14,\r\n\t\t\t\u0027A\u0027, \r\n\t\t\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 14 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 22, \r\n\t\t\t\t\t\u0027B\u0027, \r\n\t\t\t\t\t\u0027none\u0027\r\n\t\t\t\t\t)\r\n\t\t\t)\r\n\t)"
+          },
+          "type": "expr"
+        }
+      },
+      "custom.shiftStarDateTime": {
+        "binding": {
+          "config": {
+            "path": "./FlexContainer_reasonsAssignment/FlexContainer/FlexContainer_function_Type_Reason_Button/DateTimeInput_StartTime.props.value"
+          },
+          "type": "property"
+        },
+        "onChange": {
+          "enabled": null,
+          "script": "\tsystem.perspective.sendMessage(\u0027getDownTimeEvents\u0027)"
+        }
+      },
+      "custom.shiftStarDateTimeDefault": {
+        "binding": {
+          "config": {
+            "expression": "if( {this.custom.shift} \u003d \u0027C\u0027,\r\n\r\n\tif( dateExtract({this.custom.actualDateTime}, \u0027hour\u0027) \u003e\u003d 22 \u0026\u0026 dateExtract({this.custom.actualDateTime}, \u0027hour\u0027) \u003c\u003d 23,\r\n\t\ttoDate(\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 22:00:00\u0027\r\n\t\t\t),\r\n\t\t\t\r\n\t\tdateArithmetic(\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 22:00:00\u0027,\r\n\t\t\t-1, \u0027day\u0027\r\n\t\t\t)\r\n\t\t),\r\n\t\t\t\r\n\tif( {this.custom.shift} \u003d \u0027A\u0027,\r\n\t\ttoDate(\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 06:00:00\u0027\r\n\t\t\t),\r\n\t\t\r\n\t\tif( {this.custom.shift} \u003d \u0027B\u0027,\r\n\t\t\ttoDate(\r\n\t\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027year\u0027)) + \u0027-\u0027 +\r\n\t\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027month\u0027) + 1) + \u0027-\u0027 + \r\n\t\t\t\ttoStr(dateExtract({this.custom.actualDateTime}, \u0027day\u0027)) + \u0027 14:00:00\u0027\r\n\t\t\t\t),\r\n\t\t\t\u0027none\u0027\r\n\t\t\t)\r\n\t\t)\r\n\t)"
+          },
+          "enabled": false,
+          "transforms": [
+            {
+              "code": "\t\n\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day - 8)\n\tdatetime \u003d system.date.setTime(date, Hour, 00, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\t\n\t\n\treturn value",
+              "type": "script"
+            }
+          ],
+          "type": "expr"
+        }
+      },
+      "custom.subreasonId": {
+        "binding": {
+          "config": {
+            "bidirectional": true,
+            "path": "./FlexContainer_reasonsAssignment/FlexContainer/FlexContainer_function_Type_Reason_Button/Dropdown Subreason.props.value"
+          },
+          "type": "property"
+        }
+      }
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "backgroundColor": "--cla-page-bg",
+        "overflow": "hidden"
+      }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "refreshDropdown",
+          "pageScope": true,
+          "script": "\t#implement your handler here\n\tdbConnection \u003d self.view.custom.dbConnection\n\tnode \u003d mes_core.model.nodeTable(dbConnection)\n\tself.custom.dataLine \u003d node.selectCustom(columns \u003d[\u0027ID\u0027,\u0027Name\u0027], where_clause \u003d \u0027Type \u003d ? order by ID ASC\u0027, where_args \u003d [\u0027LINE\u0027] )\n\treason \u003d mes_core.model.statereasonTable(dbConnection)\n\t\n\trole \u003d self.session.custom.adminPermissions\t\n\treasonSel \u003d self.view.custom.reasonSel\n\t\n\tif role:\n\t\tself.view.custom.dataReason \u003d reason.selectCustom(columns \u003d[\u0027ID\u0027,\u0027ReasonName\u0027] , where_clause\u003d \u0027SubReasonOf \u003d -1 order by ReasonCode asc\u0027, where_args \u003d [])\t\t\n\t\tself.view.custom.dataSubreason \u003d reason.selectCustom(columns \u003d[\u0027ID\u0027,\u0027ReasonName\u0027] , where_clause\u003d \u0027ReasonCode not in (?,?,?) AND SubReasonOf \u003d ? order by ReasonCode asc\u0027, where_args \u003d [1,3,10000,reasonSel ])\n\telse:\n\t\tself.view.custom.dataReason \u003d reason.selectCustom(columns \u003d[\u0027ID\u0027,\u0027ReasonName\u0027] , where_clause\u003d \u0027SubReasonOf \u003d -1 AND OperatorSelectable \u003d 1 order by ReasonCode asc\u0027, where_args \u003d [])\n\t\tself.view.custom.dataSubreason \u003d reason.selectCustom(columns \u003d[\u0027ID\u0027,\u0027ReasonName\u0027] , where_clause\u003d \u0027ReasonCode not in (?,?,?) AND OperatorSelectable \u003d 1 AND SubReasonOf \u003d ? order by ReasonCode asc\u0027, where_args \u003d [1,3,10000,reasonSel])",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}
