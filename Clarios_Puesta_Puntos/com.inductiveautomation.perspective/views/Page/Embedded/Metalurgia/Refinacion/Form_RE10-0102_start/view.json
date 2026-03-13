@@ -5,7 +5,7 @@
     "fontSize": 17,
     "insights": "",
     "path": "[UNS]Clarios/Andina/Smelter/Refinacion/UI/RE10_0102",
-    "refreshSecond": 53,
+    "refreshSecond": 48,
     "registerTypeID": 7,
     "supervisorOption": [
       "supervisor"
@@ -851,6 +851,20 @@
         "config": {
           "path": "/root/FlexContainer1.custom.answers"
         },
+        "type": "property"
+      }
+    },
+    "custom.answers.formato": {
+      "binding": {
+        "config": {
+          "path": "/root/FlexContainer1.custom.answers"
+        },
+        "transforms": [
+          {
+            "code": "\t\n\t\tsupervisorAnswer \u003d self.getChild(\"root\").getChild(\"FlexContainerSupervisor\").custom.answers.items[0]\n\t\t#return supervisorAnswer\n\t\tsupervisorAnswer \u003d dict(supervisorAnswer)\n\t\tvalue[\"items\"].append(supervisorAnswer)\n\t\t\n\t\t\n\t\treturn value",
+            "type": "script"
+          }
+        ],
         "type": "property"
       }
     },
@@ -5587,6 +5601,25 @@
           "basis": "32px",
           "shrink": 0
         },
+        "propConfig": {
+          "custom.answers": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "key": "{./Dropdown.props.value}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
         "type": "ia.container.flex"
       },
       {
@@ -5730,6 +5763,19 @@
         "marginLeft": 10,
         "paddingLeft": 10
       }
+    },
+    "scripts": {
+      "customMethods": [],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\t\"\"\"\n\tSave form data to database including supervisor selection.\n\t\n\tCollects answers from all FlexContainerGroups and appends supervisor\n\tanswer from FlexContainerSupervisor into the same JSON before INSERT.\n\t\n\tArgs:\n\t\tself (Component): Reference to root component\n\t\tpayload (dict): Message payload (unused)\n\t\n\tReturns:\n\t\tNone: Performs database INSERT and sends UI refresh messages\n\t\"\"\"\n\t\n\tfrom java.lang import String\n\t\n\tlogger \u003d system.util.getLogger(\"clarios/puestaPuntos/saveDataRoot\")\n\t\n\ttry:\n\t\t# ---- Context ----\n\t\tpapoID \u003d self.view.params.papoID\n\t\tuser \u003d self.session.props.auth.user.userName\n\t\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\t\tworkstationID \u003d self.view.params.workstationID\n\t\tnodeID \u003d self.view.params.nodeID\n\t\tstatus \u003d \"En proceso\"\n\t\tnow \u003d system.date.now()\n\t\t\n\t\tflexGroupCount \u003d int(self.custom.flexGroupCount)\n\t\t\n\t\t# ---- Get last RegisterCode ----\n\t\tqueryLastCode \u003d \"\"\"\n\t\t\tSELECT TOP 1 RegisterCode\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\t\tORDER BY ID DESC\n\t\t\"\"\"\n\t\trs \u003d system.db.runPrepQuery(queryLastCode, [workstationNodeID, papoID], \"papo_db\")\n\t\tlastCode \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\t\tregCode \u003d int(lastCode)\n\t\t\n\t\t# ---- Insert template ----\n\t\tinsertSql \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\t\"\"\"\n\t\t\n\t\tdef _inferRegisterType(answersObj):\n\t\t\t\"\"\"Extract registerTypeID from first item in answers.\"\"\"\n\t\t\titems \u003d answersObj.get(\"items\", []) if answersObj else []\n\t\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\t\treturn 7\n\t\t\n\t\t# ---- Get supervisor answer from FlexContainerSupervisor ----\n\t\tsupervisorContainer \u003d self.getChild(\"FlexContainerSupervisor\")\n\t\tsupervisorItem \u003d None\n\t\t\n\t\tif supervisorContainer is not None:\n\t\t\tsupervisorAnswers \u003d getattr(supervisorContainer.custom, \"answers\", None)\n\t\t\tif supervisorAnswers is not None:\n\t\t\t\tsupervisorItems \u003d supervisorAnswers.get(\"items\", [])\n\t\t\t\tif supervisorItems:\n\t\t\t\t\tsupervisorItem \u003d dict(supervisorItems[0])\n\t\t\t\t\tlogger.debug(\"Supervisor item captured: \" + str(supervisorItem))\n\t\telse:\n\t\t\tlogger.warn(\"FlexContainerSupervisor not found\")\n\t\t\n\t\t# ---- Process each FlexContainerGroup ----\n\t\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\t\t\t\n\t\t\t# Collect answers from this group\n\t\t\tanswersObj \u003d self.answerRecopile(flexGroup)\n\t\t\tlogger.debug(\"Raw answers group {}: {}\".format(groupIndex, answersObj))\n\t\t\t\n\t\t\t# Skip if empty\n\t\t\titems \u003d answersObj.get(\"items\", []) if answersObj else []\n\t\t\tif not items:\n\t\t\t\tcontinue\n\t\t\t\n\t\t\t# ---- Append supervisor to first group ----\n\t\t\tif groupIndex \u003d\u003d 1 and supervisorItem is not None:\n\t\t\t\tanswersObj[\"items\"].append(supervisorItem)\n\t\t\t\tlogger.info(\"Supervisor appended to FlexContainerGroup1\")\n\t\t\t\n\t\t\tregisterTypeID \u003d _inferRegisterType(answersObj)\n\t\t\tdataAnswerStr \u003d String(system.util.jsonEncode(answersObj))\n\t\t\t\n\t\t\tlogger.debug(\"Encoded JSON group {}: {}\".format(groupIndex, dataAnswerStr))\n\t\t\t\n\t\t\tparams \u003d [\n\t\t\t\tnow,\n\t\t\t\tdataAnswerStr,\n\t\t\t\tstatus,\n\t\t\t\tpapoID,\n\t\t\t\tregisterTypeID,\n\t\t\t\tuser,\n\t\t\t\tworkstationNodeID,\n\t\t\t\tnodeID,\n\t\t\t\tworkstationID,\n\t\t\t\tregCode\n\t\t\t]\n\t\t\tsystem.db.runPrepUpdate(insertSql, params, \"papo_db\")\n\t\t\tlogger.info(\"Record saved - PapoID: {} RegisterCode: {}\".format(papoID, regCode))\n\t\t\n\t\t# ---- UI refresh ----\n\t\tsystem.perspective.sendMessage(\"refreshTable\", {\"estado\": True}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"closeEmbeded\", {\"estado\": False}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPeriodic\", {\"min\": 0}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")\n\t\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error saving form data: \" + str(e))",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }

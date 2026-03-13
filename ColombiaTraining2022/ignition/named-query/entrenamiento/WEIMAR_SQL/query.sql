@@ -1,5 +1,0 @@
-SELECT TOP(CUALQUIER_NOMBRE )
- t_stamp  AS [FECHA],
-  Temp_Real [temperatura]
-FROM WEIMAR_SQL
-ORDER BY T_STAMP DESC

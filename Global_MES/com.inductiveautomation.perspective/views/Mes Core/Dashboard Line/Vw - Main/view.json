@@ -1,61 +1,68 @@
 {
   "custom": {
+    "dbConnection": "mes_core",
     "db_reasons": {
       "$": [
         "ds",
         192,
-        1765517163968
+        1773205651862
       ],
       "$columns": [
         {
           "data": [
-            8,
-            8,
-            8
+            4,
+            4,
+            4,
+            4
           ],
           "name": "itemId",
           "type": "Integer"
         },
         {
           "data": [
-            60032,
-            60432,
-            60034
+            32709,
+            86684,
+            88218,
+            88219
           ],
           "name": "ID",
           "type": "Integer"
         },
         {
           "data": [
-            1765491835000,
-            1765504508000,
-            1765491857000
+            1773176851841,
+            1773176851841,
+            1773176851841,
+            1773187237000
           ],
           "name": "startDate",
           "type": "Date"
         },
         {
           "data": [
-            1765491857000,
-            1765517158438,
-            1765504508000
+            1773205648240,
+            1773205648240,
+            1773187237000,
+            1773205648240
           ],
           "name": "endDate",
           "type": "Date"
         },
         {
           "data": [
+            "Falta de Materia Prima externa",
             "Produciendo",
-            "Produciendo",
-            "No produciendo"
+            "No produciendo",
+            "Otro"
           ],
           "name": "label",
           "type": "String"
         },
         {
           "data": [
+            "#FF8A8A",
             "#8AFF8A",
-            "#8AFF8A",
+            "#FF8A8A",
             "#FF8A8A"
           ],
           "name": "color",
@@ -63,6 +70,7 @@
         },
         {
           "data": [
+            0.5,
             0.5,
             0.5,
             0.5
@@ -76,9 +84,9 @@
       "$": [
         "ts",
         192,
-        1765517158438
+        1773205648240
       ],
-      "$ts": 1765517158438
+      "$ts": 1773205648240
     },
     "endDateTime": {
       "$": [
@@ -102,25 +110,25 @@
           "path": "",
           "style": {}
         },
-        "id": 8,
-        "label": "IMM 3",
+        "id": 4,
+        "label": "IMM 15",
         "rowStyle": {
           "classes": ""
         }
       }
     ],
-    "nodeID": 8,
+    "nodeID": 4,
     "oee": {
       "actualRun": {}
     },
-    "path": "Clarios/Pacifico/Cubiertas/IMM 3",
+    "path": "Clarios/Pacifico/Cubiertas/IMM 15",
     "startDate": {
       "$": [
         "ts",
         192,
-        1765517163961
+        1773205651841
       ],
-      "$ts": 1765488363961
+      "$ts": 1773176851841
     },
     "startDateTime": {
       "$": [
@@ -153,9 +161,18 @@
     }
   },
   "params": {
-    "nodeID": 8
+    "nodeID": 4
   },
   "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
     "custom.db_reasons": {
       "binding": {
         "config": {
@@ -169,7 +186,7 @@
         },
         "transforms": [
           {
-            "code": "\ttry:\n\t\t\"\"\"\n\t\tReturn statehistory events that overlap a given range, clipped to that range.\n\t\n\t\tColor:\n\t\t  - \u0027#6ABCE2\u0027 if ReasonCode \u003d 1001 (highest priority).\n\t\t  - \u0027#FF8A8A\u0027 if RecordDowntime \u003d 1 in statereason.\n\t\t  - \u0027#FFFF8A\u0027 if PlannedDowntime \u003d 1 (and RecordDowntime !\u003d 1).\n\t\t  - \u0027#8AFF8A\u0027 if both \u003d 0.\n\t\n\t\tInputs:\n\t\t\tvalue[\"dbConnection\"] (str)\n\t\t\tvalue[\"startDateTime\"] (datetime)\n\t\t\tvalue[\"endDateTime\"] (datetime)\n\t\t\tvalue[\"nodeID\"] (int or str)\n\t\n\t\tReturns:\n\t\t\tDataset: [itemId, ID, startDate, endDate, label, color, opacity]\n\t\t\"\"\"\n\t\t# Initialization of variables\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tstartDateTime \u003d value[\"startDateTime\"]\n\t\tendDateTime \u003d value[\"endDateTime\"]\n\t\tnodeID \u003d value[\"nodeID\"]\n\t\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\t\n\t\tcolumns \u003d [\n\t\t\t\"NodeID AS itemId\",\n\t\t\t\"ID\",\n\t\t\t# start clipped to range start\n\t\t\t\"CASE WHEN StartDateTime \u003c ? THEN ? ELSE StartDateTime END AS startDate\",\n\t\t\t# end clipped to range end (considering open-ended)\n\t\t\t(\n\t\t\t\t\"CASE WHEN COALESCE(EndDateTime, GETDATE()) \u003e ? THEN ? \"\n\t\t\t\t\"ELSE COALESCE(EndDateTime, GETDATE()) END AS endDate\"\n\t\t\t),\n\t\t\t\"ReasonName AS label\",\n\t\t\t# color: priority 1001 \u003e RecordDowntime \u003e PlannedDowntime \u003e green\n\t\t\t(\n\t\t\t\t\"CASE \"\n\t\t\t\t\" WHEN ReasonCode \u003d 1001 THEN \u0027#6ABCE2\u0027 \"\n\t\t\t\t\" WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"               WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"                 AND sr.RecordDowntime \u003d 1) THEN \u0027#FF8A8A\u0027 \"\n\t\t\t\t\" WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"               WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"                 AND sr.PlannedDowntime \u003d 1) THEN \u0027#FFFF8A\u0027 \"\n\t\t\t\t\" ELSE \u0027#8AFF8A\u0027 \"\n\t\t\t\t\"END AS color\"\n\t\t\t),\n\t\t\t\"0.5 AS opacity\"\n\t\t]\n\t\n\t\t# Overlap: [Start, End] with [startDateTime, endDateTime]\n\t\twhere_clause \u003d (\n\t\t\t\"StartDateTime \u003c ? \"\n\t\t\t\"AND COALESCE(EndDateTime, GETDATE()) \u003e ? \"\n\t\t\t\"AND NodeID \u003d ?\"\n\t\t)\n\t\n\t\t# Parameter order:\n\t\t# 1-2: CASE startDate\n\t\t# 3-4: CASE endDate\n\t\t# 5-6: WHERE overlap\n\t\t# 7: NodeID filter\n\t\twhere_args \u003d [\n\t\t\tstartDateTime, startDateTime,\n\t\t\tendDateTime,   endDateTime,\n\t\t\tendDateTime,   startDateTime,\n\t\t\tnodeID\n\t\t]\n\t\n\t\tds \u003d stateHistoryTable.selectCustom(columns\u003dcolumns, where_clause\u003dwhere_clause, where_args\u003dwhere_args)\n\t\treturn ds\n\t\n\texcept:\n\t\timport system\n\t\treturn system.dataset.toDataSet([\u0027itemId\u0027,\u0027ID\u0027,\u0027startDate\u0027,\u0027endDate\u0027,\u0027label\u0027,\u0027color\u0027,\u0027opacity\u0027], [])",
+            "code": "\t\"\"\"\n\tReturn statehistory events that overlap a given range, clipped to that range.\n\t\n\tColor logic:\n\t  - \u0027#6ABCE2\u0027 if ReasonCode \u003d 1001 (highest priority)\n\t  - \u0027#FF8A8A\u0027 if RecordDowntime \u003d 1 in statereason\n\t  - \u0027#FFFF8A\u0027 if PlannedDowntime \u003d 1 (and RecordDowntime !\u003d 1)\n\t  - \u0027#8AFF8A\u0027 if both \u003d 0\n\t\n\tArgs:\n\t\tvalue (dict): Contains dbConnection, startDateTime, endDateTime, nodeID\n\t\n\tReturns:\n\t\tDataset: [itemId, ID, startDate, endDate, label, color, opacity]\n\t\tEmpty dataset on error\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"dautom.mescore.dashboardLine.views.main.dbReasons\")\n\t\n\ttry:\n\t\t# Initialize variables\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tstartDateTime \u003d value[\"startDateTime\"]\n\t\tendDateTime \u003d value[\"endDateTime\"]\n\t\tnodeID \u003d value[\"nodeID\"]\n\t\tstateHistoryTable \u003d mes_core.model.statehistoryTable(db)\n\t\t\n\t\t# Define columns with clipped dates and color logic\n\t\tcolumns \u003d [\n\t\t\t\"NodeID AS itemId\",\n\t\t\t\"ID\",\n\t\t\t\"CASE WHEN StartDateTime \u003c ? THEN ? ELSE StartDateTime END AS startDate\",\n\t\t\t(\n\t\t\t\t\"CASE WHEN COALESCE(EndDateTime, GETDATE()) \u003e ? THEN ? \"\n\t\t\t\t\"ELSE COALESCE(EndDateTime, GETDATE()) END AS endDate\"\n\t\t\t),\n\t\t\t\"ReasonName AS label\",\n\t\t\t(\n\t\t\t\t\"CASE \"\n\t\t\t\t\"WHEN ReasonCode \u003d 1001 THEN \u0027#6ABCE2\u0027 \"\n\t\t\t\t\"WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"             WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"               AND sr.RecordDowntime \u003d 1) THEN \u0027#FF8A8A\u0027 \"\n\t\t\t\t\"WHEN EXISTS (SELECT 1 FROM statereason sr \"\n\t\t\t\t\"             WHERE sr.ID \u003d statehistory.StateReasonID \"\n\t\t\t\t\"               AND sr.PlannedDowntime \u003d 1) THEN \u0027#FFFF8A\u0027 \"\n\t\t\t\t\"ELSE \u0027#8AFF8A\u0027 \"\n\t\t\t\t\"END AS color\"\n\t\t\t),\n\t\t\t\"0.5 AS opacity\"\n\t\t]\n\t\t\n\t\t# Filter overlapping events within date range\n\t\twhere_clause \u003d (\n\t\t\t\"StartDateTime \u003c ? \"\n\t\t\t\"AND COALESCE(EndDateTime, GETDATE()) \u003e ? \"\n\t\t\t\"AND NodeID \u003d ?\"\n\t\t)\n\t\t\n\t\t# Parameters: startDate CASE (2), endDate CASE (2), WHERE overlap (2), NodeID (1)\n\t\twhere_args \u003d [\n\t\t\tstartDateTime, startDateTime,\n\t\t\tendDateTime, endDateTime,\n\t\t\tendDateTime, startDateTime,\n\t\t\tnodeID\n\t\t]\n\t\t\n\t\t# Execute query\n\t\tds \u003d stateHistoryTable.selectCustom(columns\u003dcolumns, where_clause\u003dwhere_clause, where_args\u003dwhere_args)\n\t\t\n\t\tlogger.info(\"Retrieved \" + str(ds.rowCount) + \" state history events for NodeID: \" + str(nodeID))\n\t\t\n\t\treturn ds\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error retrieving state history events: \" + str(e))\n\t\treturn system.dataset.toDataSet([\u0027itemId\u0027, \u0027ID\u0027, \u0027startDate\u0027, \u0027endDate\u0027, \u0027label\u0027, \u0027color\u0027, \u0027opacity\u0027], [])",
             "type": "script"
           }
         ],
@@ -288,7 +305,7 @@
         },
         "transforms": [
           {
-            "code": "\ttry:\n\t\tnodeID \u003d int(value[\"nodeID\"])\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tpath \u003d value[\"path\"]\n\t\trunID \u003d system.tag.readBlocking([path + \u0027/Line/OEE/RunID\u0027])[0].value\n\t\t#return runID\n\t\ttableSch \u003d mes_core.schedule.scheduleTable(db)\n\t\tcolumnsSch  \u003d [\"ID\"]\n\t\twhere_clouseSch \u003d \"NodeID \u003d ? AND RunID \u003d ?\"\n\t\twhere_argsSch \u003d [nodeID, runID]\n\t\tdsSch \u003d tableSch.selectCustom(columns \u003d columnsSch,where_clause \u003d where_clouseSch, where_args \u003d where_argsSch)\t\n\t\tschID \u003d dsSch.getValueAt(0,0)\n\t\t\n\t\ttableRun \u003d mes_core.run.RunTable(db)\n\t\tcolumns \u003d [\"ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\", \"OEE\", \"Quality\", \"Performance\",\"EstimatedFinishedTime\"]\n\t\twhere_clause \u003d \"Closed \u003d ? AND ScheduleID \u003d ? \"\n\t\twhere_args \u003d [0, schID]\n\t\tds \u003d tableRun.selectCustom(columns,where_clause,where_args)\n\t\treturn ds\n\texcept:\n\t\tNone",
+            "code": "\t\"\"\"\n\tRetrieve active run information for a given node.\n\t\n\tArgs:\n\t\tvalue (dict): Contains dbConnection, nodeID, path, and refresh trigger\n\t\n\tReturns:\n\t\tDataset: Active run data with columns [ID, RunStartDateTime, RunStopDateTime, \n\t\t         Availability, RunTime, TotalTime, OEE, Quality, Performance, EstimatedFinishedTime]\n\t\tEmpty dataset on error\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"dautom.mescore.dashboardLine.views.main.oeeActualRunDataset\")\n\t\n\ttry:\n\t\t# Initialize variables\n\t\tnodeID \u003d int(value[\"nodeID\"])\n\t\tdb \u003d value[\"dbConnection\"]\n\t\tpath \u003d value[\"path\"]\n\t\t\n\t\t# Read current RunID from tags\n\t\trunID \u003d system.tag.readBlocking([path + \u0027/Line/OEE/RunID\u0027])[0].value\n\t\t\n\t\t# Get ScheduleID from schedule table\n\t\ttableSch \u003d mes_core.schedule.scheduleTable(db)\n\t\tcolumnsSch \u003d [\"ID\"]\n\t\twhere_clauseSch \u003d \"NodeID \u003d ? AND RunID \u003d ?\"\n\t\twhere_argsSch \u003d [nodeID, runID]\n\t\tdsSch \u003d tableSch.selectCustom(columns\u003dcolumnsSch, where_clause\u003dwhere_clauseSch, where_args\u003dwhere_argsSch)\n\t\t\n\t\t# Validate schedule data exists\n\t\tif dsSch.rowCount \u003d\u003d 0:\n\t\t\tlogger.warn(\"No schedule found for NodeID: \" + str(nodeID) + \", RunID: \" + str(runID))\n\t\t\treturn system.dataset.toDataSet(\n\t\t\t\t[\"ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\", \"OEE\", \"Quality\", \"Performance\", \"EstimatedFinishedTime\"],\n\t\t\t\t[]\n\t\t\t)\n\t\t\n\t\tschID \u003d dsSch.getValueAt(0, 0)\n\t\t\n\t\t# Get active run data\n\t\ttableRun \u003d mes_core.run.RunTable(db)\n\t\tcolumns \u003d [\"ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\", \"OEE\", \"Quality\", \"Performance\", \"EstimatedFinishedTime\"]\n\t\twhere_clause \u003d \"Closed \u003d ? AND ScheduleID \u003d ?\"\n\t\twhere_args \u003d [0, schID]\n\t\tds \u003d tableRun.selectCustom(columns, where_clause, where_args)\n\t\t\n\t\t#logger.info(\"Retrieved run data for NodeID: \" + str(nodeID) + \", ScheduleID: \" + str(schID))\n\t\t\n\t\treturn ds\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error retrieving run data: \" + str(e))\n\t\treturn system.dataset.toDataSet(\n\t\t\t[\"ID\", \"RunStartDateTime\", \"RunStopDateTime\", \"Availability\", \"RunTime\", \"TotalTime\", \"OEE\", \"Quality\", \"Performance\", \"EstimatedFinishedTime\"],\n\t\t\t[]\n\t\t)",
             "type": "script"
           }
         ],
@@ -442,7 +459,7 @@
         },
         "transforms": [
           {
-            "code": "\tnodeID \u003d value[\"nodeID\"]\t\n\tdb \u003d value[\"db\"]\n\t\n\ttablenode \u003d mes_core.model.nodeTable(db)\n\tcolumns \u003d [\"Topic\"]\n\twhere_clause \u003d \"ID \u003d ?\"\n\twhere_args \u003d [nodeID]\n\tds \u003d tablenode.selectCustom(columns,where_clause,where_args)\n\t\n\ttopic \u003d ds.getValueAt(0,0)\n\t\n\t\n\treturn topic",
+            "code": "\n\t\"\"\"\n\tRetrieve the topic name for a given node.\n\t\n\tArgs:\n\t\tself: Transform context\n\t\tvalue (dict): Contains nodeID and db\n\t\tquality: Tag quality\n\t\ttimestamp: Tag timestamp\n\t\n\tReturns:\n\t\tstr: Topic name from node table\n\t\tNone on error\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"dautom.mescore.dashboardLine.views.main.pathTransform\")\n\t\n\ttry:\n\t\t# Initialize variables\n\t\tnodeID \u003d value[\"nodeID\"]\n\t\tdb \u003d value[\"db\"]\n\t\t\n\t\t# Get topic from node table\n\t\ttablenode \u003d mes_core.model.nodeTable(db)\n\t\tcolumns \u003d [\"Topic\"]\n\t\twhere_clause \u003d \"ID \u003d ?\"\n\t\twhere_args \u003d [nodeID]\n\t\tds \u003d tablenode.selectCustom(columns, where_clause, where_args)\n\t\t\n\t\t# Validate data exists\n\t\tif ds.rowCount \u003d\u003d 0:\n\t\t\tlogger.warn(\"No topic found for NodeID: \" + str(nodeID))\n\t\t\treturn None\n\t\t\n\t\ttopic \u003d ds.getValueAt(0, 0)\n\t\t\n\t\t#logger.info(\"Retrieved topic for NodeID: \" + str(nodeID))\n\t\t\n\t\treturn topic\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error retrieving topic: \" + str(e))\n\t\treturn None",
             "type": "script"
           }
         ],
@@ -948,6 +965,21 @@
           }
         },
         "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Vw - Main"
+        },
+        "position": {
+          "basis": "320px"
+        },
+        "props": {
+          "params": {
+            "nodeID": 8
+          },
+          "path": "Mes Core/Dashboard Line/Vw - Main"
+        },
+        "type": "ia.display.view"
       }
     ],
     "meta": {
