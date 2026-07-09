@@ -1,0 +1,215 @@
+{
+  "custom": {},
+  "params": {
+    "areaName": "Ensamble",
+    "lineName": "Linea 1"
+  },
+  "propConfig": {
+    "params.areaName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.lineName": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1360,
+      "width": 268
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_0"
+            },
+            "position": {
+              "basis": "306px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.params.lineName"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "classes": "text-title-2",
+                "fontSize": "16px",
+                "fontWeight": "bold",
+                "paddingLeft": "10px",
+                "paddingTop": 0
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "component": {
+                "onActionPerformed": {
+                  "config": {
+                    "script": "\tself.parent.parent.getChild(\"FormRepeater\").position.display \u003d not self.parent.parent.getChild(\"FormRepeater\").position.display"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button"
+            },
+            "position": {
+              "basis": "48px"
+            },
+            "propConfig": {
+              "props.image.icon.path": {
+                "binding": {
+                  "config": {
+                    "expression": "if({.../FormRepeater.position.display}, \"material/keyboard_arrow_up\", \"material/keyboard_arrow_down\")"
+                  },
+                  "type": "expr"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "height": 45,
+                "icon": {
+                  "color": "--cla-text-title",
+                  "style": {
+                    "fontSize": "100px"
+                  }
+                },
+                "width": 35
+              },
+              "primary": false,
+              "style": {
+                "backgroundColor": "#B37D4100",
+                "borderColor": "#BD0F0F00"
+              },
+              "text": "",
+              "textStyle": {
+                "backgroundColor": "#85191900",
+                "color": "#FAFAFB"
+              }
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "25px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "space-between",
+          "style": {
+            "borderBottomLeftRadius": 10,
+            "borderBottomRightRadius": 10,
+            "borderColor": "--button-2",
+            "borderStyle": "solid",
+            "borderTopLeftRadius": 10,
+            "borderTopRightRadius": 10,
+            "borderWidth": 1,
+            "classes": "text-titles",
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "20px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "FormRepeater"
+        },
+        "position": {
+          "basis": "100%",
+          "grow": 1
+        },
+        "propConfig": {
+          "custom.instance": {
+            "binding": {
+              "config": {
+                "path": "view.params.areaName"
+              },
+              "type": "property"
+            }
+          },
+          "props.instances": {
+            "binding": {
+              "config": {
+                "path": "view.params.lineName"
+              },
+              "transforms": [
+                {
+                  "code": "\t# \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\t# Generar instancias dinámicas de formularios desde el UNS\n\t# \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n\t\n\t# Parámetros de la vista\n\tareaName \u003d self.view.params.areaName\n\tlineName \u003d self.view.params.lineName\n\t\n\t# Ruta base del UNS\n\tbasePath \u003d \"[UNS]Clarios/Andina/{}/{}/UI\".format(areaName, lineName)\n\t\n\t# Navegar dentro de la carpeta\n\tresults \u003d system.tag.browse(basePath)\n\t\n\t# Obtener nombres de formularios (carpetas con hijos)\n\tformNames \u003d [tag[\u0027name\u0027] for tag in results.getResults() if tag[\u0027hasChildren\u0027]]\n\t\n\t# Construir la lista de instancias\n\tinstances \u003d []\n\tfor formName in formNames:\n\t\tinstance \u003d {\n\t\t\t\"instanceStyle\": { \"classes\": \"\" },\n\t\t\t\"instancePosition\": {},\n\t\t\t\"areaName\": areaName,\n\t\t\t\"formName\": formName,\n\t\t\t\"lineName\": lineName\n\t\t}\n\t\tinstances.append(instance)\n\t\n\t\n\t\n\t# Retornar lista JSON con todas las instancias\n\treturn instances",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "alignItems": "center",
+          "direction": "column",
+          "elementPosition": {
+            "basis": "auto",
+            "grow": 0,
+            "shrink": 0
+          },
+          "justify": "center",
+          "path": "Node/MixingDashboard/Mixing Trend/Framework/FormRepeater",
+          "style": {
+            "overflow": "hidden"
+          },
+          "useDefaultViewHeight": false
+        },
+        "type": "ia.display.flex-repeater"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "basis": "20px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "button-question",
+        "overflow": "hidden",
+        "paddingTop": 10
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

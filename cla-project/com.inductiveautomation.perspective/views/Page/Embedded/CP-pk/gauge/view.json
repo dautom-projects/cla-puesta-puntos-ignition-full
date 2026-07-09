@@ -1,0 +1,642 @@
+{
+  "custom": {},
+  "params": {
+    "cpk": 50,
+    "cpp": 10,
+    "fontZise": 4,
+    "lsl": 0,
+    "name": "value",
+    "sp": 0,
+    "usl": 0
+  },
+  "propConfig": {
+    "params.cpk": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.cpp": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.fontZise": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.lsl": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.name": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.sp": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.usl": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 235,
+      "width": 600
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "50px"
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.name"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles-2"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.name"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn value + \u0027 Cpp\u0027",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "PPK",
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "SimpleGauge_0"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.arc.color": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n    \"\"\"\n    Transform gauge value to color based on CpK/PpK ranges.\n    \n    Ranges:\n    - Red    (no capaz)  : 0.0  a 1.0\n    - Yellow (marginal)  : 1.0  a 1.33\n    - Green  (capaz)     : 1.33 a 1.67\n    - Dark Green (optimo): 1.67 a 2.0+\n    \n    Args:\n        value (float): CpK or PpK value\n        quality (int): Tag quality code\n        timestamp (datetime): Tag timestamp\n    \n    Returns:\n        str: Hex color code based on value range\n    \"\"\"\n    try:\n        # Umbrales CpK/PpK estándar industria\n        NO_CAPAZ    \u003d 1.00   # por debajo \u003d rojo\n        MARGINAL    \u003d 1.33   # por debajo \u003d amarillo\n        CAPAZ       \u003d 1.67   # por debajo \u003d verde\n                             # por encima \u003d verde oscuro\n\n        # Valor nulo o negativo\n        if value is None:\n            return \"#AAAAAA\"  # Gris - sin datos\n\n        if value \u003c NO_CAPAZ:\n            color \u003d \"#F00C2D\"  # 🔴 Rojo   - No capaz\n        elif value \u003c MARGINAL:\n            color \u003d \"#FFCD06\"  # 🟡 Amarillo - Marginal\n        elif value \u003c CAPAZ:\n            color \u003d \"#44BB44\"  # 🟢 Verde  - Capaz\n        else:\n            color \u003d \"#006600\"  # 🟢 Verde oscuro - Muy capaz\n\n        return color\n\n    except Exception as e:\n        system.util.getLogger(\"papos.components.simpleGauge\").error(\n            \"Error transforming CpK gauge color: \" + str(e)\n        )\n        return \"#AAAAAA\"  # Gris por defecto",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.arc.width": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 2",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.label.size": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 7.5",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.classes": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.class_gauge"
+                      },
+                      "enabled": false,
+                      "type": "property"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "expression": "round({view.params.cpp},3)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "arc": {},
+                  "arcBackground": {
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  },
+                  "label": {
+                    "maxDecimal": 1,
+                    "units": "%",
+                    "visible": false
+                  },
+                  "maxValue": 2
+                },
+                "type": "ia.chart.simple-gauge"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "10.1%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "round({view.params.cpp},3)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn str(value)\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingBottom": 30
+                  },
+                  "textStyle": {
+                    "classes": "text-data-2",
+                    "fontSize": 24
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "50%"
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "marginBottom": 0,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "32px",
+                  "shrink": 0
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "CPK",
+                  "textStyle": {
+                    "fontWeight": "normal"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "SimpleGauge_0"
+                },
+                "position": {
+                  "basis": "50%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.arc.color": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n    \"\"\"\n    Transform gauge value to color based on CpK/PpK ranges.\n    \n    Ranges:\n    - Red    (no capaz)  : 0.0  a 1.0\n    - Yellow (marginal)  : 1.0  a 1.33\n    - Green  (capaz)     : 1.33 a 1.67\n    - Dark Green (optimo): 1.67 a 2.0+\n    \n    Args:\n        value (float): CpK or PpK value\n        quality (int): Tag quality code\n        timestamp (datetime): Tag timestamp\n    \n    Returns:\n        str: Hex color code based on value range\n    \"\"\"\n    try:\n        # Umbrales CpK/PpK estándar industria\n        NO_CAPAZ    \u003d 1.00   # por debajo \u003d rojo\n        MARGINAL    \u003d 1.33   # por debajo \u003d amarillo\n        CAPAZ       \u003d 1.67   # por debajo \u003d verde\n                             # por encima \u003d verde oscuro\n\n        # Valor nulo o negativo\n        if value is None:\n            return \"#AAAAAA\"  # Gris - sin datos\n\n        if value \u003c NO_CAPAZ:\n            color \u003d \"#F00C2D\"  # 🔴 Rojo   - No capaz\n        elif value \u003c MARGINAL:\n            color \u003d \"#FFCD06\"  # 🟡 Amarillo - Marginal\n        elif value \u003c CAPAZ:\n            color \u003d \"#44BB44\"  # 🟢 Verde  - Capaz\n        else:\n            color \u003d \"#006600\"  # 🟢 Verde oscuro - Muy capaz\n\n        return color\n\n    except Exception as e:\n        system.util.getLogger(\"papos.components.simpleGauge\").error(\n            \"Error transforming CpK gauge color: \" + str(e)\n        )\n        return \"#AAAAAA\"  # Gris por defecto",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.arc.width": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 2",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.label.size": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.fontZise"
+                      },
+                      "transforms": [
+                        {
+                          "expression": "{value} * 2",
+                          "type": "expression"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.classes": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.class_gauge"
+                      },
+                      "enabled": false,
+                      "type": "property"
+                    }
+                  },
+                  "props.value": {
+                    "binding": {
+                      "config": {
+                        "expression": "round({view.params.cpk},3)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "arc": {},
+                  "arcBackground": {
+                    "color": "#FFFFFF",
+                    "opacity": 0.9
+                  },
+                  "label": {
+                    "maxDecimal": 1,
+                    "units": "%",
+                    "visible": false
+                  },
+                  "maxValue": 2
+                },
+                "type": "ia.chart.simple-gauge"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "10.1%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "round({view.params.cpk},3)"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\treturn str(value)\n\texcept:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "expr"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingBottom": 30
+                  },
+                  "textStyle": {
+                    "classes": "text-data-2",
+                    "fontSize": 24
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "50%"
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "marginBottom": 0,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_1"
+        },
+        "position": {
+          "basis": "100%"
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "LSL:",
+                  "textStyle": {
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.lsl"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "textStyle": {
+                    "fontWeight": "normal",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "USL:",
+                  "textStyle": {
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.usl"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "textStyle": {
+                    "fontWeight": "normal",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "text": "SP:",
+                  "textStyle": {
+                    "textAlign": "right"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.sp"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-titles-2"
+                  },
+                  "textStyle": {
+                    "fontWeight": "normal",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-widget"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
