@@ -1,18 +1,21 @@
 {
   "custom": {
     "db": "papo_db",
+    "dbConnection": "papo_db",
     "fontSize": 17,
     "initialPapoDateTime": {
       "$": [
         "ts",
         192,
-        1783615182669
+        1784647048098
       ],
-      "$ts": 1783614440910
+      "$ts": 1784647048098
     },
     "insights": " | T: 2, H: 11:27 - ",
     "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/CI11-0101",
+    "referencePapo": "",
     "registerTypeID": 7,
+    "sign": "",
     "supervisorOption": [],
     "user": "Soporte D."
   },
@@ -20,7 +23,7 @@
     "system": {
       "onStartup": {
         "config": {
-          "script": "\t\"\"\"\n\tPopulate dropdown with supervisor full names (firstName + lastName).\n\t\n\tArgs:\n\t\tNone (onStartup event)\n\t\n\tReturns:\n\t\tNone (writes to self.custom.supervisorOption)\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"dautom.views.supervisorDropdown\")\n\t\n\ttry:\n\t\t# Input variables (for Script Console debugging)\n\t\t# userSource \u003d \"ClariosAD\"  # Replace with actual user source for testing\n\t\t\n\t\t# Configuration\n\t\ttargetRole \u003d \"Supervisor_PAPO\"\n\t\tuserSource \u003d self.session.custom.userSource\n\t\t\n\t\t# Get all users from user source\n\t\tallUsers \u003d system.user.getUsers(userSource)\n\t\t\n\t\t# print \"Total users found: {}\".format(len(allUsers))\n\t\t# logger.info(\"Starting supervisor dropdown population - Total users: {}\".format(len(allUsers)))\n\t\t\n\t\t# Filter users with Supervisor_PAPO role\n\t\tsupervisorList \u003d []\n\t\t\n\t\tfor user in allUsers:\n\t\t\t# Get username\n\t\t\tusername \u003d user.get(\"Username\")\n\t\t\t\n\t\t\t# Get user roles using getRoles() method\n\t\t\tuserRoles \u003d user.getRoles()\n\t\t\t\n\t\t\t# print \"User: {} - Roles: {}\".format(username, list(userRoles))\n\t\t\t\n\t\t\t# Check if user has target role\n\t\t\tif targetRole in userRoles:\n\t\t\t\t# Get firstName and lastName\n\t\t\t\tfirstName \u003d user.get(\"FirstName\")\n\t\t\t\tlastName \u003d user.get(\"LastName\")\n\t\t\t\t\n\t\t\t\t# Concatenate full name\n\t\t\t\tif firstName and lastName:\n\t\t\t\t\tfullName \u003d \"{} {}\".format(firstName, lastName)\n\t\t\t\telif firstName:\n\t\t\t\t\tfullName \u003d firstName\n\t\t\t\telif lastName:\n\t\t\t\t\tfullName \u003d lastName\n\t\t\t\telse:\n\t\t\t\t\tfullName \u003d username  # Fallback to username if no name defined\n\t\t\t\t\n\t\t\t\tsupervisorList.append(fullName)\n\t\t\t\t# print \"Added supervisor: {} ({})\".format(fullName, username)\n\t\t\n\t\t# Sort alphabetically for better UX\n\t\tsupervisorList.sort()\n\t\t\n\t\t# Write to custom property for dropdown consumption\n\t\tself.custom.supervisorOption \u003d supervisorList\n\t\t\n\t\t# print \"Supervisor dropdown populated - Total supervisors: {}\".format(len(supervisorList))\n\t\t# logger.info(\"Supervisor dropdown populated successfully - Total: {} - List: {}\".format(len(supervisorList), supervisorList))\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error populating supervisor dropdown: \" + str(e))\n\t\tself.custom.supervisorOption \u003d []"
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tself.custom.supervisorOption \u003d papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
         },
         "scope": "G",
         "type": "script"
@@ -35,6 +38,15 @@
   },
   "propConfig": {
     "custom.db": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
       "persistent": true
     },
     "custom.fontSize": {
@@ -155,24 +167,6 @@
         "position": {
           "basis": "15px",
           "shrink": 0
-        },
-        "type": "ia.display.label"
-      },
-      {
-        "meta": {
-          "name": "Label_2"
-        },
-        "position": {
-          "basis": "12px",
-          "grow": 1
-        },
-        "props": {
-          "style": {
-            "paddingLeft": 0
-          },
-          "textStyle": {
-            "fontSize": 14
-          }
         },
         "type": "ia.display.label"
       },
@@ -615,6 +609,7 @@
         },
         "position": {
           "basis": "200px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -637,7 +632,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -655,7 +650,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer2.position.display"
+                "path": "../FlexContainerGroup2.position.display"
               },
               "transforms": [
                 {
@@ -1856,6 +1851,7 @@
         },
         "position": {
           "basis": "328px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -1878,7 +1874,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -1896,7 +1892,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer3.position.display"
+                "path": "../FlexContainerGroup3.position.display"
               },
               "transforms": [
                 {
@@ -2150,6 +2146,7 @@
         },
         "position": {
           "basis": "70px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -2172,7 +2169,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -2190,7 +2187,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer4.position.display"
+                "path": "../FlexContainerGroup4.position.display"
               },
               "transforms": [
                 {
@@ -2684,6 +2681,7 @@
         },
         "position": {
           "basis": "180px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -2706,7 +2704,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -2724,7 +2722,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer5.position.display"
+                "path": "../FlexContainerGroup5.position.display"
               },
               "transforms": [
                 {
@@ -3030,6 +3028,7 @@
         },
         "position": {
           "basis": "61px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -3052,7 +3051,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -3070,7 +3069,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer6.position.display"
+                "path": "../FlexContainerGroup6.position.display"
               },
               "transforms": [
                 {
@@ -3324,6 +3323,7 @@
         },
         "position": {
           "basis": "200px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -3346,7 +3346,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -3364,7 +3364,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer1.position.display"
+                "path": "../FlexContainerGroup7.position.display"
               },
               "transforms": [
                 {
@@ -3618,6 +3618,7 @@
         },
         "position": {
           "basis": "200px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -3640,7 +3641,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -3658,7 +3659,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer5.position.display"
+                "path": "../FlexContainerGroup8.position.display"
               },
               "transforms": [
                 {
@@ -4074,6 +4075,7 @@
         },
         "position": {
           "basis": "200px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -4096,7 +4098,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -4114,7 +4116,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer2.position.display"
+                "path": "../FlexContainerGroup9.position.display"
               },
               "transforms": [
                 {
@@ -4608,6 +4610,7 @@
         },
         "position": {
           "basis": "180px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -4630,7 +4633,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -4648,7 +4651,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer6.position.display"
+                "path": "../FlexContainerGroup10.position.display"
               },
               "transforms": [
                 {
@@ -4902,6 +4905,7 @@
         },
         "position": {
           "basis": "70px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -4924,7 +4928,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -4942,7 +4946,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer4.position.display"
+                "path": "../FlexContainerGroup11.position.display"
               },
               "transforms": [
                 {
@@ -5248,6 +5252,7 @@
         },
         "position": {
           "basis": "61px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -5270,7 +5275,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -5288,7 +5293,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer3.position.display"
+                "path": "../FlexContainerGroup12.position.display"
               },
               "transforms": [
                 {
@@ -6489,6 +6494,7 @@
         },
         "position": {
           "basis": "328px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -6505,6 +6511,24 @@
           }
         },
         "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_2"
+        },
+        "position": {
+          "basis": "12px",
+          "grow": 1
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 0
+          },
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
       },
       {
         "children": [
@@ -6781,10 +6805,9 @@
         {
           "name": "toggleFlexRoot",
           "params": [
-            "groupIndex",
             "sectionIndex"
           ],
-          "script": "\t\"\"\"\n\tToggle accordion sections in form view.\n\t\n\tExpands the clicked FlexContainerGroup and collapses all others.\n\tFinds all FlexContainerGroups and Sections by name scanning root\n\tchildren, independent of component hierarchy.\n\t\n\tVersion: 2.0.0\n\t\n\tArgs:\n\t\tsectionIndex (int): Section number clicked (1-based)\n\t\n\tReturns:\n\t\tNone: Modifies component display and styles directly\n\t\n\tChangelog:\n\t\t2026-07-05 | William | v1.0.0 - Initial version\n\t\t2026-07-05 | William | v2.0.0 - Dynamic hierarchy-independent approach\n\t\"\"\"\n\t\n\tSTYLE_ACTIVE \u003d \"button-questions\"\n\tSTYLE_INACTIVE \u003d \"button-questions-2\"\n\t\n\tthisSectionIndex \u003d int(sectionIndex)\n\t\n\t# Scan root children to find all FlexContainerGroups and Sections\n\troot \u003d self\n\tgroups \u003d {}\n\tsections \u003d {}\n\t\n\tfor child in root.getChildren():\n\t\tchildName \u003d child.meta.name\n\t\tif childName.startswith(\"FlexContainerGroup\"):\n\t\t\ttry:\n\t\t\t\tidx \u003d int(childName.replace(\"FlexContainerGroup\", \"\"))\n\t\t\t\tgroups[idx] \u003d child\n\t\t\texcept Exception:\n\t\t\t\tpass\n\t\telif childName.startswith(\"Section\"):\n\t\t\ttry:\n\t\t\t\tidx \u003d int(childName.replace(\"Section\", \"\"))\n\t\t\t\tsections[idx] \u003d child\n\t\t\texcept Exception:\n\t\t\t\tpass\n\t\n\t# Toggle each group based on clicked section\n\tfor idx, group in groups.items():\n\t\t# Store initial basis height on first run\n\t\tif not group.custom.get(\"baseBasisPx\", None):\n\t\t\tbasisPx \u003d int(str(group.position.basis).replace(\"px\", \"\")) if group.position.basis else 100\n\t\t\tgroup.custom.baseBasisPx \u003d basisPx\n\t\n\t\tgroupBasePx \u003d int(group.custom.get(\"baseBasisPx\", 0))\n\t\n\t\tif idx \u003d\u003d thisSectionIndex:\n\t\t\t# Toggle the clicked group\n\t\t\tcurrentDisplay \u003d bool(group.position.display)\n\t\t\tnewDisplay \u003d not currentDisplay\n\t\t\tgroup.position.display \u003d newDisplay\n\t\n\t\t\t# Adjust basis based on visibility\n\t\t\tif newDisplay:\n\t\t\t\tgroup.position.basis \u003d str(groupBasePx) + \"px\"\n\t\t\telse:\n\t\t\t\tgroup.position.basis \u003d \"0px\"\n\t\telse:\n\t\t\t# Hide all other groups\n\t\t\tgroup.position.display \u003d False\n\t\t\tgroup.position.basis \u003d \"0px\"\n\t\n\t# Update section button styles\n\tfor idx, section in sections.items():\n\t\tif idx \u003d\u003d thisSectionIndex and groups.get(idx) and bool(groups[idx].position.display):\n\t\t\tsection.props.style.classes \u003d STYLE_ACTIVE\n\t\telse:\n\t\t\tsection.props.style.classes \u003d STYLE_INACTIVE"
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
         },
         {
           "name": "answerRecopile",
@@ -6799,7 +6822,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\"\"\"\n\tSave form data to database including supervisor selection.\n\t\n\tCollects answers from all FlexContainerGroups and appends supervisor\n\tanswer from FlexContainerSupervisor into the same JSON before INSERT.\n\t\n\tArgs:\n\t\tself (Component): Reference to root component\n\t\tpayload (dict): Message payload (unused)\n\t\n\tReturns:\n\t\tNone: Performs database INSERT and sends UI refresh messages\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"clarios/puestaPuntos/saveDataRoot\")\n\t\n\ttry:\n\t\tfrom java.lang import String\n\t\t\n\t\t# ---- Context ----\n\t\tpapoID \u003d self.view.params.papoID\n\t\t\n\t\t# Get user full name (firstName + lastName) or fallback to userName\n\t\tuserName \u003d self.session.props.auth.user.userName\n\t\tfirstName \u003d self.session.props.auth.user.get(\"firstName\", \"\")\n\t\tlastName \u003d self.session.props.auth.user.get(\"lastName\", \"\")\n\t\tuser \u003d \"{} {}\".format(firstName, lastName).strip() if firstName or lastName else userName\n\t\t\n\t\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\t\tworkstationID \u003d self.view.params.workstationID\n\t\tnodeID \u003d self.view.params.nodeID\n\t\tstatus \u003d \"En proceso\"\n\t\tnow \u003d system.date.now()\n\t\t\n\t\tflexGroupCount \u003d int(self.custom.flexGroupCount)\n\t\t\n\t\t# logger.info(\"User full name: {}\".format(user))\n\t\t\n\t\t# ---- Get last RegisterCode ----\n\t\tqueryLastCode \u003d \"\"\"\n\t\t\tSELECT TOP 1 RegisterCode\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\t\tORDER BY ID DESC\n\t\t\"\"\"\n\t\trs \u003d system.db.runPrepQuery(queryLastCode, [workstationNodeID, papoID], \"papo_db\")\n\t\tlastCode \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\t\tregCode \u003d int(lastCode)\n\t\t\n\t\t# ---- Insert template ----\n\t\tinsertSql \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\t\"\"\"\n\t\t\n\t\tdef _inferRegisterType(answersObj):\n\t\t\t\"\"\"Extract registerTypeID from first item in answers.\"\"\"\n\t\t\titems \u003d answersObj.get(\"items\", []) if answersObj else []\n\t\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\t\treturn 7\n\t\t\n\t\t# ---- Get supervisor answer from FlexContainerSupervisor ----\n\t\tsupervisorContainer \u003d self.getChild(\"FlexContainerSupervisor\")\n\t\tsupervisorItem \u003d None\n\t\t\n\t\tif supervisorContainer is not None:\n\t\t\tsupervisorAnswers \u003d self.answerRecopile(supervisorContainer)\n\t\t\tlogger.debug(\"Supervisor answers: {}\".format(supervisorAnswers))\n\t\t\t\n\t\t\tif supervisorAnswers is not None:\n\t\t\t\tsupervisorItems \u003d supervisorAnswers.get(\"items\", [])\n\t\t\t\tif supervisorItems:\n\t\t\t\t\tsupervisorItem \u003d dict(supervisorItems[0])\n\t\t\t\t\tlogger.debug(\"Supervisor item captured: \" + str(supervisorItem))\n\t\t\t\telse:\n\t\t\t\t\tlogger.warn(\"Supervisor answers has no items\")\n\t\t\telse:\n\t\t\t\tlogger.warn(\"Supervisor answerRecopile returned None\")\n\t\telse:\n\t\t\tlogger.warn(\"FlexContainerSupervisor not found\")\n\t\t\n\t\t# ---- Process each FlexContainerGroup ----\n\t\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\t\t\t\n\t\t\t# Collect answers from this group\n\t\t\tanswersObj \u003d self.answerRecopile(flexGroup)\n\t\t\tlogger.debug(\"Raw answers group {}: {}\".format(groupIndex, answersObj))\n\t\t\t\n\t\t\t# Skip if empty\n\t\t\titems \u003d answersObj.get(\"items\", []) if answersObj else []\n\t\t\tif not items:\n\t\t\t\tlogger.warn(\"Group {} has no items - skipping\".format(groupIndex))\n\t\t\t\tcontinue\n\t\t\t\n\t\t\t# ---- CRITICAL: Clean items - remove any metadata items that came from answerRecopile ----\n\t\t\tcleanedItems \u003d []\n\t\t\tfor item in items:\n\t\t\t\tif isinstance(item, dict):\n\t\t\t\t\t# Keep only items with papoItemID (actual answers)\n\t\t\t\t\tif \"papoItemID\" in item:\n\t\t\t\t\t\tcleanedItems.append(item)\n\t\t\t\n\t\t\tanswersObj[\"items\"] \u003d cleanedItems\n\t\t\tlogger.debug(\"Cleaned items group {}: {} items\".format(groupIndex, len(cleanedItems)))\n\t\t\t\n\t\t\t# ---- Append supervisor to first group (BEFORE final metadata) ----\n\t\t\tif groupIndex \u003d\u003d 1 and supervisorItem is not None:\n\t\t\t\tanswersObj[\"items\"].append(supervisorItem)\n\t\t\t\tlogger.info(\"Supervisor appended to FlexContainerGroup1\")\n\t\t\t\n\t\t\t# ---- CRITICAL: Always append final metadata as LAST item ----\n\t\t\tfinalMetadata \u003d {\n\t\t\t\t\"insights\": \"\",\n\t\t\t\t\"registerTypeID\": 7,\n\t\t\t\t\"user\": user,\n\t\t\t\t\"timestamp\": str(now)\n\t\t\t}\n\t\t\tanswersObj[\"items\"].append(finalMetadata)\n\t\t\tlogger.info(\"Final metadata appended as last item - user: {}\".format(user))\n\t\t\t\n\t\t\tregisterTypeID \u003d _inferRegisterType(answersObj)\n\t\t\tdataAnswerStr \u003d String(system.util.jsonEncode(answersObj))\n\t\t\t\n\t\t\tlogger.debug(\"Encoded JSON group {}: {}\".format(groupIndex, dataAnswerStr))\n\t\t\t\n\t\t\tparams \u003d [\n\t\t\t\tnow,\n\t\t\t\tdataAnswerStr,\n\t\t\t\tstatus,\n\t\t\t\tpapoID,\n\t\t\t\tregisterTypeID,\n\t\t\t\tuser,\n\t\t\t\tworkstationNodeID,\n\t\t\t\tnodeID,\n\t\t\t\tworkstationID,\n\t\t\t\tregCode\n\t\t\t]\n\t\t\t\n\t\t\tsystem.db.runPrepUpdate(insertSql, params, \"papo_db\")\n\t\t\tlogger.info(\"Record saved - PapoID: {} RegisterCode: {} Group: {}\".format(papoID, regCode, groupIndex))\n\t\t\n\t\t# ---- UI refresh ----\n\t\tsystem.perspective.sendMessage(\"refreshTable\", {\"estado\": True}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"closeEmbeded\", {\"estado\": False}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPeriodic\", {\"min\": 0}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")\n\t\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error saving form data: \" + str(e))",
+          "script": "\tpapo_core.register.save(self)",
           "sessionScope": false,
           "viewScope": false
         }

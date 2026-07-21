@@ -1,13 +1,33 @@
 {
   "custom": {
-    "answers": {},
     "db": "papo_db",
+    "dbConnection": "papo_db",
     "fontSize": 17,
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        0
+      ],
+      "$ts": 0
+    },
     "insights": "",
     "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
-    "refreshSecond": 2,
+    "referencePapo": "",
     "registerTypeID": 4,
+    "sign": "",
     "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
   },
   "params": {
     "nodeID": 26,
@@ -16,18 +36,16 @@
     "workstationnodeID": 1
   },
   "propConfig": {
-    "custom.answers": {
+    "custom.db": {
       "persistent": true
     },
-    "custom.answers.formato": {
+    "custom.dbConnection": {
       "binding": {
         "config": {
-          "path": "/root/FlexContainerGroup1.custom.answers"
+          "path": "session.custom.dbConnection"
         },
         "type": "property"
-      }
-    },
-    "custom.db": {
+      },
       "persistent": true
     },
     "custom.fontSize": {
@@ -38,24 +56,17 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
     },
     "custom.path": {
-      "persistent": true
-    },
-    "custom.refreshSecond": {
-      "binding": {
-        "config": {
-          "expression": "dateExtract(now(1000),\"second\")"
-        },
-        "type": "expr"
-      },
-      "onChange": {
-        "enabled": false,
-        "script": "\tlistCustom \u003d [\n\t\t\"answers.formato\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))"
-      },
       "persistent": true
     },
     "custom.registerTypeID": {
@@ -157,7 +168,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -175,7 +186,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer1.position.display"
+                "path": "../FlexContainerGroup1.position.display"
               },
               "transforms": [
                 {
@@ -681,6 +692,7 @@
         },
         "position": {
           "basis": "226px",
+          "display": false,
           "shrink": 0
         },
         "props": {
@@ -871,14 +883,28 @@
         {
           "name": "toggleFlexRoot",
           "params": [
-            "groupIndex",
             "sectionIndex"
           ],
-          "script": "\t\n\tlogging.log(\"Entered toggleFlexRoot\", \"info\")\n\t\n\tflexGroupCount \u003d self.custom.flexGroupCount          # e.g., 3 groups\n\tflexCount \u003d self.custom.flexCount                    # e.g., [4, 3, 5]\n\n\t# Índices del botón clicado\n\tthisGroupIndex \u003d int(groupIndex)      # FlexContainerGroupN\n\tthisSectionIndex \u003d int(sectionIndex)  # SectionN / FlexContainerN\n\tlogging.log(\"Group Index that sent the message {}\".format(thisGroupIndex), \"info\")\n\n\t# Recorre cada FlexContainerGroupX\n\tfor flexStartIndex in range(1, int(flexGroupCount) + 1):\n\n\t\t# Contenedor del grupo\n\t\tflexStart \u003d self.getChild(\"FlexContainerGroup{}\".format(flexStartIndex))\n\n\t\t# Asegurar base inicial por grupo (una sola vez)\n\t\tif not flexStart.custom.get(\"baseBasisPx\", None):\n\t\t\tbasis_px \u003d int(str(flexStart.position.basis).replace(\"px\", \"\")) if flexStart.position.basis else 100\n\t\t\tflexStart.custom.baseBasisPx \u003d basis_px\n\n\t\ttotal_in_group \u003d int(flexCount[flexStartIndex - 1])\n\n\t\t# Flag: este es el grupo activo (el del click)\n\t\tis_active_group \u003d (flexStartIndex \u003d\u003d thisGroupIndex)\n\n\t\tfor secIndex in range(1, total_in_group + 1):\n\n\t\t\tflex \u003d flexStart.getChild(\"FlexContainer{}\".format(secIndex))\n\t\t\tbutton \u003d flexStart.getChild(\"Section{}\".format(secIndex))\n\n\t\t\tif is_active_group and secIndex \u003d\u003d thisSectionIndex:\n\t\t\t\t# --- Toggle del seleccionado (grupo activo) ---\n\t\t\t\tcurrent_display \u003d bool(flex.position.display)\n\t\t\t\tnew_display \u003d not current_display\n\t\t\t\tflex.position.display \u003d new_display\n\t\t\t\t\n\t\t\t\t# Ajustar basis del GRUPO ACTIVO según new_display\n\t\t\t\tgroup_base_px \u003d int(flexStart.custom.get(\"baseBasisPx\", 0))\n\t\t\t\tflex_base_px \u003d int(flex.position.basis.replace(\"px\",\"\"))\n\t\t\t\tif new_display:\n\t\t\t\t\tflexStart.position.basis \u003d str(group_base_px + flex_base_px) + \"px\"\n\t\t\t\t\tbutton.props.style.classes \u003d \u0027button-questions\u0027\n\t\t\t\telse:\n\t\t\t\t\tflexStart.position.basis \u003d str(group_base_px) + \"px\"\n\t\t\t\t\tbutton.props.style.classes \u003d \u0027button-questions-2\u0027\n\t\t\t\t\n\t\t\telse:\n\t\t\t\t# --- Ocultar todos los demás ---\n\t\t\t\tflex.position.display \u003d False\n\t\t\t\tbutton.props.style.classes \u003d \u0027button-questions-2\u0027\n\t\t\t\n\t\t\t\t# Si NO es el grupo activo, su basis debe quedar en base\n\t\t\t\tif not is_active_group:\n\t\t\t\t\tbase_px \u003d int(flexStart.custom.get(\"baseBasisPx\", 0))\n\t\t\t\t\tflexStart.position.basis \u003d str(base_px) + \"px\""
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
         }
       ],
       "extensionFunctions": null,
-      "messageHandlers": []
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }
