@@ -1,10 +1,10 @@
 # Mapa de dependencias Ignition
 
 - Proyectos: 1 (cla-project)
-- Vistas: 303
-- Scripts de proyecto: 12
+- Vistas: 304
+- Scripts de proyecto: 13
 - Mensajes (messageType): 93
-- Relaciones (aristas): 1769
+- Relaciones (aristas): 1757
 
 ## Nodos mas usados (mayor impacto si cambian)
 
@@ -27,21 +27,21 @@
 
 ### Scripts mas llamados
 - **alerts** (cla-project) — llamado por 226 vistas
-- **logging** (cla-project) — llamado por 139 vistas
-- **users** (cla-project) — llamado por 6 vistas
-- **papo_core.ui** (cla-project) — llamado por 5 vistas
-- **papo_core.register** (cla-project) — llamado por 4 vistas
+- **papo_core.register** (cla-project) — llamado por 206 vistas
+- **papo_core.ui** (cla-project) — llamado por 206 vistas
+- **papo_core.sign** (cla-project) — llamado por 75 vistas
+- **logging** (cla-project) — llamado por 19 vistas
 - **sql** (cla-project) — llamado por 3 vistas
-- **papo_core.sign** (cla-project) — llamado por 2 vistas
 - **treeScriptingPAPO** (cla-project) — llamado por 1 vistas
+- **users** (cla-project) — llamado por 1 vistas
 - **utils** (cla-project) — llamado por 1 vistas
 
 ### Mensajes mas referenciados (si renombras el messageType, se rompen)
 - **closeEmbeded** — usado por 211 vistas (envian/manejan)
-- **refreshPeriodic** — usado por 209 vistas (envian/manejan)
-- **refreshPreviewTable** — usado por 208 vistas (envian/manejan)
-- **refreshTable** — usado por 206 vistas (envian/manejan)
-- **saveDataRoot** — usado por 167 vistas (envian/manejan)
+- **saveDataRoot** — usado por 209 vistas (envian/manejan)
+- **refreshTable** — usado por 74 vistas (envian/manejan)
+- **refreshPeriodic** — usado por 73 vistas (envian/manejan)
+- **refreshPreviewTable** — usado por 71 vistas (envian/manejan)
 - **resetTable** — usado por 40 vistas (envian/manejan)
 - **saveStartRegister-2201-end** — usado por 24 vistas (envian/manejan)
 - **saveStartShift** — usado por 21 vistas (envian/manejan)

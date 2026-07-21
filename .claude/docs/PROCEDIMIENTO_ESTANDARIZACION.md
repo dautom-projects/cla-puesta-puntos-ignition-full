@@ -183,17 +183,14 @@ return papo_core.ui.preInsight(self, value)
 
 ## PASO 10 — onClick del botón Guardar (Button_Apply)
 
-- [ ] Reemplazar script legacy por:
+- [ ] Reemplazar CUALQUIER script legacy (`alerts.showAlert(...)` inline, con cualquier
+      mensaje de confirmación) por el wrapper de una línea:
 ```python
-alerts.showAlert(
-    state="warning",
-    title="Guardar registro",
-    message="Esta seguro de que desea guardar?",
-    btnTextPrimary="Si",
-    btnTextSecondary="No",
-    btnActionPrimary="saveDataRoot"
-)
+papo_core.ui.confirmSave()
 ```
+- [ ] Mensaje FIJO para todos los forms (definido dentro de `confirmSave`, NO varía por form):
+      `"Esta seguro de que desea guardar el registro"`
+- [ ] `confirmSave()` internamente llama a `alerts.showAlert(...)` con `btnActionPrimary="saveDataRoot"`
 
 - [ ] **Verificar** que el botón NO tenga un bloque `"scripts"` propio — si lo tiene, eliminarlo. Los scripts van SOLO en `root.scripts`.
 
@@ -285,7 +282,7 @@ papo_core.report.extractReportData(data)
 |root.scripts → answerRecopile|`papo_core.register.recopile(flexContainer, self)`|
 |root.scripts → saveDataRoot|`papo_core.register.save(self)`|
 |root.scripts → signOperator|`papo_core.sign.signOperator(self)`|
-|Botón Guardar → onClick|`alerts.showAlert(... btnActionPrimary="saveDataRoot")`|
+|Botón Guardar → onClick|`papo_core.ui.confirmSave()` (mensaje fijo: "Esta seguro de que desea guardar el registro")|
 |Overview filtrado → transform|`papo_core.overview.getPapoListFiltered(value)`|
 |Embedded_PAPO path → transform|`papo_core.overview.getCardPath(value)`|
 |Reporte → data source|`papo_core.report.extractReportData(data)`|

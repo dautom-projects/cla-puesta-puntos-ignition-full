@@ -4,9 +4,10 @@ papo_core.ui
 Visual behavior logic for PAPO forms.
 Handles accordion toggle, form initialization, and title labels.
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
+	2026-07-21 | William M. | v1.1.0 - Added confirmSave for save button onClick standardization
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
 """
 
@@ -119,3 +120,22 @@ def preInsight(root, value):
 
 	timeStr = "{:02d}:{:02d}".format(hour, minute)
 	return " | T: {}, H: {} - ".format(shift, timeStr) + value
+
+
+def confirmSave():
+	"""
+	Show the standard save confirmation dialog for form save buttons.
+
+	Fires saveDataRoot on confirm. Message is fixed across all forms.
+
+	Returns:
+		None
+	"""
+	alerts.showAlert(
+		state="warning",
+		title="Guardar registro",
+		message="Esta seguro de que desea guardar el registro",
+		btnTextPrimary="Si",
+		btnTextSecondary="No",
+		btnActionPrimary="saveDataRoot"
+	)
