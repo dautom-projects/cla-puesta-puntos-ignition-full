@@ -1,10 +1,20 @@
 {
   "custom": {
-    "answers": {},
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        0
+      ],
+      "$ts": 0
+    },
+    "referencePapo": "",
+    "sign": "",
+    "dbConnection": "papo_db",
     "fontSize": 17,
     "insights": "",
     "registerTypeID": 8,
-    "user": "Mohamed Salah"
+    "user": "Soporte D."
   },
   "params": {
     "applyButton": 1,
@@ -826,16 +836,14 @@
     "workstationnodeID": 2
   },
   "propConfig": {
-    "custom.answers": {
-      "persistent": true
-    },
-    "custom.answers.condiciones": {
+    "custom.dbConnection": {
       "binding": {
         "config": {
-          "path": "/root/FlexContainer1.custom.answers"
+          "path": "session.custom.dbConnection"
         },
         "type": "property"
-      }
+      },
+      "persistent": true
     },
     "custom.fontSize": {
       "persistent": true
@@ -845,6 +853,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -1011,6 +1025,17 @@
       "persistent": true
     }
   },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
   "props": {
     "defaultSize": {
       "height": 967,
@@ -1057,46 +1082,6 @@
           "basis": "15px"
         },
         "type": "ia.display.label"
-      },
-      {
-        "children": [
-          {
-            "custom": {
-              "item": {}
-            },
-            "meta": {
-              "name": "Label"
-            },
-            "position": {
-              "basis": "50px"
-            },
-            "type": "ia.display.label"
-          }
-        ],
-        "meta": {
-          "name": "FlexContainer1"
-        },
-        "position": {
-          "basis": "200px"
-        },
-        "propConfig": {
-          "custom.answers": {
-            "binding": {
-              "config": {
-                "struct": {},
-                "waitOnAll": true
-              },
-              "transforms": [
-                {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
-            }
-          }
-        },
-        "type": "ia.container.flex"
       },
       {
         "meta": {
@@ -1266,6 +1251,34 @@
         "classes": "container-borders-dautom-widget",
         "overflow": "hidden"
       }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }

@@ -13,8 +13,18 @@
 - Maintain exact indentation (2 spaces for JSON)
 
 ## After editing
+- Update `resource.json` in the same view folder:
+  - `version`: increment by 1
+  - `lastModificationSignature`: SHA256 hash of the modified view.json
+  - `timestamp`: current UTC time (ISO format)
+  - `actor`: MUST be `"external"` (not `"admin"`) — Designer ignores changes with actor=admin
 - Run `/sync` to trigger Designer project scan
 - Confirm the JSON parses: `python -c "import json; json.load(open('path/to/view.json'))"`
+
+## NEVER use json.load/json.dump to rewrite view.json
+Ignition uses Gson which HTML-escapes `'` `=` `<` `>` as unicode sequences.
+Python's json module irreversibly destroys these escapes. Use targeted Edit tool
+calls or raw text manipulation instead. json.load is OK for READ-ONLY analysis.
 
 ## Component location pattern
 In root.children array, components appear in this order:

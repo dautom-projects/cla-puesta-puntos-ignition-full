@@ -1,26 +1,52 @@
 {
   "custom": {
-    "fontSize": 17,
-    "insights": "",
-    "registerTypeID": 3,
-    "user": "Soporte D.",
+    "db": "papo_db",
     "dbConnection": "papo_db",
+    "fontSize": 17,
     "initialPapoDateTime": {
       "$": [
         "ts",
         192,
-        1783575864557
+        1784616019379
       ],
-      "$ts": 1783575864557
-    }
+      "$ts": 1784616019379
+    },
+    "insights": " | T: 1, H: 01:40 - ",
+    "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
+    "referencePapo": "",
+    "refreshSecond": 25,
+    "registerTypeID": 3,
+    "sign": "",
+    "test": {
+      "items": [
+        {
+          "answer": "No Cumple",
+          "papoItemID": 3093,
+          "registerTypeID": 3
+        },
+        {
+          "answer": "No Cumple",
+          "papoItemID": 3095,
+          "registerTypeID": 3
+        },
+        {
+          "insights": " | T: 1, H: 01:40 - ",
+          "registerTypeID": 3,
+          "timestamp": "Tue Jul 21 01:44:25 COT 2026",
+          "user": "Soporte D."
+        }
+      ]
+    },
+    "user": "Soporte D."
   },
   "events": {
     "system": {
       "onStartup": {
         "config": {
-          "script": "papo_core.ui.initForm(self)"
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
         },
-        "scope": "G"
+        "scope": "G",
+        "type": "script"
       }
     }
   },
@@ -31,6 +57,18 @@
     "workstationnodeID": 1
   },
   "propConfig": {
+    "custom.db": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
     "custom.fontSize": {
       "persistent": true
     },
@@ -49,7 +87,26 @@
       },
       "persistent": true
     },
+    "custom.path": {
+      "persistent": true
+    },
+    "custom.refreshSecond": {
+      "binding": {
+        "config": {
+          "expression": "dateExtract(now(1000),\"second\")"
+        },
+        "type": "expr"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\n\t\t\n\tself.custom.test \u003d self.getChild(\"root\").answerRecopile(self.getChild(\"root\").getChild(\"FlexContainerGroup1\"))"
+      },
+      "persistent": true
+    },
     "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.test": {
       "persistent": true
     },
     "custom.user": {
@@ -81,15 +138,6 @@
     },
     "params.workstationnodeID": {
       "paramDirection": "input",
-      "persistent": true
-    },
-    "custom.dbConnection": {
-      "binding": {
-        "config": {
-          "path": "session.custom.dbConnection"
-        },
-        "type": "property"
-      },
       "persistent": true
     }
   },
@@ -157,17 +205,11 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
             }
-          },
-          "onClick": {
-            "config": {
-              "script": "sectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\nself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
-            },
-            "scope": "G"
           }
         },
         "meta": {
@@ -185,13 +227,20 @@
               },
               "transforms": [
                 {
-                  "inputType": "bool",
-                  "mappings": {
-                    "false": "button-questions",
-                    "true": "button-questions-2"
-                  },
-                  "outputType": "string",
-                  "type": "mapValues"
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
                 }
               ],
               "type": "property"
@@ -222,7 +271,8 @@
               "name": "Label"
             },
             "position": {
-              "basis": "40px"
+              "basis": "40px",
+              "display": false
             },
             "propConfig": {
               "props.textStyle.fontSize": {
@@ -355,15 +405,16 @@
           }
         ],
         "custom": {
+          "baseBasisPx": 143,
           "basePapo": 6190
         },
         "meta": {
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "143px",
-          "shrink": 0,
-          "display": false
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
         },
         "props": {
           "direction": "column",
@@ -516,7 +567,12 @@
         "type": "ia.container.flex"
       }
     ],
-    "custom": {},
+    "custom": {
+      "flexCount": [
+        1
+      ],
+      "flexGroupCount": 1
+    },
     "meta": {
       "name": "root"
     },
@@ -536,14 +592,14 @@
           "params": [
             "sectionIndex"
           ],
-          "script": "papo_core.ui.toggleSection(self, sectionIndex)"
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
         },
         {
           "name": "answerRecopile",
           "params": [
             "flexContainer"
           ],
-          "script": "return papo_core.register.recopile(flexContainer, self)"
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
         }
       ],
       "extensionFunctions": null,
@@ -551,7 +607,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "papo_core.register.save(self)",
+          "script": "\tpapo_core.register.save(self)",
           "sessionScope": false,
           "viewScope": false
         }

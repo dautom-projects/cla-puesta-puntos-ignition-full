@@ -1,12 +1,33 @@
 {
   "custom": {
-    "answers": {},
+    "dbConnection": "papo_db",
     "fontSize": 17,
-    "insights": "",
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1784618266889
+      ],
+      "$ts": 1784618266889
+    },
+    "insights": " | T: 1, H: 02:17 - ",
     "path": "[UNS]Clarios/Andina/Ensamble/Linea 4/UI/EA11-4101",
-    "refreshSecond": 11,
+    "referencePapo": "",
+    "refreshSecond": 35,
     "registerTypeID": 2,
-    "user": "Mohamed Salah"
+    "sign": "",
+    "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
   },
   "params": {
     "nodeID": 6,
@@ -15,24 +36,14 @@
     "workstationnodeID": 2
   },
   "propConfig": {
-    "custom.answers": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
       "persistent": true
-    },
-    "custom.answers.oneHour": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainerGroup1.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.twoHour": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainerGroup2.custom.answers"
-        },
-        "type": "property"
-      }
     },
     "custom.fontSize": {
       "persistent": true
@@ -42,6 +53,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -50,12 +67,6 @@
       "persistent": true
     },
     "custom.refreshSecond": {
-      "binding": {
-        "config": {
-          "expression": "dateExtract(now(1000),\"second\")"
-        },
-        "type": "expr"
-      },
       "onChange": {
         "enabled": null,
         "script": "\tlistCustom \u003d [\n\t\t\"answers.oneHour\",\n\t\t\"answers.twoHour\"\n\t\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))"
@@ -147,44 +158,102 @@
         "type": "ia.display.label"
       },
       {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section1"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup1.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Condiciones del Producto/Proceso ",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
         "children": [
           {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\n\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
+            "custom": {
+              "item": {
+                "papoItemID": 3118,
+                "registerTypeID": 1
               }
             },
             "meta": {
-              "name": "Section1"
+              "name": "Checkbox"
             },
             "position": {
-              "basis": "40px",
-              "shrink": 0
+              "basis": "56px"
             },
             "propConfig": {
-              "props.style.classes": {
+              "custom.item.answer": {
                 "binding": {
                   "config": {
-                    "path": "../FlexContainer1.position.display"
+                    "path": "this.props.selected"
                   },
                   "transforms": [
                     {
-                      "fallback": "button-questions",
+                      "fallback": "none",
                       "inputType": "scalar",
                       "mappings": [
                         {
                           "input": true,
-                          "output": "button-questions"
+                          "output": "Cumple"
                         },
                         {
                           "input": false,
-                          "output": "button-questions-2"
+                          "output": "No Cumple"
                         }
                       ],
                       "outputType": "scalar",
@@ -194,7 +263,7 @@
                   "type": "property"
                 }
               },
-              "props.textStyle.fontSize": {
+              "props.style.fontSize": {
                 "binding": {
                   "config": {
                     "path": "view.custom.fontSize"
@@ -204,190 +273,85 @@
               }
             },
             "props": {
-              "style": {},
-              "text": "Condiciones del Producto/Proceso ",
-              "textStyle": {
-                "textAlign": "center"
-              }
+              "text": "Altura Espigos acorde especificación/ USE GALGA"
             },
-            "type": "ia.display.label"
+            "type": "ia.input.checkbox"
           },
           {
-            "children": [
-              {
-                "custom": {
-                  "item": {
-                    "papoItemID": 3118,
-                    "registerTypeID": 1
-                  }
-                },
-                "meta": {
-                  "name": "Checkbox"
-                },
-                "position": {
-                  "basis": "56px"
-                },
-                "propConfig": {
-                  "custom.item.answer": {
-                    "binding": {
-                      "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "props.style.fontSize": {
-                    "binding": {
-                      "config": {
-                        "path": "view.custom.fontSize"
-                      },
-                      "type": "property"
-                    }
-                  }
-                },
-                "props": {
-                  "text": "Altura Espigos acorde especificación/ USE GALGA"
-                },
-                "type": "ia.input.checkbox"
-              },
-              {
-                "custom": {
-                  "item": {
-                    "papoItemID": 3121,
-                    "registerTypeID": 1
-                  }
-                },
-                "meta": {
-                  "name": "Checkbox_0"
-                },
-                "position": {
-                  "basis": "56px"
-                },
-                "propConfig": {
-                  "custom.item.answer": {
-                    "binding": {
-                      "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "props.style.fontSize": {
-                    "binding": {
-                      "config": {
-                        "path": "view.custom.fontSize"
-                      },
-                      "type": "property"
-                    }
-                  }
-                },
-                "props": {
-                  "text": "Apariencia de borne correcta y Altura de borne según Galga (Ver criterio aceptación rechazo)"
-                },
-                "type": "ia.input.checkbox"
+            "custom": {
+              "item": {
+                "papoItemID": 3121,
+                "registerTypeID": 1
               }
-            ],
+            },
             "meta": {
-              "name": "FlexContainer1"
+              "name": "Checkbox_0"
             },
             "position": {
-              "basis": "117px",
-              "display": false,
-              "shrink": 0
+              "basis": "56px"
             },
-            "props": {
-              "direction": "column",
-              "style": {
-                "borderBottomLeftRadius": 15,
-                "borderBottomRightRadius": 15,
-                "borderTopLeftRadius": 15,
-                "borderTopRightRadius": 15,
-                "marginLeft": 15,
-                "marginRight": 10,
-                "overflow": "hidden"
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
               }
             },
-            "type": "ia.container.flex"
+            "props": {
+              "text": "Apariencia de borne correcta y Altura de borne según Galga (Ver criterio aceptación rechazo)"
+            },
+            "type": "ia.input.checkbox"
           }
         ],
         "custom": {
-          "baseBasisPx": 60
+          "baseBasisPx": 117
         },
         "meta": {
           "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "60px",
+          "basis": "0px",
+          "display": false,
           "shrink": 0
-        },
-        "propConfig": {
-          "custom.answers": {
-            "binding": {
-              "config": {
-                "struct": {},
-                "waitOnAll": true
-              },
-              "transforms": [
-                {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único. Además, si el componente\n\tes un Flex Repeater (tiene props.instances), toma los items de sus instancias.\n\t\"\"\"\n\t\n\tdef _append_item(candidate, out_list):\n\t\t\"\"\"Agrega al arreglo de salida un item con las claves esperadas, si existe.\"\"\"\n\t\tif not candidate:\n\t\t\treturn\n\t\ttry:\n\t\t\tout_list.append({\n\t\t\t\t\"papoItemID\": candidate.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": candidate.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": candidate.get(\"answer\")\n\t\t\t})\n\t\texcept Exception:\n\t\t\t# Silencioso: si el objeto no es mapeable, lo ignoramos\n\t\t\tpass\n\t\n\t\n\tdef _gather_from_instances(component):\n\t\t\"\"\"\n\t\tIntenta extraer items desde props.instances (Flex Repeater).\n\t\tBusca en:\n\t\t  - instancia[\u0027item\u0027]\n\t\t  - instancia[\u0027viewParams\u0027][\u0027item\u0027]\n\t\tTambién soporta que \u0027item\u0027 sea una lista de ítems.\n\t\t\"\"\"\n\t\titems \u003d []\n\t\ttry:\n\t\t\tif hasattr(component, \"props\") and hasattr(component.props, \"instances\"):\n\t\t\t\tfor inst in component.props.instances:\n\t\t\t\t\t# inst es un dict-like\n\t\t\t\t\tcandidate \u003d None\n\t\t\t\t\t# item directo en la instancia\n\t\t\t\t\tif hasattr(inst, \"get\"):\n\t\t\t\t\t\tcandidate \u003d inst.get(\"item\", None)\n\t\t\t\t\t\t# o dentro de viewParams\n\t\t\t\t\t\tif candidate is None:\n\t\t\t\t\t\t\tvp \u003d inst.get(\"viewParams\", None)\n\t\t\t\t\t\t\tif hasattr(vp, \"get\"):\n\t\t\t\t\t\t\t\tcandidate \u003d vp.get(\"item\", None)\n\t\n\t\t\t\t\t# \u0027item\u0027 puede ser un solo dict o una lista de dicts\n\t\t\t\t\tif candidate is not None:\n\t\t\t\t\t\tif isinstance(candidate, (list, tuple)):\n\t\t\t\t\t\t\tfor it in candidate:\n\t\t\t\t\t\t\t\t_append_item(it, items)\n\t\t\t\t\t\telse:\n\t\t\t\t\t\t\t_append_item(candidate, items)\n\t\texcept Exception:\n\t\t\t# Si algo falla, no rompemos el flujo\n\t\t\tpass\n\t\n\t\treturn items\n\t\n\t\n\tdef gather_items(component):\n\t\titems \u003d []\n\t\n\t\t# 1) Si este componente tiene custom.item, lo guardamos\n\t\ttry:\n\t\t\tif hasattr(component, \"custom\") and hasattr(component.custom, \"item\"):\n\t\t\t\t_append_item(component.custom.item, items)\n\t\texcept Exception:\n\t\t\tpass\n\t\n\t\t# 2) Si es un Flex Repeater (o similar) con props.instances, recolectamos desde las instancias\n\t\t#    y NO descendemos a sus hijos para evitar duplicados.\n\t\tif hasattr(component, \"props\") and hasattr(component.props, \"instances\"):\n\t\t\titems.extend(_gather_from_instances(component))\n\t\t\treturn items  # Importante: no recursar hijos del repeater para no duplicar\n\t\n\t\t# 3) Recorremos hijos recursivamente\n\t\ttry:\n\t\t\tfor child in component.getChildren():\n\t\t\t\titems.extend(gather_items(child))\n\t\texcept Exception:\n\t\t\tpass\n\t\n\t\treturn items\n\t\n\t\n\t# --- Ejecución principal ---\n\tall_items \u003d gather_items(self)  # empezamos desde el contenedor actual (p. ej., FlexContainer4)\n\t\n\t# Agregar observaciones como un item extra (NO TOCAR)\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\": registerType\n\t\t})\n\t\n\treturn {\"items\": all_items}",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
-            }
-          },
-          "custom.refreshSecond": {
-            "binding": {
-              "config": {
-                "expression": "dateExtract(now(1000),\"second\")"
-              },
-              "type": "expr"
-            },
-            "onChange": {
-              "enabled": null,
-              "script": "\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\tfor path in listCustom:\n\t\tself.refreshBinding(\"custom.{}\".format(path))"
-            }
-          }
         },
         "props": {
           "direction": "column",
           "style": {
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 15,
+            "marginRight": 10,
             "overflow": "hidden"
           }
         },
@@ -427,53 +391,80 @@
         "type": "ia.display.label"
       },
       {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section2"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup2.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Condiciones del Producto/Proceso ",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
         "children": [
           {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\n\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
             "meta": {
-              "name": "Section1"
+              "name": "Label_3"
             },
             "position": {
-              "basis": "40px",
+              "basis": "-141.2%",
               "shrink": 0
             },
             "propConfig": {
-              "props.style.classes": {
-                "binding": {
-                  "config": {
-                    "path": "../FlexContainer1.position.display"
-                  },
-                  "transforms": [
-                    {
-                      "fallback": "button-questions",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "button-questions"
-                        },
-                        {
-                          "input": false,
-                          "output": "button-questions-2"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
               "props.textStyle.fontSize": {
                 "binding": {
                   "config": {
@@ -484,10 +475,9 @@
               }
             },
             "props": {
-              "style": {},
-              "text": "Condiciones del Producto/Proceso ",
+              "text": "Referencia hora/hora",
               "textStyle": {
-                "textAlign": "center"
+                "fontWeight": "bold"
               }
             },
             "type": "ia.display.label"
@@ -495,11 +485,494 @@
           {
             "children": [
               {
+                "children": [
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 7905,
+                        "registerTypeID": 2
+                      }
+                    },
+                    "meta": {
+                      "name": "NumericEntryField"
+                    },
+                    "position": {
+                      "basis": "205px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.value"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "align": "left",
+                      "format": "none",
+                      "placeholder": "Esciba aqui",
+                      "spinner": {
+                        "enabled": false
+                      },
+                      "style": {
+                        "classes": "dropdown",
+                        "marginLeft": 0
+                      }
+                    },
+                    "type": "ia.input.numeric-entry-field"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_2"
+                },
+                "position": {
+                  "basis": "50%",
+                  "shrink": 0
+                },
+                "props": {
+                  "alignItems": "flex-start",
+                  "direction": "column",
+                  "justify": "flex-end",
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_9"
+            },
+            "position": {
+              "basis": "25px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 3122,
+                        "registerTypeID": 1
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox"
+                    },
+                    "position": {
+                      "basis": "56px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Medidores de gas y oxígeno de alta en buen estado."
+                    },
+                    "type": "ia.input.checkbox"
+                  },
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 3123,
+                        "registerTypeID": 2
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox_0"
+                    },
+                    "position": {
+                      "basis": "56px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Estado de ajuste de bornera correcto."
+                    },
+                    "type": "ia.input.checkbox"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_0"
+                },
+                "position": {
+                  "basis": "50%"
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 3117,
+                        "registerTypeID": 2
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox"
+                    },
+                    "position": {
+                      "basis": "56px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Rotámetros enfríamiento en buen estado."
+                    },
+                    "type": "ia.input.checkbox"
+                  },
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 3119,
+                        "registerTypeID": 2
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox_0"
+                    },
+                    "position": {
+                      "basis": "56px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Tipo de caja y cubierta de acuerdo a la referencia.\n"
+                    },
+                    "type": "ia.input.checkbox"
+                  },
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 3120,
+                        "registerTypeID": 2
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox_1"
+                    },
+                    "position": {
+                      "basis": "56px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Tipo de cubierta según referencia de batería"
+                    },
+                    "type": "ia.input.checkbox"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "50%"
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 171
+        },
+        "meta": {
+          "name": "FlexContainerGroup2"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "borderBottomLeftRadius": 0,
+            "borderBottomRightRadius": 0,
+            "borderTopLeftRadius": 0,
+            "borderTopRightRadius": 0,
+            "marginLeft": 15,
+            "marginRight": 10,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section3"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup3.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Verificación del Producto",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
                 "meta": {
                   "name": "Label_3"
                 },
                 "position": {
-                  "basis": "-141.2%",
+                  "basis": "30px",
                   "shrink": 0
                 },
                 "propConfig": {
@@ -513,1517 +986,964 @@
                   }
                 },
                 "props": {
-                  "text": "Referencia hora/hora",
+                  "text": "Verificación del producto",
                   "textStyle": {
-                    "fontWeight": "bold"
+                    "fontWeight": "bold",
+                    "textAlign": "left"
                   }
                 },
                 "type": "ia.display.label"
               },
               {
-                "children": [
-                  {
-                    "children": [
-                      {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 7905,
-                            "registerTypeID": 2
-                          }
-                        },
-                        "meta": {
-                          "name": "NumericEntryField"
-                        },
-                        "position": {
-                          "basis": "205px"
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.value"
-                              },
-                              "type": "property"
-                            }
-                          },
-                          "props.style.fontSize": {
-                            "binding": {
-                              "config": {
-                                "path": "view.custom.fontSize"
-                              },
-                              "type": "property"
-                            }
-                          }
-                        },
-                        "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
-                          },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
-                        },
-                        "type": "ia.input.numeric-entry-field"
-                      }
-                    ],
-                    "meta": {
-                      "name": "FlexContainer_2"
-                    },
-                    "position": {
-                      "basis": "50%",
-                      "shrink": 0
-                    },
-                    "props": {
-                      "alignItems": "flex-start",
-                      "direction": "column",
-                      "justify": "flex-end",
-                      "style": {
-                        "overflow": "hidden"
-                      }
-                    },
-                    "type": "ia.container.flex"
-                  }
-                ],
                 "meta": {
-                  "name": "FlexContainer_9"
+                  "name": "Label"
                 },
                 "position": {
-                  "basis": "25px",
-                  "shrink": 0
+                  "basis": "60px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
                 },
                 "props": {
                   "style": {
-                    "overflow": "hidden"
-                  }
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Los instrumentos de medida y ensayo están calibrados"
                 },
-                "type": "ia.container.flex"
+                "type": "ia.display.label"
               },
               {
-                "children": [
-                  {
-                    "children": [
-                      {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 3122,
-                            "registerTypeID": 1
-                          }
-                        },
-                        "meta": {
-                          "name": "Checkbox"
-                        },
-                        "position": {
-                          "basis": "56px"
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.selected"
-                              },
-                              "transforms": [
-                                {
-                                  "fallback": "none",
-                                  "inputType": "scalar",
-                                  "mappings": [
-                                    {
-                                      "input": true,
-                                      "output": "Cumple"
-                                    },
-                                    {
-                                      "input": false,
-                                      "output": "No Cumple"
-                                    }
-                                  ],
-                                  "outputType": "scalar",
-                                  "type": "map"
-                                }
-                              ],
-                              "type": "property"
-                            }
-                          },
-                          "props.style.fontSize": {
-                            "binding": {
-                              "config": {
-                                "path": "view.custom.fontSize"
-                              },
-                              "type": "property"
-                            }
-                          }
-                        },
-                        "props": {
-                          "text": "Medidores de gas y oxígeno de alta en buen estado."
-                        },
-                        "type": "ia.input.checkbox"
-                      },
-                      {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 3123,
-                            "registerTypeID": 2
-                          }
-                        },
-                        "meta": {
-                          "name": "Checkbox_0"
-                        },
-                        "position": {
-                          "basis": "56px"
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.selected"
-                              },
-                              "transforms": [
-                                {
-                                  "fallback": "none",
-                                  "inputType": "scalar",
-                                  "mappings": [
-                                    {
-                                      "input": true,
-                                      "output": "Cumple"
-                                    },
-                                    {
-                                      "input": false,
-                                      "output": "No Cumple"
-                                    }
-                                  ],
-                                  "outputType": "scalar",
-                                  "type": "map"
-                                }
-                              ],
-                              "type": "property"
-                            }
-                          },
-                          "props.style.fontSize": {
-                            "binding": {
-                              "config": {
-                                "path": "view.custom.fontSize"
-                              },
-                              "type": "property"
-                            }
-                          }
-                        },
-                        "props": {
-                          "text": "Estado de ajuste de bornera correcto."
-                        },
-                        "type": "ia.input.checkbox"
-                      }
-                    ],
-                    "meta": {
-                      "name": "FlexContainer_0"
-                    },
-                    "position": {
-                      "basis": "50%"
-                    },
-                    "props": {
-                      "direction": "column"
-                    },
-                    "type": "ia.container.flex"
-                  },
-                  {
-                    "children": [
-                      {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 3117,
-                            "registerTypeID": 2
-                          }
-                        },
-                        "meta": {
-                          "name": "Checkbox"
-                        },
-                        "position": {
-                          "basis": "56px"
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.selected"
-                              },
-                              "transforms": [
-                                {
-                                  "fallback": "none",
-                                  "inputType": "scalar",
-                                  "mappings": [
-                                    {
-                                      "input": true,
-                                      "output": "Cumple"
-                                    },
-                                    {
-                                      "input": false,
-                                      "output": "No Cumple"
-                                    }
-                                  ],
-                                  "outputType": "scalar",
-                                  "type": "map"
-                                }
-                              ],
-                              "type": "property"
-                            }
-                          },
-                          "props.style.fontSize": {
-                            "binding": {
-                              "config": {
-                                "path": "view.custom.fontSize"
-                              },
-                              "type": "property"
-                            }
-                          }
-                        },
-                        "props": {
-                          "text": "Rotámetros enfríamiento en buen estado."
-                        },
-                        "type": "ia.input.checkbox"
-                      },
-                      {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 3119,
-                            "registerTypeID": 2
-                          }
-                        },
-                        "meta": {
-                          "name": "Checkbox_0"
-                        },
-                        "position": {
-                          "basis": "56px"
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.selected"
-                              },
-                              "transforms": [
-                                {
-                                  "fallback": "none",
-                                  "inputType": "scalar",
-                                  "mappings": [
-                                    {
-                                      "input": true,
-                                      "output": "Cumple"
-                                    },
-                                    {
-                                      "input": false,
-                                      "output": "No Cumple"
-                                    }
-                                  ],
-                                  "outputType": "scalar",
-                                  "type": "map"
-                                }
-                              ],
-                              "type": "property"
-                            }
-                          },
-                          "props.style.fontSize": {
-                            "binding": {
-                              "config": {
-                                "path": "view.custom.fontSize"
-                              },
-                              "type": "property"
-                            }
-                          }
-                        },
-                        "props": {
-                          "text": "Tipo de caja y cubierta de acuerdo a la referencia.\n"
-                        },
-                        "type": "ia.input.checkbox"
-                      },
-                      {
-                        "custom": {
-                          "item": {
-                            "papoItemID": 3120,
-                            "registerTypeID": 2
-                          }
-                        },
-                        "meta": {
-                          "name": "Checkbox_1"
-                        },
-                        "position": {
-                          "basis": "56px"
-                        },
-                        "propConfig": {
-                          "custom.item.answer": {
-                            "binding": {
-                              "config": {
-                                "path": "this.props.selected"
-                              },
-                              "transforms": [
-                                {
-                                  "fallback": "none",
-                                  "inputType": "scalar",
-                                  "mappings": [
-                                    {
-                                      "input": true,
-                                      "output": "Cumple"
-                                    },
-                                    {
-                                      "input": false,
-                                      "output": "No Cumple"
-                                    }
-                                  ],
-                                  "outputType": "scalar",
-                                  "type": "map"
-                                }
-                              ],
-                              "type": "property"
-                            }
-                          },
-                          "props.style.fontSize": {
-                            "binding": {
-                              "config": {
-                                "path": "view.custom.fontSize"
-                              },
-                              "type": "property"
-                            }
-                          }
-                        },
-                        "props": {
-                          "text": "Tipo de cubierta según referencia de batería"
-                        },
-                        "type": "ia.input.checkbox"
-                      }
-                    ],
-                    "meta": {
-                      "name": "FlexContainer"
-                    },
-                    "position": {
-                      "basis": "50%"
-                    },
-                    "props": {
-                      "direction": "column"
-                    },
-                    "type": "ia.container.flex"
+                "custom": {
+                  "item": {
+                    "papoItemID": 3126,
+                    "registerTypeID": 2
                   }
-                ],
+                },
                 "meta": {
-                  "name": "FlexContainer_1"
+                  "name": "NumericEntryField"
                 },
                 "position": {
-                  "basis": "200px"
+                  "basis": "32px"
                 },
-                "type": "ia.container.flex"
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Cabezal 1 molde izquierdo y derecho"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3128,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "Label_4"
+                },
+                "position": {
+                  "basis": "20px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "fallbackDelay": 2.5,
+                        "mode": "indirect",
+                        "references": {
+                          "path": "{view.custom.path}"
+                        },
+                        "tagPath": "{path}/Cabezal_1_Molde_Izq_Dere"
+                      },
+                      "type": "tag"
+                    }
+                  },
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-data-2",
+                    "color": "#1199C7"
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_6"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Regulador Principal de Gas. CABEZAL 1"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3130,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_1"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_7"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Regulador Principal de Oxigeno. CABEZAL 1."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3131,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_2"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_8"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Ajuste Rotametro Llama alta de Gas. CABEZAL 1."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3134,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_3"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_9"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Ajuste Rotametro Llama alta de Oxigeno. CABEZAL 1."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3135,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_4"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
               }
             ],
             "meta": {
-              "name": "FlexContainer1"
+              "name": "FlexContainer"
             },
             "position": {
-              "basis": "171px",
-              "display": false,
-              "shrink": 0
+              "basis": "48%"
             },
             "props": {
+              "alignItems": "flex-start",
               "direction": "column",
               "style": {
-                "borderBottomLeftRadius": 0,
-                "borderBottomRightRadius": 0,
-                "borderTopLeftRadius": 0,
-                "borderTopRightRadius": 0,
-                "marginLeft": 15,
-                "marginRight": 10,
                 "overflow": "hidden"
               }
             },
             "type": "ia.container.flex"
           },
           {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\n\tgroupIndex \u003d int(self.parent.meta.name.replace(\"FlexContainerGroup\", \"\"))\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(groupIndex,sectionIndex)"
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Section2"
-            },
-            "position": {
-              "basis": "40px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.style.classes": {
-                "binding": {
-                  "config": {
-                    "path": "../FlexContainer2.position.display"
-                  },
-                  "transforms": [
-                    {
-                      "fallback": "button-questions",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "button-questions"
-                        },
-                        {
-                          "input": false,
-                          "output": "button-questions-2"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
-              "props.textStyle.fontSize": {
-                "binding": {
-                  "config": {
-                    "path": "view.custom.fontSize"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "style": {},
-              "text": "Verificación del Producto",
-              "textStyle": {
-                "textAlign": "center"
-              }
-            },
-            "type": "ia.display.label"
-          },
-          {
             "children": [
               {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Label_3"
-                    },
-                    "position": {
-                      "basis": "30px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Verificación del producto",
-                      "textStyle": {
-                        "fontWeight": "bold",
-                        "textAlign": "left"
-                      }
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label"
-                    },
-                    "position": {
-                      "basis": "60px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Los instrumentos de medida y ensayo están calibrados"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3126,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_1"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Cabezal 1 molde izquierdo y derecho"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3128,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "Label_4"
-                    },
-                    "position": {
-                      "basis": "20px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.text"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "fallbackDelay": 2.5,
-                            "mode": "indirect",
-                            "references": {
-                              "path": "{view.custom.path}"
-                            },
-                            "tagPath": "{path}/Cabezal_1_Molde_Izq_Dere"
-                          },
-                          "type": "tag"
-                        }
-                      },
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "text-data-2",
-                        "color": "#1199C7"
-                      }
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_6"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Regulador Principal de Gas. CABEZAL 1"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3130,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_1"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_7"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Regulador Principal de Oxigeno. CABEZAL 1."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3131,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_2"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_8"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Ajuste Rotametro Llama alta de Gas. CABEZAL 1."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3134,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_3"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_9"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Ajuste Rotametro Llama alta de Oxigeno. CABEZAL 1."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3135,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_4"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  }
-                ],
                 "meta": {
-                  "name": "FlexContainer"
+                  "name": "Label_3"
                 },
                 "position": {
-                  "basis": "48%"
+                  "basis": "30px",
+                  "shrink": 0
                 },
-                "props": {
-                  "alignItems": "flex-start",
-                  "direction": "column",
-                  "style": {
-                    "overflow": "hidden"
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
                   }
                 },
-                "type": "ia.container.flex"
+                "props": {
+                  "text": "\n",
+                  "textStyle": {
+                    "fontWeight": "bold",
+                    "textAlign": "left"
+                  }
+                },
+                "type": "ia.display.label"
               },
               {
-                "children": [
-                  {
-                    "meta": {
-                      "name": "Label_3"
-                    },
-                    "position": {
-                      "basis": "30px",
-                      "shrink": 0
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "\n",
-                      "textStyle": {
-                        "fontWeight": "bold",
-                        "textAlign": "left"
-                      }
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label"
-                    },
-                    "position": {
-                      "basis": "60px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Electrodos al rojo vivo en funcionamiento. Ajustando Perillas Llama Baja."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3127,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_1"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Cabezal 2 molde izquierdo y derecho"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3129,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "Label_4"
-                    },
-                    "position": {
-                      "basis": "20px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.text"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.text": {
-                        "binding": {
-                          "config": {
-                            "fallbackDelay": 2.5,
-                            "mode": "indirect",
-                            "references": {
-                              "path": "{view.custom.path}"
-                            },
-                            "tagPath": "{path}/Cabezal_2_Molde_Izq_Dere"
-                          },
-                          "type": "tag"
-                        }
-                      },
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "classes": "text-data-2",
-                        "color": "#1199C7",
-                        "paddingLeft": ""
-                      }
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_6"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Regulador Principal de Gas. CABEZAL 2"
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3132,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_1"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_7"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Regulador Principal de Oxigeno. CABEZAL 2."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3133,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_2"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_8"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Ajuste Rotametro Llama alta de Gas. CABEZAL 2."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3136,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_3"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  },
-                  {
-                    "meta": {
-                      "name": "Label_9"
-                    },
-                    "position": {
-                      "basis": "45px"
-                    },
-                    "propConfig": {
-                      "props.textStyle.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "style": {
-                        "paddingLeft": 0,
-                        "textAlign": ""
-                      },
-                      "text": "Ajuste Rotametro Llama alta de Oxigeno. CABEZAL 2."
-                    },
-                    "type": "ia.display.label"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3137,
-                        "registerTypeID": 2
-                      }
-                    },
-                    "meta": {
-                      "name": "NumericEntryField_4"
-                    },
-                    "position": {
-                      "basis": "32px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.value"
-                          },
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
-                      },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
-                    },
-                    "type": "ia.input.numeric-entry-field"
-                  }
-                ],
                 "meta": {
-                  "name": "FlexContainer_0"
+                  "name": "Label"
                 },
                 "position": {
-                  "basis": "50%"
+                  "basis": "60px"
                 },
-                "props": {
-                  "alignItems": "flex-start",
-                  "direction": "column",
-                  "style": {
-                    "overflow": "hidden",
-                    "paddingLeft": 20
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
                   }
                 },
-                "type": "ia.container.flex"
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Electrodos al rojo vivo en funcionamiento. Ajustando Perillas Llama Baja."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3127,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Cabezal 2 molde izquierdo y derecho"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3129,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "Label_4"
+                },
+                "position": {
+                  "basis": "20px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "fallbackDelay": 2.5,
+                        "mode": "indirect",
+                        "references": {
+                          "path": "{view.custom.path}"
+                        },
+                        "tagPath": "{path}/Cabezal_2_Molde_Izq_Dere"
+                      },
+                      "type": "tag"
+                    }
+                  },
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-data-2",
+                    "color": "#1199C7",
+                    "paddingLeft": ""
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_6"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Regulador Principal de Gas. CABEZAL 2"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3132,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_1"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_7"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Regulador Principal de Oxigeno. CABEZAL 2."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3133,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_2"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_8"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Ajuste Rotametro Llama alta de Gas. CABEZAL 2."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3136,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_3"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_9"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0,
+                    "textAlign": ""
+                  },
+                  "text": "Ajuste Rotametro Llama alta de Oxigeno. CABEZAL 2."
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3137,
+                    "registerTypeID": 2
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_4"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "align": "left",
+                  "format": "none",
+                  "placeholder": "Esciba aqui",
+                  "spinner": {
+                    "enabled": false
+                  },
+                  "style": {
+                    "classes": "dropdown",
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.input.numeric-entry-field"
               }
             ],
             "meta": {
-              "name": "FlexContainer2"
+              "name": "FlexContainer_0"
             },
             "position": {
-              "basis": "517px",
-              "display": false,
-              "shrink": 0
+              "basis": "50%"
             },
             "props": {
-              "justify": "center",
+              "alignItems": "flex-start",
+              "direction": "column",
               "style": {
-                "borderBottomLeftRadius": 15,
-                "borderBottomRightRadius": 15,
-                "borderTopLeftRadius": 15,
-                "borderTopRightRadius": 15,
-                "marginLeft": 15,
-                "marginRight": 10,
-                "overflow": "hidden"
+                "overflow": "hidden",
+                "paddingLeft": 20
               }
             },
             "type": "ia.container.flex"
           }
         ],
         "custom": {
-          "baseBasisPx": 130
+          "baseBasisPx": 517
         },
         "meta": {
-          "name": "FlexContainerGroup2"
+          "name": "FlexContainerGroup3"
         },
         "position": {
-          "basis": "130px",
+          "basis": "0px",
+          "display": false,
           "shrink": 0
         },
-        "propConfig": {
-          "custom.answers": {
-            "binding": {
-              "config": {
-                "struct": {},
-                "waitOnAll": true
-              },
-              "transforms": [
-                {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único. Además, si el componente\n\tes un Flex Repeater (tiene props.instances), toma los items de sus instancias.\n\t\"\"\"\n\t\n\tdef _append_item(candidate, out_list):\n\t\t\"\"\"Agrega al arreglo de salida un item con las claves esperadas, si existe.\"\"\"\n\t\tif not candidate:\n\t\t\treturn\n\t\ttry:\n\t\t\tout_list.append({\n\t\t\t\t\"papoItemID\": candidate.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": candidate.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": candidate.get(\"answer\")\n\t\t\t})\n\t\texcept Exception:\n\t\t\t# Silencioso: si el objeto no es mapeable, lo ignoramos\n\t\t\tpass\n\t\n\t\n\tdef _gather_from_instances(component):\n\t\t\"\"\"\n\t\tIntenta extraer items desde props.instances (Flex Repeater).\n\t\tBusca en:\n\t\t  - instancia[\u0027item\u0027]\n\t\t  - instancia[\u0027viewParams\u0027][\u0027item\u0027]\n\t\tTambién soporta que \u0027item\u0027 sea una lista de ítems.\n\t\t\"\"\"\n\t\titems \u003d []\n\t\ttry:\n\t\t\tif hasattr(component, \"props\") and hasattr(component.props, \"instances\"):\n\t\t\t\tfor inst in component.props.instances:\n\t\t\t\t\t# inst es un dict-like\n\t\t\t\t\tcandidate \u003d None\n\t\t\t\t\t# item directo en la instancia\n\t\t\t\t\tif hasattr(inst, \"get\"):\n\t\t\t\t\t\tcandidate \u003d inst.get(\"item\", None)\n\t\t\t\t\t\t# o dentro de viewParams\n\t\t\t\t\t\tif candidate is None:\n\t\t\t\t\t\t\tvp \u003d inst.get(\"viewParams\", None)\n\t\t\t\t\t\t\tif hasattr(vp, \"get\"):\n\t\t\t\t\t\t\t\tcandidate \u003d vp.get(\"item\", None)\n\t\n\t\t\t\t\t# \u0027item\u0027 puede ser un solo dict o una lista de dicts\n\t\t\t\t\tif candidate is not None:\n\t\t\t\t\t\tif isinstance(candidate, (list, tuple)):\n\t\t\t\t\t\t\tfor it in candidate:\n\t\t\t\t\t\t\t\t_append_item(it, items)\n\t\t\t\t\t\telse:\n\t\t\t\t\t\t\t_append_item(candidate, items)\n\t\texcept Exception:\n\t\t\t# Si algo falla, no rompemos el flujo\n\t\t\tpass\n\t\n\t\treturn items\n\t\n\t\n\tdef gather_items(component):\n\t\titems \u003d []\n\t\n\t\t# 1) Si este componente tiene custom.item, lo guardamos\n\t\ttry:\n\t\t\tif hasattr(component, \"custom\") and hasattr(component.custom, \"item\"):\n\t\t\t\t_append_item(component.custom.item, items)\n\t\texcept Exception:\n\t\t\tpass\n\t\n\t\t# 2) Si es un Flex Repeater (o similar) con props.instances, recolectamos desde las instancias\n\t\t#    y NO descendemos a sus hijos para evitar duplicados.\n\t\tif hasattr(component, \"props\") and hasattr(component.props, \"instances\"):\n\t\t\titems.extend(_gather_from_instances(component))\n\t\t\treturn items  # Importante: no recursar hijos del repeater para no duplicar\n\t\n\t\t# 3) Recorremos hijos recursivamente\n\t\ttry:\n\t\t\tfor child in component.getChildren():\n\t\t\t\titems.extend(gather_items(child))\n\t\texcept Exception:\n\t\t\tpass\n\t\n\t\treturn items\n\t\n\t\n\t# --- Ejecución principal ---\n\tall_items \u003d gather_items(self)  # empezamos desde el contenedor actual (p. ej., FlexContainer4)\n\t\n\t# Agregar observaciones como un item extra (NO TOCAR)\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\": registerType\n\t\t})\n\t\n\treturn {\"items\": all_items}",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
-            }
-          },
-          "custom.refreshSecond": {
-            "binding": {
-              "config": {
-                "expression": "dateExtract(now(1000),\"second\")"
-              },
-              "type": "expr"
-            },
-            "onChange": {
-              "enabled": null,
-              "script": "\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\tfor path in listCustom:\n\t\tself.refreshBinding(\"custom.{}\".format(path))"
-            }
-          }
-        },
         "props": {
-          "direction": "column",
+          "justify": "center",
           "style": {
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 15,
+            "marginRight": 10,
             "overflow": "hidden"
           }
         },
@@ -2211,18 +2131,16 @@
         {
           "name": "toggleFlexRoot",
           "params": [
-            "groupIndex",
-            "sectionIndex",
-            "labelsHeight\u003d210"
+            "sectionIndex"
           ],
-          "script": "\t\n\tflexGroupCount \u003d self.custom.flexGroupCount          # e.g., 3 groups\n\tflexCount \u003d self.custom.flexCount                    # e.g., [4, 3, 5]\n\n\t# Índices del botón clicado\n\tthisGroupIndex \u003d int(groupIndex)      # FlexContainerGroupN\n\tthisSectionIndex \u003d int(sectionIndex)  # SectionN / FlexContainerN\n\t#logging.log(\"Group Index that sent the message {}\".format(thisGroupIndex), \"info\")\n\n\t# Recorre cada FlexContainerGroupX\n\tfor flexStartIndex in range(1, int(flexGroupCount) + 1):\n\n\t\t# Contenedor del grupo\n\t\tflexStart \u003d self.getChild(\"FlexContainerGroup{}\".format(flexStartIndex))\n\n\t\t# Asegurar base inicial por grupo (una sola vez)\n\t\tif not flexStart.custom.get(\"baseBasisPx\", None):\n\t\t\tbasis_px \u003d int(str(flexStart.position.basis).replace(\"px\", \"\")) if flexStart.position.basis else 100\n\t\t\tflexStart.custom.baseBasisPx \u003d basis_px\n\n\t\ttotal_in_group \u003d int(flexCount[flexStartIndex - 1])\n\n\t\t# Flag: este es el grupo activo (el del click)\n\t\tis_active_group \u003d (flexStartIndex \u003d\u003d thisGroupIndex)\n\n\t\tfor secIndex in range(1, total_in_group + 1):\n\n\t\t\tflex \u003d flexStart.getChild(\"FlexContainer{}\".format(secIndex))\n\t\t\tbutton \u003d flexStart.getChild(\"Section{}\".format(secIndex))\n\n\t\t\tif is_active_group and secIndex \u003d\u003d thisSectionIndex:\n\t\t\t\t# --- Toggle del seleccionado (grupo activo) ---\n\t\t\t\tcurrent_display \u003d bool(flex.position.display)\n\t\t\t\tnew_display \u003d not current_display\n\t\t\t\tflex.position.display \u003d new_display\n\n\t\t\t\t# Ajustar basis del GRUPO ACTIVO según new_display\n\t\t\t\tgroup_base_px \u003d int(flexStart.custom.get(\"baseBasisPx\", 0))\n\t\t\t\tflex_base_px \u003d int(flex.position.basis.replace(\"px\",\"\"))\n\t\t\t\tif new_display:\n\t\t\t\t\tflexStart.position.basis \u003d str(group_base_px + flex_base_px) + \"px\"\n\t\t\t\t\tbutton.props.style.classes \u003d \u0027button-questions\u0027\n\t\t\t\telse:\n\t\t\t\t\tflexStart.position.basis \u003d str(group_base_px) + \"px\"\n\t\t\t\t\tbutton.props.style.classes \u003d \u0027button-questions-2\u0027\n\n\t\t\telse:\n\t\t\t\t# --- Ocultar todos los demás ---\n\t\t\t\tflex.position.display \u003d False\n\t\t\t\tbutton.props.style.classes \u003d \u0027button-questions-2\u0027\n\n\t\t\t\t# Si NO es el grupo activo, su basis debe quedar en base\n\t\t\t\tif not is_active_group:\n\t\t\t\t\tbase_px \u003d int(flexStart.custom.get(\"baseBasisPx\", 0))\n\t\t\t\t\tflexStart.position.basis \u003d str(base_px) + \"px\""
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
         },
         {
           "name": "answerRecopile",
           "params": [
             "flexContainer"
           ],
-          "script": "\t# implement your method here\n\t\n\t\t\"\"\"Recorre recursivamente todos los hijos del contenedor (flexContainer)\n\t\ty recolecta los custom.item en un JSON único. Además, si el componente\n\t\tes un Flex Repeater (tiene props.instances), toma los items de sus instancias.\n\t\t\"\"\"\n\t\t\n\t\tdef _append_item(candidate, out_list):\n\t\t\t\"\"\"Agrega al arreglo de salida un item con las claves esperadas, si existe.\"\"\"\n\t\t\tif not candidate:\n\t\t\t\treturn\n\t\t\ttry:\n\t\t\t\tout_list.append({\n\t\t\t\t\t\"papoItemID\": candidate.get(\"papoItemID\"),\n\t\t\t\t\t\"registerTypeID\": candidate.get(\"registerTypeID\"),\n\t\t\t\t\t\"answer\": candidate.get(\"answer\")\n\t\t\t\t})\n\t\t\texcept Exception:\n\t\t\t\t# Silencioso: si el objeto no es mapeable, lo ignoramos\n\t\t\t\tpass\n\t\t\n\t\t\n\t\tdef _gather_from_instances(component):\n\t\t\t\"\"\"\n\t\t\tIntenta extraer items desde props.instances (Flex Repeater).\n\t\t\tBusca en:\n\t\t\t  - instancia[\u0027item\u0027]\n\t\t\t  - instancia[\u0027viewParams\u0027][\u0027item\u0027]\n\t\t\tTambién soporta que \u0027item\u0027 sea una lista de ítems.\n\t\t\t\"\"\"\n\t\t\titems \u003d []\n\t\t\ttry:\n\t\t\t\tif hasattr(component, \"props\") and hasattr(component.props, \"instances\"):\n\t\t\t\t\tfor inst in component.props.instances:\n\t\t\t\t\t\t# inst es un dict-like\n\t\t\t\t\t\tcandidate \u003d None\n\t\t\t\t\t\t# item directo en la instancia\n\t\t\t\t\t\tif hasattr(inst, \"get\"):\n\t\t\t\t\t\t\tcandidate \u003d inst.get(\"item\", None)\n\t\t\t\t\t\t\t# o dentro de viewParams\n\t\t\t\t\t\t\tif candidate is None:\n\t\t\t\t\t\t\t\tvp \u003d inst.get(\"viewParams\", None)\n\t\t\t\t\t\t\t\tif hasattr(vp, \"get\"):\n\t\t\t\t\t\t\t\t\tcandidate \u003d vp.get(\"item\", None)\n\t\t\n\t\t\t\t\t\t# \u0027item\u0027 puede ser un solo dict o una lista de dicts\n\t\t\t\t\t\tif candidate is not None:\n\t\t\t\t\t\t\tif isinstance(candidate, (list, tuple)):\n\t\t\t\t\t\t\t\tfor it in candidate:\n\t\t\t\t\t\t\t\t\t_append_item(it, items)\n\t\t\t\t\t\t\telse:\n\t\t\t\t\t\t\t\t_append_item(candidate, items)\n\t\t\texcept Exception:\n\t\t\t\t# Si algo falla, no rompemos el flujo\n\t\t\t\tpass\n\t\t\n\t\t\treturn items\n\t\t\n\t\t\n\t\tdef gather_items(component):\n\t\t\titems \u003d []\n\t\t\n\t\t\t# 1) Si este componente tiene custom.item, lo guardamos\n\t\t\ttry:\n\t\t\t\tif hasattr(component, \"custom\") and hasattr(component.custom, \"item\"):\n\t\t\t\t\t_append_item(component.custom.item, items)\n\t\t\texcept Exception:\n\t\t\t\tpass\n\t\t\n\t\t\t# 2) Si es un Flex Repeater (o similar) con props.instances, recolectamos desde las instancias\n\t\t\t#    y NO descendemos a sus hijos para evitar duplicados.\n\t\t\tif hasattr(component, \"props\") and hasattr(component.props, \"instances\"):\n\t\t\t\titems.extend(_gather_from_instances(component))\n\t\t\t\treturn items  # Importante: no recursar hijos del repeater para no duplicar\n\t\t\n\t\t\t# 3) Recorremos hijos recursivamente\n\t\t\ttry:\n\t\t\t\tfor child in component.getChildren():\n\t\t\t\t\titems.extend(gather_items(child))\n\t\t\texcept Exception:\n\t\t\t\tpass\n\t\t\n\t\t\treturn items\n\t\t\n\t\t\n\t\t# --- Ejecución principal ---\n\t\tall_items \u003d gather_items(flexContainer)  # empezamos desde el contenedor actual (p. ej., FlexContainer4)\n\t\t\n\t\t# Agregar observaciones como un item extra (NO TOCAR)\n\t\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\t\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\t\tuser \u003d getattr(self.view.custom, \"user\", None)\n\t\thour \u003d system.date.now()\n\t\tif insight_text is not None:\n\t\t\tall_items.append({\n\t\t\t\t\"user\": user,\n\t\t\t\t\"timestamp\": hour,\n\t\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\t\"registerTypeID\": registerType\n\t\t\t})\n\t\t\n\t\treturn {\"items\": all_items}"
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
         }
       ],
       "extensionFunctions": null,
@@ -2230,7 +2148,7 @@
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\n\t\n\t\t# ---- Context ----\n\t\tpapoID \u003d self.view.params.papoID\n\t\tuser \u003d self.session.props.auth.user.userName\n\t\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\t\tworkstationID \u003d self.view.params.workstationID\n\t\tnodeID \u003d self.view.params.nodeID\n\t\tstatus \u003d \"En proceso\"\n\t\tnow \u003d system.date.now()\n\t\n\t\tflexGroupCount \u003d int(self.custom.flexGroupCount)  # e.g., 3\n\t\n\t\t# ---- Get next RegisterCode (last + 1 for a new batch) ----\n\t\tquery_last_code \u003d \"\"\"\n\t\t\tSELECT TOP 1 RegisterCode\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\t\tORDER BY ID DESC\n\t\t\"\"\"\n\t\trs \u003d system.db.runPrepQuery(query_last_code, [workstationNodeID, papoID], \"papo_db\")\n\t\tlast_code \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\t\tregCode \u003d int(last_code) # + 1\n\t\t# If you need to REUSE the last RegisterCode instead, set: regCode \u003d int(last_code) or 1\n\t\n\t\t# ---- Insert template ----\n\t\tfrom java.lang import String\n\t\tinsert_sql \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\t\"\"\"\n\t\n\t\tdef _infer_register_type(answers_obj):\n\t\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\t\treturn 7\n\t\n\t\t# ---- Walk every FlexContainerGroupN, collect answers via your function, insert row ----\n\t\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\t\n\t\t\t# Use YOUR aggregator to build the answers JSON for this group\n\t\t\tanswers_obj \u003d self.answerRecopile(flexGroup)  # {\"items\":[...]} per your function\n\t\t\tlogging.log(\"Recopiled answers {}\".format(answers_obj), \"info\")\n\t\t\t# Skip if empty\n\t\t\titems \u003d answers_obj.get(\"items\", []) if answers_obj else []\n\t\t\tif not items:\n\t\t\t\tcontinue\n\t\n\t\t\tregisterTypeID \u003d _infer_register_type(answers_obj)\n\t\t\tdata_answer_str \u003d String(system.util.jsonEncode(answers_obj))\n\t\n\t\t\tparams \u003d [\n\t\t\t\tnow,                # [Timestamp]\n\t\t\t\tdata_answer_str,    # DataAnswer (JSON)\n\t\t\t\tstatus,             # Status\n\t\t\t\tpapoID,             # PapoID\n\t\t\t\tregisterTypeID,     # RegisterTypeID\n\t\t\t\tuser,               # [User]\n\t\t\t\tworkstationNodeID,  # WorkstationNodeID\n\t\t\t\tnodeID,             # NodeID\n\t\t\t\tworkstationID,      # WorkstationID\n\t\t\t\tregCode             # RegisterCode (same for the whole batch)\n\t\t\t]\n\t\t\tsystem.db.runPrepUpdate(insert_sql, params, \"papo_db\")\n\t\n\t\t# ---- UI refresh (same convention you used) ----\n\t\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
+          "script": "\tpapo_core.register.save(self)",
           "sessionScope": false,
           "viewScope": false
         }

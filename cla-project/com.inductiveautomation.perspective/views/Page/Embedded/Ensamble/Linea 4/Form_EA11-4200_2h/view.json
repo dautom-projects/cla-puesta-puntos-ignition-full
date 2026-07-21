@@ -1,12 +1,21 @@
 {
   "custom": {
-    "answers": {},
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        0
+      ],
+      "$ts": 0
+    },
+    "referencePapo": "",
+    "sign": "",
+    "dbConnection": "papo_db",
     "fontSize": 17,
     "insights": "",
     "path": "[UNS]Clarios/Andina/Ensamble/Linea 4/UI/EA11-4200",
-    "refreshSecond": 29,
     "registerTypeID": 2,
-    "user": " "
+    "user": "Soporte D."
   },
   "params": {
     "applyButton": 1,
@@ -828,24 +837,14 @@
     "workstationnodeID": 2
   },
   "propConfig": {
-    "custom.answers": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
       "persistent": true
-    },
-    "custom.answers.oneHour": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer5.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.twoHour": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer1.custom.answers"
-        },
-        "type": "property"
-      }
     },
     "custom.fontSize": {
       "persistent": true
@@ -855,6 +854,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -1037,6 +1042,17 @@
       "persistent": true
     }
   },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
   "props": {
     "defaultSize": {
       "height": 967,
@@ -1113,7 +1129,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\n    fc \u003d self.getSibling(\"FlexContainer5\")\n    fc.position.display \u003d not fc.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer1\").position.display \u003d False\n  "
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -1121,7 +1137,7 @@
           }
         },
         "meta": {
-          "name": "Label7"
+          "name": "Section1"
         },
         "position": {
           "basis": "40px",
@@ -1131,7 +1147,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer5.position.display"
+                "path": "../FlexContainerGroup1.position.display"
               },
               "transforms": [
                 {
@@ -5666,7 +5682,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer5"
+          "name": "FlexContainerGroup1"
         },
         "position": {
           "basis": "1150px",
@@ -5755,7 +5771,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\n    fc1 \u003d self.getSibling(\"FlexContainer1\")\n    fc1.position.display \u003d not fc1.position.display\n    \n    # Forzar ocultar los demás\n\n    self.getSibling(\"FlexContainer5\").position.display \u003d False\n"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -5763,7 +5779,7 @@
           }
         },
         "meta": {
-          "name": "Label1"
+          "name": "Section2"
         },
         "position": {
           "basis": "40px",
@@ -5773,7 +5789,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer1.position.display"
+                "path": "../FlexContainerGroup2.position.display"
               },
               "transforms": [
                 {
@@ -6076,7 +6092,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer1"
+          "name": "FlexContainerGroup2"
         },
         "position": {
           "basis": "180px",
@@ -6302,6 +6318,34 @@
         "marginLeft": 10,
         "paddingLeft": 10
       }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }

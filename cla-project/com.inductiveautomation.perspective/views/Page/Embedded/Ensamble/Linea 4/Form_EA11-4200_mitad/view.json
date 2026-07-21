@@ -1,10 +1,31 @@
 {
   "custom": {
-    "answers": {},
+    "dbConnection": "papo_db",
     "fontSize": 17,
-    "insights": "",
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1784618671822
+      ],
+      "$ts": 1784618671822
+    },
+    "insights": " | T: 1, H: 02:24 - ",
+    "referencePapo": "",
     "registerTypeID": 9,
-    "user": "Mohamed Salah"
+    "sign": "",
+    "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
   },
   "params": {
     "applyButton": 1,
@@ -826,16 +847,14 @@
     "workstationnodeID": 2
   },
   "propConfig": {
-    "custom.answers": {
-      "persistent": true
-    },
-    "custom.answers.condiciones": {
+    "custom.dbConnection": {
       "binding": {
         "config": {
-          "path": "/root/FlexContainer1.custom.answers"
+          "path": "session.custom.dbConnection"
         },
         "type": "property"
-      }
+      },
+      "persistent": true
     },
     "custom.fontSize": {
       "persistent": true
@@ -845,6 +864,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -1094,7 +1119,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\n    fc1 \u003d self.getSibling(\"FlexContainer1\")\n    fc1.position.display \u003d not fc1.position.display\n    \n    \n    "
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -1102,7 +1127,7 @@
           }
         },
         "meta": {
-          "name": "Label1"
+          "name": "Section1"
         },
         "position": {
           "basis": "40px"
@@ -1111,7 +1136,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer1.position.display"
+                "path": "../FlexContainerGroup1.position.display"
               },
               "transforms": [
                 {
@@ -1223,11 +1248,14 @@
             "type": "ia.container.flex"
           }
         ],
+        "custom": {
+          "baseBasisPx": 300
+        },
         "meta": {
-          "name": "FlexContainer1"
+          "name": "FlexContainerGroup1"
         },
         "position": {
-          "basis": "300px",
+          "basis": "0px",
           "display": false
         },
         "propConfig": {
@@ -1441,6 +1469,34 @@
         "overflow": "hidden",
         "paddingLeft": 10
       }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }

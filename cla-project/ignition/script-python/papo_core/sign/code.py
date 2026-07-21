@@ -55,6 +55,55 @@ def _insertSignature(dbConnection, dataAnswerStr, papoId, userName, workstationN
 
 # ==================== PUBLIC FUNCTIONS ====================
 
+def supervisorOpt(root):
+	"""
+	Get list of supervisor full names for dropdown population.
+
+	Filters users with the Supervisor_PAPO role and returns their
+	full names (firstName + lastName), sorted alphabetically.
+
+	Args:
+		root (Component): The root component (for session access)
+
+	Returns:
+		list: Sorted list of supervisor full names
+	"""
+	logger = system.util.getLogger("papo_core.sign")
+
+	try:
+		targetRole = "Supervisor_PAPO"
+		userSource = root.session.custom.userSource
+
+		allUsers = system.user.getUsers(userSource)
+		supervisorList = []
+
+		for user in allUsers:
+			username = user.get("Username")
+			userRoles = user.getRoles()
+
+			if targetRole in userRoles:
+				firstName = user.get("FirstName")
+				lastName = user.get("LastName")
+
+				if firstName and lastName:
+					fullName = "{} {}".format(firstName, lastName)
+				elif firstName:
+					fullName = firstName
+				elif lastName:
+					fullName = lastName
+				else:
+					fullName = username
+
+				supervisorList.append(fullName)
+
+		supervisorList.sort()
+		return supervisorList
+
+	except Exception as e:
+		logger.error("Error populating supervisor dropdown: " + str(e))
+		return []
+
+
 def signOperator(root):
 	"""
 	Finalize current form cycle and create next Idle record.
@@ -79,12 +128,12 @@ def signOperator(root):
 		nodeID = root.view.params.nodeID
 		now = system.date.now()
 
-		# Get current RegisterCode
+		# Get current RegisterCode (highest, not most recent by time)
 		queryLastCode = """
 			SELECT TOP 1 RegisterCode
 			FROM registerhistory
 			WHERE WorkstationNodeID = ? AND PapoID = ?
-			ORDER BY Timestamp DESC
+			ORDER BY RegisterCode DESC
 		"""
 		result = system.db.runPrepQuery(queryLastCode, [workstationNodeID, papoID], dbConnection)
 		regCode = result.getValueAt(0, 0) if result.getRowCount() > 0 else 0
@@ -227,7 +276,7 @@ def signSupervisor(root):
 	"""
 	try:
 		papoId = root.view.params.papoID
-		reference = root.view.params.referencePapo
+		reference = root.view.custom.referencePapo
 		logger = system.util.getLogger(reference)
 		nodeId = root.view.params.nodeID
 		registerCode = root.view.custom.registerCode
@@ -373,48 +422,3 @@ def authenticateAndSign(popup):
 		alerts.showAlert(state='error', title='Error del Sistema',
 		                 message='Ocurrio un error inesperado. Contacte al administrador.',
 		                 btnTextPrimary='Aceptar', btnActionPrimary='')
-
-def supervisorOpt(root):
-	"""
-	Get list of supervisor full names (firstName + lastName).
-
-	Args:
-		root (Component): The root component (for session access)
-
-	Returns:
-		list: Sorted list of supervisor full names
-	"""
-	logger = system.util.getLogger("papo_core.sign")
-
-	try:
-		targetRole = "Supervisor_PAPO"
-		userSource = root.session.custom.userSource 
-
-		allUsers = system.user.getUsers(userSource)
-		supervisorList = []
-
-		for user in allUsers:
-			username = user.get("Username")
-			userRoles = user.getRoles()
-
-			if targetRole in userRoles:
-				firstName = user.get("FirstName")
-				lastName = user.get("LastName")
-
-				if firstName and lastName:
-					fullName = "{} {}".format(firstName, lastName)
-				elif firstName:
-					fullName = firstName
-				elif lastName:
-					fullName = lastName
-				else:
-					fullName = username
-
-				supervisorList.append(fullName)
-
-		supervisorList.sort()
-		return supervisorList
-
-	except Exception as e:
-		logger.error("Error populating supervisor dropdown: " + str(e))
-		return [] 

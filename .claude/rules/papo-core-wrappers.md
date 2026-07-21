@@ -11,7 +11,17 @@
 - `signOperator` → `papo_core.sign.signOperator(self)`
 
 ### View-level onStartup (events.system.onStartup)
-- `papo_core.ui.initForm(self)`
+```python
+self.custom.initialPapoDateTime = system.date.now()
+papo_core.ui.initForm(self)
+```
+- With supervisor: add `self.custom.supervisorOption = papo_core.sign.supervisorOpt(self)` before initForm
+
+### initialPapoDateTime format in view.json
+Must be a timestamp object, NOT a string:
+```json
+"initialPapoDateTime": {"$": ["ts", 192, 0], "$ts": 0}
+```
 
 ### custom.insights transform
 - Script transform: `return papo_core.ui.preInsight(self, value)`

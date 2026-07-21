@@ -1,53 +1,28 @@
 {
   "custom": {
-    "answers": {},
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        0
+      ],
+      "$ts": 0
+    },
+    "referencePapo": "",
+    "sign": "",
+    "dbConnection": "papo_db",
     "fontSize": 17,
     "insights": "",
     "path": "[UNS]Clarios/Andina/Ensamble/Linea 4/UI/EA11-4200",
     "registerTypeID": 7,
-    "supervisorOption": [
-      "Alexander Rivera",
-      "Angel Eduardo Salas",
-      "Carlos Alberto Espada",
-      "Carlos Alberto Giral",
-      "Carlos MuÃ±oz Tenorio",
-      "Christian Cardenas",
-      "Cristian Eduardo Villota",
-      "Edward  Mosquera ",
-      "Edward Otalvaro",
-      "Edwin  Solis ",
-      "Enrique  Vargas ",
-      "Felipe Andres Arango",
-      "Felipe Casamachin",
-      "Fredy Arley Arboleda Mazo",
-      "Guillermo Andres Banderas Ayala",
-      "Harold Orejuela",
-      "Herly  Ramirez ",
-      "Herly Ramirez",
-      "Jailer  Olaya ",
-      "John Marin Aguirre",
-      "Jorge Taba",
-      "Juan  Castillo ",
-      "Kevin Mejia Hernandez ",
-      "Luis Amaro Rodriguez",
-      "Luis Felipe Ruiz ",
-      "Luis Gabriel Millan",
-      "Manuel Fernando Munoz",
-      "Mauricio Arango Duque",
-      "Michael Torres",
-      "Milagros Algarin Miranda",
-      "Ricardo Leon",
-      "Rober  Castillo ",
-      "Ubeymar  Reyes ",
-      "Yeimson Carmona Colorado"
-    ],
-    "user": " "
+    "supervisorOption": [],
+    "user": "Soporte D."
   },
   "events": {
     "system": {
       "onStartup": {
         "config": {
-          "script": "\t\"\"\"\n\tPopulate dropdown with supervisor full names (firstName + lastName).\n\t\n\tArgs:\n\t\tNone (onStartup event)\n\t\n\tReturns:\n\t\tNone (writes to self.custom.supervisorOption)\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"dautom.views.supervisorDropdown\")\n\t\n\ttry:\n\t\t# Input variables (for Script Console debugging)\n\t\t# userSource \u003d \"ClariosAD\"  # Replace with actual user source for testing\n\t\t\n\t\t# Configuration\n\t\ttargetRole \u003d \"Supervisor_PAPO\"\n\t\tuserSource \u003d self.session.custom.userSource\n\t\t\n\t\t# Get all users from user source\n\t\tallUsers \u003d system.user.getUsers(userSource)\n\t\t\n\t\t# print \"Total users found: {}\".format(len(allUsers))\n\t\t# logger.info(\"Starting supervisor dropdown population - Total users: {}\".format(len(allUsers)))\n\t\t\n\t\t# Filter users with Supervisor_PAPO role\n\t\tsupervisorList \u003d []\n\t\t\n\t\tfor user in allUsers:\n\t\t\t# Get username\n\t\t\tusername \u003d user.get(\"Username\")\n\t\t\t\n\t\t\t# Get user roles using getRoles() method\n\t\t\tuserRoles \u003d user.getRoles()\n\t\t\t\n\t\t\t# print \"User: {} - Roles: {}\".format(username, list(userRoles))\n\t\t\t\n\t\t\t# Check if user has target role\n\t\t\tif targetRole in userRoles:\n\t\t\t\t# Get firstName and lastName\n\t\t\t\tfirstName \u003d user.get(\"FirstName\")\n\t\t\t\tlastName \u003d user.get(\"LastName\")\n\t\t\t\t\n\t\t\t\t# Concatenate full name\n\t\t\t\tif firstName and lastName:\n\t\t\t\t\tfullName \u003d \"{} {}\".format(firstName, lastName)\n\t\t\t\telif firstName:\n\t\t\t\t\tfullName \u003d firstName\n\t\t\t\telif lastName:\n\t\t\t\t\tfullName \u003d lastName\n\t\t\t\telse:\n\t\t\t\t\tfullName \u003d username  # Fallback to username if no name defined\n\t\t\t\t\n\t\t\t\tsupervisorList.append(fullName)\n\t\t\t\t# print \"Added supervisor: {} ({})\".format(fullName, username)\n\t\t\n\t\t# Sort alphabetically for better UX\n\t\tsupervisorList.sort()\n\t\t\n\t\t# Write to custom property for dropdown consumption\n\t\tself.custom.supervisorOption \u003d supervisorList\n\t\t\n\t\t# print \"Supervisor dropdown populated - Total supervisors: {}\".format(len(supervisorList))\n\t\t# logger.info(\"Supervisor dropdown populated successfully - Total: {} - List: {}\".format(len(supervisorList), supervisorList))\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error populating supervisor dropdown: \" + str(e))\n\t\tself.custom.supervisorOption \u003d []"
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tself.custom.supervisorOption \u003d papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
         },
         "scope": "G",
         "type": "script"
@@ -61,56 +36,14 @@
     "workstationnodeID": 2
   },
   "propConfig": {
-    "custom.answers": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
       "persistent": true
-    },
-    "custom.answers.condiciones": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer3.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.est": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer2.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.oneHour": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer5.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.sec": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer1.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.sup": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainerSupervisor.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.twoHour": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer4.custom.answers"
-        },
-        "type": "property"
-      }
     },
     "custom.fontSize": {
       "persistent": true
@@ -120,6 +53,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -248,7 +187,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\n    fc1 \u003d self.getSibling(\"FlexContainer1\")\n    fc1.position.display \u003d not fc1.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer2\").position.display \u003d False\n    self.getSibling(\"FlexContainer3\").position.display \u003d False\n    "
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -256,7 +195,7 @@
           }
         },
         "meta": {
-          "name": "Label1"
+          "name": "Section1"
         },
         "position": {
           "basis": "40px",
@@ -266,7 +205,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer1.position.display"
+                "path": "../FlexContainerGroup1.position.display"
               },
               "transforms": [
                 {
@@ -879,7 +818,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer1"
+          "name": "FlexContainerGroup1"
         },
         "position": {
           "basis": "300px",
@@ -932,7 +871,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\t\n    fc \u003d self.getSibling(\"FlexContainer2\")\n    fc.position.display \u003d not fc.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer1\").position.display \u003d False\n    self.getSibling(\"FlexContainer3\").position.display \u003d False\n    "
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -940,7 +879,7 @@
           }
         },
         "meta": {
-          "name": "Label2"
+          "name": "Section2"
         },
         "position": {
           "basis": "40px",
@@ -950,7 +889,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer2.position.display"
+                "path": "../FlexContainerGroup2.position.display"
               },
               "transforms": [
                 {
@@ -1790,7 +1729,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer2"
+          "name": "FlexContainerGroup2"
         },
         "position": {
           "basis": "400px",
@@ -1845,7 +1784,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\t\n    fc \u003d self.getSibling(\"FlexContainer3\")\n    fc.position.display \u003d not fc.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer1\").position.display \u003d False\n    self.getSibling(\"FlexContainer2\").position.display \u003d False\n    "
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -1853,7 +1792,7 @@
           }
         },
         "meta": {
-          "name": "Label3"
+          "name": "Section3"
         },
         "position": {
           "basis": "40px",
@@ -1863,7 +1802,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer3.position.display"
+                "path": "../FlexContainerGroup3.position.display"
               },
               "transforms": [
                 {
@@ -1962,7 +1901,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer3"
+          "name": "FlexContainerGroup3"
         },
         "position": {
           "basis": "100px",
@@ -2017,7 +1956,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\t\n\tfc \u003d self.getSibling(\"FlexContainer5\")\n\tfc.position.display \u003d not fc.position.display\n\t\n\tself.getSibling(\"FlexContainer1\").position.display \u003d False\n\tself.getSibling(\"FlexContainer2\").position.display \u003d False\n\tself.getSibling(\"FlexContainer3\").position.display \u003d False\n"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -2025,7 +1964,7 @@
           }
         },
         "meta": {
-          "name": "Label7"
+          "name": "Section4"
         },
         "position": {
           "basis": "40px",
@@ -2035,7 +1974,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer5.position.display"
+                "path": "../FlexContainerGroup4.position.display"
               },
               "transforms": [
                 {
@@ -6245,7 +6184,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer5"
+          "name": "FlexContainerGroup4"
         },
         "position": {
           "basis": "1150px",
@@ -6301,7 +6240,7 @@
           "dom": {
             "onClick": {
               "config": {
-                "script": "\n\tfc1 \u003d self.getSibling(\"FlexContainer4\")\n\tfc1.position.display \u003d not fc1.position.display\n\t\n\t# Forzar ocultar los demás\n\t\n\tself.getSibling(\"FlexContainer5\").position.display \u003d False\n\tself.getSibling(\"FlexContainer1\").position.display \u003d False\n\tself.getSibling(\"FlexContainer2\").position.display \u003d False\n\tself.getSibling(\"FlexContainer3\").position.display \u003d False\n"
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
               "scope": "G",
               "type": "script"
@@ -6309,7 +6248,7 @@
           }
         },
         "meta": {
-          "name": "Label6"
+          "name": "Section5"
         },
         "position": {
           "basis": "40px",
@@ -6319,7 +6258,7 @@
           "props.style.classes": {
             "binding": {
               "config": {
-                "path": "../FlexContainer1.position.display"
+                "path": "../FlexContainerGroup5.position.display"
               },
               "transforms": [
                 {
@@ -6622,7 +6561,7 @@
           }
         ],
         "meta": {
-          "name": "FlexContainer4"
+          "name": "FlexContainerGroup5"
         },
         "position": {
           "basis": "180px",
@@ -6970,6 +6909,34 @@
         "overflow": "scroll",
         "paddingLeft": 10
       }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }

@@ -1,19 +1,27 @@
 {
   "custom": {
-    "answers": {},
+    "dbConnection": "papo_db",
     "fontSize": 17,
-    "insights": "",
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1784618241104
+      ],
+      "$ts": 1784618241104
+    },
+    "insights": " | T: 1, H: 02:17 - ",
+    "referencePapo": "",
     "registerTypeID": 7,
-    "supervisorOption": [
-      "Test Supervisor"
-    ],
-    "user": "Mohamed Salah"
+    "sign": "",
+    "supervisorOption": [],
+    "user": "Soporte D."
   },
   "events": {
     "system": {
       "onStartup": {
         "config": {
-          "script": "\t\"\"\"\n\tPopulate dropdown with supervisor full names (firstName + lastName).\n\t\n\tArgs:\n\t\tNone (onStartup event)\n\t\n\tReturns:\n\t\tNone (writes to self.custom.supervisorOption)\n\t\"\"\"\n\t\n\tlogger \u003d system.util.getLogger(\"dautom.views.supervisorDropdown\")\n\t\n\ttry:\n\t\t# Input variables (for Script Console debugging)\n\t\t# userSource \u003d \"ClariosAD\"  # Replace with actual user source for testing\n\t\t\n\t\t# Configuration\n\t\ttargetRole \u003d \"Supervisor_PAPO\"\n\t\tuserSource \u003d self.session.custom.userSource\n\t\t\n\t\t# Get all users from user source\n\t\tallUsers \u003d system.user.getUsers(userSource)\n\t\t\n\t\t# print \"Total users found: {}\".format(len(allUsers))\n\t\t# logger.info(\"Starting supervisor dropdown population - Total users: {}\".format(len(allUsers)))\n\t\t\n\t\t# Filter users with Supervisor_PAPO role\n\t\tsupervisorList \u003d []\n\t\t\n\t\tfor user in allUsers:\n\t\t\t# Get username\n\t\t\tusername \u003d user.get(\"Username\")\n\t\t\t\n\t\t\t# Get user roles using getRoles() method\n\t\t\tuserRoles \u003d user.getRoles()\n\t\t\t\n\t\t\t# print \"User: {} - Roles: {}\".format(username, list(userRoles))\n\t\t\t\n\t\t\t# Check if user has target role\n\t\t\tif targetRole in userRoles:\n\t\t\t\t# Get firstName and lastName\n\t\t\t\tfirstName \u003d user.get(\"FirstName\")\n\t\t\t\tlastName \u003d user.get(\"LastName\")\n\t\t\t\t\n\t\t\t\t# Concatenate full name\n\t\t\t\tif firstName and lastName:\n\t\t\t\t\tfullName \u003d \"{} {}\".format(firstName, lastName)\n\t\t\t\telif firstName:\n\t\t\t\t\tfullName \u003d firstName\n\t\t\t\telif lastName:\n\t\t\t\t\tfullName \u003d lastName\n\t\t\t\telse:\n\t\t\t\t\tfullName \u003d username  # Fallback to username if no name defined\n\t\t\t\t\n\t\t\t\tsupervisorList.append(fullName)\n\t\t\t\t# print \"Added supervisor: {} ({})\".format(fullName, username)\n\t\t\n\t\t# Sort alphabetically for better UX\n\t\tsupervisorList.sort()\n\t\t\n\t\t# Write to custom property for dropdown consumption\n\t\tself.custom.supervisorOption \u003d supervisorList\n\t\t\n\t\t# print \"Supervisor dropdown populated - Total supervisors: {}\".format(len(supervisorList))\n\t\t# logger.info(\"Supervisor dropdown populated successfully - Total: {} - List: {}\".format(len(supervisorList), supervisorList))\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error populating supervisor dropdown: \" + str(e))\n\t\tself.custom.supervisorOption \u003d []"
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tself.custom.supervisorOption \u003d papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
         },
         "scope": "G",
         "type": "script"
@@ -840,24 +848,14 @@
     "workstationnodeID": 2
   },
   "propConfig": {
-    "custom.answers": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
       "persistent": true
-    },
-    "custom.answers.startShift": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainer_0.custom.answers"
-        },
-        "type": "property"
-      }
-    },
-    "custom.answers.supervisor": {
-      "binding": {
-        "config": {
-          "path": "/root/FlexContainerSupervisor.custom.answers"
-        },
-        "type": "property"
-      }
     },
     "custom.fontSize": {
       "persistent": true
@@ -867,6 +865,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -1115,1286 +1119,1249 @@
         "type": "ia.display.label"
       },
       {
-        "children": [
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\n    fc1 \u003d self.getSibling(\"FlexContainer1\")\n    fc1.position.display \u003d not fc1.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer3\").position.display \u003d False\n    "
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Label1"
-            },
-            "position": {
-              "basis": "40px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.style.classes": {
-                "binding": {
-                  "config": {
-                    "path": "../FlexContainer1.position.display"
-                  },
-                  "transforms": [
-                    {
-                      "fallback": "button-questions",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "button-questions"
-                        },
-                        {
-                          "input": false,
-                          "output": "button-questions-2"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
               },
-              "props.textStyle.fontSize": {
-                "binding": {
-                  "config": {
-                    "path": "view.custom.fontSize"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "style": {},
-              "text": "Seguridad",
-              "textStyle": {
-                "textAlign": "center"
-              }
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3099,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5\u0027s."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3100,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_0"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Cabinas electricas cerradas."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3101,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_1"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Guardas en su lugar."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3102,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_2"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Cabinas electricas con libre acceso."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3103,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_3"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "No hay objetos dentro ni sobre las cabinas eléctricas."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3104,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_4"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Cableado en buenas condiciones."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3105,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_5"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "No hay fugas ni goteos en las máquinas."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3106,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_6"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Switch de seguro de puerta activo."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3107,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_7"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Presión de aire de la línea principal entre SET POINT 95 psi   - Variación proceso 85 - 105 psi"
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3108,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_8"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Buen estado pantalla de control panel touch."
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer"
-                },
-                "position": {
-                  "basis": "50%"
-                },
-                "props": {
-                  "direction": "column"
-                },
-                "type": "ia.container.flex"
-              },
-              {
-                "children": [
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3109,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Inexistencia de ruidos inusuales."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3110,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_0"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Los sistemas de alarmas funcionan corectamente."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3111,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_1"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Banda transportadora en buen estado."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3112,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_2"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Banda transportadora sin ruidos inusuales."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3113,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_3"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "No hay fugas de gas y oxígeno."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3114,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_4"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Mangueras de borneadora manual y APB en buen estado, grafadas y con arrestador de llama en salida."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3115,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_5"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Buen estado del economizador (apague la llama cuando se ubique sobre él)."
-                    },
-                    "type": "ia.input.checkbox"
-                  },
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3116,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox_6"
-                    },
-                    "position": {
-                      "basis": "65px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "El estibador manual se encuentra en buen estado."
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer_0"
-                },
-                "position": {
-                  "basis": "50%"
-                },
-                "props": {
-                  "direction": "column"
-                },
-                "type": "ia.container.flex"
-              }
-            ],
-            "meta": {
-              "name": "FlexContainer1"
-            },
-            "position": {
-              "basis": "600px",
-              "display": false,
-              "shrink": 0
-            },
-            "props": {
-              "style": {
-                "borderBottomLeftRadius": 15,
-                "borderBottomRightRadius": 15,
-                "borderTopLeftRadius": 15,
-                "borderTopRightRadius": 15,
-                "marginLeft": 15,
-                "marginRight": 10
-              }
-            },
-            "type": "ia.container.flex"
-          },
-          {
-            "events": {
-              "dom": {
-                "onClick": {
-                  "config": {
-                    "script": "\n    fc1 \u003d self.getSibling(\"FlexContainer3\")\n    fc1.position.display \u003d not fc1.position.display\n    \n    # Forzar ocultar los demás\n    self.getSibling(\"FlexContainer1\").position.display \u003d False\n    "
-                  },
-                  "scope": "G",
-                  "type": "script"
-                }
-              }
-            },
-            "meta": {
-              "name": "Label2"
-            },
-            "position": {
-              "basis": "40px",
-              "shrink": 0
-            },
-            "propConfig": {
-              "props.style.classes": {
-                "binding": {
-                  "config": {
-                    "path": "../FlexContainer3.position.display"
-                  },
-                  "transforms": [
-                    {
-                      "fallback": "button-questions",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "button-questions"
-                        },
-                        {
-                          "input": false,
-                          "output": "button-questions-2"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
-              "props.textStyle.fontSize": {
-                "binding": {
-                  "config": {
-                    "path": "view.custom.fontSize"
-                  },
-                  "type": "property"
-                }
-              }
-            },
-            "props": {
-              "style": {},
-              "text": "Verificación del Producto",
-              "textStyle": {
-                "textAlign": "center"
-              }
-            },
-            "type": "ia.display.label"
-          },
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "custom": {
-                      "item": {
-                        "papoItemID": 3125,
-                        "registerTypeID": 7
-                      }
-                    },
-                    "meta": {
-                      "name": "Checkbox"
-                    },
-                    "position": {
-                      "basis": "56px"
-                    },
-                    "propConfig": {
-                      "custom.item.answer": {
-                        "binding": {
-                          "config": {
-                            "path": "this.props.selected"
-                          },
-                          "transforms": [
-                            {
-                              "fallback": "none",
-                              "inputType": "scalar",
-                              "mappings": [
-                                {
-                                  "input": true,
-                                  "output": "Cumple"
-                                },
-                                {
-                                  "input": false,
-                                  "output": "No Cumple"
-                                }
-                              ],
-                              "outputType": "scalar",
-                              "type": "map"
-                            }
-                          ],
-                          "type": "property"
-                        }
-                      },
-                      "props.style.fontSize": {
-                        "binding": {
-                          "config": {
-                            "path": "view.custom.fontSize"
-                          },
-                          "type": "property"
-                        }
-                      }
-                    },
-                    "props": {
-                      "text": "Buena fusion espigo buje, use galga"
-                    },
-                    "type": "ia.input.checkbox"
-                  }
-                ],
-                "meta": {
-                  "name": "FlexContainer"
-                },
-                "position": {
-                  "basis": "100%"
-                },
-                "props": {
-                  "direction": "column"
-                },
-                "type": "ia.container.flex"
-              }
-            ],
-            "meta": {
-              "name": "FlexContainer3"
-            },
-            "position": {
-              "basis": "600px",
-              "display": false
-            },
-            "props": {
-              "style": {
-                "borderBottomLeftRadius": 15,
-                "borderBottomRightRadius": 15,
-                "borderTopLeftRadius": 15,
-                "borderTopRightRadius": 15,
-                "marginLeft": 15,
-                "marginRight": 10
-              }
-            },
-            "type": "ia.container.flex"
+              "scope": "G",
+              "type": "script"
+            }
           }
-        ],
+        },
         "meta": {
-          "name": "FlexContainer_0"
+          "name": "Section1"
         },
         "position": {
-          "basis": "1200px"
+          "basis": "40px",
+          "shrink": 0
         },
         "propConfig": {
-          "custom.answers": {
+          "props.style.classes": {
             "binding": {
               "config": {
-                "struct": {},
-                "waitOnAll": true
+                "path": "../FlexContainerGroup1.position.display"
               },
               "transforms": [
                 {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\treturn {\"items\": all_items}",
-                  "type": "script"
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
                 }
               ],
-              "type": "expr-struct"
+              "type": "property"
             }
           },
-          "custom.refreshSecond": {
+          "props.textStyle.fontSize": {
             "binding": {
               "config": {
-                "expression": "dateExtract(now(1000),\"second\")"
+                "path": "view.custom.fontSize"
               },
-              "type": "expr"
-            },
-            "onChange": {
-              "enabled": null,
-              "script": "\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\tfor path in listCustom:\n\t\tself.refreshBinding(\"custom.{}\".format(path))"
+              "type": "property"
             }
           }
         },
         "props": {
-          "direction": "column"
+          "style": {},
+          "text": "Seguridad",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3099,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5\u0027s."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3100,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_0"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Cabinas electricas cerradas."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3101,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_1"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Guardas en su lugar."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3102,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_2"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Cabinas electricas con libre acceso."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3103,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_3"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "No hay objetos dentro ni sobre las cabinas eléctricas."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3104,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_4"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Cableado en buenas condiciones."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3105,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_5"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "No hay fugas ni goteos en las máquinas."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3106,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_6"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Switch de seguro de puerta activo."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3107,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_7"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Presión de aire de la línea principal entre SET POINT 95 psi   - Variación proceso 85 - 105 psi"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3108,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_8"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Buen estado pantalla de control panel touch."
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "50%"
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3109,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Inexistencia de ruidos inusuales."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3110,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_0"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Los sistemas de alarmas funcionan corectamente."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3111,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_1"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Banda transportadora en buen estado."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3112,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_2"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Banda transportadora sin ruidos inusuales."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3113,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_3"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "No hay fugas de gas y oxígeno."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3114,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_4"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Mangueras de borneadora manual y APB en buen estado, grafadas y con arrestador de llama en salida."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3115,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_5"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Buen estado del economizador (apague la llama cuando se ubique sobre él)."
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3116,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_6"
+                },
+                "position": {
+                  "basis": "65px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "El estibador manual se encuentra en buen estado."
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "50%"
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 600
+        },
+        "meta": {
+          "name": "FlexContainerGroup1"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 15,
+            "marginRight": 10
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section2"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup2.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Verificación del Producto",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 3125,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox"
+                },
+                "position": {
+                  "basis": "56px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Buena fusion espigo buje, use galga"
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "100%"
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 600
+        },
+        "meta": {
+          "name": "FlexContainerGroup2"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false
+        },
+        "props": {
+          "style": {
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 15,
+            "marginRight": 10
+          }
         },
         "type": "ia.container.flex"
       },
@@ -2700,13 +2667,28 @@
       }
     },
     "scripts": {
-      "customMethods": [],
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
       "extensionFunctions": null,
       "messageHandlers": [
         {
           "messageType": "saveDataRoot",
           "pageScope": true,
-          "script": "\t\"\"\"\n\tSave form data to database including supervisor selection.\n\t\n\tCollects answers from all FlexContainerGroups and appends supervisor\n\tanswer from FlexContainerSupervisor into the same JSON before INSERT.\n\t\n\tArgs:\n\t\tself (Component): Reference to root component\n\t\tpayload (dict): Message payload (unused)\n\t\n\tReturns:\n\t\tNone: Performs database INSERT and sends UI refresh messages\n\t\"\"\"\n\t\n\tfrom java.lang import String\n\t\n\tlogger \u003d system.util.getLogger(\"clarios/puestaPuntos/saveDataRoot\")\n\t\n\ttry:\n\t\t# ---- Context ----\n\t\tpapoID \u003d self.view.params.papoID\n\t\tuser \u003d self.session.props.auth.user.userName\n\t\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\t\tworkstationID \u003d self.view.params.workstationID\n\t\tnodeID \u003d self.view.params.nodeID\n\t\tstatus \u003d \"En proceso\"\n\t\tnow \u003d system.date.now()\n\t\t\n\t\tflexGroupCount \u003d int(self.custom.flexGroupCount)\n\t\t\n\t\t# ---- Get last RegisterCode ----\n\t\tqueryLastCode \u003d \"\"\"\n\t\t\tSELECT TOP 1 RegisterCode\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID \u003d ? AND PapoID \u003d ?\n\t\t\tORDER BY ID DESC\n\t\t\"\"\"\n\t\trs \u003d system.db.runPrepQuery(queryLastCode, [workstationNodeID, papoID], \"papo_db\")\n\t\tlastCode \u003d rs.getValueAt(0, 0) if rs.getRowCount() \u003e 0 else 0\n\t\tregCode \u003d int(lastCode)\n\t\t\n\t\t# ---- Insert template ----\n\t\tinsertSql \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n\t\t\"\"\"\n\t\t\n\t\tdef _inferRegisterType(answersObj):\n\t\t\t\"\"\"Extract registerTypeID from first item in answers.\"\"\"\n\t\t\titems \u003d answersObj.get(\"items\", []) if answersObj else []\n\t\t\tif items and isinstance(items[0], dict) and \"registerTypeID\" in items[0]:\n\t\t\t\treturn int(items[0][\"registerTypeID\"])\n\t\t\treturn 7\n\t\t\n\t\t# ---- Get supervisor answer from FlexContainerSupervisor ----\n\t\tsupervisorContainer \u003d self.getChild(\"FlexContainerSupervisor\")\n\t\tsupervisorItem \u003d None\n\t\t\n\t\tif supervisorContainer is not None:\n\t\t\tsupervisorAnswers \u003d getattr(supervisorContainer.custom, \"answers\", None)\n\t\t\tif supervisorAnswers is not None:\n\t\t\t\tsupervisorItems \u003d supervisorAnswers.get(\"items\", [])\n\t\t\t\tif supervisorItems:\n\t\t\t\t\tsupervisorItem \u003d dict(supervisorItems[0])\n\t\t\t\t\tlogger.debug(\"Supervisor item captured: \" + str(supervisorItem))\n\t\telse:\n\t\t\tlogger.warn(\"FlexContainerSupervisor not found\")\n\t\t\n\t\t# ---- Process each FlexContainerGroup ----\n\t\tfor groupIndex in range(1, flexGroupCount + 1):\n\t\t\tflexGroup \u003d self.getChild(\"FlexContainerGroup{}\".format(groupIndex))\n\t\t\t\n\t\t\t# Collect answers from this group\n\t\t\tanswersObj \u003d self.answerRecopile(flexGroup)\n\t\t\tlogger.debug(\"Raw answers group {}: {}\".format(groupIndex, answersObj))\n\t\t\t\n\t\t\t# Skip if empty\n\t\t\titems \u003d answersObj.get(\"items\", []) if answersObj else []\n\t\t\tif not items:\n\t\t\t\tcontinue\n\t\t\t\n\t\t\t# ---- Append supervisor to first group ----\n\t\t\tif groupIndex \u003d\u003d 1 and supervisorItem is not None:\n\t\t\t\tanswersObj[\"items\"].append(supervisorItem)\n\t\t\t\tlogger.info(\"Supervisor appended to FlexContainerGroup1\")\n\t\t\t\n\t\t\tregisterTypeID \u003d _inferRegisterType(answersObj)\n\t\t\tdataAnswerStr \u003d String(system.util.jsonEncode(answersObj))\n\t\t\t\n\t\t\tlogger.debug(\"Encoded JSON group {}: {}\".format(groupIndex, dataAnswerStr))\n\t\t\t\n\t\t\tparams \u003d [\n\t\t\t\tnow,\n\t\t\t\tdataAnswerStr,\n\t\t\t\tstatus,\n\t\t\t\tpapoID,\n\t\t\t\tregisterTypeID,\n\t\t\t\tuser,\n\t\t\t\tworkstationNodeID,\n\t\t\t\tnodeID,\n\t\t\t\tworkstationID,\n\t\t\t\tregCode\n\t\t\t]\n\t\t\tsystem.db.runPrepUpdate(insertSql, params, \"papo_db\")\n\t\t\tlogger.info(\"Record saved - PapoID: {} RegisterCode: {}\".format(papoID, regCode))\n\t\t\n\t\t# ---- UI refresh ----\n\t\tsystem.perspective.sendMessage(\"refreshTable\", {\"estado\": True}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"closeEmbeded\", {\"estado\": False}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPeriodic\", {\"min\": 0}, scope\u003d\"session\")\n\t\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")\n\t\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error saving form data: \" + str(e))",
+          "script": "\tpapo_core.register.save(self)",
           "sessionScope": false,
           "viewScope": false
         }
