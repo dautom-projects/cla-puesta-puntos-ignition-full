@@ -37,6 +37,7 @@ project/
 
 - [ ] Listar todas las Section{N} presentes en el view.json
 - [ ] Verificar que cada Section{N} corresponda a su FlexContainerGroup{N} por número
+- [ ] **Validar correspondencia en AMBAS direcciones:** toda `Section{N}` debe tener su `FlexContainerGroup{N}`, y todo `FlexContainerGroup{N}` su `Section{N}` (sin huérfanos). A veces se agrega una y falta la otra → binding roto. `check_sections.py` / `validate_all.py` reportan `MISSING FlexContainerGroupN` y `ORPHAN` (colección recursiva, no solo hijos directos del root).
 - [ ] Renombrar si es necesario para que coincidan (Section1↔FlexContainerGroup1, Section2↔FlexContainerGroup2, etc.)
 
 ---
@@ -198,9 +199,32 @@ alerts.showAlert(
 
 ---
 
+## PASO 10.5 — Canonicalizar (CRÍTICO: evita reordenamiento del Designer)
+
+El Designer/Gson serializa las llaves en orden **alfabético**. Los scripts insertan
+llaves nuevas al inicio del bloque, rompiendo ese orden; al guardar, el Designer
+re-ordena TODO → diff gigante ("reordenamiento de objetos"). Para evitarlo,
+canonicalizar el view.json a orden Gson ANTES del sync:
+
+```bash
+python C:/Users/willi/.claude/scripts/canonicalize_view.py "<ruta>/view.json"
+```
+
+- Re-serializa exactamente como Gson (sort_keys + escapes HTML) — verificado byte-idéntico.
+- Aborta si el contenido cambia (solo reordena llaves).
+- Tras esto, un save del Designer produce **0 diff**.
+
 ## PASO 11 — Sync y Pruebas
 
-### Sync:
+### Pipeline completo por cada vista:
+```bash
+python C:/Users/willi/.claude/scripts/standardize_view_v2.py "<ruta>/view.json"
+python C:/Users/willi/.claude/scripts/fix_all_sections.py   "<ruta>/view.json"
+python C:/Users/willi/.claude/scripts/canonicalize_view.py  "<ruta>/view.json"
+python C:/Users/willi/.claude/scripts/sync_view.py          "<carpeta_de_la_vista>"
+```
+
+### Sync (solo):
 ```bash
 python C:/Users/willi/.claude/scripts/sync_view.py "<carpeta_de_la_vista>"
 ```

@@ -1,10 +1,31 @@
 {
   "custom": {
-    "answers": {},
+    "dbConnection": "papo_db",
     "fontSize": 17,
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        0
+      ],
+      "$ts": 0
+    },
     "insights": "",
+    "referencePapo": "",
     "registerTypeID": 8,
+    "sign": "",
     "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
   },
   "params": {
     "applyButton": 1,
@@ -33,16 +54,14 @@
     "workstationnodeID": 1
   },
   "propConfig": {
-    "custom.answers": {
-      "persistent": true
-    },
-    "custom.answers.condiciones": {
+    "custom.dbConnection": {
       "binding": {
         "config": {
-          "path": "/root/FlexContainer1.custom.answers"
+          "path": "session.custom.dbConnection"
         },
         "type": "property"
-      }
+      },
+      "persistent": true
     },
     "custom.fontSize": {
       "persistent": true
@@ -52,6 +71,12 @@
         "config": {
           "path": "/root/TextField.props.text"
         },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
         "type": "property"
       },
       "persistent": true
@@ -358,6 +383,34 @@
         "overflow": "hidden",
         "paddingLeft": 10
       }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
     },
     "type": "ia.container.flex"
   }
