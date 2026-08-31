@@ -134,7 +134,7 @@ def confirmSave():
 	alerts.showAlert(
 		state="warning",
 		title="Guardar registro",
-		message="Esta seguro de que desea guardar el registro",
+		message="Esta seguro de que desea guardar el registro?",
 		btnTextPrimary="Si",
 		btnTextSecondary="No",
 		btnActionPrimary="saveDataRoot"

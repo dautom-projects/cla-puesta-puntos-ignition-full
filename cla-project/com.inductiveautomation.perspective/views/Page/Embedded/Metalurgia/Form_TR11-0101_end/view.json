@@ -1,0 +1,347 @@
+{
+  "custom": {
+    "dbConnection": "papo_db",
+    "fontSize": 17,
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1785785645662
+      ],
+      "$ts": 1785785645662
+    },
+    "insights": " | T: 3, H: 14:34 - ",
+    "referencePapo": "",
+    "registerTypeID": 8,
+    "sign": "",
+    "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "nodeID": 5,
+    "papoID": 3,
+    "workstationID": 1,
+    "workstationnodeID": 1
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.fontSize": {
+      "persistent": true
+    },
+    "custom.insights": {
+      "binding": {
+        "config": {
+          "path": "/root/TextField.props.text"
+        },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.user": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.firstName"
+        },
+        "transforms": [
+          {
+            "expression": "{value} + \" \" +{session.props.auth.user.lastName}",
+            "type": "expression"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationnodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 967,
+      "width": 858
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": ""
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Label5"
+        },
+        "position": {
+          "basis": "22px"
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "textStyle": {
+            "color": "#002C36",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "15px"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_2"
+        },
+        "position": {
+          "basis": "12px",
+          "grow": 1
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 0
+          },
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 15
+          },
+          "text": "Observaciones:",
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "TextField"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "placeholder": "Esciba aqui",
+          "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
+            "marginLeft": 15,
+            "marginRight": 30
+          }
+        },
+        "type": "ia.input.text-field"
+      },
+      {
+        "meta": {
+          "name": "Label_0"
+        },
+        "position": {
+          "basis": "10px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tpapo_core.ui.confirmSave()"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Guardar"
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "saveStartRegister-2201-end",
+                  "pageScope": true,
+                  "script": "\tsystem.perspective.sendMessage(\"resetTable\", payload\u003d{})\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer1\").refreshBinding(\"custom.{}\".format(path))\n\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.condiciones\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswerCond \u003d self.view.custom.answers.condiciones\n\t\n\tregisterTypeID \u003d self.view.custom.registerTypeID\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\ttry:\n\t\n\t\tfrom java.lang import String\n\t\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT TOP 1 RegisterCode\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\t\tORDER BY RegisterCode DESC\n\t\t\"\"\"\n\t\n\t\n\t\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\t\n\t\tregCode \u003d result.getValueAt(0,0)\n\texcept:\n\t\tregCode \u003d 1\n\t\t\n\ttry:\n\t\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT TOP 1 Status\n\t\t\tFROM registerhistory\n\t\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\t\tORDER BY Timestamp DESC\n\t\t\"\"\"\n\t\n\t\n\t\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\t\n\t\tstatus \u003d \"Finalizado\"\n\t\t\n\texcept:\n\t\tstatus \u003d \"En proceso\"\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los  JSON ---\n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerCond), regCode)   \n\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_1"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-2"
+              },
+              "text": "Cancelar"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "center"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-widget",
+        "marginLeft": 10,
+        "overflow": "hidden",
+        "paddingLeft": 10
+      }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

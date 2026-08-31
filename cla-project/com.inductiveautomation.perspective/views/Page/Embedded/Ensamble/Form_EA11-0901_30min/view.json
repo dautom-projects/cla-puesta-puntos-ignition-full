@@ -1,0 +1,676 @@
+{
+  "custom": {
+    "dbConnection": "papo_db",
+    "fontSize": 17,
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1787152073850
+      ],
+      "$ts": 1787152073850
+    },
+    "insights": " | T: 2, H: 10:07 - ",
+    "referencePapo": "",
+    "registerTypeID": 3,
+    "sign": "",
+    "supervisorOption": [],
+    "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tself.custom.supervisorOption \u003d papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "nodeID": 5,
+    "papoID": 1,
+    "workstationID": 1,
+    "workstationnodeID": 1
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.fontSize": {
+      "persistent": true
+    },
+    "custom.initialPapoDateTime": {
+      "persistent": true
+    },
+    "custom.insights": {
+      "binding": {
+        "config": {
+          "path": "/root/TextField.props.text"
+        },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.user": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.firstName"
+        },
+        "transforms": [
+          {
+            "expression": "{value} + \" \" +{session.props.auth.user.lastName}",
+            "type": "expression"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationnodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 967,
+      "width": 858
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "spacer1"
+        },
+        "position": {
+          "basis": "22px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "textStyle": {
+            "color": "#002C36",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Tittle 30min"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "text": "FORMULARIO CADA 30 MINUTOS",
+          "textStyle": {
+            "color": "--cla-text-question",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t\"\"\"\n\tSection button onClick - trigger accordion toggle.\n\t\n\tExtracts section index from component name and calls\n\ttoggleFlexRoot on root. Works regardless of hierarchy.\n\t\n\tVersion: 1.1.0\n\t\n\tArgs:\n\t\tself (Component): Reference to Section component\n\t\n\tReturns:\n\t\tNone: Triggers toggleFlexRoot on root\n\t\n\tChangelog:\n\t\t2026-07-05 | William | v1.0.0 - Initial version\n\t\t2026-07-05 | William | v1.1.0 - Dynamic, hierarchy-independent\n\t\"\"\"\n\t\n\t# Extract section index from component name\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\t\n\t# Trigger accordion toggle on root\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)\n\t    "
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section1"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup1.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Parámetros de operación y control proceso",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label"
+                    },
+                    "position": {
+                      "basis": "100%"
+                    },
+                    "propConfig": {
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "alignVertical": "bottom",
+                      "style": {
+                        "fontWeight": "bold",
+                        "paddingLeft": 0
+                      },
+                      "text": "Soldador de punto"
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "100%"
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_5"
+            },
+            "position": {
+              "basis": "45px",
+              "shrink": 0
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 173,
+                        "registerTypeID": 3
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox"
+                    },
+                    "position": {
+                      "basis": "56px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Prueba de desgarre soldadura de punto."
+                    },
+                    "type": "ia.input.checkbox"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "50%",
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 175,
+                        "registerTypeID": 3
+                      }
+                    },
+                    "meta": {
+                      "name": "Checkbox"
+                    },
+                    "position": {
+                      "basis": "56px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.selected"
+                          },
+                          "transforms": [
+                            {
+                              "fallback": "none",
+                              "inputType": "scalar",
+                              "mappings": [
+                                {
+                                  "input": true,
+                                  "output": "Cumple"
+                                },
+                                {
+                                  "input": false,
+                                  "output": "No Cumple"
+                                }
+                              ],
+                              "outputType": "scalar",
+                              "type": "map"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Alineación de soldadura"
+                    },
+                    "type": "ia.input.checkbox"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_0"
+                },
+                "position": {
+                  "basis": "50%",
+                  "shrink": 0
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer5"
+            },
+            "position": {
+              "basis": "67px"
+            },
+            "props": {
+              "style": {
+                "backgroundColor": "",
+                "borderBottomLeftRadius": 15,
+                "borderBottomRightRadius": 15,
+                "borderTopLeftRadius": 15,
+                "borderTopRightRadius": 15,
+                "marginLeft": 10,
+                "marginRight": 10,
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Label_0"
+            },
+            "position": {
+              "basis": "32px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "style": {
+                "color": "--cla-orange",
+                "marginTop": -25,
+                "paddingLeft": 30
+              },
+              "text": "Nota: revisar criterios de aceptación y rechazo"
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 10
+        },
+        "meta": {
+          "name": "FlexContainerGroup1"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 10,
+            "marginRight": 10
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "spacer2"
+        },
+        "position": {
+          "basis": "12px",
+          "grow": 1
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 0
+          },
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 15
+          },
+          "text": "Observaciones:",
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "TextField"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "placeholder": "Esciba aqui",
+          "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
+            "marginLeft": 15,
+            "marginRight": 30
+          }
+        },
+        "type": "ia.input.text-field"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tpapo_core.ui.confirmSave()"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_0"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Guardar"
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": [
+                {
+                  "messageType": "saveHourRegister_test",
+                  "pageScope": true,
+                  "script": "\t\t\n\t#logger \u003d system.util.getLogger(\"oneHour\")\n\t#logger.info(\"Mensaje recibido\")\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.half_hour\"\n\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswer30min \u003d self.view.custom.answers.half_hour\n\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY RegisterCode DESC\n\t\"\"\"\n\n\n\t#result \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t#regCode \u003d result.getValueAt(0,0)\n\t\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tif result.getRowCount() \u003e 0:\n\t\tregCode \u003d result.getValueAt(0, 0)\n\telse:\n\t\tregCode \u003d 0\n\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\tstatus \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(3, system.util.jsonEncode(answer30min),regCode)  # 30 minutos\n\t\n\t\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
+                  "sessionScope": false,
+                  "viewScope": false
+                }
+              ]
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_1"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-2"
+              },
+              "text": "Cancelar"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_0"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "center"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-widget",
+        "marginLeft": 10,
+        "overflow": "hidden",
+        "paddingLeft": 10
+      }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

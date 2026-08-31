@@ -5,14 +5,26 @@ Supervisor signature logic for PAPO forms.
 Handles direct signing, authentication popup flow, and
 IP validation by role.
 
-Version: 1.0.0
+Version: 1.2.0
 
 Changelog:
+	2026-07-30 | William M. | v1.2.0 - Added signSupervisorFromSelection for
+		management/audit tables (e.g. Gestion) that sign a selected
+		registerhistory row instead of the PAPO's own form view
+	2026-07-23 | William M. | v1.1.1 - Fix autoCloseOpenForms picking a stale
+		row when RegisterCode repeats for the same PapoID/WorkstationNodeID
+		(pre-existing historical duplicates); added Timestamp/ID tiebreak
+	2026-07-23 | William M. | v1.1.0 - Added autoCloseOpenForms for
+		Gateway-driven shift-end auto-close of forms left "En proceso"
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
 """
 
 ALLOWED_ROLES = {"INTEGRADOR", "Administrator", "Supervisor_PAPO"}
 IP_EXEMPT_ROLES = {"INTEGRADOR", "Administrator"}
+
+# Nodes excluded from shift-end auto-close (forms that intentionally span shifts)
+AUTO_CLOSE_EXCLUDED_NODE_ID = 29  # Granja de acidos
+AUTO_CLOSE_EXCLUDED_PARENT_NODE_ID = 4  # Metalurgia area - covers all its lines
 
 
 # ==================== INTERNAL HELPERS ====================
@@ -119,7 +131,7 @@ def signOperator(root):
 	"""
 	try:
 		dbConnection = root.view.custom.dbConnection
-		ref = getattr(root.view.custom, "referencePapo", "papo_core.sign")
+		ref = str(getattr(root.view.custom, "referencePapo", "papo_core.sign"))
 		logger = system.util.getLogger(ref)
 		papoID = root.view.params.papoID
 		user = root.session.props.auth.user.userName
@@ -184,7 +196,7 @@ def requestSupervisorAuth(button):
 	"""
 	try:
 		dbConnection = button.view.custom.dbConnection
-		ref = getattr(button.view.custom, "referencePapo", "papo_core.sign")
+		ref = str(getattr(button.view.custom, "referencePapo", "papo_core.sign"))
 		logger = system.util.getLogger(ref)
 		papoId = button.view.params.papoID
 		nodeId = button.view.params.nodeID
@@ -314,6 +326,55 @@ def signSupervisor(root):
 		system.util.getLogger("papo_core.sign").error("Error in supervisor sign: " + str(e))
 
 
+def signSupervisorFromSelection(root):
+	"""
+	Sign the currently selected row from a PAPO management table.
+
+	Inserts a supervisor signature (type 10, Revisado) for the row
+	selected in a Table component (root.view.custom.selection), using
+	the logged-in user's identity. Meant for management/audit views
+	(e.g. Gestion) where the user reviews a historical row instead of
+	working inside the PAPO's own form view.
+
+	Args:
+		root (Component): The root component
+
+	Returns:
+		None
+	"""
+	try:
+		dbConnection = root.view.custom.dbConnection
+		selection = root.view.custom.selection
+
+		papoId = selection.PapoID
+		nodeId = selection.NodeID
+		registerCode = selection.RegisterCode
+		workstationNodeId = selection.WorkstationNodeID
+		workstationId = selection.WorkstationID
+
+		userName = root.session.props.auth.user.userName
+		firstName = root.session.props.auth.user.firstName
+		lastName = root.session.props.auth.user.lastName
+		roles = root.session.props.auth.user.roles
+
+		dataAnswer = {
+			"user": userName,
+			"role": list(roles),
+			"name": firstName,
+			"lastname": lastName
+		}
+		dataAnswerStr = system.util.jsonEncode(dataAnswer)
+
+		_insertSignature(dbConnection, dataAnswerStr, papoId, userName,
+		                 workstationNodeId, nodeId, workstationId, registerCode)
+
+		alerts.actionSuccess('Formulario firmado', message='El formulario fue firmado correctamente')
+		root.view.custom.refreshTable = root.view.custom.refreshTable + 1
+
+	except Exception as e:
+		system.util.getLogger("papo_core.sign").error("Error in supervisor sign from selection: " + str(e))
+
+
 def authenticateAndSign(popup):
 	"""
 	Authenticate a supervisor via popup and execute signature.
@@ -422,3 +483,119 @@ def authenticateAndSign(popup):
 		alerts.showAlert(state='error', title='Error del Sistema',
 		                 message='Ocurrio un error inesperado. Contacte al administrador.',
 		                 btnTextPrimary='Aceptar', btnActionPrimary='')
+
+
+def autoCloseOpenForms(dbConnection):
+	"""
+	Auto-close PAPO forms left "En proceso" past the shift boundary.
+
+	Meant to run from a Gateway Timer/Scheduled Script shortly after each
+	shift change (06:10, 14:10, 22:10). Finds the latest registerhistory
+	row per PapoID/WorkstationNodeID pair still in "En proceso", then
+	inserts the same closing pair signOperator() would (type 10 Finalizado
+	+ type 12 Sin Iniciar, RegisterCode + 1), attributing the closure to
+	the operator recorded on that last save and tagging the signature
+	comment with turno/hora plus "Cierre automatico". Forms under Granja
+	de acidos or any Metalurgia line are skipped since they intentionally
+	span multiple shifts.
+
+	Args:
+		dbConnection (str): Database connection name.
+
+	Returns:
+		int: Number of forms auto-closed.
+	"""
+	try:
+		logger = system.util.getLogger("papo_core.sign.autoCloseOpenForms")
+		now = system.date.now()
+
+		# Build turno/hora prefix for the closing comment
+		hour = system.date.getHour24(now)
+		minute = system.date.getMinute(now)
+
+		if hour >= 22 or hour < 6:
+			shift = 1
+		elif hour >= 6 and hour < 14:
+			shift = 2
+		else:
+			shift = 3
+
+		timeStr = "{:02d}:{:02d}".format(hour, minute)
+		comment = "T: {}, H: {} - Cierre automatico".format(shift, timeStr)
+
+		# Get node IDs excluded from auto-close (Granja de acidos + Metalurgia lines)
+		excludedQuery = "SELECT ID FROM node WHERE ID = ? OR ParentNodeID = ?"
+		excludedResult = system.db.runPrepQuery(
+			excludedQuery,
+			[AUTO_CLOSE_EXCLUDED_NODE_ID, AUTO_CLOSE_EXCLUDED_PARENT_NODE_ID],
+			dbConnection
+		)
+		excludedNodeIds = set(
+			int(excludedResult.getValueAt(i, 0)) for i in range(excludedResult.getRowCount())
+		)
+
+		# Get the latest register per PapoID/WorkstationNodeID still "En proceso"
+		# Tiebreak by Timestamp then ID: historical RegisterCode duplicates exist
+		# for some stations (pre-dating the signOperator RegisterCode fix), so
+		# RegisterCode alone is not always unique per PapoID/WorkstationNodeID
+		openQuery = """
+			SELECT PapoID, WorkstationNodeID, NodeID, WorkstationID, RegisterCode, [User]
+			FROM (
+				SELECT
+					PapoID, WorkstationNodeID, NodeID, WorkstationID, RegisterCode, [User], Status,
+					ROW_NUMBER() OVER (
+						PARTITION BY PapoID, WorkstationNodeID
+						ORDER BY RegisterCode DESC, [Timestamp] DESC, ID DESC
+					) AS rn
+				FROM registerhistory
+			) latest
+			WHERE rn = 1 AND Status = ?
+		"""
+		openResult = system.db.runPrepQuery(openQuery, ["En proceso"], dbConnection)
+
+		insertSql = """
+			INSERT INTO registerhistory (
+				[Timestamp], DataAnswer, Status, PapoID, RegisterTypeID,
+				[User], WorkstationNodeID, NodeID, WorkstationID, RegisterCode
+			)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		"""
+
+		closedCount = 0
+		for i in range(openResult.getRowCount()):
+			papoID = openResult.getValueAt(i, "PapoID")
+			workstationNodeID = openResult.getValueAt(i, "WorkstationNodeID")
+			nodeID = openResult.getValueAt(i, "NodeID")
+			workstationID = openResult.getValueAt(i, "WorkstationID")
+			regCode = int(openResult.getValueAt(i, "RegisterCode"))
+			lastUser = openResult.getValueAt(i, "User")
+
+			if workstationNodeID is None or int(workstationNodeID) in excludedNodeIds:
+				continue
+
+			regPayload = {
+				"user": lastUser,
+				"role": "SYSTEM",
+				"name": "Cierre",
+				"lastname": "Automatico",
+				"comment": comment
+			}
+
+			system.db.runPrepUpdate(insertSql, [
+				now, system.util.jsonEncode(regPayload), "Finalizado", papoID, 10,
+				lastUser, workstationNodeID, nodeID, workstationID, regCode
+			], dbConnection)
+
+			system.db.runPrepUpdate(insertSql, [
+				now, "{}", "Sin Iniciar", papoID, 12,
+				lastUser, workstationNodeID, nodeID, workstationID, regCode + 1
+			], dbConnection)
+
+			closedCount += 1
+
+		# logger.info("Auto-closed {} open PAPO forms at shift boundary".format(closedCount))
+		return closedCount
+
+	except Exception as e:
+		system.util.getLogger("papo_core.sign").error("Error in auto-close job: " + str(e))
+		return 0

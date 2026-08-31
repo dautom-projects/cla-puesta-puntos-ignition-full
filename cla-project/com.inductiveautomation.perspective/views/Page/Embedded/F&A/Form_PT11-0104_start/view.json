@@ -1,0 +1,4693 @@
+{
+  "custom": {
+    "db": "papo_db",
+    "dbConnection": "papo_db",
+    "fontSize": 17,
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1787326111786
+      ],
+      "$ts": 1787326111786
+    },
+    "insights": " | T: 2, H: 10:28 - ",
+    "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
+    "referencePapo": "",
+    "registerTypeID": 7,
+    "sign": "",
+    "supervisorOption": [],
+    "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": [
+        {
+          "config": {
+            "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tself.custom.supervisorOption \u003d papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
+          },
+          "scope": "G",
+          "type": "script"
+        },
+        {
+          "config": {
+            "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()"
+          },
+          "scope": "G",
+          "type": "script"
+        }
+      ]
+    }
+  },
+  "params": {
+    "nodeID": 26,
+    "papoID": 25,
+    "workstationID": 1,
+    "workstationnodeID": 1
+  },
+  "propConfig": {
+    "custom.db": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.fontSize": {
+      "persistent": true
+    },
+    "custom.initialPapoDateTime": {
+      "onChange": {
+        "enabled": null,
+        "script": "\tself.getChild(\"root\").getChild(\"FlexContainerGroup2\").getChild(\"FlexContainer_2\").getChild(\"DateTimeInput\").props.value \u003d currentValue.value\n\tself.getChild(\"root\").getChild(\"FlexContainerGroup2\").getChild(\"FlexContainer_2\").getChild(\"DateTimeInput_0\").props.value \u003d currentValue.value\n\tself.getChild(\"root\").getChild(\"FlexContainerGroup2\").getChild(\"FlexContainer_5\").getChild(\"DateTimeInput\").props.value \u003d currentValue.value\n\tself.getChild(\"root\").getChild(\"FlexContainerGroup2\").getChild(\"FlexContainer_5\").getChild(\"DateTimeInput_0\").props.value \u003d currentValue.value\n"
+      },
+      "persistent": true
+    },
+    "custom.insights": {
+      "binding": {
+        "config": {
+          "path": "/root/TextField.props.text"
+        },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.path": {
+      "persistent": true
+    },
+    "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.user": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.firstName"
+        },
+        "transforms": [
+          {
+            "expression": "{value} + \" \" +{session.props.auth.user.lastName}",
+            "type": "expression"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationnodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1760,
+      "width": 1024
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Spacer"
+        },
+        "position": {
+          "basis": "22px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "textStyle": {
+            "color": "#002C36",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label4"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "text": "FORMULARIO INICIO DE TURNO",
+          "textStyle": {
+            "color": "--cla-text-question",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Spacer1"
+        },
+        "position": {
+          "basis": "15px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section1"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup1.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Condiciones de Seguridad",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox0"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox1"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox2"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox3"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox4"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox5"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox6"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox7"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox8"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox9"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox10"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox11"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox12"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox13"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Checkbox14"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.meta.name"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tindex \u003d int(value.replace(\"Checkbox\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 886,
+          "basePapo": 6246
+        },
+        "meta": {
+          "name": "FlexContainerGroup1"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section2"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup2.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Reporte de Descarga",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "custom": {
+                  "papoItemID": 6261
+                },
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "307.1px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6261,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "275px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "expression": "{session.props.auth.user.firstName} + \" \" + {session.props.auth.user.lastName}"
+                      },
+                      "type": "expr"
+                    }
+                  },
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-data-2",
+                    "color": "#1199C7",
+                    "paddingLeft": 20
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "33px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item_dev": {
+                    "papoItemID": 6267
+                  }
+                },
+                "meta": {
+                  "name": "TextField"
+                },
+                "position": {
+                  "basis": "297px",
+                  "display": false
+                },
+                "propConfig": {
+                  "custom.item_dev.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item_dev.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "placeholder": "Escriba Aqui",
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_1"
+            },
+            "position": {
+              "basis": "48px"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "papoItemID": 6262
+                },
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "236px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6262
+                  }
+                },
+                "meta": {
+                  "name": "DateTimeInput"
+                },
+                "position": {
+                  "basis": "146px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n    \"\"\"\n    Recibe algo como: \"10/1/25, 2:00:00 AM\" (string) o un java.util.Date\n    Retorna: \"h:mm:ss a\" -\u003e p.ej. \"2:00:00 AM\"\n    Forzamos Locale.ENGLISH para evitar problemas con AM/PM en es_CO.\n    \"\"\"\n    try:\n        # 1) Si ya es un java.util.Date, úsalo tal cual\n        if hasattr(value, \u0027getTime\u0027):\n            dt \u003d value\n        else:\n            s \u003d str(value).strip().replace(u\u0027\\xa0\u0027, \u0027 \u0027)\n            from java.text import SimpleDateFormat\n            from java.util import Locale\n\n            # Patrones típicos que pueden llegarte\n            patterns \u003d [\n                \"M/d/yy, h:mm:ss a\",\n                \"M/d/yy h:mm:ss a\",\n                \"MM/dd/yy, hh:mm:ss a\",\n                \"MM/dd/yy hh:mm:ss a\",\n                \"M/d/yyyy, h:mm:ss a\",\n                \"M/d/yyyy h:mm:ss a\"\n            ]\n            dt \u003d None\n            for p in patterns:\n                try:\n                    dt \u003d SimpleDateFormat(p, Locale.ENGLISH).parse(s)\n                    break\n                except:\n                    pass\n\n            # Fallback: extrae solo la hora por regex si no se pudo parsear todo\n            if dt is None:\n                import re\n                m \u003d re.search(r\u0027(\\d{1,2}):(\\d{2}):(\\d{2})\\s*(AM|PM)\u0027, s, re.IGNORECASE)\n                if not m:\n                    return None\n                h, mm, ss \u003d int(m.group(1)), int(m.group(2)), int(m.group(3))\n                ap \u003d m.group(4).upper()\n                if ap \u003d\u003d \"PM\" and h !\u003d 12: h +\u003d 12\n                if ap \u003d\u003d \"AM\" and h \u003d\u003d 12: h \u003d 0\n                cal \u003d system.date.getCalendar()\n                cal.set(system.date.getYear(cal), system.date.getMonth(cal), system.date.getDayOfMonth(cal), h, mm, ss)\n                dt \u003d cal.getTime()\n\n        # 2) Formato de salida\n        from java.text import SimpleDateFormat\n        from java.util import Locale\n        fmt \u003d SimpleDateFormat(\"h:mm:ss a\", Locale.ENGLISH)  # -\u003e \"2:00:00 AM\"\n        # Si lo quieres EXACTO como \"2:0000 AM\" (mmss sin dos puntos), usa:\n        # fmt \u003d SimpleDateFormat(\"h:mmss a\", Locale.ENGLISH)  # -\u003e \"2:0000 AM\"\n\n        return fmt.format(dt)\n    except:\n        return None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "formattedValue": "Aug 21, 2026 10:28 AM",
+                  "pickerType": "time",
+                  "style": {
+                    "paddingBottom": -30,
+                    "paddingTop": -30
+                  },
+                  "value": {
+                    "$": [
+                      "ts",
+                      192,
+                      1787326111786
+                    ],
+                    "$ts": 1787326111786
+                  }
+                },
+                "type": "ia.input.date-time-input"
+              },
+              {
+                "custom": {
+                  "item_dev": {
+                    "papoItemID": 6262
+                  }
+                },
+                "meta": {
+                  "name": "TextField"
+                },
+                "position": {
+                  "basis": "163px",
+                  "display": false
+                },
+                "propConfig": {
+                  "custom.item_dev.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item_dev.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "placeholder": "Escriba Aqui",
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.input.text-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "33px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "papoItemID": 6268
+                },
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "284px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item_dev": {
+                    "papoItemID": 6268
+                  }
+                },
+                "meta": {
+                  "name": "TextField_0"
+                },
+                "position": {
+                  "basis": "163px",
+                  "display": false
+                },
+                "propConfig": {
+                  "custom.item_dev.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item_dev.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "placeholder": "Escriba Aqui",
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.input.text-field"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6268
+                  }
+                },
+                "meta": {
+                  "name": "DateTimeInput_0"
+                },
+                "position": {
+                  "basis": "146px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n    \"\"\"\n    Recibe algo como: \"10/1/25, 2:00:00 AM\" (string) o un java.util.Date\n    Retorna: \"h:mm:ss a\" -\u003e p.ej. \"2:00:00 AM\"\n    Forzamos Locale.ENGLISH para evitar problemas con AM/PM en es_CO.\n    \"\"\"\n    try:\n        # 1) Si ya es un java.util.Date, úsalo tal cual\n        if hasattr(value, \u0027getTime\u0027):\n            dt \u003d value\n        else:\n            s \u003d str(value).strip().replace(u\u0027\\xa0\u0027, \u0027 \u0027)\n            from java.text import SimpleDateFormat\n            from java.util import Locale\n\n            # Patrones típicos que pueden llegarte\n            patterns \u003d [\n                \"M/d/yy, h:mm:ss a\",\n                \"M/d/yy h:mm:ss a\",\n                \"MM/dd/yy, hh:mm:ss a\",\n                \"MM/dd/yy hh:mm:ss a\",\n                \"M/d/yyyy, h:mm:ss a\",\n                \"M/d/yyyy h:mm:ss a\"\n            ]\n            dt \u003d None\n            for p in patterns:\n                try:\n                    dt \u003d SimpleDateFormat(p, Locale.ENGLISH).parse(s)\n                    break\n                except:\n                    pass\n\n            # Fallback: extrae solo la hora por regex si no se pudo parsear todo\n            if dt is None:\n                import re\n                m \u003d re.search(r\u0027(\\d{1,2}):(\\d{2}):(\\d{2})\\s*(AM|PM)\u0027, s, re.IGNORECASE)\n                if not m:\n                    return None\n                h, mm, ss \u003d int(m.group(1)), int(m.group(2)), int(m.group(3))\n                ap \u003d m.group(4).upper()\n                if ap \u003d\u003d \"PM\" and h !\u003d 12: h +\u003d 12\n                if ap \u003d\u003d \"AM\" and h \u003d\u003d 12: h \u003d 0\n                cal \u003d system.date.getCalendar()\n                cal.set(system.date.getYear(cal), system.date.getMonth(cal), system.date.getDayOfMonth(cal), h, mm, ss)\n                dt \u003d cal.getTime()\n\n        # 2) Formato de salida\n        from java.text import SimpleDateFormat\n        from java.util import Locale\n        fmt \u003d SimpleDateFormat(\"h:mm:ss a\", Locale.ENGLISH)  # -\u003e \"2:00:00 AM\"\n        # Si lo quieres EXACTO como \"2:0000 AM\" (mmss sin dos puntos), usa:\n        # fmt \u003d SimpleDateFormat(\"h:mmss a\", Locale.ENGLISH)  # -\u003e \"2:0000 AM\"\n\n        return fmt.format(dt)\n    except:\n        return None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "formattedValue": "Aug 21, 2026 10:28 AM",
+                  "pickerType": "time",
+                  "style": {
+                    "paddingBottom": -30,
+                    "paddingTop": -30
+                  },
+                  "value": {
+                    "$": [
+                      "ts",
+                      192,
+                      1787326111786
+                    ],
+                    "$ts": 1787326111786
+                  }
+                },
+                "type": "ia.input.date-time-input"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_2"
+            },
+            "position": {
+              "basis": "68px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Label_0"
+            },
+            "position": {
+              "basis": "13px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "papoItemID": 6263
+                },
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "236px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6263
+                  }
+                },
+                "meta": {
+                  "name": "TextField"
+                },
+                "position": {
+                  "basis": "163px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "placeholder": "Escriba Aqui",
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.input.text-field"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "33px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "papoItemID": 6269
+                },
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "284px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6269
+                  }
+                },
+                "meta": {
+                  "name": "TextField_0"
+                },
+                "position": {
+                  "basis": "163px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "placeholder": "Escriba Aqui",
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_3"
+            },
+            "position": {
+              "basis": "48px"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "papoItemID": 6264
+                },
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "235px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item_dev": {
+                    "papoItemID": 6264,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "105px",
+                  "display": false
+                },
+                "propConfig": {
+                  "custom.item_dev.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-data-2",
+                    "color": "#1199C7",
+                    "paddingLeft": 20
+                  },
+                  "text": 2
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6264
+                  }
+                },
+                "meta": {
+                  "name": "TextField"
+                },
+                "position": {
+                  "basis": "309px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "placeholder": "Escriba Aqui",
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  }
+                },
+                "type": "ia.input.text-field"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_4"
+            },
+            "position": {
+              "basis": "48px"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 6265
+              }
+            },
+            "meta": {
+              "name": "Checkbox0"
+            },
+            "position": {
+              "basis": "49px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.selected"
+                  },
+                  "transforms": [
+                    {
+                      "fallback": "none",
+                      "inputType": "scalar",
+                      "mappings": [
+                        {
+                          "input": true,
+                          "output": "Cumple"
+                        },
+                        {
+                          "input": false,
+                          "output": "No Cumple"
+                        }
+                      ],
+                      "outputType": "scalar",
+                      "type": "map"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "props.style.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "type": "ia.input.checkbox"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "papoItemID": 6266
+                },
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "236px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6266
+                  }
+                },
+                "meta": {
+                  "name": "DateTimeInput"
+                },
+                "position": {
+                  "basis": "146px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n    \"\"\"\n    Recibe algo como: \"10/1/25, 2:00:00 AM\" (string) o un java.util.Date\n    Retorna: \"h:mm:ss a\" -\u003e p.ej. \"2:00:00 AM\"\n    Forzamos Locale.ENGLISH para evitar problemas con AM/PM en es_CO.\n    \"\"\"\n    try:\n        # 1) Si ya es un java.util.Date, úsalo tal cual\n        if hasattr(value, \u0027getTime\u0027):\n            dt \u003d value\n        else:\n            s \u003d str(value).strip().replace(u\u0027\\xa0\u0027, \u0027 \u0027)\n            from java.text import SimpleDateFormat\n            from java.util import Locale\n\n            # Patrones típicos que pueden llegarte\n            patterns \u003d [\n                \"M/d/yy, h:mm:ss a\",\n                \"M/d/yy h:mm:ss a\",\n                \"MM/dd/yy, hh:mm:ss a\",\n                \"MM/dd/yy hh:mm:ss a\",\n                \"M/d/yyyy, h:mm:ss a\",\n                \"M/d/yyyy h:mm:ss a\"\n            ]\n            dt \u003d None\n            for p in patterns:\n                try:\n                    dt \u003d SimpleDateFormat(p, Locale.ENGLISH).parse(s)\n                    break\n                except:\n                    pass\n\n            # Fallback: extrae solo la hora por regex si no se pudo parsear todo\n            if dt is None:\n                import re\n                m \u003d re.search(r\u0027(\\d{1,2}):(\\d{2}):(\\d{2})\\s*(AM|PM)\u0027, s, re.IGNORECASE)\n                if not m:\n                    return None\n                h, mm, ss \u003d int(m.group(1)), int(m.group(2)), int(m.group(3))\n                ap \u003d m.group(4).upper()\n                if ap \u003d\u003d \"PM\" and h !\u003d 12: h +\u003d 12\n                if ap \u003d\u003d \"AM\" and h \u003d\u003d 12: h \u003d 0\n                cal \u003d system.date.getCalendar()\n                cal.set(system.date.getYear(cal), system.date.getMonth(cal), system.date.getDayOfMonth(cal), h, mm, ss)\n                dt \u003d cal.getTime()\n\n        # 2) Formato de salida\n        from java.text import SimpleDateFormat\n        from java.util import Locale\n        fmt \u003d SimpleDateFormat(\"h:mm:ss a\", Locale.ENGLISH)  # -\u003e \"2:00:00 AM\"\n        # Si lo quieres EXACTO como \"2:0000 AM\" (mmss sin dos puntos), usa:\n        # fmt \u003d SimpleDateFormat(\"h:mmss a\", Locale.ENGLISH)  # -\u003e \"2:0000 AM\"\n\n        return fmt.format(dt)\n    except:\n        return None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "formattedValue": "Aug 21, 2026 10:28 AM",
+                  "pickerType": "time",
+                  "style": {
+                    "paddingBottom": -30,
+                    "paddingTop": -30
+                  },
+                  "value": {
+                    "$": [
+                      "ts",
+                      192,
+                      1787326111786
+                    ],
+                    "$ts": 1787326111786
+                  }
+                },
+                "type": "ia.input.date-time-input"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "33px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "papoItemID": 6271
+                },
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "284px"
+                },
+                "propConfig": {
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6271
+                  }
+                },
+                "meta": {
+                  "name": "DateTimeInput_0"
+                },
+                "position": {
+                  "basis": "170px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n    \"\"\"\n    Recibe algo como: \"10/1/25, 2:00:00 AM\" (string) o un java.util.Date\n    Retorna: \"h:mm:ss a\" -\u003e p.ej. \"2:00:00 AM\"\n    Forzamos Locale.ENGLISH para evitar problemas con AM/PM en es_CO.\n    \"\"\"\n    try:\n        # 1) Si ya es un java.util.Date, úsalo tal cual\n        if hasattr(value, \u0027getTime\u0027):\n            dt \u003d value\n        else:\n            s \u003d str(value).strip().replace(u\u0027\\xa0\u0027, \u0027 \u0027)\n            from java.text import SimpleDateFormat\n            from java.util import Locale\n\n            # Patrones típicos que pueden llegarte\n            patterns \u003d [\n                \"M/d/yy, h:mm:ss a\",\n                \"M/d/yy h:mm:ss a\",\n                \"MM/dd/yy, hh:mm:ss a\",\n                \"MM/dd/yy hh:mm:ss a\",\n                \"M/d/yyyy, h:mm:ss a\",\n                \"M/d/yyyy h:mm:ss a\"\n            ]\n            dt \u003d None\n            for p in patterns:\n                try:\n                    dt \u003d SimpleDateFormat(p, Locale.ENGLISH).parse(s)\n                    break\n                except:\n                    pass\n\n            # Fallback: extrae solo la hora por regex si no se pudo parsear todo\n            if dt is None:\n                import re\n                m \u003d re.search(r\u0027(\\d{1,2}):(\\d{2}):(\\d{2})\\s*(AM|PM)\u0027, s, re.IGNORECASE)\n                if not m:\n                    return None\n                h, mm, ss \u003d int(m.group(1)), int(m.group(2)), int(m.group(3))\n                ap \u003d m.group(4).upper()\n                if ap \u003d\u003d \"PM\" and h !\u003d 12: h +\u003d 12\n                if ap \u003d\u003d \"AM\" and h \u003d\u003d 12: h \u003d 0\n                cal \u003d system.date.getCalendar()\n                cal.set(system.date.getYear(cal), system.date.getMonth(cal), system.date.getDayOfMonth(cal), h, mm, ss)\n                dt \u003d cal.getTime()\n\n        # 2) Formato de salida\n        from java.text import SimpleDateFormat\n        from java.util import Locale\n        fmt \u003d SimpleDateFormat(\"h:mm:ss a\", Locale.ENGLISH)  # -\u003e \"2:00:00 AM\"\n        # Si lo quieres EXACTO como \"2:0000 AM\" (mmss sin dos puntos), usa:\n        # fmt \u003d SimpleDateFormat(\"h:mmss a\", Locale.ENGLISH)  # -\u003e \"2:0000 AM\"\n\n        return fmt.format(dt)\n    except:\n        return None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "formattedValue": "Aug 21, 2026 10:28 AM",
+                  "pickerType": "time",
+                  "value": {
+                    "$": [
+                      "ts",
+                      192,
+                      1787326111786
+                    ],
+                    "$ts": 1787326111786
+                  }
+                },
+                "type": "ia.input.date-time-input"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_5"
+            },
+            "position": {
+              "basis": "65px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 388,
+          "basePapo": 6261
+        },
+        "meta": {
+          "name": "FlexContainerGroup2"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "justify": "space-around",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section3"
+        },
+        "position": {
+          "basis": "46px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup3.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Condiciones Para Descarga, Equipos, Herramientas y Elementos",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6272
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox2"
+                },
+                "position": {
+                  "basis": "867px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_4"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6273
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "584px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_21"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6274
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox2"
+                },
+                "position": {
+                  "basis": "867px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_5"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6275
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "584px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_22"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6276
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox2"
+                },
+                "position": {
+                  "basis": "584px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_6"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6277
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "870px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_23"
+            },
+            "position": {
+              "basis": "77px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6278
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "584px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_20"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6280
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "870px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_25"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6281
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "870px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_26"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6282
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "870px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_27"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_0"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.value": {
+                        "binding": {
+                          "config": {
+                            "path": "this.meta.name"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.value"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                              "type": "script"
+                            },
+                            {
+                              "code": "\tvalue \u003d value.split(\"-\")[0].strip()\n\treturn value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_1"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.value": {
+                        "binding": {
+                          "config": {
+                            "path": "this.meta.name"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.value"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                              "type": "script"
+                            },
+                            {
+                              "code": "\tvalue \u003d value.split(\"-\")[0].strip()\n\treturn value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_2"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.value": {
+                        "binding": {
+                          "config": {
+                            "path": "this.meta.name"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tindex \u003d int(value.replace(\"Label_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.value"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                              "type": "script"
+                            },
+                            {
+                              "code": "\tvalue \u003d value.split(\"-\")[0].strip()\n\treturn value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "custom": {
+                  "basePapo": 6283
+                },
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "327px"
+                },
+                "props": {
+                  "direction": "column",
+                  "justify": "space-around"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "custom": {
+                      "item_dev": {}
+                    },
+                    "meta": {
+                      "name": "TextField_0"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.item_dev.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.text"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "custom.item_dev.papoItemID": {
+                        "binding": {
+                          "config": {
+                            "path": "this.meta.name"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "custom.item_dev.registerTypeID": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.item.papoItemID"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "placeholder": "Escriba Aqui",
+                      "style": {
+                        "borderBottomLeftRadius": 10,
+                        "borderBottomRightRadius": 10,
+                        "borderTopLeftRadius": 10,
+                        "borderTopRightRadius": 10,
+                        "fontSize": 17,
+                        "marginLeft": 0
+                      }
+                    },
+                    "type": "ia.input.text-field"
+                  },
+                  {
+                    "custom": {
+                      "item_dev": {}
+                    },
+                    "meta": {
+                      "name": "TextField_1"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.item_dev.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.text"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "custom.item_dev.papoItemID": {
+                        "binding": {
+                          "config": {
+                            "path": "this.meta.name"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "custom.item_dev.registerTypeID": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.item.papoItemID"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "placeholder": "Escriba Aqui",
+                      "style": {
+                        "borderBottomLeftRadius": 10,
+                        "borderBottomRightRadius": 10,
+                        "borderTopLeftRadius": 10,
+                        "borderTopRightRadius": 10,
+                        "fontSize": 17,
+                        "marginLeft": 0
+                      }
+                    },
+                    "type": "ia.input.text-field"
+                  },
+                  {
+                    "custom": {
+                      "item_dev": {}
+                    },
+                    "meta": {
+                      "name": "TextField_2"
+                    },
+                    "position": {
+                      "basis": "32px"
+                    },
+                    "propConfig": {
+                      "custom.item_dev.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.text"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "custom.item_dev.papoItemID": {
+                        "binding": {
+                          "config": {
+                            "path": "this.meta.name"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "custom.item_dev.registerTypeID": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.item.papoItemID"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "placeholder": "Escriba Aqui",
+                      "style": {
+                        "borderBottomLeftRadius": 10,
+                        "borderBottomRightRadius": 10,
+                        "borderTopLeftRadius": 10,
+                        "borderTopRightRadius": 10,
+                        "fontSize": 17,
+                        "marginLeft": 0
+                      }
+                    },
+                    "type": "ia.input.text-field"
+                  }
+                ],
+                "custom": {
+                  "basePapo": 6283
+                },
+                "meta": {
+                  "name": "FlexContainer_0"
+                },
+                "position": {
+                  "basis": "315px"
+                },
+                "props": {
+                  "direction": "column",
+                  "justify": "space-around"
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "S3"
+            },
+            "position": {
+              "basis": "200px",
+              "display": false,
+              "shrink": 0
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6286
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "870px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_31"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6287
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox8"
+                },
+                "position": {
+                  "basis": "870px",
+                  "shrink": 0
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_32"
+            },
+            "position": {
+              "basis": "50px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 871,
+          "basePapo": 6272
+        },
+        "meta": {
+          "name": "FlexContainerGroup3"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label"
+        },
+        "position": {
+          "basis": "32px",
+          "grow": 1,
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_2"
+            },
+            "position": {
+              "basis": "94px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "paddingLeft": 15
+              },
+              "text": "Supervisor:",
+              "textStyle": {
+                "fontSize": 14
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "item": {}
+            },
+            "meta": {
+              "name": "Dropdown"
+            },
+            "position": {
+              "basis": "250px"
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.value"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t\n\t# value \u003d numero que llega al binding\n\t# jsonData \u003d propiedad donde tienes el JSON\n\t\n\tdata \u003d self.props.options\n\t\n\tfor item in data:\n\t    if str(item[\"value\"]) \u003d\u003d str(value):\n\t        return item[\"label\"]\n\t\n\treturn \"\"\n\t",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "parent.custom.papoItemID"
+                  },
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.registerTypeID"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.supervisorOption"
+                  },
+                  "transforms": [
+                    {
+                      "code": "# Transform the array to dropdown format\n\tif value is None or len(value) \u003d\u003d 0:\n\t\treturn [{\"label\": \"No hay supervisores disponibles\", \"value\": \"\"}]\n\t\n\treturn [{\"label\": user, \"value\": user} for user in value]",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "placeholder": {
+                "text": "Seleccionar"
+              },
+              "style": {
+                "backgroundColor": "#FFFFFF",
+                "classes": "dropdown",
+                "marginLeft": 15,
+                "marginRight": 30
+              }
+            },
+            "type": "ia.input.dropdown"
+          }
+        ],
+        "custom": {
+          "papoItemID": 10965
+        },
+        "meta": {
+          "name": "FlexContainerSupervisor"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "custom.answers": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "key": "{./Dropdown.props.value}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 15
+          },
+          "text": "Observaciones:",
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "TextField"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "placeholder": "Esciba aqui",
+          "style": {
+            "backgroundColor": "#FFFFFF",
+            "classes": "dropdown",
+            "marginLeft": 15,
+            "marginRight": 30
+          }
+        },
+        "type": "ia.input.text-field"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tpapo_core.ui.confirmSave()"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_0"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Guardar"
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_1"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-2"
+              },
+              "text": "Cancelar"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_0"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "center"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "custom": {
+      "flexCount": [
+        3
+      ],
+      "flexGroupCount": 1
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-widget",
+        "marginLeft": 10,
+        "overflow": "scroll",
+        "paddingLeft": 10
+      }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

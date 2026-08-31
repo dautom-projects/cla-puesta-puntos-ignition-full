@@ -1,0 +1,176 @@
+// =====================================================
+// papo_db - Database Schema (ACTUALIZADO Y MEJORADO)
+// Sistema de Gestión de PAPOs (Procedimientos de Arranque y Puesta en Operación)
+// Basado en exportación real de SQL Server
+// Fecha: 2026-03-17
+// Registros totales: 6,570
+// =====================================================
+
+// =====================================================
+// TABLAS PRINCIPALES
+// =====================================================
+
+Table node {
+  ID int [pk, increment, not null]
+  Selectable tinyint [not null]
+  Type varchar(255) [null, note: 'ENTERPRISE, SITE, AREA, LINE, CELL']
+  DisplayName varchar(255) [null]
+  ParentNodeID int [null, ref: > node.ID, note: 'Auto-referencia jerárquica']
+  Name varchar(255) [null]
+  Topic varchar(255) [null, note: 'Path completo: Clarios/Andina/Ensamble/Linea1']
+
+  Note: '''
+  Jerarquía de la planta industrial (5 niveles):
+  ENTERPRISE (Clarios)
+    → SITE (Andina, Pacifico)
+      → AREA (Ensamble, Metalurgia, F&A, OREC)
+        → LINE (Linea 1, Linea 4, Refinacion, etc.)
+          → CELL (Automatica, Ensobradora, Borneadora)
+
+  Total: 42 nodos
+  '''
+}
+
+Table papo {
+  ID int [pk, increment, not null]
+  Description varchar(255) [not null]
+  Reference varchar(255) [not null, note: 'Código de referencia (ej: EA11-0901)']
+
+  Note: '''
+  Procedimientos de Arranque y Puesta en Operación (PAPO).
+  Define plantillas de checklists que se asignan a equipos.
+
+  Total: 48 procedimientos
+  Ejemplo: "Linea automatica" (EA11-0901)
+  '''
+}
+
+Table registertype {
+  ID int [pk, increment, not null]
+  Description varchar(255) [not null]
+
+  Note: '''
+  Tipos de registro/checklist:
+  - Checklist de Seguridad
+  - Verificación de Calidad
+  - Mantenimiento Preventivo
+  - etc.
+
+  Total: 21 tipos
+  '''
+}
+
+Table papoitem {
+  ID int [pk, increment, not null]
+  RegisterTypeID int [not null, ref: > registertype.ID]
+  PapoID int [not null, ref: > papo.ID]
+  Description nvarchar(max) [null, note: 'Texto de la pregunta del checklist']
+  AnswerType varchar(10) [not null, note: 'BOOL, TEXT, NUMBER']
+
+  Note: '''
+  Items/preguntas específicas de cada PAPO.
+  Cada PAPO puede tener múltiples items.
+
+  Total: 2,749 preguntas
+  Ejemplo: "Área de trabajo aseada y libre de obstáculos" (BOOL)
+  '''
+}
+
+Table papoitem_registertype {
+  PapoItemID int [null, ref: > papoitem.ID]
+  RegisterTypeID int [null, ref: > registertype.ID]
+
+  Note: '''
+  Relación muchos a muchos: PapoItem ↔ RegisterType
+  Permite que un item pertenezca a múltiples tipos de registro.
+
+  ⚠️ PROBLEMA: No tiene Primary Key definida
+  ⚠️ Ambas columnas permiten NULL (no recomendado)
+
+  Total: 3,571 relaciones
+
+  MEJORA SUGERIDA:
+  - Agregar PK compuesta: (PapoItemID, RegisterTypeID)
+  - Hacer columnas NOT NULL
+  '''
+}
+
+Table nodepapo {
+  ID int [pk, increment, not null]
+  NodeID int [not null, ref: > node.ID]
+  PapoID int [not null, ref: > papo.ID]
+
+  Note: '''
+  Asignación de PAPOs a nodos/equipos.
+  Define qué procedimientos aplican a qué equipos.
+
+  Relación muchos a muchos:
+  - Un nodo puede tener múltiples PAPOs
+  - Un PAPO puede aplicar a múltiples nodos
+
+  Total: 62 asignaciones
+  Ejemplo: Linea 1 (NodeID=5) → PAPO "Linea automatica" (PapoID=1)
+  '''
+}
+
+Table workstation {
+  ID int [pk, increment, not null]
+  Description varchar(255) [null]
+  Hostname varchar(50) [not null, default: '']
+  IpAddress varchar(255) [not null, default: '']
+
+  Note: '''
+  Estaciones de trabajo (computadoras/terminales)
+  desde donde se ejecutan los PAPOs.
+
+  Total: 24 estaciones
+  Ejemplo: PC-LINEA1 (192.168.1.10)
+  '''
+}
+
+Table workstationnode {
+  ID int [pk, increment, not null]
+  NodeID int [not null, ref: > node.ID]
+  WorkstationID int [not null, ref: > workstation.ID]
+
+  Note: '''
+  Asignación de workstations a nodos.
+  Define desde qué estaciones se puede operar cada equipo.
+
+  Relación muchos a muchos:
+  - Una estación puede operar varios nodos
+  - Un nodo puede operarse desde varias estaciones
+
+  Total: 24 asignaciones
+  '''
+}
+
+Table registerhistory {
+  ID int [pk, increment, not null]
+  Timestamp datetime [not null]
+  DataAnswer varchar(max) [null, note: 'Respuestas del checklist (JSON)']
+  Status varchar(50) [null, note: 'Completado, Pendiente, etc.']
+  PapoID int [not null, ref: > papo.ID]
+  RegisterTypeID int [not null, ref: > registertype.ID]
+  User varchar(100) [not null, note: 'Usuario que ejecutó el PAPO']
+  WorkstationNodeID int [not null, ref: > workstationnode.ID]
+  NodeID int [not null, ref: > node.ID]
+  WorkstationID int [not null, ref: > workstation.ID]
+  RegisterCode int [not null, default: 0]
+
+  Note: '''
+  Historial de ejecuciones de PAPOs.
+  Registra cada vez que se completa un checklist.
+
+  Auditoría completa:
+  - Quién (User)
+  - Qué (PapoID)
+  - Dónde (NodeID)
+  - Desde dónde (WorkstationID)
+  - Cuándo (Timestamp)
+  - Resultado (DataAnswer, Status)
+
+  Tabla de auditoría - Crece con el tiempo
+  NO exportada en backup (puede tener millones de registros)
+  '''
+}

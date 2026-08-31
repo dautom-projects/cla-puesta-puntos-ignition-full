@@ -5,9 +5,11 @@ Data collection and saving logic for PAPO forms.
 Handles answer recopilation, saving to registerhistory,
 and operator signature flow.
 
-Version: 1.0.0
+Version: 1.0.1
 
 Changelog:
+	2026-07-22 | William M. | v1.0.1 - Fix save() silently skipping flat forms
+		(no FlexContainerGroup) since allItems is always empty for them
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
 """
 
@@ -150,7 +152,7 @@ def save(root):
 	try:
 		# Input variables
 		dbConnection = root.view.custom.dbConnection
-		ref = getattr(root.view.custom, "referencePapo", "papo_core.register")
+		ref = str(getattr(root.view.custom, "referencePapo", "papo_core.register"))
 		logger = system.util.getLogger(ref)
 		papoID = root.view.params.papoID
 		userName = root.session.props.auth.user.userName
@@ -181,8 +183,8 @@ def save(root):
 				if isinstance(item, dict) and "papoItemID" in item:
 					allItems.append(item)
 
-		# Skip if no answers collected
-		if not allItems:
+		# Skip only when the form has sections AND no answers were collected
+		if flexGroupCount > 0 and not allItems:
 			return
 
 		# Append supervisor answer if present

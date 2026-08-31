@@ -89,6 +89,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `.claude/docs/PROCEDIMIENTO_ESTANDARIZACION.md` — pasos de estandarización por vista
 - `.claude/docs/USAGE.md` — referencia de wrappers de papo_core
 - `.claude/docs/papo_core_reference/` — los 5 módulos papo_core como referencia
+- `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de `papo_db` (DBML), con notas de mejoras sugeridas
 
 ## Estado actual
 
