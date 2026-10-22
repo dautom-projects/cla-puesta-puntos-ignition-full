@@ -14,11 +14,21 @@ las áreas de la planta (Ensamble, Metalurgia, OREC, F&A, General).
 - **Base de datos:** SQL Server, conexión `papo_db`
 - **User sources:** ClariosAD (AD, primario) + papo_db_users (failover)
 
+## Base de datos papo_db
+
+Esquema completo en `.claude/docs/DATABASE_SCHEMA.dbml`.
+
+- Tablas de PAPO: `node`, `nodepapo`, `papo`, `papoitem`, `papoitem_registertype`, `registerhistory`, `registertype`, `workstation`, `workstationnode`
+- `users`, `roles`, `user_roles`: user source `papo_db_users`
+- `scada_*`: tablas internas del user source de Ignition (vacías)
+- `fa_cpk_*`: proyecto CPK/SPC de F&A, no pertenecen a PAPO
+- No hay FKs físicas: todas las relaciones son lógicas
+
 ## Rutas clave (relativas a esta carpeta projects/)
 
-- Proyecto Ignition: `cla_mes/`
-- Vistas Perspective: `cla_mes/com.inductiveautomation.perspective/views/<ruta>/view.json`
-- Project Library: `cla_mes/ignition/script-python/papo_core/<modulo>/code.py`
+- Proyecto Ignition: `cla-project/`
+- Vistas Perspective: `cla-project/com.inductiveautomation.perspective/views/<ruta>/view.json`
+- Project Library: `cla-project/ignition/script-python/papo_core/<modulo>/code.py`
 
 ## Jerarquía de nodos
 
@@ -29,6 +39,26 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - T1: 22:00–06:00
 - T2: 06:00–14:00
 - T3: 14:00–22:00
+
+## Roles
+
+- `Operator` — operario, rellena formularios
+- `Supervisor_PAPO` — supervisor, firma formularios (valida IP de la estación)
+- `Administrator`, `INTEGRADOR` — firman sin validar IP
+
+## Vistas principales
+
+- `Form_XXXX_<tipo>` — formularios embebidos (start, end, 1h, 30min, SKU, ...)
+- `Page/Digitalizacion_Template` — preview con tabla de respuestas y firmas
+- `Page/PopUps/Authenticator` — popup para que el supervisor firme sin cerrar la sesión del operario
+- `Page/Overview_Papos` — lista de tarjetas de formularios; `Page/Embedded/Embedded_PAPO` — tarjeta individual
+- Reportes (EA11-0901, etc.) — generan el PDF del formulario
+
+## Despliegue
+
+- Se desarrolla en una máquina dev y se despliega compartiendo la vista completa
+- Scripts de cache (tags UDT) y de reporte se despliegan aparte
+- Cada cambio se registra en `.claude/docs/DEPLOY_INVENTORY.md`
 
 ## Arquitectura papo_core (Project Library)
 
@@ -41,12 +71,13 @@ papo_core.ui.toggleSection(self, sectionIndex)
 papo_core.sign.signOperator(self)
 ```
 
-Módulos:
-- `register.py` — recopile, save
-- `ui.py` — toggleSection, initForm, preInsight
-- `sign.py` — supervisorOpt, signOperator, requestSupervisorAuth, signSupervisor, authenticateAndSign
-- `report.py` — extractReportData
-- `overview.py` — getPapoListFiltered, getCardPath
+Módulos (`papo_core/<modulo>/code.py`, funciones públicas):
+- `register` — recopile, save
+- `ui` — toggleSection, initForm, preInsight, confirmSave, getSecurityImage
+- `sign` — supervisorOpt, signOperator, requestSupervisorAuth, signSupervisor, signSupervisorFromSelection, authenticateAndSign, autoCloseOpenForms
+- `report` — extractReportData, extractReportDataAuto
+- `overview` — getPapoListFiltered, getCardPath
+- `items` — getRangeColor
 
 ## Convenciones de código (SIEMPRE aplicar)
 
@@ -59,6 +90,8 @@ Módulos:
 - Un solo try/except por función pública
 - Loggers: `logger.error` con nombre = referencia del PAPO (para filtrar)
 - **dbConnection** siempre de `view.custom` o `session.custom`, NUNCA hardcodear "papo_db"
+- Turnos: nunca system.date.getHour24(); usar java.util.Calendar con TimeZone America/Bogota
+- Deploy: siempre desplegar el módulo del Project Library antes que la vista que lo llama
 
 ## Reglas críticas al editar view.json
 
@@ -74,7 +107,7 @@ Módulos:
 
 1. Cada campo: `custom.item = {papoItemID, answer, registerTypeID}`
 2. `answerRecopile` (custom method root) recolecta recursivamente
-3. `saveDataRoot` (message handler root) junta TODO en UN JSON, UN INSERT
+3. `saveDataRoot` (message handler root) junta TODO en UN JSON, UN INSERT con Status "En proceso"
 4. Firma operario: type 10 "Finalizado" + type 12 Idle "Sin Iniciar" con regCode+1
 5. Firma supervisor: type 10 "Revisado"
 
@@ -84,19 +117,24 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 
 ## Documentos de contexto
 
-- `.claude/docs/CONTEXT_PROYECTO.md` — contexto general completo
-- `.claude/docs/CONTEXT_AUTOMATIZACION_JSON.md` — cómo inyectar wrappers en view.json
+- `cla-project/ignition/script-python/papo_core/` — código fuente del package papo_core (referencia de los módulos)
+- `.claude/docs/USAGE.md` — referencia de funciones de papo_core y desde dónde se llaman
+- `.claude/docs/MIGRATION_STATUS.md` — estado de migración de las vistas Form_* por módulo
 - `.claude/docs/PROCEDIMIENTO_ESTANDARIZACION.md` — pasos de estandarización por vista
-- `.claude/docs/USAGE.md` — referencia de wrappers de papo_core
-- `.claude/docs/papo_core_reference/` — los 5 módulos papo_core como referencia
-- `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de `papo_db` (DBML), con notas de mejoras sugeridas
+- `.claude/docs/CONTEXT_AUTOMATIZACION_JSON.md` — cómo inyectar wrappers en view.json
+- `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de papo_db generado desde la base viva (notas de dominio, conteos y catálogos)
+- `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
+- `.claude/docs/BACKLOG.md` — pendientes y horizonte del proyecto
 
 ## Estado actual
 
-- 63 formularios inventariados
+- 63 formularios inventariados → 238 vistas Form_* (variantes start/1h/2h/end/...)
 - papo_core creado y en despliegue a producción
-- Digitalizacion_Template: firmas migrándose a papo_core
-- Pendiente: estandarizar los 63 forms con wrappers
+- Migración Form_* (ver `.claude/docs/MIGRATION_STATUS.md`, corrida 2026-10-22):
+  - 235 completas (ui + register), 3 parciales, 0 sin migrar
+  - Parciales: Cubiertas `Form_PL11-0101-CA_start`, `-CU_start`, `-S&A_start` (solo confirmSave)
+  - 94 usan además `sign.supervisorOpt` en onStartup
+- Digitalizacion_Template: firmas aún inline (0 llamadas a papo_core); signOperator, requestSupervisorAuth, signSupervisor y authenticateAndSign sin uso todavía
 
 <!--
 CLAUDE.md se carga en el contexto al inicio de CADA sesion.

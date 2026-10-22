@@ -1,5 +1,9 @@
 # papo_core Wrapper Injection Rules
 
+Verified against `Page/Embedded/Ensamble/Form_EA11-1501_30min` (no supervisor) and
+`Page/Embedded/Ensamble/Form_EA11-0901_1h` (with supervisor) on 2026-10-22.
+Exact JSON of each wrapper: `.claude/docs/CONTEXT_AUTOMATIZACION_JSON.md`.
+
 ## Standard wrappers for Form views
 
 ### customMethods (root.scripts.customMethods)
@@ -7,15 +11,15 @@
 - `answerRecopile` (params: ["flexContainer"]) → `return papo_core.register.recopile(flexContainer, self)`
 
 ### messageHandlers (root.scripts.messageHandlers)
-- `saveDataRoot` → `papo_core.register.save(self)`
-- `signOperator` → `papo_core.sign.signOperator(self)`
+- `saveDataRoot` → `papo_core.register.save(self)` — pageScope: true, sessionScope: false, viewScope: false
+- Form views have no `signOperator` handler: operator/supervisor signatures live in `Page/Digitalizacion_Template`
 
 ### View-level onStartup (events.system.onStartup)
 ```python
 self.custom.initialPapoDateTime = system.date.now()
 papo_core.ui.initForm(self)
 ```
-- With supervisor: add `self.custom.supervisorOption = papo_core.sign.supervisorOpt(self)` before initForm
+- With supervisor: add `self.custom.supervisorOption = papo_core.sign.supervisorOpt(self)` before initForm (also used by non-start forms, e.g. Form_EA11-0901_1h)
 
 ### initialPapoDateTime format in view.json
 Must be a timestamp object, NOT a string:
@@ -24,7 +28,7 @@ Must be a timestamp object, NOT a string:
 ```
 
 ### custom.insights transform
-- Script transform: `return papo_core.ui.preInsight(self, value)`
+- Property binding to `/root/TextField.props.text` + script transform: `return papo_core.ui.preInsight(self, value)`
 
 ### Section{N} onClick script
 ```python
@@ -36,17 +40,18 @@ self.view.getChild("root").toggleFlexRoot(sectionIndex)
 - Property binding to `../FlexContainerGroup{N}.position.display`
 - Map transform: true → "button-questions", false → "button-questions-2", fallback → "button-questions"
 
-### Save button onClick
-- `alerts.showAlert(state="warning", title="Guardar registro", message="Esta seguro de que desea guardar?", btnTextPrimary="Si", btnTextSecondary="No", btnActionPrimary="saveDataRoot")`
+### Save button onClick (Button_Apply / Button_Apply_0)
+- `papo_core.ui.confirmSave()` — shows the standard confirmation and sends `saveDataRoot` on confirm
 
-### Sign operator button onClick
-- `alerts.showAlert(state="warning", title="Firmar PAPO", message="Esta seguro de que desea firmar el puesta a punto?", btnTextPrimary="Si", btnTextSecondary="No", btnActionPrimary="signOperator")`
+### Cancel button onClick (Button_Apply_1)
+- `system.perspective.sendMessage(messageType="closeEmbeded", payload={"estado": False,}, scope="session")`
 
 ## Legacy keys to remove from view.custom
 answers, formato, test, flexGroupCount, flexCount, refreshSecond, dsTable_v3, dsTable_vJ, changedRegister
 
 ## Required keys in view.custom
 dbConnection, initialPapoDateTime, registerTypeID, insights, user, sign, referencePapo
+- With supervisor: also `supervisorOption`
 
 ## Calling convention
 - ALWAYS: `papo_core.modulo.funcion(self)`

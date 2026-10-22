@@ -13,11 +13,11 @@
 - Maintain exact indentation (2 spaces for JSON)
 
 ## After editing
-- Update `resource.json` in the same view folder:
+- Update `resource.json` in the same view folder (**pendiente de verificar**: no confirmado que el Designer ignore cambios con actor=admin; ver `.claude/docs/BACKLOG.md`):
   - `version`: increment by 1
   - `lastModificationSignature`: SHA256 hash of the modified view.json
   - `timestamp`: current UTC time (ISO format)
-  - `actor`: MUST be `"external"` (not `"admin"`) — Designer ignores changes with actor=admin
+  - `actor`: MUST be `"external"` (not `"admin"`) — Designer ignores changes with actor=admin (**pendiente de verificar**)
 - Run `/sync` to trigger Designer project scan
 - Confirm the JSON parses: `python -c "import json; json.load(open('path/to/view.json'))"`
 
