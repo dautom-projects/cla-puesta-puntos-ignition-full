@@ -7,11 +7,11 @@
       "$": [
         "ts",
         192,
-        1786554210113
+        1790785243878
       ],
-      "$ts": 1786554210113
+      "$ts": 1790785243878
     },
-    "insights": " | T: 2, H: 12:03 - ",
+    "insights": " | T: 2, H: 11:20 - ",
     "path": "[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101",
     "referencePapo": "",
     "registerTypeID": 1001,
@@ -636,54 +636,42 @@
                   },
                   {
                     "custom": {
-                      "item": {}
+                      "item": {
+                        "papoItemID": 11311,
+                        "registerTypeID": 7
+                      }
                     },
                     "meta": {
-                      "name": "TextField_2"
+                      "name": "Dropdown"
                     },
                     "position": {
-                      "basis": "32px"
+                      "basis": "29.8px"
                     },
                     "propConfig": {
                       "custom.item.answer": {
                         "binding": {
                           "config": {
-                            "path": "this.props.text"
+                            "path": "this.props.value"
                           },
                           "type": "property"
                         }
                       },
-                      "custom.item.papoItemID": {
+                      "props.options": {
                         "binding": {
                           "config": {
-                            "path": "this.meta.name"
+                            "expression": "now(120000)"
                           },
                           "transforms": [
                             {
-                              "code": "\tindex \u003d int(value.replace(\"TextField_\",\"\"))\n\treturn self.parent.custom.basePapo + index",
+                              "code": "\trows \u003d []\n\t\n\ttry:\n\t\tds \u003d system.db.runPrepQuery(\n\t\t\t\"SELECT nombre FROM dbo.fa_cpk_program_specs WHERE linea \u003d \u0027Auxiliar\u0027 ORDER BY nombre ASC\",\n\t\t\t[],\n\t\t\t\"papo_db\"\n\t\t)\n\t\t\n\t\tfor i in range(ds.rowCount):\n\t\t\trows.append({\n\t\t\t\t\"label\": ds.getValueAt(i, \"nombre\"),\n\t\t\t\t\"value\": ds.getValueAt(i, \"nombre\")\n\t\t\t})\n\t\n\texcept Exception as e:\n\t\tsystem.util.getLogger(\"Andina.FA.CPK_FA.dropdownAuxiliar\").error(\"Error loading referencias: \" + str(e))\n\t\n\treturn rows",
                               "type": "script"
                             }
                           ],
-                          "type": "property"
-                        }
-                      },
-                      "custom.item.registerTypeID": {
-                        "binding": {
-                          "config": {
-                            "path": "this.custom.item.papoItemID"
-                          },
-                          "transforms": [
-                            {
-                              "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
-                              "type": "script"
-                            }
-                          ],
-                          "type": "property"
+                          "type": "expr"
                         }
                       }
                     },
                     "props": {
-                      "placeholder": "Escriba Aqui",
                       "style": {
                         "borderBottomLeftRadius": 10,
                         "borderBottomRightRadius": 10,
@@ -691,9 +679,10 @@
                         "borderTopRightRadius": 10,
                         "fontSize": 17,
                         "marginLeft": 0
-                      }
+                      },
+                      "value": "24 4x4"
                     },
-                    "type": "ia.input.text-field"
+                    "type": "ia.input.dropdown"
                   },
                   {
                     "custom": {

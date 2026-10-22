@@ -1,0 +1,517 @@
+{
+  "custom": {
+    "badPathHistory": "histprov:dautom_historian_db:/drv:Ignition-B9586S28:uns:/tag:Clarios/Pacifico/Cubiertas/IMM 3/line/oee/bad count",
+    "dbConnection": "mes_core",
+    "goodPathHistory": "histprov:dautom_historian_db:/drv:Ignition-B9586S28:uns:/tag:Clarios/Pacifico/Cubiertas/IMM 3/line/oee/good count",
+    "path": "Clarios/Pacifico/Cubiertas/IMM 3",
+    "totalPathHistory": "histprov:dautom_historian_db:/drv:Ignition-B9586S28:uns:/tag:Clarios/Pacifico/Cubiertas/IMM 3/line/oee/total count"
+  },
+  "params": {
+    "nodeID": 8
+  },
+  "propConfig": {
+    "custom.badPathHistory": {
+      "binding": {
+        "config": {
+          "struct": {
+            "path": "{view.custom.path}",
+            "systemName": "{[System]Gateway/SystemName}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tpath \u003d value[\u0027path\u0027]\n\tsystemName \u003d value[\u0027systemName\u0027]\n\ttagPathHistory \u003d \"histprov:dautom_historian_db:/drv:\" +systemName+ \":uns:/tag:\" +path+ \"/line/oee/bad count\"\n\treturn tagPathHistory",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.goodPathHistory": {
+      "binding": {
+        "config": {
+          "struct": {
+            "path": "{view.custom.path}",
+            "systemName": "{[System]Gateway/SystemName}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tpath \u003d value[\u0027path\u0027]\n\tsystemName \u003d value[\u0027systemName\u0027]\n\ttagPathHistory \u003d \"histprov:dautom_historian_db:/drv:\" +systemName+ \":uns:/tag:\" +path+ \"/line/oee/good count\"\n\treturn tagPathHistory",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.path": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tnodeID \u003d value[\"nodeID\"]\t\n\tdb \u003d value[\"db\"]\n\t\n\ttablenode \u003d mes_core.model.nodeTable(db)\n\tcolumns \u003d [\"Topic\"]\n\twhere_clause \u003d \"ID \u003d ?\"\n\twhere_args \u003d [nodeID]\n\tds \u003d tablenode.selectCustom(columns,where_clause,where_args)\n\t\n\ttopic \u003d ds.getValueAt(0,0)\n\t\n\t\n\treturn topic",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.totalPathHistory": {
+      "binding": {
+        "config": {
+          "struct": {
+            "path": "{view.custom.path}",
+            "systemName": "{[System]Gateway/SystemName}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tpath \u003d value[\u0027path\u0027]\n\tsystemName \u003d value[\u0027systemName\u0027]\n\ttagPathHistory \u003d \"histprov:dautom_historian_db:/drv:\" +systemName+ \":uns:/tag:\" +path+ \"/line/oee/total count\"\n\treturn tagPathHistory",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {},
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "basis": "28px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-titles-2"
+              },
+              "text": "Tendencias"
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Spacer_0"
+            },
+            "position": {
+              "basis": "10px",
+              "shrink": 0
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "PowerChart"
+            },
+            "position": {
+              "basis": "Auto",
+              "grow": 1
+            },
+            "propConfig": {
+              "props.pens[0].data.source": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.badPathHistory"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.pens[1].data.source": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.goodPathHistory"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.pens[2].data.source": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.totalPathHistory"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "axes": [
+                {
+                  "color": "#757A7F",
+                  "dataFormat": "0,0.##",
+                  "grid": {
+                    "color": "#757A7F",
+                    "dashArray": 0,
+                    "opacity": 0.9,
+                    "style": {
+                      "classes": ""
+                    },
+                    "visible": false
+                  },
+                  "label": {
+                    "font": {
+                      "color": "#757A7F",
+                      "size": 20
+                    },
+                    "offset": 0,
+                    "style": {
+                      "classes": "",
+                      "translate": "-11px 30%"
+                    },
+                    "text": "Piezas"
+                  },
+                  "name": "Default",
+                  "position": "left",
+                  "range": {
+                    "auto": true,
+                    "max": "",
+                    "min": ""
+                  },
+                  "style": {
+                    "classes": "",
+                    "key": "value"
+                  },
+                  "tick": {
+                    "color": "#757A7F",
+                    "count": "Auto",
+                    "label": {
+                      "font": {
+                        "color": "#757A7F",
+                        "size": 15
+                      },
+                      "format": "Auto",
+                      "style": {
+                        "classes": ""
+                      }
+                    },
+                    "style": {
+                      "classes": ""
+                    }
+                  },
+                  "width": 60
+                }
+              ],
+              "config": {
+                "rangeEndDate": {
+                  "$": [
+                    "ts",
+                    0,
+                    1765511374651
+                  ],
+                  "$ts": 1765511273639
+                },
+                "rangeStartDate": {
+                  "$": [
+                    "ts",
+                    0,
+                    1765511374651
+                  ],
+                  "$ts": 1765482569639
+                },
+                "visibility": {
+                  "buttons": {
+                    "showAnnotationButton": false,
+                    "showFullscreenButton": false,
+                    "showMoreButton": false,
+                    "showRangeBrushButton": false,
+                    "showSettingsButton": false,
+                    "showTagBrowserButton": false
+                  }
+                }
+              },
+              "interaction": {
+                "chartZoomLevel": 1,
+                "rangeZoomLevel": 1
+              },
+              "legend": {
+                "visible": true
+              },
+              "pens": [
+                {
+                  "axis": "",
+                  "data": {
+                    "aggregateMode": "default"
+                  },
+                  "display": {
+                    "breakLine": true,
+                    "interpolation": "curveLinear",
+                    "radius": 3,
+                    "styles": {
+                      "highlighted": {
+                        "fill": {
+                          "color": "#63BEA2",
+                          "opacity": 1
+                        },
+                        "stroke": {
+                          "color": "#e41515",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      },
+                      "muted": {
+                        "fill": {
+                          "color": "#63BEA2",
+                          "opacity": 0.4
+                        },
+                        "stroke": {
+                          "color": "#e41515",
+                          "dashArray": 0,
+                          "opacity": 0.4,
+                          "width": 1
+                        }
+                      },
+                      "normal": {
+                        "fill": {
+                          "color": "#63BEA2",
+                          "opacity": 0.8
+                        },
+                        "stroke": {
+                          "color": "#e41515",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      },
+                      "selected": {
+                        "fill": {
+                          "color": "#63BEA2",
+                          "opacity": 1
+                        },
+                        "stroke": {
+                          "color": "#e41515",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      }
+                    },
+                    "type": "line"
+                  },
+                  "enabled": true,
+                  "name": "Scrap",
+                  "plot": 0,
+                  "selectable": true,
+                  "visible": true
+                },
+                {
+                  "axis": "",
+                  "data": {
+                    "aggregateMode": "default"
+                  },
+                  "display": {
+                    "breakLine": true,
+                    "interpolation": "curveLinear",
+                    "radius": 3,
+                    "styles": {
+                      "highlighted": {
+                        "fill": {
+                          "color": "#FC8D62",
+                          "opacity": 1
+                        },
+                        "stroke": {
+                          "color": "#17c326",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      },
+                      "muted": {
+                        "fill": {
+                          "color": "#FC8D62",
+                          "opacity": 0.4
+                        },
+                        "stroke": {
+                          "color": "#17c326",
+                          "dashArray": 0,
+                          "opacity": 0.4,
+                          "width": 1
+                        }
+                      },
+                      "normal": {
+                        "fill": {
+                          "color": "#FC8D62",
+                          "opacity": 0.8
+                        },
+                        "stroke": {
+                          "color": "#17c326",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      },
+                      "selected": {
+                        "fill": {
+                          "color": "#FC8D62",
+                          "opacity": 1
+                        },
+                        "stroke": {
+                          "color": "#17c326",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      }
+                    },
+                    "type": "line"
+                  },
+                  "enabled": true,
+                  "name": "Producido",
+                  "plot": 0,
+                  "selectable": true,
+                  "visible": true
+                },
+                {
+                  "axis": "",
+                  "data": {
+                    "aggregateMode": "default"
+                  },
+                  "display": {
+                    "breakLine": true,
+                    "interpolation": "curveLinear",
+                    "radius": 3,
+                    "styles": {
+                      "highlighted": {
+                        "fill": {
+                          "color": "#8DA0CB",
+                          "opacity": 1
+                        },
+                        "stroke": {
+                          "color": "#2454c1",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      },
+                      "muted": {
+                        "fill": {
+                          "color": "#8DA0CB",
+                          "opacity": 0.4
+                        },
+                        "stroke": {
+                          "color": "#2454c1",
+                          "dashArray": 0,
+                          "opacity": 0.4,
+                          "width": 1
+                        }
+                      },
+                      "normal": {
+                        "fill": {
+                          "color": "#8DA0CB",
+                          "opacity": 0.8
+                        },
+                        "stroke": {
+                          "color": "#2454c1",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      },
+                      "selected": {
+                        "fill": {
+                          "color": "#8DA0CB",
+                          "opacity": 1
+                        },
+                        "stroke": {
+                          "color": "#2454c1",
+                          "dashArray": 0,
+                          "opacity": 1,
+                          "width": 1
+                        }
+                      }
+                    },
+                    "type": "line"
+                  },
+                  "enabled": true,
+                  "name": "Total",
+                  "plot": 0,
+                  "selectable": true,
+                  "visible": true
+                }
+              ],
+              "plots": [
+                {
+                  "color": "transparent",
+                  "markers": [],
+                  "relativeWeight": 1,
+                  "style": {
+                    "classes": ""
+                  }
+                }
+              ],
+              "style": {
+                "borderStyle": "none"
+              },
+              "timeAxis": {
+                "tick": {
+                  "label": {
+                    "font": {
+                      "size": 15
+                    }
+                  }
+                },
+                "tickCount": 8
+              }
+            },
+            "type": "ia.chart.powerchart"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_Druration"
+        },
+        "position": {
+          "basis": "200px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "borderStyle": "solid",
+            "borderWidth": 1,
+            "classes": "container-borders-dautom-widget-2",
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

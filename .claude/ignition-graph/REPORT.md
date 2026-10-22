@@ -1,86 +1,203 @@
 # Mapa de dependencias Ignition
 
 - Proyectos: 1 (cla-project)
-- Vistas: 286
-- Scripts de proyecto: 14
-- Mensajes (messageType): 77
-- Tags referenciados: 273
+- Vistas: 338
+- Scripts de proyecto: 23
+- Eventos (gateway y sesion): 2
+- Mensajes: 90
+- Tags referenciados: 264
 - Paginas y docks: 8
-- Relaciones (aristas): 2114
-  - vincula tag: 532, llama: 531, embebe: 68, maneja: 373, monta: 8, envia: 602
+- Clases de estilo: 100
+- Session props: 5
+- Relaciones: 4432 (usa tag 716, llama 644, embebe/abre 90, maneja 421, monta 8, envia 676, usa sesion 263, usa estilo 1614)
+- Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
 
-### Vistas mas usadas (embebidas o montadas)
-- **Page/Embedded/Metalurgia/Fundamental Views/Checkbox** (cla-project) — usado por 19
-- **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — usado por 7
-- **Page/Embedded/Title_Header** (cla-project) — usado por 4
-- **Node/MixingDashboard/TankInfo** (cla-project) — usado por 3
-- **Node/MixingDashboard/Mixing Trend/Framework/LineRepeater** (cla-project) — usado por 2
-- **Node/MixingDashboard/Mixing Trend/MixingProcessTrend** (cla-project) — usado por 2
-- **Page/Embedded/Title_Large** (cla-project) — usado por 2
-- **PowerChart** (cla-project) — usado por 2
-- **Docks/Tree_v2** (cla-project) — usado por 1
-- **Header/Header** (cla-project) — usado por 1
-- **Node/MixingDashboard/ItemID** (cla-project) — usado por 1
-- **Node/MixingDashboard/MixMetric** (cla-project) — usado por 1
+_Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 
-### Scripts mas llamados
-- **papo_core.ui** (cla-project) — usado por 207
-- **papo_core.register** (cla-project) — usado por 204
-- **papo_core.sign** (cla-project) — usado por 85
-- **logging** (cla-project) — usado por 15
-- **alerts** (cla-project) — usado por 14
-- **sql** (cla-project) — usado por 3
-- **treeScriptingPAPO** (cla-project) — usado por 1
-- **users** (cla-project) — usado por 1
-- **utils** (cla-project) — usado por 1
+### Vistas
+- **Alerts/alert** (cla-project) — directo 1, transitivo 264
+- **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 264
+- **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 101
+- **Page/Embedded/Metalurgia/Fundamental Views/Checkbox** (cla-project) — directo 19, transitivo 19
+- **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
+- **Page/Embedded/Title_Header** (cla-project) — directo 5, transitivo 9
+- **Page/Embedded/Title_Large** (cla-project) — directo 5, transitivo 7
+- **Node/MixingDashboard/Mixing Trend/Framework/FormRepeater** (cla-project) — directo 1, transitivo 5
+- **Node/MixingDashboard/TankMetric** (cla-project) — directo 1, transitivo 5
+- **Node/MixingDashboard/TankInfo** (cla-project) — directo 3, transitivo 4
 
-### messageType mas referenciados
-- **closeEmbeded** ((mensajeria)) — usado por 209
-- **saveDataRoot** ((mensajeria)) — usado por 207
-- **refreshPeriodic** ((mensajeria)) — usado por 91
-- **refreshPreviewTable** ((mensajeria)) — usado por 89
-- **refreshTable** ((mensajeria)) — usado por 88
-- **resetTable** ((mensajeria)) — usado por 48
-- **saveStartRegister-2201-end** ((mensajeria)) — usado por 31
-- **saveStartShift** ((mensajeria)) — usado por 30
-- **enableDisablePen** ((mensajeria)) — usado por 9
-- **deleteArea** ((mensajeria)) — usado por 6
-- **deleteEquipment** ((mensajeria)) — usado por 6
-- **deleteLine** ((mensajeria)) — usado por 6
+### Scripts
+- **logging** (cla-project) — directo 10, transitivo 271
+- **alerts** (cla-project) — directo 19, transitivo 263
+- **papo_core.ui** (cla-project) — directo 238, transitivo 240
+- **papo_core.register** (cla-project) — directo 235, transitivo 237
+- **papo_core.sign** (cla-project) — directo 96, transitivo 99
+- **mes_core.sql** (cla-project) — directo 4, transitivo 22
+- **mes_core.model** (cla-project) — directo 19, transitivo 21
+- **mes_core.workOrder** (cla-project) — directo 4, transitivo 7
+- **mes_core.schedule** (cla-project) — directo 3, transitivo 7
+- **mes_core.misc** (cla-project) — directo 3, transitivo 5
 
-### Tags mas vinculados
-- **{1}/Temp_Planchas** ((tags)) — usado por 21
-- **{1}/Temperatura_Brazo** ((tags)) — usado por 12
-- **{1}/Temperatura_Canoa** ((tags)) — usado por 12
-- **{1}/Temperatura_Molde_Inf** ((tags)) — usado por 12
-- **{1}/Temperatura_Molde_Sup** ((tags)) — usado por 12
-- **{1}/Velocidad_Maquina** ((tags)) — usado por 12
-- **{1}/Nivel_Elect_Programado** ((tags)) — usado por 9
-- **{1}/Reference** ((tags)) — usado por 9
-- **{1}/Densidad_Especifica** ((tags)) — usado por 5
-- **{1}/Nivel_Elect_C1** ((tags)) — usado por 5
-- **{1}/Nivel_Elect_C2** ((tags)) — usado por 5
-- **{1}/Nivel_Elect_C3** ((tags)) — usado por 5
+### Mensajes
+- **deleteArea** (cla-project) — directo 6, transitivo 267
+- **deleteEquipment** (cla-project) — directo 6, transitivo 267
+- **deleteLine** (cla-project) — directo 6, transitivo 267
+- **deletePlant** (cla-project) — directo 6, transitivo 267
+- **deleteReason** (cla-project) — directo 6, transitivo 267
+- **deleteRelation** (cla-project) — directo 6, transitivo 267
+- **insertArea** (cla-project) — directo 6, transitivo 267
+- **insertEquipment** (cla-project) — directo 6, transitivo 267
+- **insertLine** (cla-project) — directo 6, transitivo 267
+- **insertPlant** (cla-project) — directo 6, transitivo 267
 
-## Vistas huerfanas (9)
-_Ni usadas por otra vista/pagina ni usan nada. Candidatas a revision._
+### Tags
+- **[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101** ((tags)) — directo 62, transitivo 64
+- **[UNS]Clarios/Andina/FA/Granja_Acidos/UI/GR10_0501** ((tags)) — directo 13, transitivo 13
+- **[UNS]Clarios/Andina** ((tags)) — directo 5, transitivo 10
+- **[UNS]Clarios/Andina/FA/Formacion/UI/AC10-0202** ((tags)) — directo 8, transitivo 8
+- **[UNS]Clarios/Andina/OREC/UI_JCI/EJ07_0101** ((tags)) — directo 8, transitivo 8
+- **[uns]VIC/Manufacturing/Electrode Anode/Mixing Anode/ProcessMixing/CmcMixer/CmcWeight/Act_Value** ((tags)) — directo 8, transitivo 8
+- **[UNS]Clarios/Andina/FA/Terminado/UI/AC10-0201** ((tags)) — directo 6, transitivo 8
+- **[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/SlurryPdMixer/Temperature/Act_Value** ((tags)) — directo 6, transitivo 8
+- **[UNS]Clarios/Pacifico/Cubiertas/IMM 15/UI/Schedule/Dataset_excel** ((tags)) — directo 1, transitivo 8
+- **[uns]VIC/Manufacturing/Electrode Anode/Mixing Anode/ProcessMixing/SlurryPdMixer1/Temperature/Act_Value** ((tags)) — directo 6, transitivo 7
 
-- Node/MixingDashboard/ItemMetric (cla-project)
-- Node/MixingDashboard/TankMetricID (cla-project)
-- Page/Digitalizacion_Reportes (cla-project)
-- Page/Embedded/Metalurgia/Fundamental Views/Checkbox_Corrective (cla-project)
+### Clases de estilo
+- **container-borders-dautom-widget** (cla-project) — directo 267, transitivo 279
+- **text-description-centered** (cla-project) — directo 11, transitivo 271
+- **text-titles** (cla-project) — directo 242, transitivo 268
+- **Utilities/m-r-16** (cla-project) — directo 3, transitivo 267
+- **Alerts/alertTitle** (cla-project) — directo 2, transitivo 266
+- **alert-icons-margin** (cla-project) — directo 2, transitivo 266
+- **container-alarms** (cla-project) — directo 2, transitivo 266
+- **container-borders-dautom-alert** (cla-project) — directo 2, transitivo 266
+- **container-padding-30** (cla-project) — directo 2, transitivo 266
+- **text-description** (cla-project) — directo 2, transitivo 266
+
+### Session props
+- **session.custom.dbConnection** (cla-project) — directo 256, transitivo 263
+- **session.custom.userSource** (cla-project) — directo 2, transitivo 102
+- **session.custom.adminPermissions** (cla-project) — directo 3, transitivo 6
+- **session.custom.filterOverview** (cla-project) — directo 1, transitivo 2
+- **session.custom.shift** (cla-project) — directo 1, transitivo 1
+
+## Vistas huerfanas (4)
+_Nadie las usa (ni vistas, ni paginas, ni scripts) y no usan nada. Candidatas a limpieza._
+
 - Page/Embedded/Metalurgia/Fundamental Views/Checkbox_Observation (cla-project)
-- Page/Embedded/Title (cla-project)
+- Page/Template/Breakpoint (cla-project)
+- Page/ViewTest (cla-project)
+- PowerChart (cla-project)
+
+## Popups sin referentes (2)
+_Probablemente se abren con una ruta armada en tiempo de ejecucion. Verificar._
+
 - Page/PopUps/DateAndTime (cla-project)
 - Page/PopUps/Test (cla-project)
-- Page/UserManagement/Views/Popups/Popup_SaveError (cla-project)
 
-## Referencias no resueltas (3)
-_Se referencia algo que no existe en el alcance analizado: tipico tras un **renombre** o borrado. Si el recurso vive en otro proyecto del gateway, incluyelo en la carpeta raiz y vuelve a correr._
+## Referencias no resueltas (31)
+_Algo se usa pero no existe en el proyecto ni en su cadena de herencia: tipico tras un **renombre** o borrado. Estilos y session props pueden venir de fuera (tema CSS, creacion dinamica); verificar antes de corregir._
 
-### Scripts / modulos (3)
-- `yieldCalc.report` — referenciada desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+54)
-- `yieldCalc_AB.report` — referenciada desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+54)
-- `yieldCalc_C.report` — referenciada desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+54)
+### Vistas (9)
+- `Components/MachineChip` — desde **Node/MixingDashboard/MixerCard**
+- `Components/NodeLocation` — desde **Node/MixingDashboard/MixingDashboard**
+- `Page/Digitalizacion_EA11-1101` — desde **Page/Digitalizacion_Reportes**
+- `Page/Embedded/Widget OEE` — desde **Page/Template/Overview**
+- `Page/Embedded/Widget OEE v3` — desde **Page/Template/Overview**
+- `Page/PopUps/CreateOrEditSch` — desde **Mes Core/Schedule WO/Emb - ScheduleChart**
+- `Page/Template/Breakpoint Embedded` — desde **Page/Template/Breakpoint**
+- `UserManagement/Views/Popup_SaveError` — desde **Page/UserManagement/Views/Popups/Popup_SaveError**
+- `UserManagement/Views/Popups/Popup_CheckRemoval` — desde **Page/UserManagement/Views/Popups/Popup_CheckRemoval**
+
+### Scripts / modulos (runScript) (3)
+- `yieldCalc.report` — desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+59)
+- `yieldCalc_AB.report` — desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+59)
+- `yieldCalc_C.report` — desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+59)
+
+### Clases de estilo (17)
+- `--cla-text-question` — desde **Page/Embedded/Cubiertas/Form_PL11-0101-CU_start** (+4)
+- `InputFont` — desde **Page/UserManagement/Views/Home**
+- `Page/Page` — desde **Page/UserManagement/Views/AddEditRoles** (+2)
+- `Page/Reports/border_1` — desde **Page/Overview_Papos**
+- `Page/themes` — desde **Page/Digitalizacion_Template** (+1)
+- `ScheduleManagement/Headers` — desde **Page/UserManagement/Views/AddEditRoles**
+- `ScheduleManagement/InputFont` — desde **Page/UserManagement/Views/AddEditUser**
+- `Title/Title_0` — desde **Page/Embedded/Title_Header** (+1)
+- `UserManagement/MainFont` — desde **Page/UserManagement/Tools/ContactInformation/Move Selection** (+4)
+- `bg-[--neutral-10]gap-2` — desde **Node/MixingDashboard/MixerCard**
+- `button-question` — desde **Node/MixingDashboard/Mixing Trend/Framework/LineRepeater**
+- `datetime` — desde **Page/Embedded/GenericWidget_4**
+- `gauge-fill-blue` — desde **Page/Template/Overview**
+- `lg:w-21` — desde **Node/MixingDashboard/MixMetric**
+- `some-class` — desde **Page/PopUps/Test**
+- `text-title-2` — desde **Node/MixingDashboard/Mixing Trend/Framework/LineRepeater** (+1)
+- `w-28` — desde **Node/MixingDashboard/MixerCard**
+
+### Session props no declaradas (2)
+- `cla-project: session.custom.adminPermissions` — desde **Docks/Tree_v2** (+2)
+- `cla-project: session.custom.shift` — desde **Page/Embedded/F&A/Form_FO10-1701-1_start**
+
+## Mensajes desbalanceados
+
+_Senal fuerte de un messageType renombrado de un solo lado. Los envios con nombre en variable no se detectan, asi que un handler 'sin emisor' puede ser valido._
+
+### Se envian y nadie los maneja (21)
+- `confirmAction` (cla-project)
+- `filterTable` (cla-project)
+- `refreshRun` (cla-project)
+- `refreshTable` (cla-project)
+- `refreshTableMoldes` (cla-project)
+- `refreshTableNode` (cla-project)
+- `refreshTableReason` (cla-project)
+- `refreshTableRelationLine` (cla-project)
+- `refreshTableSKU` (cla-project)
+- `refreshTableSKUMolde` (cla-project)
+- `refreshTableSchedule` (cla-project)
+- `refreshTableStandardRate` (cla-project)
+- `refreshTableWO` (cla-project)
+- `resetPreviewTable` (cla-project)
+- `resetTable` (cla-project)
+- `signatureCancelled` (cla-project)
+- `signatureError` (cla-project)
+- `signatureException` (cla-project)
+- `signatureRoleDenied` (cla-project)
+- `signatureTimeout` (cla-project)
+- `trends` (cla-project)
+
+### Se manejan y nadie los envia (32)
+- `createRelation` (cla-project)
+- `deleteSch` (cla-project)
+- `deleteWO` (cla-project)
+- `logout` (cla-project)
+- `refresh` (cla-project)
+- `refreshTableSch` (cla-project)
+- `saveDataRoot` (cla-project)
+- `saveEndShift` (cla-project)
+- `saveFourHourRegister` (cla-project)
+- `saveHourRegister_test` (cla-project)
+- `saveStartRegister` (cla-project)
+- `saveStartRegister-2201-end` (cla-project)
+- `saveStartRegister-2501-2h` (cla-project)
+- `saveStartRegister-2501-end` (cla-project)
+- `saveStartRegister-4101-1h` (cla-project)
+- `saveStartRegister-4101-end` (cla-project)
+- `saveStartRegister-4101-sku` (cla-project)
+- `saveStartRegister-4101-start` (cla-project)
+- `saveStartRegister-4200-1h` (cla-project)
+- `saveStartRegister-4200-2h` (cla-project)
+- `saveStartRegister-4200-end` (cla-project)
+- `saveStartRegister-4200-mid` (cla-project)
+- `saveStartRegister-4200-start` (cla-project)
+- `saveStartRegister-PTARI` (cla-project)
+- `saveStartShift` (cla-project)
+- `saveTwoHourRegister` (cla-project)
+- `signOperator` (cla-project)
+- `signPapoSup` (cla-project)
+- `signSuper` (cla-project)
+- `signatureSuccess` (cla-project)
+
+## No analizado
+
+- cla-project: 67 reportes, 1 ventanas vision (formato binario o modulo no cubierto)

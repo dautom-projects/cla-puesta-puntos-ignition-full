@@ -13,7 +13,7 @@ Changelog:
 logger = system.util.getLogger("papo_core.overview")
 
 # Statuses visible to non-admin users
-NON_ADMIN_STATUSES = ("Sin Iniciar", "En proceso", None)
+NON_ADMIN_STATUSES = ("Sin Iniciar", "En proceso", "Revisado", None)
 
 
 def getPapoListFiltered(value):

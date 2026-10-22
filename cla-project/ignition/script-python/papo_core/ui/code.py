@@ -139,3 +139,40 @@ def confirmSave():
 		btnTextSecondary="No",
 		btnActionPrimary="saveDataRoot"
 	)
+	
+def getSecurityImage(papoItemID,dbConnection):
+
+	db = dbConnection
+	
+	# 1. Query
+	query = "SELECT Description FROM papoitem WHERE ID = ?"
+	ds = system.db.runPrepQuery(query, [papoItemID], db)
+	
+	if ds and ds.getRowCount() > 0:
+	    descripcion = str(ds.getValueAt(0, "Description")).strip().lower()
+	    print "Descripcion encontrada:", descripcion
+	
+	    # 2. Diccionario normalizado
+	    paths = {
+	        "botas de seguridad": "EPP/botas.png",
+	        "botas de pvc": "EPP/botaspvc.png",
+	        "careta respirador": "EPP/caretarespirador.png",
+	        "gafas de seguridad": "EPP/gafas.png",
+	        "gafas de seguridad de sello": "EPP/gafassello.png",
+	        "guante quimico": "EPP/guantequimico.png",
+	        "guantes nitrilo": "EPP/guantesnitrilo.png",
+	        "guantes poli/algodon": "EPP/guantespolialgodon.png",
+	        "multimetro": "EPP/multimetro.png",
+	        "protector auditivo tipo diadema": "EPP/protectortipocopa.png",
+	        "tapabocas": "EPP/tapaboca.png",
+	        "tapon oido": "EPP/tapones.png",
+	        "valvula de cierre": "EPP/valvulacierre.png"
+	    }
+	
+	    # 3. Obtener ruta
+	    url = paths.get(descripcion, "EPP/default.png")
+	    print "Ruta asignada:", url
+	else:
+	    print "No se encontró descripción para ID:", papoItemID
+	
+	return '/system/images/'+url

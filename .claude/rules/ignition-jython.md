@@ -5,29 +5,25 @@ paths:
   - "**/code.py"
 ---
 
-# Reglas Ignition Perspective / Jython
+# Reglas Ignition Perspective / Jython (PAPO)
 
-## Jython 2.7 (Python 2)
-- NO usar f-strings. Usar `"{}".format(...)`
-- `unicode` y `basestring` existen (son de Python 2)
-- `long` existe como tipo numérico
-- NO usar sintaxis exclusiva de Python 3
+## Jython 2.7
+- Sin f-strings: usar "{}".format(...)
+- unicode, basestring y long existen
+- Nada de sintaxis exclusiva de Python 3
 
-## Convenciones de código PAPO
-- Indentación con TABS (no espacios)
-- camelCase para variables y funciones
-- Funciones públicas sin `_`, helpers privados con `_`
-- Docstring con Version / Changelog / Args / Returns
-- Comentarios en inglés describiendo QUÉ hace
-- `is` / `is not` para comparar con None
-- Un solo try/except por función pública
-- dbConnection SIEMPRE de view.custom o session.custom, nunca "papo_db" hardcoded
-- Loggers nombrados por referencia del PAPO para filtrado
+## Código
+- Tabs, camelCase, funciones públicas sin _ y helpers privados con _
+- Docstring con Version / Changelog / Args / Returns; comentarios en inglés (QUÉ, no CÓMO)
+- is / is not para None; != en vez de <>
+- Un solo try/except por función pública; logger.error con nombre = referencia del PAPO
+- dbConnection siempre de view.custom o session.custom, nunca hardcodeado
+- Lógica en el root con message handlers; los botones solo envían mensajes
+- Turnos: nunca system.date.getHour24(); usar java.util.Calendar con TimeZone America/Bogota
+- Último RegisterCode: ORDER BY RegisterCode DESC, nunca por Timestamp
 
 ## Al editar view.json
-- SIEMPRE backup primero
-- Leer una vista estandarizada como plantilla antes de editar
-- Validar JSON parseable después de editar
+- Backup antes de tocar; usar una vista ya estandarizada como plantilla
+- Validar que el JSON parsea después de editar
 - Preservar custom.item de cada campo
-- papo_core se llama SIN prefijo project.
-- Al leer último RegisterCode: ORDER BY RegisterCode DESC (no Timestamp)
+- papo_core se llama sin prefijo project.

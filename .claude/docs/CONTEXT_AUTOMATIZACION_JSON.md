@@ -1,183 +1,158 @@
-# PAPO — Automatización de Wrappers en JSON (para Claude Code)
+# Automatización de wrappers en view.json
 
-## Objetivo de la tarea
+Plantilla: `cla-project/com.inductiveautomation.perspective/views/Page/Embedded/Ensamble/Form_EA11-1501_30min/view.json` (sin firma). Variante con `supervisorOpt`: `Page/Embedded/Ensamble/Form_EA11-0901_1h`. Extraído el 2026-10-22.
 
-Automatizar la aplicación del procedimiento de estandarización editando
-directamente los archivos JSON de las vistas de Ignition Perspective, para
-inyectar los wrappers de `papo_core` sin hacerlo manualmente en el Designer.
+Mapa de dónde vive cada wrapper dentro de `view.json` y con qué claves, para inyectarlos en lote. Rutas expresadas como claves JSON desde la raíz del archivo.
 
-Esto es lo que Perspective NO permite hacer en runtime (no se pueden inyectar
-scripts a componentes en ejecución), pero SÍ se puede hacer editando el
-filesystem del proyecto.
+## Esqueleto relevante de un view.json migrado
 
-## Estructura del filesystem de un proyecto Ignition
-
-En este repo, el proyecto vive en:
+```text
+view.json
+├── custom{ dbConnection, registerTypeID, referencePapo, insights, initialPapoDateTime, ... }
+├── params{ papoID, nodeID, workstationID, workstationnodeID }
+├── propConfig
+│   ├── "custom.dbConnection"  → binding a session.custom.dbConnection
+│   └── "custom.insights"      → binding + transform papo_core.ui.preInsight      [W5]
+├── events.system.onStartup     → papo_core.ui.initForm                             [W4]
+└── root (ia.container.flex)
+    ├── scripts.customMethods[]  → toggleFlexRoot, answerRecopile                   [W1, W2]
+    ├── scripts.messageHandlers[]→ saveDataRoot                                     [W3]
+    └── children[]
+        ├── SectionN (ia.display.label) .events.dom.onClick                         [W6]
+        ├── FlexContainerGroupN (ia.container.flex) → campos con custom.item
+        ├── TextField (comentarios, fuente de custom.insights)
+        └── FlexContainer_0.children[] → Button_Apply_0 / Button_Apply .events.dom.onClick  [W7]
 ```
-gateway-data-active/projects/cla_mes/
-```
 
-Las vistas Perspective están en:
-```
-cla_mes/com.inductiveautomation.perspective/views/<ruta_de_la_vista>/view.json
-```
-
-Cada vista es una carpeta que contiene:
-- `view.json` — la definición completa de la vista (componentes, props, scripts, bindings)
-- `thumbnail.png` — miniatura (ignorar)
-
-El Project Library (scripts de `papo_core`) está en:
-```
-cla_mes/ignition/script-python/papo_core/<modulo>/code.py
-```
-Cada módulo es una carpeta con `code.py` y `resource.json`.
-
-## Anatomía de un view.json
-
-Estructura relevante (simplificada):
+## W1 — `root.scripts.customMethods[] (name == "toggleFlexRoot")`
 
 ```json
 {
-  "custom": { },
-  "params": { },
-  "props": { },
-  "root": {
-    "children": [
-      {
-        "meta": {"name": "Section1"},
-        "events": {
-          "dom": {
-            "onClick": {
-              "config": {
-                "script": "sectionIndex = int(...)\n..."
-              },
-              "scope": "G",
-              "type": "script"
-            }
-          }
-        }
-      }
-    ],
-    "meta": {"name": "root"}
-  },
-  "scripts": {
-    "customMethods": [
-      {
-        "name": "toggleFlexRoot",
-        "params": ["sectionIndex"],
-        "script": "papo_core.ui.toggleSection(self, sectionIndex)"
-      }
-    ],
-    "messageHandlers": [
-      {
-        "messageType": "saveDataRoot",
-        "scopes": {"page": true, "session": true, "view": true},
-        "script": "papo_core.register.save(self)"
-      }
-    ]
-  }
+  "name": "toggleFlexRoot",
+  "params": [
+    "sectionIndex"
+  ],
+  "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
 }
 ```
 
-## Puntos de inyección por vista
+Reemplazar el elemento con ese `name`; si no existe, agregarlo.
 
-### Form_XXXX_start / Form_XXXX_end
+## W2 — `root.scripts.customMethods[] (name == "answerRecopile")`
 
-**En `root.scripts.customMethods`** (array), agregar/reemplazar:
-- `toggleFlexRoot` (params: `["sectionIndex"]`) → `papo_core.ui.toggleSection(self, sectionIndex)`
-- `answerRecopile` (params: `["flexContainer"]`) → `return papo_core.register.recopile(flexContainer, self)`
-
-**En `root.scripts.messageHandlers`** (array), agregar/reemplazar:
-- `saveDataRoot` → `papo_core.register.save(self)`
-
-**En la vista → `events.onStartup`** (a nivel de view, no root):
-- `papo_core.ui.initForm(self)`
-
-**En `custom.insights`** → agregar transform tipo script:
-- `return papo_core.ui.preInsight(self, value)`
-
-**En cada componente `Section{N}`** → `events.dom.onClick.config.script`:
-```python
-sectionIndex = int(self.meta.name.replace("Section", ""))
-self.view.getChild("root").toggleFlexRoot(sectionIndex)
+```json
+{
+  "name": "answerRecopile",
+  "params": [
+    "flexContainer"
+  ],
+  "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+}
 ```
 
-**En cada `Section{N}.props.style.classes`** → binding property a
-`../FlexContainerGroup{N}.position.display` con transform map:
-- true → "button-questions", false → "button-questions-2", fallback → "button-questions"
+Igual que W1.
 
-**En el botón Guardar** → `events.dom.onClick.config.script`:
-```python
-alerts.showAlert(state="warning", title="Guardar registro",
-    message="Esta seguro de que desea guardar?",
-    btnTextPrimary="Si", btnTextSecondary="No", btnActionPrimary="saveDataRoot")
+## W3 — `root.scripts.messageHandlers[] (messageType == "saveDataRoot")`
+
+```json
+{
+  "messageType": "saveDataRoot",
+  "pageScope": true,
+  "script": "\tpapo_core.register.save(self)",
+  "sessionScope": false,
+  "viewScope": false
+}
 ```
 
-## Limpieza requerida en view.custom
+Reemplazar el elemento con ese `messageType`; conservar los demás handlers.
 
-Eliminar estas claves de `custom` si existen (legacy):
-- `answers`, `formato`, `test`, `flexGroupCount`, `flexCount`, `refreshSecond`
-- `dsTable_v3`, `dsTable_vJ`, `changedRegister`, `viewOn` (solo en Digitalizacion_Template)
+## W4 — `events.system.onStartup`
 
-Eliminar de cada `FlexContainerGroup{N}.custom`:
-- `answers` (binding/script reactivo legacy)
+```json
+{
+  "config": {
+    "script": "\tself.custom.initialPapoDateTime = system.date.now()\n\tpapo_core.ui.initForm(self)"
+  },
+  "scope": "G",
+  "type": "script"
+}
+```
 
-Verificar/crear en `custom`:
-- `dbConnection`, `initialPapoDateTime`, `registerTypeID`, `insights`, `user`, `sign`, `referencePapo`
+Objeto (no lista). Si la vista ya llama `supervisorOpt`, conservar esa línea (ver variante abajo). Ojo: 17 vistas lo tienen como lista de un elemento; normalizar a objeto o mantener la forma existente.
 
-## Reglas de nombrado a normalizar
+## W5 — `propConfig["custom.insights"]`
 
-- Títulos de sección → `Section1`, `Section2`, ... (buscar labels/botones que
-  actúen como títulos y renombrar por índice)
-- Grupos de preguntas → `FlexContainerGroup1`, `FlexContainerGroup2`, ...
-- Contenedor supervisor → `FlexContainerSupervisor`
+```json
+{
+  "binding": {
+    "config": {
+      "path": "/root/TextField.props.text"
+    },
+    "transforms": [
+      {
+        "code": "\treturn papo_core.ui.preInsight(self, value)",
+        "type": "script"
+      }
+    ],
+    "type": "property"
+  },
+  "persistent": true
+}
+```
 
-El emparejamiento es por número: `Section{N}` ↔ `FlexContainerGroup{N}`.
+La clave literal es `"custom.insights"` (con punto) dentro de `propConfig`. `config.path` apunta al TextField de comentarios de esa vista: verificar el nombre.
 
-## Precauciones críticas
+## W6 — `root.children[i].events.dom.onClick  (meta.name =~ ^Section\d+$)`
 
-1. **Hacer backup del proyecto antes de tocar cualquier JSON.** Un error de
-   estructura rompe la vista y no carga en el Designer.
+```json
+{
+  "config": {
+    "script": "\tsectionIndex = int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+  },
+  "scope": "G",
+  "type": "script"
+}
+```
 
-2. **El JSON de Perspective es estricto.** Respetar el formato exacto de
-   `events`, `scripts`, `bindings`. Un campo mal ubicado invalida la vista.
+Aplicar a cada `SectionN`. El índice sale del nombre, así que el script es el mismo para todas.
 
-3. **Después de editar, el gateway necesita re-scan o reinicio del proyecto**
-   para detectar los cambios (o reimport desde el Designer).
+## W7 — `<botón Guardar>.events.dom.onClick  (meta.name in Button_Apply_0, Button_Apply)`
 
-4. **No inventar la estructura.** Antes de editar, LEER un `view.json` de una
-   vista YA estandarizada manualmente y usarla como plantilla de referencia
-   exacta para el formato de cada tipo de script/binding.
+```json
+{
+  "config": {
+    "script": "\tpapo_core.ui.confirmSave()"
+  },
+  "scope": "G",
+  "type": "script"
+}
+```
 
-5. **Preservar** los `custom.item` de cada campo — contienen las respuestas
-   mapeadas a papoItemID. NO tocarlos.
+El botón está anidado (en la plantilla: `root/FlexContainer_0/Button_Apply_0`); buscarlo recursivo por nombre. No confundir con `Button_Apply_1` (cerrar).
 
-6. **Los scripts de `papo_core` se llaman SIN prefijo `project.`** —
-   `papo_core.ui.initForm(self)`, no `project.papo_core.ui.initForm(self)`.
+### Variante de W4 con supervisorOpt
 
-## Flujo de trabajo sugerido
+```json
+{
+  "config": {
+    "script": "\tself.custom.initialPapoDateTime = system.date.now()\n\tself.custom.supervisorOption = papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
+  },
+  "scope": "G",
+  "type": "script"
+}
+```
 
-1. Leer una vista ya estandarizada (ej: Form_EA11-0901_start) como referencia
-2. Extraer los templates exactos de cada script/binding de esa referencia
-3. Para cada vista a estandarizar:
-   a. Backup
-   b. Renombrar Sections y FlexContainerGroups por índice
-   c. Inyectar los custom methods, message handlers, onStartup en `root.scripts`
-   d. Inyectar los onClick en Sections y botones
-   e. Inyectar los bindings de style.classes
-   f. Agregar el transform en custom.insights
-   g. Limpiar las claves legacy de custom
-   h. Validar que el JSON sigue siendo parseable
-4. Re-scan del proyecto en el gateway
-5. Verificar cada vista en el Designer antes de desplegar
+## Claves comunes de un script de evento
 
-## Verificación post-edición
+- Eventos (`events.*`): `{"config": {"script": "..."}, "scope": "G", "type": "script"}`.
+- Custom methods: `{"name", "params": [...], "script"}`. Message handlers: `{"messageType", "pageScope", "sessionScope", "viewScope", "script"}`.
+- Transforms script: `{"code": "...", "type": "script"}` dentro de `binding.transforms[]`.
+- El cuerpo de todo script empieza con `\t` (indentación de Ignition) y usa `\n\t` entre líneas; tabs, nunca espacios.
 
-Por cada vista editada, confirmar:
-- [ ] El JSON parsea sin errores
-- [ ] La vista carga en el Designer sin overlay de error
-- [ ] Los custom methods aparecen con sus params correctos
-- [ ] Los message handlers tienen los scopes correctos
-- [ ] El acordeón funciona (Sections expanden/colapsan)
-- [ ] El guardado produce UN registro con todos los grupos
-- [ ] Las firmas funcionan (operario y supervisor)
+## Reglas para la inyección en lote
+
+1. Backup de cada `view.json` antes de escribir.
+2. Cargar con `json.load`, modificar el dict y escribir con `json.dump(obj, f, indent=2, ensure_ascii=False)` + `sort_keys=True` (Ignition guarda las claves ordenadas). Verificar el diff: solo deben cambiar los nodos W1–W7.
+3. Validar que el resultado parsea y que el número de `custom.item` no cambió.
+4. Identificar elementos por `name` / `messageType` / `meta.name`, nunca por índice.
+5. Después: re-scan del proyecto y nueva corrida de `ignition-graph` para confirmar en `MIGRATION_STATUS.md`.

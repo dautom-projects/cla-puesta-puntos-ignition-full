@@ -7,18 +7,60 @@
       "$": [
         "ts",
         192,
-        1786355769585
+        1791409562060
       ],
-      "$ts": 1786355769585
+      "$ts": 1791409562060
     },
-    "insights": " | T: 1, H: 04:56 - ",
+    "insights": " | T: 3, H: 16:46 - ",
     "lineRol": "NFR",
     "path": "[UNS]Clarios/Andina/FA/Formacion/UI/AC10-0202",
     "referencePapo": "",
     "registerTypeID": 7,
     "sign": "",
-    "supervisorOption": [],
-    "user": "Soporte D."
+    "supervisorOption": [
+      "Alexander Rivera",
+      "Angel Eduardo Salas",
+      "Carlos Alberto Espada",
+      "Carlos Alberto Giral",
+      "Carlos MuÃ±oz Tenorio",
+      "Christian Cardenas",
+      "Cristian Eduardo Villota",
+      "Edward  Mosquera ",
+      "Edward Otalvaro",
+      "Edwin  Solis ",
+      "Enrique  Vargas ",
+      "Felipe Andres Arango",
+      "Felipe Casamachin",
+      "Fredy Arley Arboleda Mazo",
+      "Gonzalo DeJesus Gomez",
+      "Guillermo Andres Banderas Ayala",
+      "Harold Orejuela",
+      "Henry Ortiz",
+      "Herly  Ramirez ",
+      "Herly Ramirez",
+      "Jailer  Olaya ",
+      "John Marin Aguirre",
+      "Jorge Home",
+      "Jorge Taba",
+      "Juan  Castillo ",
+      "Kevin Mejia Hernandez ",
+      "LUIS SILVA RIERA",
+      "Luis Amaro Rodriguez",
+      "Luis Felipe Ruiz ",
+      "Luis Fernando Henao",
+      "Luis Gabriel Millan",
+      "Manuel Fernando Munoz",
+      "Mauricio Arango Duque",
+      "Michael Torres",
+      "Milagros Algarin Miranda",
+      "Oscar Viafara",
+      "Ricardo Leon",
+      "Rober  Castillo ",
+      "Ubeymar  Reyes ",
+      "Yeimson Carmona Colorado",
+      "harold Holgin"
+    ],
+    "user": "Soporte "
   },
   "events": {
     "system": {
@@ -4266,63 +4308,19 @@
               },
               {
                 "custom": {
-                  "item": {
-                    "papoItemID": 6102
-                  }
+                  "papoItemID": 6102
                 },
                 "meta": {
-                  "name": "Checkbox6"
+                  "name": "Label"
                 },
                 "position": {
-                  "shrink": 0
+                  "basis": "118px"
                 },
                 "propConfig": {
-                  "custom.item.answer": {
-                    "binding": {
-                      "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.registerTypeID": {
-                    "binding": {
-                      "config": {
-                        "path": "view.custom.registerTypeID"
-                      },
-                      "type": "property"
-                    }
-                  },
-                  "props.style.fontSize": {
-                    "binding": {
-                      "config": {
-                        "path": "view.custom.fontSize"
-                      },
-                      "type": "property"
-                    }
-                  },
                   "props.text": {
                     "binding": {
                       "config": {
-                        "path": "this.custom.item.papoItemID"
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
@@ -4336,10 +4334,77 @@
                 },
                 "props": {
                   "style": {
-                    "marginLeft": 10
+                    "marginLeft": 40
                   }
                 },
-                "type": "ia.input.checkbox"
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 6102
+                  }
+                },
+                "meta": {
+                  "name": "Dropdown"
+                },
+                "position": {
+                  "basis": "199px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.value"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n\treturn value if value else \"-\"",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "options": [
+                    {
+                      "label": "Hubo",
+                      "value": "Hubo"
+                    },
+                    {
+                      "label": "No Hubo",
+                      "value": "no Hubo"
+                    }
+                  ],
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "fontSize": 17,
+                    "marginBottom": 10,
+                    "marginLeft": 0,
+                    "marginTop": 10
+                  },
+                  "value": 1
+                },
+                "type": "ia.input.dropdown"
               }
             ],
             "meta": {
@@ -4801,10 +4866,10 @@
                   }
                 },
                 "meta": {
-                  "name": "TextField"
+                  "name": "Label_1"
                 },
                 "position": {
-                  "basis": "163px"
+                  "basis": "172px"
                 },
                 "propConfig": {
                   "custom.item.answer": {
@@ -4822,22 +4887,37 @@
                       },
                       "type": "property"
                     }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "fallbackDelay": 2.5,
+                        "mode": "indirect",
+                        "references": {
+                          "1": "{view.custom.path}"
+                        },
+                        "tagPath": "{1}/Reference"
+                      },
+                      "type": "tag"
+                    }
+                  },
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba Aqui",
                   "style": {
-                    "borderBottomLeftRadius": 10,
-                    "borderBottomRightRadius": 10,
-                    "borderTopLeftRadius": 10,
-                    "borderTopRightRadius": 10,
-                    "fontSize": 17,
-                    "marginBottom": 5,
-                    "marginLeft": 0,
-                    "marginTop": 5
+                    "classes": "text-data-2",
+                    "color": "#1199C7",
+                    "paddingLeft": 20
                   }
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.label"
               }
             ],
             "meta": {
@@ -5716,8 +5796,7 @@
           "name": "FlexContainerGroup3"
         },
         "position": {
-          "basis": "0px",
-          "display": false,
+          "basis": "1533px",
           "shrink": 0
         },
         "props": {
