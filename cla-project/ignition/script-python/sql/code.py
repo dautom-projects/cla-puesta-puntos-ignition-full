@@ -88,8 +88,8 @@ def papoByNode(nodeId=None, db='papo_db'):
 def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, db='papo_db'):
     """
     Recupera el último registro válido (Status != 'Sin Iniciar') 
-    para cada combinación (NodeID, PapoID, RegisterCode) desde registerhistory,
-    incluyendo StartTime (último Timestamp del tipo RegisterTypeID=7 de la misma combinación,
+    para cada ciclo (NodeID, PapoID, WorkstationNodeID, RegisterCode) desde registerhistory,
+    incluyendo StartTime (último Timestamp del tipo RegisterTypeID=7 del mismo ciclo,
     anterior o igual al registro actual).
 
     El filtro por nodo es en cascada: nodeId puede ser un AREA, LINE o CELL e
@@ -97,6 +97,8 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
 
     Changelog:
         2026-10-22 | William M. | Filtro por nodo en cascada (AREA > LINE > CELL)
+        2026-10-22 | William M. | WorkstationNodeID en la llave del ciclo: dos estaciones
+            del mismo nodo con el mismo PAPO y RegisterCode ya no se mezclan
     """
     logger = system.util.getLogger("getRegisterHistory")
 
@@ -131,7 +133,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                     w.Description AS WorkstationDescription,
                     
                     ROW_NUMBER() OVER (
-                        PARTITION BY rh.NodeID, rh.PapoID, rh.RegisterCode
+                        PARTITION BY rh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode
                         ORDER BY rh.Timestamp DESC
                     ) AS rn
                 FROM registerhistory rh
@@ -151,6 +153,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                 SELECT 
                     rh.NodeID,
                     rh.PapoID,
+                    rh.WorkstationNodeID,
                     rh.RegisterCode,
                     rh.Timestamp AS StartTime
                 FROM registerhistory rh
@@ -166,6 +169,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                 LEFT JOIN start_records s
                   ON r.NodeID = s.NodeID
                  AND r.PapoID = s.PapoID
+                 AND r.WorkstationNodeID = s.WorkstationNodeID
                  AND r.RegisterCode = s.RegisterCode
                  AND s.StartTime <= r.Timestamp
                 GROUP BY r.RegisterID

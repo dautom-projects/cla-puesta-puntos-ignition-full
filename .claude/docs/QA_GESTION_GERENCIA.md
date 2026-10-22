@@ -58,4 +58,4 @@ Corregidos en `Page/Gestion Gerencia` y validados ejecutando el código real de 
 - Pipeline 10: sin `custom.refresh`; el fin del rango cambia una vez por minuto
 - Pipelines 11–12: sin referencias rotas; `custom.path` ya no registra error sin selección
 
-Pendiente fuera de esta vista: `Page/Gestion` tiene el mismo error de Día Actual / Día Anterior, y `sql.getRegisterHistory` agrupa ciclos sin `WorkstationNodeID`. El reporte PDF recibe `nodeID`, `papoID` y `registerCode` (sin estación), así que con dos estaciones en el mismo ciclo puede mezclar datos. Hay datos con problemas de codificación ("Carlos MuÃ...oz Tenorio").
+En `Page/Gestion` se corrigieron después el mismo error de Día Actual / Día Anterior y la llave de ciclo de `sql.getRegisterHistory` (ahora con `WorkstationNodeID`). Pendiente: el reporte PDF recibe `nodeID`, `papoID` y `registerCode` (sin estación), así que con dos estaciones en el mismo ciclo puede mezclar datos. Hay datos con problemas de codificación ("Carlos MuÃ...oz Tenorio").
