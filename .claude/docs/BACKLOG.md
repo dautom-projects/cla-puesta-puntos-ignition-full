@@ -20,5 +20,5 @@
 ## Verificaciones pendientes
 
 - `resource.json` con `actor: "external"`: confirmar si el Designer ignora cambios en disco cuando `actor` es `admin` (regla de `.claude/rules/view-json-editing.md`). Afecta a las 7 ediciones de la ronda 4, que no actualizaron `resource.json`
-- Timer Script `claude-code-sync`: falla con `AttributeError: ... no attribute 'requestScan'`; reemplazarlo en el Designer por la versión con `system.project.requestScan()`
+- Timer Script `claude-code-sync`: en Ignition 8.1.19 ni `system.project.requestScan()` ni `getProjectManager().requestScan()` existen; el timer borra el sentinel y falla. Decidido sync manual (Project → Update Project). Retomar si el gateway sube de versión (funciona en 8.1.43 y 8.3.8)
 - Scheduled Script de gateway que llama a `papo_core.sign.autoCloseOpenForms("papo_db")`: conexión hardcodeada

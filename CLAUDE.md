@@ -59,6 +59,7 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - Se desarrolla en una máquina dev y se despliega compartiendo la vista completa
 - Scripts de cache (tags UDT) y de reporte se despliegan aparte
 - Cada cambio se registra en `.claude/docs/DEPLOY_INVENTORY.md`
+- Sync con el gateway local (PAPOS, Ignition 8.1.19): manual, con Project → Update Project en el Designer. El timer `claude-code-sync` no puede re-escanear en 8.1.19 (`system.project.requestScan` no existe)
 
 ## Arquitectura papo_core (Project Library)
 
