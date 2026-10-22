@@ -1,7 +1,6 @@
 # QA — Page/Gestion Gerencia (filtrado y consultas)
 
-Fecha: 2026-10-22. Revisión estática del `view.json`, de la Project Library y de los logs de PAPOS.
-Las consultas no se ejecutaron contra `papo_db` (sin acceso directo a SQL Server desde aquí).
+Fecha: 2026-10-22. Revisión del `view.json`, de la Project Library y de los logs de PAPOS, validada contra la base de pruebas `cla-db-papo` (contenedor `mssql`, 2,898 registros del 2025-10-22 al 2026-10-22).
 
 ## Flujo de la vista
 
@@ -21,9 +20,20 @@ Filtros: **Supervisor**, **Periodo** (Turno 1/2/3, Día Anterior, Día Actual, S
 | 7 | Consulta de ciclos (consulta 1) | ⚠️ Riesgo | Agrupa por `NodeID + PapoID + RegisterCode`. Si dos estaciones del mismo nodo llenan el mismo PAPO, sus ciclos con igual `RegisterCode` se mezclan (falta `WorkstationNodeID`) |
 | 8 | Firmas (consulta 2) | ⚠️ Riesgo | Mismo riesgo que el 7. La detección de "Cierre Automatico" sí pasa (coincide con lo que escribe `autoCloseOpenForms`) |
 | 9 | Supervisor esperado del formulario (consulta 3) | ❌ Falla | Busca la pregunta "Supervisor" con `papoitem.PapoID = PapoID`. Los PAPO clonados (`MasterPapoID`) no tienen `papoitem`: quedan en la firma o "Sin asignar" |
-| 10 | Frecuencia de consultas | ❌ Falla | `custom.refresh` y `endTime` cambian cada segundo, así que las 3 consultas corren cada segundo por sesión. Además `custom.dataTable` (no lo usa ninguna tabla) consulta `sql.getRegisterHistory` sin filtros cada segundo |
+| 10 | Frecuencia de consultas | ⚠️ Riesgo | `custom.refresh` y `endTime` cambian cada segundo, así que las 3 consultas corren cada segundo por sesión. Además `custom.dataTable` (no lo usa ninguna tabla) consulta `sql.getRegisterHistory` sin filtros cada segundo |
 | 11 | Selección → reporte PDF | ✅ Pasa | `onRowClick` desempaqueta la fila y `custom.path` resuelve la referencia del master. Sin fila seleccionada, `custom.path` falla (`'NoneType' ... split`) y deja error en el log |
 | 12 | Referencias rotas | ❌ Falla | `position.basis` de los dropdowns apunta a `../Dropdown Area` (no existe); 7 labels leen `view.custom.ips` / `ipStation` (no existen); `custom.dataTable` usa `nodeId`, `papoId`, `refreshTable` (no existen); el handler `signPapoSup` busca el componente `Table` (no existe) y nadie lo envía en esta vista; `custom.refresh` envía `filterTable` cada segundo sin receptor |
+
+## Validación con datos (cla-db-papo)
+
+| Chequeo | Resultado |
+|---|---|
+| Tipos de nodo | 5 AREA, 23 LINE, 50 CELL. El 44 % de los registros (1,276 de 2,898) está en nodos CELL |
+| Filtro en cascada de `Page/Gestion` (fix `feeaa50`) | Por Área antes 0 registros en las 5 áreas; ahora Ensamble 275, F&A 1,723, General 3, Metalurgia 94, OREC 803. Por Línea, Terminado 593 → 1,310 y Reactores 87 → 371 (registros de sus celdas) |
+| Ciclos que mezclan estaciones (pipelines 7 y 8) | 13 nodos tienen 2+ estaciones; **56 ciclos** `NodeID + PapoID + RegisterCode` combinan 2–3 estaciones (p. ej. Terminado, PAPO 47, RegisterCode 0–3, 3 estaciones) |
+| PAPOs clonados (pipeline 9) | 18 clones con 106 inicios de turno; sus 18 masters sí tienen la pregunta "Supervisor", así que `COALESCE(MasterPapoID, ID)` lo resuelve |
+| Filtro de supervisor (pipelines 2–5) | El dropdown usa usuarios (`bhomej`, `bramirh1`…) y las tablas comparan con nombres (`Jorge Home`, `Herly Ramirez`…): nunca coinciden. Hay variantes del mismo nombre ("Herly  Ramirez " / "Herly Ramirez"), supervisores asignados en formularios que nunca firmaron (Fredy Arley Arboleda Mazo, Guillermo Andres Banderas Ayala, Oscar Viafara…) y 77 firmas con usuario `NA` ("NA NA") |
+| Costo de las consultas (pipeline 10) | Semana actual: 2 ciclos, ~15 ms. Todo el historial: 411 ciclos, 603 firmas, ~26 ms. Correrlas cada segundo no se nota con estos datos, pero crece con el historial de producción |
 
 ## Correcciones propuestas
 
@@ -34,4 +44,4 @@ Filtros: **Supervisor**, **Periodo** (Turno 1/2/3, Día Anterior, Día Actual, S
 5. Agregar `WorkstationNodeID` a la llave de ciclo en las consultas 1–3 (y en `sql.getRegisterHistory`).
 6. Resolver la pregunta "Supervisor" con `COALESCE(MasterPapoID, ID)`.
 7. Limpiar referencias rotas y proteger `custom.path` cuando no hay selección.
-8. Supervisores del dropdown: sumar los asignados en formularios, no solo los que firmaron.
+8. Supervisores del dropdown: sumar los asignados en formularios, no solo los que firmaron, y excluir el usuario `NA`.
