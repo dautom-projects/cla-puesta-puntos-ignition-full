@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 100
 - Session props: 5
-- Relaciones: 4440 (usa tag 716, llama 649, embebe/abre 90, maneja 420, monta 8, envia 673, usa sesion 268, usa estilo 1616)
+- Relaciones: 4437 (usa tag 716, llama 648, embebe/abre 90, maneja 419, monta 8, envia 672, usa sesion 268, usa estilo 1616)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -19,7 +19,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 ### Vistas
 - **Alerts/alert** (cla-project) — directo 1, transitivo 264
 - **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 264
-- **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 101
+- **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 100
 - **Page/Embedded/Metalurgia/Fundamental Views/Checkbox** (cla-project) — directo 19, transitivo 19
 - **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
 - **Page/Embedded/Title_Header** (cla-project) — directo 5, transitivo 9
@@ -31,9 +31,9 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 ### Scripts
 - **logging** (cla-project) — directo 10, transitivo 271
 - **alerts** (cla-project) — directo 19, transitivo 263
-- **papo_core.ui** (cla-project) — directo 238, transitivo 240
+- **papo_core.ui** (cla-project) — directo 239, transitivo 241
 - **papo_core.register** (cla-project) — directo 235, transitivo 237
-- **papo_core.sign** (cla-project) — directo 96, transitivo 99
+- **papo_core.sign** (cla-project) — directo 95, transitivo 98
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
 - **papo_core.items** (cla-project) — directo 7, transitivo 7
@@ -66,7 +66,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 
 ### Clases de estilo
 - **container-borders-dautom-widget** (cla-project) — directo 267, transitivo 279
-- **text-description-centered** (cla-project) — directo 11, transitivo 271
+- **text-description-centered** (cla-project) — directo 11, transitivo 272
 - **text-titles** (cla-project) — directo 242, transitivo 268
 - **Utilities/m-r-16** (cla-project) — directo 3, transitivo 267
 - **Alerts/alertTitle** (cla-project) — directo 2, transitivo 266
@@ -78,7 +78,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 
 ### Session props
 - **session.custom.dbConnection** (cla-project) — directo 261, transitivo 268
-- **session.custom.userSource** (cla-project) — directo 2, transitivo 102
+- **session.custom.userSource** (cla-project) — directo 2, transitivo 101
 - **session.custom.adminPermissions** (cla-project) — directo 3, transitivo 6
 - **session.custom.filterOverview** (cla-project) — directo 1, transitivo 2
 - **session.custom.shift** (cla-project) — directo 1, transitivo 1
