@@ -91,6 +91,12 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
     para cada combinación (NodeID, PapoID, RegisterCode) desde registerhistory,
     incluyendo StartTime (último Timestamp del tipo RegisterTypeID=7 de la misma combinación,
     anterior o igual al registro actual).
+
+    El filtro por nodo es en cascada: nodeId puede ser un AREA, LINE o CELL e
+    incluye los registros de ese nodo y de sus descendientes (hasta 2 niveles).
+
+    Changelog:
+        2026-10-22 | William M. | Filtro por nodo en cascada (AREA > LINE > CELL)
     """
     logger = system.util.getLogger("getRegisterHistory")
 
@@ -130,9 +136,11 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                     ) AS rn
                 FROM registerhistory rh
                 INNER JOIN node n ON n.ID = rh.NodeID
+                LEFT JOIN node pn ON pn.ID = n.ParentNodeID
                 INNER JOIN papo p ON p.ID = rh.PapoID
                 INNER JOIN workstation w ON w.ID = rh.WorkstationID
-                WHERE ( (? IS NULL OR n.ID = ?) )
+                -- Cascading node filter: the node itself, its children and grandchildren
+                WHERE ( (? IS NULL OR n.ID = ? OR n.ParentNodeID = ? OR pn.ParentNodeID = ?) )
                   AND ( (? IS NULL OR p.ID = ?) )
                   AND ( (? IS NULL OR rh.Timestamp >= ?) )
                   AND ( (? IS NULL OR rh.Timestamp <= ?) )
@@ -190,7 +198,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
         """
 
         args = [
-            nodeId, nodeId,
+            nodeId, nodeId, nodeId, nodeId,
             papoId, papoId,
             startDate, startDate,
             endDate, endDate
