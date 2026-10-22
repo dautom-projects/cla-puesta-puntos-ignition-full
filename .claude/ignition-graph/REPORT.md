@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 100
 - Session props: 5
-- Relaciones: 4432 (usa tag 716, llama 644, embebe/abre 90, maneja 421, monta 8, envia 676, usa sesion 263, usa estilo 1614)
+- Relaciones: 4429 (usa tag 716, llama 645, embebe/abre 90, maneja 420, monta 8, envia 673, usa sesion 263, usa estilo 1614)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -97,7 +97,7 @@ _Probablemente se abren con una ruta armada en tiempo de ejecucion. Verificar._
 - Page/PopUps/DateAndTime (cla-project)
 - Page/PopUps/Test (cla-project)
 
-## Referencias no resueltas (31)
+## Referencias no resueltas (30)
 _Algo se usa pero no existe en el proyecto ni en su cadena de herencia: tipico tras un **renombre** o borrado. Estilos y session props pueden venir de fuera (tema CSS, creacion dinamica); verificar antes de corregir._
 
 ### Vistas (9)
@@ -116,12 +116,11 @@ _Algo se usa pero no existe en el proyecto ni en su cadena de herencia: tipico t
 - `yieldCalc_AB.report` — desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+59)
 - `yieldCalc_C.report` — desde **Page/Embedded/Ensamble/Form_EA11-1101_1h** (+59)
 
-### Clases de estilo (17)
-- `--cla-text-question` — desde **Page/Embedded/Cubiertas/Form_PL11-0101-CU_start** (+4)
+### Clases de estilo (16)
+- `--cla-text-question` — desde **Page/Embedded/Cubiertas/Form_PL11-0101-CU_start** (+1)
 - `InputFont` — desde **Page/UserManagement/Views/Home**
 - `Page/Page` — desde **Page/UserManagement/Views/AddEditRoles** (+2)
 - `Page/Reports/border_1` — desde **Page/Overview_Papos**
-- `Page/themes` — desde **Page/Digitalizacion_Template** (+1)
 - `ScheduleManagement/Headers` — desde **Page/UserManagement/Views/AddEditRoles**
 - `ScheduleManagement/InputFont` — desde **Page/UserManagement/Views/AddEditUser**
 - `Title/Title_0` — desde **Page/Embedded/Title_Header** (+1)
