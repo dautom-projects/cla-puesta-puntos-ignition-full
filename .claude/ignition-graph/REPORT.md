@@ -1,7 +1,7 @@
 # Mapa de dependencias Ignition
 
 - Proyectos: 1 (cla-project)
-- Vistas: 338
+- Vistas: 343
 - Scripts de proyecto: 23
 - Eventos (gateway y sesion): 2
 - Mensajes: 90
@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 100
 - Session props: 5
-- Relaciones: 4429 (usa tag 716, llama 645, embebe/abre 90, maneja 420, monta 8, envia 673, usa sesion 263, usa estilo 1614)
+- Relaciones: 4440 (usa tag 716, llama 649, embebe/abre 90, maneja 420, monta 8, envia 673, usa sesion 268, usa estilo 1616)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -36,9 +36,9 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **papo_core.sign** (cla-project) — directo 96, transitivo 99
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
+- **papo_core.items** (cla-project) — directo 7, transitivo 7
 - **mes_core.workOrder** (cla-project) — directo 4, transitivo 7
 - **mes_core.schedule** (cla-project) — directo 3, transitivo 7
-- **mes_core.misc** (cla-project) — directo 3, transitivo 5
 
 ### Mensajes
 - **deleteArea** (cla-project) — directo 6, transitivo 267
@@ -77,7 +77,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **text-description** (cla-project) — directo 2, transitivo 266
 
 ### Session props
-- **session.custom.dbConnection** (cla-project) — directo 256, transitivo 263
+- **session.custom.dbConnection** (cla-project) — directo 261, transitivo 268
 - **session.custom.userSource** (cla-project) — directo 2, transitivo 102
 - **session.custom.adminPermissions** (cla-project) — directo 3, transitivo 6
 - **session.custom.filterOverview** (cla-project) — directo 1, transitivo 2
