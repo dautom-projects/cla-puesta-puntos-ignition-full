@@ -94,6 +94,17 @@ Módulos (`papo_core/<modulo>/code.py`, funciones públicas):
 - Turnos: nunca system.date.getHour24(); usar java.util.Calendar con TimeZone America/Bogota
 - Deploy: siempre desplegar el módulo del Project Library antes que la vista que lo llama
 
+## Flujo para corregir bugs
+
+Usar `/bug <descripción>` (`.claude/commands/bug.md`):
+1. Checkpoint: commit `chore: checkpoint antes de <bug>` solo si hay cambios sin commit
+2. Ubicar la vista/script y revisar su impacto en `.claude/ignition-graph/impact.json`
+3. Lógica compartida → corregir en papo_core; lógica inline que duplica papo_core → migrar a wrappers
+4. Editar view.json con cambios puntuales (nunca json.dump) y validar que parsea
+5. Lint de las vistas tocadas: `python3 .claude/skills/papo-lint/scripts/papo_lint.py --views <vistas>`
+6. Commit `fix: <bug>` + filas en DEPLOY_INVENTORY.md (Project Library antes que vistas)
+7. Update Project en el Designer (o reiniciar PAPOS); si cambiaron relaciones, re-correr ignition-graph
+
 ## Reglas críticas al editar view.json
 
 1. **SIEMPRE hacer backup antes** de tocar un view.json
@@ -126,6 +137,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de papo_db generado desde la base viva (notas de dominio, conteos y catálogos)
 - `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
 - `.claude/docs/BACKLOG.md` — pendientes y horizonte del proyecto
+- `.claude/docs/LINT_REPORT.md` — hallazgos de papo-lint por patrón y por vista (`.claude/skills/papo-lint/`)
 
 ## Estado actual
 
