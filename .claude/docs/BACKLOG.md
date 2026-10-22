@@ -17,8 +17,13 @@
 | Vistas huérfanas y vistas inexistentes | 7 | Decidir si se borran (Template/Overview, Template/Breakpoint, Digitalizacion_Reportes, MixingDashboard) o se restauran `Components/*` y `CreateOrEditSch`; agregar `Page/` en los cierres de popup de UserManagement |
 | Clases rotas restantes | 8 | Tipeos (`text-title-2`, `button-question`, `datetime`, `bg-[--neutral-10]gap-2`) y clases de vistas de test/huérfanas (`some-class`, `gauge-fill-blue`, `Page/Reports/border_1`, `w-28`, `lg:w-21`) |
 
+## Sync con el gateway local (PAPOS, Ignition 8.1.19)
+
+- `system.project.requestScan()` no existe en 8.1.19 (tampoco `getProjectManager().requestScan()` de la API Java); el timer `claude-code-sync` borra el sentinel y falla con `AttributeError`
+- El endpoint `POST /data/project-scan-endpoint/scan` responde 404: el módulo project-scan-endpoint no está instalado
+- Mecanismo en uso: manual, con Project → Update Project en el Designer o reiniciando el contenedor `PAPOS`. Retomar el timer si el gateway sube de versión (funciona en 8.1.43 y 8.3.8)
+- `resource.json` no hace falta actualizarlo: los cambios de la ronda 4 se cargaron sin tocarlo (verificado tras reiniciar PAPOS el 2026-10-22)
+
 ## Verificaciones pendientes
 
-- `resource.json` con `actor: "external"`: confirmar si el Designer ignora cambios en disco cuando `actor` es `admin` (regla de `.claude/rules/view-json-editing.md`). Afecta a las 7 ediciones de la ronda 4, que no actualizaron `resource.json`
-- Timer Script `claude-code-sync`: en Ignition 8.1.19 ni `system.project.requestScan()` ni `getProjectManager().requestScan()` existen; el timer borra el sentinel y falla. Decidido sync manual (Project → Update Project). Retomar si el gateway sube de versión (funciona en 8.1.43 y 8.3.8)
 - Scheduled Script de gateway que llama a `papo_core.sign.autoCloseOpenForms("papo_db")`: conexión hardcodeada
