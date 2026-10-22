@@ -24,6 +24,13 @@
 - Mecanismo en uso: manual, con Project → Update Project en el Designer o reiniciando el contenedor `PAPOS`. Retomar el timer si el gateway sube de versión (funciona en 8.1.43 y 8.3.8)
 - `resource.json` no hace falta actualizarlo: los cambios de la ronda 4 se cargaron sin tocarlo (verificado tras reiniciar PAPOS el 2026-10-22)
 
+## Mejoras opcionales (fuera de la estandarización básica)
+
+- Preguntas en una consulta por vista: hoy hay ~3,520 bindings que consultan `papoitem` uno por pregunta en 153 vistas. `papo_core.items.getQuestions(value)` y `getQuestionText(value)` ya existen (sin uso); se probaron y revirtieron en el piloto EC07-0101 barcada por no ser parte del estándar
+- `papo_core.ui.getShift(dateTime=None)` existe sin uso: reemplazar los cálculos con `getHour24` (ui.preInsight, sign.autoCloseOpenForms, report x2, custom.shift de Metalurgia FU10-0202_dia y TR11-0102_start, que además tiene el bug de turno)
+
 ## Verificaciones pendientes
+
+- `papo_core.register._getLastRegisterCode` ordena por `ID DESC` en lugar de `RegisterCode DESC` (la regla del proyecto); en la práctica devuelve lo mismo porque ID es creciente
 
 - Scheduled Script de gateway que llama a `papo_core.sign.autoCloseOpenForms("papo_db")`: conexión hardcodeada

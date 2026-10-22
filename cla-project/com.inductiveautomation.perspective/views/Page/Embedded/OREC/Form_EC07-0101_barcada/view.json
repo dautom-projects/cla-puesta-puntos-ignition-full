@@ -73,24 +73,6 @@
     "custom.path1": {
       "persistent": true
     },
-    "custom.questions": {
-      "binding": {
-        "config": {
-          "struct": {
-            "dbConnection": "{view.custom.dbConnection}",
-            "papoID": "{view.params.papoID}"
-          },
-          "waitOnAll": true
-        },
-        "transforms": [
-          {
-            "code": "\treturn papo_core.items.getQuestions(value)",
-            "type": "script"
-          }
-        ],
-        "type": "expr-struct"
-      }
-    },
     "custom.registerTypeID": {
       "persistent": true
     },
@@ -278,20 +260,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -446,20 +423,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -565,20 +537,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -685,20 +652,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -808,20 +770,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -923,20 +880,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1086,20 +1038,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.item.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.item.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1148,20 +1095,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1263,20 +1205,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1383,20 +1320,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1551,20 +1483,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.item.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.item.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1661,20 +1588,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.item.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.item.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1771,20 +1693,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.item.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.item.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1881,20 +1798,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.item.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.item.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -1943,20 +1855,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2063,20 +1970,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2183,20 +2085,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2303,20 +2200,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2423,20 +2315,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2543,20 +2430,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2663,20 +2545,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2791,20 +2668,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -2919,20 +2791,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
@@ -3039,20 +2906,15 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "struct": {
-                          "dbConnection": "{view.custom.dbConnection}",
-                          "papoItemID": "{this.custom.papoItemID}",
-                          "questions": "{view.custom.questions}"
-                        },
-                        "waitOnAll": true
+                        "path": "this.custom.papoItemID"
                       },
                       "transforms": [
                         {
-                          "code": "\treturn papo_core.items.getQuestionText(value)",
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
                           "type": "script"
                         }
                       ],
-                      "type": "expr-struct"
+                      "type": "property"
                     }
                   }
                 },
