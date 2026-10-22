@@ -24,6 +24,13 @@
 - Mecanismo en uso: manual, con Project → Update Project en el Designer o reiniciando el contenedor `PAPOS`. Retomar el timer si el gateway sube de versión (funciona en 8.1.43 y 8.3.8)
 - `resource.json` no hace falta actualizarlo: los cambios de la ronda 4 se cargaron sin tocarlo (verificado tras reiniciar PAPOS el 2026-10-22)
 
+## Objetos estándar (`Objects/`)
+
+- Aplicar formulario por formulario (un commit por formulario, `git revert` para deshacer); ver `OBJETOS_ESTANDAR.md`
+- Agregar a papo-lint el patrón "campos fuera de objetos estándar" para medir la adopción
+- Si se usan como vista embebida suelta: `papo_core.register.recopile` debe leer `props.params.item` de los `ia.display.view`
+- Verificar que el gateway carga los objetos (resource.json sin `lastModificationSignature`)
+
 ## Mejoras opcionales (fuera de la estandarización básica)
 
 - Preguntas en una consulta por vista: hoy hay ~3,520 bindings que consultan `papoitem` uno por pregunta en 153 vistas. `papo_core.items.getQuestions(value)` y `getQuestionText(value)` ya existen (sin uso); se probaron y revirtieron en el piloto EC07-0101 barcada por no ser parte del estándar

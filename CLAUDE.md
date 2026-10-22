@@ -53,6 +53,7 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - `Page/PopUps/Authenticator` — popup para que el supervisor firme sin cerrar la sesión del operario
 - `Page/Overview_Papos` — lista de tarjetas de formularios; `Page/Embedded/Embedded_PAPO` — tarjeta individual
 - Reportes (EA11-0901, etc.) — generan el PDF del formulario
+- `Objects/` — objetos estándar de campo (Checkbox, TextField, NumericField, Dropdown, Label); ver `.claude/docs/OBJETOS_ESTANDAR.md`
 
 ## Despliegue
 
@@ -137,6 +138,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de papo_db generado desde la base viva (notas de dominio, conteos y catálogos)
 - `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
 - `.claude/docs/BACKLOG.md` — pendientes y horizonte del proyecto
+- `.claude/docs/OBJETOS_ESTANDAR.md` — contrato y uso de los objetos estándar de `Objects/`
 - `.claude/docs/LINT_REPORT.md` — hallazgos de papo-lint por patrón y por vista (`.claude/skills/papo-lint/`)
 
 ## Estado actual

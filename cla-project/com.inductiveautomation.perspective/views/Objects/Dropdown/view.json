@@ -1,0 +1,217 @@
+{
+  "custom": {
+    "dbConnection": "papo_db"
+  },
+  "params": {
+    "fieldBasis": "224px",
+    "fontSize": 17,
+    "item": {},
+    "options": [],
+    "papoItemID": null,
+    "placeholder": "Seleccione",
+    "questionBasis": "450px",
+    "registerTypeID": null,
+    "showQuestion": true
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.fieldBasis": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.fontSize": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.item": {
+      "binding": {
+        "config": {
+          "path": "/root/Field.custom.item"
+        },
+        "type": "property"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    },
+    "params.options": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoItemID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.placeholder": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.questionBasis": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.registerTypeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.showQuestion": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 60,
+      "width": 900
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Question"
+        },
+        "position": {
+          "basis": "450px"
+        },
+        "propConfig": {
+          "position.basis": {
+            "binding": {
+              "config": {
+                "path": "view.params.questionBasis"
+              },
+              "type": "property"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.params.showQuestion"
+              },
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "dbConnection": "{view.custom.dbConnection}",
+                  "papoItemID": "{view.params.papoItemID}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn papo_core.items.getQuestionText(value)",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "custom": {
+          "item": {}
+        },
+        "meta": {
+          "name": "Field"
+        },
+        "position": {
+          "basis": "224px"
+        },
+        "propConfig": {
+          "custom.item.answer": {
+            "binding": {
+              "config": {
+                "path": "this.props.value"
+              },
+              "type": "property"
+            }
+          },
+          "custom.item.papoItemID": {
+            "binding": {
+              "config": {
+                "path": "view.params.papoItemID"
+              },
+              "type": "property"
+            }
+          },
+          "custom.item.registerTypeID": {
+            "binding": {
+              "config": {
+                "path": "view.params.registerTypeID"
+              },
+              "type": "property"
+            }
+          },
+          "position.basis": {
+            "binding": {
+              "config": {
+                "path": "view.params.fieldBasis"
+              },
+              "type": "property"
+            }
+          },
+          "props.options": {
+            "binding": {
+              "config": {
+                "path": "view.params.options"
+              },
+              "type": "property"
+            }
+          },
+          "props.placeholder.text": {
+            "binding": {
+              "config": {
+                "path": "view.params.placeholder"
+              },
+              "type": "property"
+            }
+          },
+          "props.style.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "classes": "dropdown"
+          }
+        },
+        "type": "ia.input.dropdown"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "alignItems": "center",
+      "style": {
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}
