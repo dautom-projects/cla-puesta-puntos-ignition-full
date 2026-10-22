@@ -45,3 +45,17 @@ Filtros: **Supervisor**, **Periodo** (Turno 1/2/3, Día Anterior, Día Actual, S
 6. Resolver la pregunta "Supervisor" con `COALESCE(MasterPapoID, ID)`.
 7. Limpiar referencias rotas y proteger `custom.path` cuando no hay selección.
 8. Supervisores del dropdown: sumar los asignados en formularios, no solo los que firmaron, y excluir el usuario `NA`.
+
+## Estado tras la corrección (2026-10-22)
+
+Corregidos en `Page/Gestion Gerencia` y validados ejecutando el código real de los transforms contra `cla-db-papo`:
+
+- Pipelines 2–5: en las 25 opciones de supervisor (todo el historial), en la del mes y en la de la semana, cada opción trae registros y TablaGeneral / TablaOperario / TablaSupervisor coinciden con total / sin firma operario / sin firma supervisor
+- Pipeline 1: el dropdown pasa de 7 nombres (con "NA NA") a los supervisores con reportes en el periodo (25 en todo el historial)
+- Pipelines 7–8: 411 → 467 ciclos (los 56 que mezclaban estaciones quedan separados)
+- Pipeline 9: "Sin asignar" 207 → 162 (PAPOs clonados resueltos por su master; gana la última respuesta del ciclo)
+- Pipeline 6: Día Actual / Día Anterior correctos a las 03:30, 10:30 y 23:30 (antes fallaban 4 de 6 casos)
+- Pipeline 10: sin `custom.refresh`; el fin del rango cambia una vez por minuto
+- Pipelines 11–12: sin referencias rotas; `custom.path` ya no registra error sin selección
+
+Pendiente fuera de esta vista: `Page/Gestion` tiene el mismo error de Día Actual / Día Anterior, y `sql.getRegisterHistory` agrupa ciclos sin `WorkstationNodeID`. El reporte PDF recibe `nodeID`, `papoID` y `registerCode` (sin estación), así que con dos estaciones en el mismo ciclo puede mezclar datos. Hay datos con problemas de codificación ("Carlos MuÃ...oz Tenorio").
