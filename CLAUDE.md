@@ -61,6 +61,7 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - Scripts de cache (tags UDT) y de reporte se despliegan aparte
 - Cada cambio se registra en `.claude/docs/DEPLOY_INVENTORY.md`
 - Sync con el gateway local (PAPOS, Ignition 8.1.19): automático. El gateway relee el disco cada 10 s (`-Dignition.projects.scanFrequency=10` en `data/ignition.conf`; por defecto 300 s). Los cambios en disco aparecen en ~10 s; en el Designer, Project → Update Project si ya tenía la vista abierta
+- Reportes y fuente: las plantillas usan Calibri, que no existe en la imagen Linux. En PAPOS está instalada Carlito renombrada como Calibri (`/Users/dautom/docker/cla-papos/fonts` → `/usr/share/fonts/truetype/calibri`, copiada con docker cp); se pierde si se recrea el contenedor hasta montarla en el stack de Portainer (ver `fonts/README.md`). Sin ella los textos se desbordan y las cajas en modo Paginate muy bajas hacen fallar el PDF (error 500)
 
 ## Arquitectura papo_core (Project Library)
 
@@ -77,7 +78,7 @@ Módulos (`papo_core/<modulo>/code.py`, funciones públicas):
 - `register` — recopile, save
 - `ui` — toggleSection, initForm, preInsight, confirmSave, getSecurityImage
 - `sign` — supervisorOpt, signOperator, requestSupervisorAuth, signSupervisor, signSupervisorFromSelection, authenticateAndSign, autoCloseOpenForms
-- `report` — extractReportData, extractReportDataAuto
+- `report` — extractReportData, extractReportDataAuto, extractShiftChecklist
 - `overview` — getPapoListFiltered, getCardPath
 - `items` — getRangeColor
 

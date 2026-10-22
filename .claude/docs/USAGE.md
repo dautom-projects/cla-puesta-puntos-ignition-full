@@ -93,9 +93,9 @@ impact.json: 0 vista(s) lo usan.
 
 Extrae y aplana datos de registerhistory al dict del reporte según una lista de secciones configuradas (tipos, nombre, max, normalize).
 
-**Llamado desde:** ninguna vista.
+**Llamado desde:** reporte `Clarios/Andina/Metalurgia/FU10-0202` (desde 2026-10-22; secciones `inicio` tipo 7 y `hallazgo` tipo 15 con max 10, normalize raw).
 
-> No se encontraron llamadas en vistas ni scripts. Los 67 reportes son binarios y el grafo no los analiza: probablemente se llama desde ahí (sin verificar).
+> El grafo no analiza los reportes (son binarios): las llamadas desde reportes se registran aquí a mano.
 
 ### `report.extractReportDataAuto(data)`
 
@@ -104,6 +104,12 @@ Variante autoconfigurada: descubre los RegisterTypeID en papoitem_registertype y
 **Llamado desde:** ninguna vista.
 
 > Igual que extractReportData: sin llamadas en archivos de texto; los reportes no se analizan.
+
+### `report.extractShiftChecklist(data, typeIDs, prefix="t", marks=None)`
+
+Checklists que se llenan una vez por turno con columnas OK / X / N/A: agrupa los registros del ciclo por el turno de su Timestamp (`papo_core.ui.getShift`), toma el último de cada turno y deja `data["t1"]`, `data["t2"]`, `data["t3"]` con `ok{ID}` (✔ si Cumple), `x{ID}` (✘ si No Cumple), `na{ID}` (✔ si N/A), `user` (quien llenó ese turno) y `date`. En la plantilla: `@t2.ok11260@`, `@t2.x11260@`, `@t2.na11260@`, `@t2.user@`.
+
+**Llamado desde:** reporte `Clarios/Andina/Metalurgia/FU10-0202` (tipo 11 Diario).
 
 ## papo_core.sign
 

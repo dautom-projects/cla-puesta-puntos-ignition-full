@@ -8,9 +8,11 @@ RegisterTypeIDs from papoitem_registertype, derives section names
 from registertype.Description, and handles multi-shift forms with
 turno prefix grouping.
 
-Version: 2.1.1
+Version: 2.2.0
 
 Changelog:
+	2026-10-22 | William M. | v2.2.0 - extractShiftChecklist: per-shift
+		OK / X / N/A columns for checklists filled once per shift (FU10-0202)
 	2026-08-12 | William M. | v2.1.1 - Fix _extractSignatures classifying
 		operator as admin: use Status column (Finalizado=operator,
 		Revisado=supervisor) instead of unreliable role field from JSON
@@ -561,3 +563,83 @@ def extractReportDataAuto(data):
 
 	except Exception as e:
 		logger.error("Error in extractReportDataAuto: " + str(e))
+
+
+def extractShiftChecklist(data, typeIDs, prefix="t", marks=None):
+	"""
+	Build per-shift OK / X / N/A columns for checklists filled once per shift.
+
+	Groups the cycle's records of the given RegisterTypeIDs by the shift of
+	their Timestamp and keeps the latest record of each shift. Each answer
+	goes into the column key of its value, so the template places one mark
+	per column (e.g. @t2.ok11260@, @t2.x11260@, @t2.na11260@).
+
+	Version: 1.0.0
+
+	Args:
+		data (dict): Report data dict with papoID, nodeID, registerCode, db
+		typeIDs (list[int]): RegisterTypeID(s) of the checklist records
+		prefix (str): Base key per shift, data["{prefix}{shift}"] (default "t")
+		marks (dict, optional): Lowercase answer -> (column, mark). Default:
+			cumple -> ("ok", check), no cumple -> ("x", cross), n/a -> ("na", check)
+
+	Returns:
+		None: Populates data["{prefix}1"], data["{prefix}2"] and data["{prefix}3"]
+			in place, each with ok{ID} / x{ID} / na{ID} marks plus "user" (who
+			filled that shift) and "date" (row Timestamp)
+
+	Changelog:
+		2026-10-22 | William M. | v1.0.0 - Initial version (FU10-0202)
+	"""
+	papoID = data.get('papoID')
+	nodeID = data.get('nodeID')
+	registerCode = data.get('registerCode')
+	db = data.get('db', 'papo_db') or 'papo_db'
+
+	if marks is None:
+		marks = {
+			"cumple": ("ok", NORMALIZE_MODES["check"]["cumple"]),
+			"no cumple": ("x", NORMALIZE_MODES["check"]["no cumple"]),
+			"n/a": ("na", NORMALIZE_MODES["check"]["cumple"]),
+		}
+
+	logger = system.util.getLogger("papo_core.report.extractShiftChecklist")
+
+	try:
+		# Empty columns so every shift key exists in the template
+		for shift in (1, 2, 3):
+			data["{0}{1}".format(prefix, shift)] = {"user": "", "date": None}
+
+		ds = _queryForAuto(typeIDs, papoID, nodeID, registerCode, db)
+		for i in range(ds.getRowCount()):
+			raw = ds.getValueAt(i, "DataAnswer")
+			if not raw:
+				continue
+			try:
+				obj = system.util.jsonDecode(raw)
+			except:
+				continue
+			if not (isinstance(obj, dict) and "items" in obj):
+				continue
+
+			rowDate = ds.getValueAt(i, "Timestamp")
+			shift = papo_core.ui.getShift(rowDate)
+			if shift is None:
+				continue
+
+			column = {"user": "", "date": rowDate}
+			for item in obj["items"]:
+				if "papoItemID" in item:
+					answer = item.get("answer")
+					answerKey = unicode(answer).strip().lower() if answer is not None else u""
+					if answerKey in marks:
+						columnName, mark = marks[answerKey]
+						column["{0}{1}".format(columnName, item["papoItemID"])] = mark
+				elif "insights" in item and isinstance(item.get("user"), basestring):
+					column["user"] = item["user"].strip()
+
+			# Rows come ordered by ID, so the latest record of each shift wins
+			data["{0}{1}".format(prefix, shift)] = column
+
+	except Exception as e:
+		logger.error("Error building shift checklist: " + str(e))
