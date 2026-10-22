@@ -4,9 +4,10 @@ papo_core.ui
 Visual behavior logic for PAPO forms.
 Handles accordion toggle, form initialization, and title labels.
 
-Version: 1.1.0
+Version: 1.2.0
 
 Changelog:
+	2026-10-22 | William M. | v1.2.0 - Added getShift (java.util.Calendar, America/Bogota)
 	2026-07-21 | William M. | v1.1.0 - Added confirmSave for save button onClick standardization
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
 """
@@ -176,3 +177,43 @@ def getSecurityImage(papoItemID,dbConnection):
 	    print "No se encontró descripción para ID:", papoItemID
 	
 	return '/system/images/'+url
+
+
+def getShift(dateTime=None):
+	"""
+	Return the plant shift (1, 2 or 3) for a timestamp in plant local time.
+
+	Uses java.util.Calendar with TimeZone America/Bogota so the result does
+	not depend on the gateway timezone.
+	T1 22:00-06:00, T2 06:00-14:00, T3 14:00-22:00.
+
+	Version: 1.0.0
+
+	Changelog:
+		2026-10-22 | William M. | v1.0.0 - Initial version
+
+	Args:
+		dateTime (java.util.Date): Timestamp to evaluate. None uses the current time
+
+	Returns:
+		int: Shift number (1, 2 or 3), or None on error
+	"""
+	from java.util import Calendar, TimeZone
+
+	logger = system.util.getLogger("papo_core.ui.getShift")
+
+	try:
+		cal = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"))
+		if dateTime is not None:
+			cal.setTime(dateTime)
+		hour = cal.get(Calendar.HOUR_OF_DAY)
+
+		if hour >= 22 or hour < 6:
+			return 1
+		elif hour < 14:
+			return 2
+		return 3
+
+	except Exception as e:
+		logger.error("Error computing shift for {}: {}".format(dateTime, str(e)))
+		return None

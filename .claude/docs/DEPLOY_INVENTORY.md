@@ -13,6 +13,9 @@ Backups en `.claude/backups/<fecha>/` con la misma ruta relativa que el archivo 
 | 2026-10-22 | 4 | `Page/Embedded/POLY/Form_PL11-0101-CUBIERTA_start` | `Label4`: mismo cambio que CU_start. | Sí: igual que CU_start. |
 | 2026-10-22 | 4 | `Page/Digitalizacion_Template` | Quitada la clase inexistente `Page/themes` de `root/FlexContainer_Reports` (1 ocurrencia). | No: la clase no existía, el aspecto no cambia. |
 | 2026-10-22 | 4 | `Page/Overview_Papos` | Quitada la clase inexistente `Page/themes` de `FlexContainer_Reports`, `Label_Mill` y `Label_Interval` (3 ocurrencias). | No: la clase no existía, el aspecto no cambia. |
+| 2026-10-22 | bug: piloto EC07-0101 barcada | Project Library `papo_core.items` (desplegar primero) | Nuevas `getQuestions(value)` (todas las preguntas del PAPO en una consulta, resuelve `MasterPapoID`) y `getQuestionText(value)` (lee del mapa; consulta individual solo si falta el ítem). | No (sin cambios en funciones existentes). |
+| 2026-10-22 | bug: piloto EC07-0101 barcada | Project Library `papo_core.ui` (desplegar primero) | Nueva `getShift(dateTime=None)` con `java.util.Calendar` y America/Bogota. Aún no la usa ninguna vista. | No. |
+| 2026-10-22 | bug: piloto EC07-0101 barcada | `Page/Embedded/OREC/Form_EC07-0101_barcada` | Nuevo `view.custom.questions` (binding a `getQuestions`); las 24 etiquetas de pregunta pasan de una consulta cada una a `getQuestionText`; quitado el handler `saveStartShift` sin uso de `Button_Apply` (`"papo_db"` fijo, `ORDER BY ID DESC`); quitada la clave legacy `refreshSecond`. | Sí: los 24 textos de pregunta deben verse igual que antes; guardar un registro y revisar `registerhistory`. |
 
 ## Pendientes del plan (ronda 3)
 
