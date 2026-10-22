@@ -25,4 +25,4 @@ Sigue estos pasos en orden y no te saltes ninguno:
 
 6. **Commit e inventario.** Agrega las filas a `.claude/docs/DEPLOY_INVENTORY.md` (fecha, ronda "bug: <resumen>", recurso, qué cambió, verificación visual) en orden de despliegue: primero los módulos de la Project Library y después las vistas que los llaman. Luego haz commit `fix: <bug>` con el código y el inventario.
 
-7. **Cierre.** Recuérdale al usuario hacer **Project → Update Project** en el Designer (o reiniciar el contenedor `PAPOS`) para ver el cambio. Si cambiaron relaciones entre recursos (llamadas, vistas embebidas, mensajes, estilos), vuelve a correr el skill `ignition-graph` con salida en `.claude/ignition-graph/`.
+7. **Cierre.** El gateway toma el cambio del disco en ~10 s (escaneo periódico); recuérdale al usuario hacer **Project → Update Project** en el Designer para verlo. Si cambiaron relaciones entre recursos (llamadas, vistas embebidas, mensajes, estilos), vuelve a correr el skill `ignition-graph` con salida en `.claude/ignition-graph/`.

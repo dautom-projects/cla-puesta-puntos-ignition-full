@@ -60,7 +60,7 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - Se desarrolla en una máquina dev y se despliega compartiendo la vista completa
 - Scripts de cache (tags UDT) y de reporte se despliegan aparte
 - Cada cambio se registra en `.claude/docs/DEPLOY_INVENTORY.md`
-- Sync con el gateway local (PAPOS, Ignition 8.1.19): manual, con Project → Update Project en el Designer. El timer `claude-code-sync` no puede re-escanear en 8.1.19 (`system.project.requestScan` no existe)
+- Sync con el gateway local (PAPOS, Ignition 8.1.19): automático. El gateway relee el disco cada 10 s (`-Dignition.projects.scanFrequency=10` en `data/ignition.conf`; por defecto 300 s). Los cambios en disco aparecen en ~10 s; en el Designer, Project → Update Project si ya tenía la vista abierta
 
 ## Arquitectura papo_core (Project Library)
 
@@ -104,7 +104,7 @@ Usar `/bug <descripción>` (`.claude/commands/bug.md`):
 4. Editar view.json con cambios puntuales (nunca json.dump) y validar que parsea
 5. Lint de las vistas tocadas: `python3 .claude/skills/papo-lint/scripts/papo_lint.py --views <vistas>`
 6. Commit `fix: <bug>` + filas en DEPLOY_INVENTORY.md (Project Library antes que vistas)
-7. Update Project en el Designer (o reiniciar PAPOS); si cambiaron relaciones, re-correr ignition-graph
+7. Esperar ~10 s (escaneo del gateway) y Update Project en el Designer; si cambiaron relaciones, re-correr ignition-graph
 
 ## Reglas críticas al editar view.json
 

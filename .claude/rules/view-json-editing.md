@@ -14,7 +14,7 @@
 
 ## After editing
 - Do not touch `resource.json`: edits to view.json load without updating it (verified 2026-10-22)
-- Sync with the local gateway (PAPOS, 8.1.19) is manual: Project → Update Project in the Designer, or restart the container
+- Sync with the local gateway (PAPOS, 8.1.19): the gateway rescans the projects folder every 10 s (`-Dignition.projects.scanFrequency=10`); then Project → Update Project in the Designer
 - Confirm the JSON parses: `python -c "import json; json.load(open('path/to/view.json'))"`
 
 ## NEVER use json.load/json.dump to rewrite view.json

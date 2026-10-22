@@ -19,10 +19,12 @@
 
 ## Sync con el gateway local (PAPOS, Ignition 8.1.19)
 
-- `system.project.requestScan()` no existe en 8.1.19 (tampoco `getProjectManager().requestScan()` de la API Java); el timer `claude-code-sync` borra el sentinel y falla con `AttributeError`
-- El endpoint `POST /data/project-scan-endpoint/scan` responde 404: el módulo project-scan-endpoint no está instalado
-- Mecanismo en uso: manual, con Project → Update Project en el Designer o reiniciando el contenedor `PAPOS`. Retomar el timer si el gateway sube de versión (funciona en 8.1.43 y 8.3.8)
-- `resource.json` no hace falta actualizarlo: los cambios de la ronda 4 se cargaron sin tocarlo (verificado tras reiniciar PAPOS el 2026-10-22)
+- Mecanismo en uso: escaneo periódico del gateway cada 10 s. `data/ignition.conf` tiene `wrapper.java.additional.3=-Dignition.projects.scanFrequency=10` (la propiedad sale de `IgnitionProjectManager`; el valor por defecto es 300 s). Medido el 2026-10-22: un cambio en disco se tomó en 9 s y su reversión en 10 s. Backup del conf en `.claude/backups/2026-10-22/gateway-data/ignition.conf`
+- Antes de este ajuste los cambios tardaban hasta 5 minutos (escaneos a las 09:32:35, 09:57:38 y 10:02:39 tras el reinicio de las 09:07), por eso parecía que solo funcionaban al reiniciar o con Update Project
+- `system.project.requestScan()` no existe en 8.1.19 (tampoco `getProjectManager().requestScan()` de la API Java) y el endpoint `POST /data/project-scan-endpoint/scan` responde 404 (módulo no instalado)
+- El timer `claude-code-sync` ya no hace falta: se puede deshabilitar en el Designer (hoy borra el sentinel y falla con `AttributeError` en cada edición). Los hooks se mantienen: el PreToolUse sigue protegiendo contra pisar cambios guardados desde el Designer
+- `resource.json` no hace falta actualizarlo a mano: el gateway firma los recursos nuevos o editados al escanearlos (`Setting LastModification to "external"`)
+- Si `data/ignition.conf` se regenera (contenedor nuevo o cambio de imagen), volver a agregar la línea
 
 ## Objetos estándar (`Objects/`)
 
