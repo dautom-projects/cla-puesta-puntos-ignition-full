@@ -42,22 +42,29 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 {"instancePosition": {}, "instanceStyle": {"classes": ""}, "papoItemID": 5134, "registerTypeID": 7}
 ```
 
-**Vista embebida en la celda** (`ia.display.view`, usada en el piloto): para formularios en grilla (columnas Receta 1/2/3, IZQ/DER). Cada campo se reemplaza por el objeto en la misma posición; las etiquetas y encabezados de la grilla quedan igual. `papo_core.register.recopile` (v1.1.0) lee `props.params.item` de la vista embebida.
+**Vista embebida en la celda** (`ia.display.view`, usada en el piloto): para formularios en grilla (columnas Receta 1/2/3, IZQ/DER). Cada campo se reemplaza por el objeto en la misma posición; las etiquetas y encabezados de la grilla quedan igual.
+
+**El `custom.item` se queda en el componente del formulario** (procedimiento v2, paso 4, y "Ruta de desarrollo": `FlexContainerGroupN > Componente (custom.item)`). `recopile` solo lee `custom.item` del árbol del formulario, así que el `ia.display.view` lleva el `custom.item` estático del campo original, y el objeto toma de ahí `papoItemID` y `registerTypeID` y devuelve la respuesta. No se cambia `papo_core.register`.
 
 ```json
 {"type": "ia.display.view", "meta": {"name": "NumericEntryField"}, "position": {"basis": "32px"},
- "props": {"path": "Objects/NumericField", "useDefaultViewHeight": false, "useDefaultViewWidth": false,
-           "style": {"width": "100%"},
-           "params": {"papoItemID": 11406, "registerTypeID": 1, "showQuestion": false, "fieldBasis": "100%", "minValue": 40, "maxValue": 50}},
- "propConfig": {"props.params.fontSize": {"binding": {"type": "property", "config": {"path": "view.custom.fontSize"}}}}}
+ "custom": {"item": {"papoItemID": 11406, "registerTypeID": 1}},
+ "props": {"path": "Objects/NumericField", "style": {"width": "100%"},
+           "params": {"showQuestion": false, "fieldBasis": "100%", "minValue": 40, "maxValue": 50}},
+ "propConfig": {
+   "custom.item.answer": {"binding": {"type": "property", "config": {"path": "this.props.params.item.answer"}}},
+   "props.params.papoItemID": {"binding": {"type": "property", "config": {"path": "this.custom.item.papoItemID"}}},
+   "props.params.registerTypeID": {"binding": {"type": "property", "config": {"path": "this.custom.item.registerTypeID"}}},
+   "props.params.fontSize": {"binding": {"type": "property", "config": {"path": "view.custom.fontSize"}}}}}
 ```
 
+- `custom.item`: el mismo `{papoItemID, registerTypeID}` del campo original; `answer` enlazado a `this.props.params.item.answer`
 - `position`: la del campo original
 - `style`: `width: 100%` si la celda es una columna; `minHeight: 32px` si es una fila
 - Checkbox: `question` = texto que tenía el checkbox; `trueValue`/`falseValue` = salidas del map original
 - NumericField: `minValue`/`maxValue` = `custom.rang_down`/`rang_up` o el rango escrito en el transform de color
 - Label (tag): `props.params.tagPath` con expresión `{view.custom.path} + "/<Tag>"` (equivale al binding indirecto `{1}/<Tag>`)
-- A verificar: una vista embebida dentro de una sección cerrada (`display: false`) probablemente no arranca, así que si el operario guarda sin abrir la sección, esas respuestas no irían en el registro (antes se guardaban vacías)
+- A verificar: una vista embebida dentro de una sección cerrada (`display: false`) probablemente no arranca; si el operario guarda sin abrir la sección, el ítem se guarda igual (está en el `custom.item` del formulario) pero con `answer` nulo (antes, en un checkbox sin marcar, "No Cumple")
 
 ## Aplicación
 
