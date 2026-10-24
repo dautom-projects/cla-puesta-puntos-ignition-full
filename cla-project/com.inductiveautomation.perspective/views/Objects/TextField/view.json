@@ -12,9 +12,11 @@
     },
     "papoItemID": null,
     "placeholder": "Escriba aqui",
+    "question": "",
     "questionBasis": "450px",
     "registerTypeID": null,
-    "showQuestion": true
+    "showQuestion": true,
+    "value": ""
   },
   "propConfig": {
     "custom.dbConnection": {
@@ -52,6 +54,10 @@
       "paramDirection": "input",
       "persistent": true
     },
+    "params.question": {
+      "paramDirection": "input",
+      "persistent": true
+    },
     "params.questionBasis": {
       "paramDirection": "input",
       "persistent": true
@@ -62,6 +68,10 @@
     },
     "params.showQuestion": {
       "paramDirection": "input",
+      "persistent": true
+    },
+    "params.value": {
+      "paramDirection": "inout",
       "persistent": true
     }
   },
@@ -99,7 +109,9 @@
               "config": {
                 "struct": {
                   "dbConnection": "{view.custom.dbConnection}",
-                  "papoItemID": "{view.params.papoItemID}"
+                  "papoItemID": "{view.params.papoItemID}",
+                  "question": "{view.params.question}",
+                  "showQuestion": "{view.params.showQuestion}"
                 },
                 "waitOnAll": true
               },
@@ -178,6 +190,15 @@
               },
               "type": "property"
             }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.params.value"
+              },
+              "type": "property"
+            }
           }
         },
         "props": {
@@ -185,9 +206,7 @@
             "borderBottomLeftRadius": 10,
             "borderBottomRightRadius": 10,
             "borderTopLeftRadius": 10,
-            "borderTopRightRadius": 10,
-            "marginBottom": 10,
-            "marginTop": 10
+            "borderTopRightRadius": 10
           }
         },
         "type": "ia.input.text-field"

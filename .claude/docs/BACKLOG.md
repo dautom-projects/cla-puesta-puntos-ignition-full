@@ -31,8 +31,7 @@
 
 - Aplicar formulario por formulario (un commit por formulario, `git revert` para deshacer); ver `OBJETOS_ESTANDAR.md`
 - Agregar a papo-lint el patrón "campos fuera de objetos estándar" para medir la adopción
-- Si se usan como vista embebida suelta: `papo_core.register.recopile` debe leer `props.params.item` de los `ia.display.view`
-- Verificar que el gateway carga los objetos (resource.json sin `lastModificationSignature`)
+- Piloto en `Form_EA11-0901_1h_PruebaPiloto` (2026-10-24): revisar en el Designer, guardar un registro y compararlo con el de `Form_EA11-0901_1h`. Si pasa, aplicar el mismo patrón a `Form_EA11-0901_1h` y a las demás variantes de EA11-0901
 
 ## Mejoras opcionales (fuera de la estandarización básica)
 

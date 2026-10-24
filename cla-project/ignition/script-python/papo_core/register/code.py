@@ -5,9 +5,11 @@ Data collection and saving logic for PAPO forms.
 Handles answer recopilation, saving to registerhistory,
 and operator signature flow.
 
-Version: 1.0.1
+Version: 1.1.0
 
 Changelog:
+	2026-10-24 | William M. | v1.1.0 - recopile reads props.params.item from embedded
+		standard objects (Objects/*, ia.display.view)
 	2026-07-22 | William M. | v1.0.1 - Fix save() silently skipping flat forms
 		(no FlexContainerGroup) since allItems is always empty for them
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
@@ -65,6 +67,16 @@ def _gatherItems(component):
 	try:
 		if hasattr(component, "custom") and hasattr(component.custom, "item"):
 			_appendItem(component.custom.item, items)
+	except Exception:
+		pass
+
+	# Collect params.item from embedded standard objects (Objects/*)
+	try:
+		if hasattr(component, "props") and hasattr(component.props, "params") and hasattr(component.props.params, "item"):
+			embeddedItem = component.props.params.item
+			if embeddedItem is not None and embeddedItem.get("papoItemID") is not None:
+				_appendItem(embeddedItem, items)
+			return items
 	except Exception:
 		pass
 

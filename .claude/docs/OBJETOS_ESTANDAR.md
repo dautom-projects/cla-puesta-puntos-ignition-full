@@ -3,7 +3,7 @@
 Vistas reutilizables para los campos de los formularios Form_*, en
 `cla-project/com.inductiveautomation.perspective/views/Objects/`. Reemplazan las ~123 variantes de bindings con las que hoy se arman checkbox, text field, numeric, dropdown y label (inventario del 2026-10-22: 5,539 campos con `custom.item` en 238 vistas).
 
-Ninguna vista usa todavía estos objetos. La adopción va formulario por formulario (ver "Aplicación").
+Piloto: `Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto` (copia de `Form_EA11-0901_1h`, 68 campos como objetos embebidos, 2026-10-24). La adopción va formulario por formulario (ver "Aplicación").
 
 ## Contrato común
 
@@ -14,9 +14,11 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 | `papoItemID` | input | null | Ítem de la pregunta |
 | `registerTypeID` | input | null | Tipo de registro del formulario (el `view.custom.registerTypeID` de la vista que lo usa) |
 | `fontSize` | input | 17 | Tamaño de letra de pregunta y campo |
+| `question` | input | "" | Texto de la pregunta que da el formulario; vacío = descripción de `papoitem` |
+| `value` | **inout** | según el objeto | Valor del campo (Checkbox, TextField, NumericField, Dropdown). Queda guardado en el formulario, así que la respuesta no se pierde si la sección se cierra y se vuelve a abrir |
 | `item` | **output** | {} | `{papoItemID, answer, registerTypeID}`, enlazado a `/root/Field.custom.item` |
 
-- Texto de la pregunta: `papo_core.items.getQuestionText(value)` con `{papoItemID, dbConnection}` (consulta individual a `papoitem`, igual que hoy; sin SQL en la vista).
+- Texto de la pregunta: `papo_core.items.getQuestionText(value)` con `{papoItemID, question, showQuestion, dbConnection}`. Si `question` trae texto se usa ese; si la pregunta está oculta (`showQuestion` false) no consulta; si no, consulta `papoitem` (sin SQL en la vista). Los textos de `papoitem` no tienen tildes y traen IZQ/DER, setpoints y numeración, así que los formularios pasan su propio texto.
 - Conexión: `view.custom.dbConnection` enlazado a `session.custom.dbConnection`.
 - Filas con pregunta separada (TextField, NumericField, Dropdown, Label): `showQuestion` (true), `questionBasis` ("450px") y `fieldBasis` ("224px").
 
@@ -40,7 +42,22 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 {"instancePosition": {}, "instanceStyle": {"classes": ""}, "papoItemID": 5134, "registerTypeID": 7}
 ```
 
-**Vista embebida suelta** (`ia.display.view`): sirve para layouts mezclados, pero hoy `recopile` no lee `props.params.item` de una vista embebida. Usarla requiere primero ese cambio en `papo_core.register` (ver BACKLOG.md).
+**Vista embebida en la celda** (`ia.display.view`, usada en el piloto): para formularios en grilla (columnas Receta 1/2/3, IZQ/DER). Cada campo se reemplaza por el objeto en la misma posición; las etiquetas y encabezados de la grilla quedan igual. `papo_core.register.recopile` (v1.1.0) lee `props.params.item` de la vista embebida.
+
+```json
+{"type": "ia.display.view", "meta": {"name": "NumericEntryField"}, "position": {"basis": "32px"},
+ "props": {"path": "Objects/NumericField", "useDefaultViewHeight": false, "useDefaultViewWidth": false,
+           "style": {"width": "100%"},
+           "params": {"papoItemID": 11406, "registerTypeID": 1, "showQuestion": false, "fieldBasis": "100%", "minValue": 40, "maxValue": 50}},
+ "propConfig": {"props.params.fontSize": {"binding": {"type": "property", "config": {"path": "view.custom.fontSize"}}}}}
+```
+
+- `position`: la del campo original
+- `style`: `width: 100%` si la celda es una columna; `minHeight: 32px` si es una fila
+- Checkbox: `question` = texto que tenía el checkbox; `trueValue`/`falseValue` = salidas del map original
+- NumericField: `minValue`/`maxValue` = `custom.rang_down`/`rang_up` o el rango escrito en el transform de color
+- Label (tag): `props.params.tagPath` con expresión `{view.custom.path} + "/<Tag>"` (equivale al binding indirecto `{1}/<Tag>`)
+- A verificar: una vista embebida dentro de una sección cerrada (`display: false`) probablemente no arranca, así que si el operario guarda sin abrir la sección, esas respuestas no irían en el registro (antes se guardaban vacías)
 
 ## Aplicación
 
@@ -51,5 +68,6 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 
 ## Pendiente de verificar
 
-- Los objetos se generaron en disco. Su `resource.json` no tiene `lastModificationSignature`; confirmar que el gateway los carga al reiniciar `PAPOS` (y que el Designer los muestra en `Objects/`).
+- El gateway carga los objetos y el piloto (log `Setting LastModification to "external"`, 2026-10-24). Falta la revisión visual del piloto en el Designer y un guardado real comparado con `Form_EA11-0901_1h` en `registerhistory`.
+- Confirmar en una sesión que el valor se conserva al cerrar y reabrir la sección (parámetro `value` inout).
 - `resource.json` está en `.gitignore`: en un clone limpio estos objetos (como el resto de vistas) no traen `resource.json`.
