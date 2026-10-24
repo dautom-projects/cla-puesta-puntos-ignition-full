@@ -1,31 +1,32 @@
 # Cambios desde la corrida anterior
 
-- Nodos nuevos: 0 · eliminados: 0
-- Relaciones nuevas: 1 · eliminadas: 4
-- Recursos con cambios internos: 3
+- Nodos nuevos: 1 · eliminados: 0
+- Relaciones nuevas: 20 · eliminadas: 0
+- Recursos con cambios internos: 5
 
-## Cambios internos (3)
+## Nodos nuevos (1)
+
+- Vistas: **Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto** (cla-project)
+
+## Cambios internos (5)
 
 _Renombres de customs, params, handlers, componentes, funciones de script..._
 
-### Page/Embedded/Metalurgia/Form_FU10-0202_start (cla-project, vista)
-- components nuevos: ['FlexContainerGroup1', 'FlexContainer_1', 'FlexContainer_2', 'FlexContainer_3', 'Section1']
-- transforms: 5 → 7
-- n_scripts: 13 → 15
+### Objects/Checkbox (cla-project, vista)
+- params nuevos: ['question', 'value']
 
-### Page/Gestion Gerencia (cla-project, vista)
-- customs quitados: ['dataTable', 'refresh']
-- component_customs quitados: ['dataTable', 'refresh']
-- message_handlers quitados: ['signPapoSup']
-- sends quitados: ['filterTable']
-- components quitados: ['Label_0']
-- transforms: 16 → 13
-- n_scripts: 24 → 18
+### Objects/Dropdown (cla-project, vista)
+- params nuevos: ['question', 'value']
 
-### papo_core.report (cla-project, script)
-- nombres nuevos: ['extractShiftChecklist']
+### Objects/Label (cla-project, vista)
+- params nuevos: ['question']
+
+### Objects/NumericField (cla-project, vista)
+- params nuevos: ['question', 'value']
+
+### Objects/TextField (cla-project, vista)
+- params nuevos: ['question', 'value']
 
 ## Relaciones
 
-- nuevas: llama 1
-- eliminadas: llama 2, maneja 1, envia 1
+- nuevas: usa tag 1, llama 3, embebe/abre 4, maneja 2, envia 4, usa sesion 1, usa estilo 5
