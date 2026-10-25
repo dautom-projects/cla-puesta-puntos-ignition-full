@@ -37,10 +37,14 @@ python3 .claude/skills/papo-design/scripts/papo_design.py --views "Page/Embedded
 
 ## Objetos estándar (v2)
 
-`scripts/papo_objects.py` reemplaza los campos interactivos por `Objects/*` embebidos: el `custom.item` queda en el componente del formulario y su `answer` lee la salida `answer` del objeto. Mismas garantías de recolección (ítems, bindings y orden). Ver `.claude/docs/OBJETOS_ESTANDAR.md`.
+`scripts/papo_objects.py` reemplaza los campos por `Objects/*` embebidos (filas de lista completas, celdas de grilla, repeaters): el `custom.item` queda en el componente del formulario y su `answer` lee la salida `answer` del objeto. Ver `.claude/docs/OBJETOS_ESTANDAR.md`. Los objetos se generan con `scripts/build_objects.py`.
+
+Estándar completo de un formulario (primero clases, luego objetos, luego QA):
 
 ```bash
-python3 .claude/skills/papo-design/scripts/papo_objects.py --views "Page/Embedded/Ensamble/Form_EA11-0901_1h"
+python3 .claude/skills/papo-design/scripts/papo_design.py --views "<vista>" --apply
+python3 .claude/skills/papo-design/scripts/papo_objects.py --views "<vista>" --legacy --form-class --apply
+python3 .claude/skills/papo-qa/scripts/papo_qa.py --views "<vista>" --graph
 ```
 
 ## Después de aplicar

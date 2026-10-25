@@ -18,7 +18,7 @@ Version: 1.1.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
-	2026-10-25 | William M. | v1.1.0 - emptyAnswer, Objects/OptionGroup and Objects/DateTime
+	2026-10-25 | William M. | v1.1.0 - emptyAnswer, Objects/OptionGroup and Objects/DateTime; new broken component references fail stage 2
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -48,6 +48,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-design", "scripts"))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-lint", "scripts"))
 import papo_design as design
 import papo_lint as lint
+import view_refs
 
 REPO = design.REPO_ROOT
 VIEWS = design.VIEWS_DIR
@@ -130,7 +131,9 @@ def nativeAnswer(source):
 	"""Return (fn, default) of the original field, or (None, reason) when its logic is not recognized."""
 	if source.get("instance") is not None:
 		if str(source.get("repeaterView", "")).endswith("Fundamental Views/Checkbox"):
-			return (lambda v: "Cumple" if v else "No Cumple"), "No Cumple"
+			# Unmounted instance: recopile reads the answer stored in the instance
+			stored = (source["instance"].get("item") or {}).get("answer")
+			return (lambda v: "Cumple" if v else "No Cumple"), stored == "Cumple"
 		return None, "repeater no reconocido"
 	node = source["node"]
 	ctype = node.get("type")
@@ -143,7 +146,7 @@ def nativeAnswer(source):
 		return (lambda v: v if v else "-"), (chosen[0] if chosen else None)
 	if ctype == "ia.input.date-time-input":
 		b = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
-		if b.get("config", {}).get("path") == "this.props.value" and 'SimpleDateFormat("h:mm:ss a"' in json.dumps(b.get("transforms", [])):
+		if b.get("config", {}).get("path") == "this.props.value" and any('SimpleDateFormat("h:mm:ss a"' in (t.get("code") or "") for t in b.get("transforms", [])):
 			return _formatTime, (node.get("props") or {}).get("value")
 		return None, "fecha con lógica no reconocida"
 	if ctype not in VALUE_PROP:
@@ -252,6 +255,9 @@ def stageCollection(cur, base):
 				break
 		if len(a) != len(b):
 			problems.append("{} ítems antes, {} ahora".format(len(a), len(b)))
+	newBroken = view_refs.broken(cur) - view_refs.broken(base["view"])
+	for owner, target, rest in sorted(newBroken)[:3]:
+		problems.append("referencia rota nueva: {} → {}.{}".format("/".join(owner), "/".join(target), rest))
 	if base["view"].get("propConfig", {}).get("custom.insights") != cur.get("propConfig", {}).get("custom.insights"):
 		problems.append("cambió el binding de custom.insights")
 	obs = [c for c in cur["root"].get("children", []) if c.get("meta", {}).get("name") == "TextField"]
@@ -308,8 +314,11 @@ def _handlers(view):
 def stageFlow(cur, base, rel):
 	problems = []
 	# Findings compared by location: a new one fails even if another one was removed
-	now = set(lint.lintView(cur, rel))
-	before = set(lint.lintView(base["view"], rel))
+	# A binding moved to the object (props.X -> props.params.X) keeps its location
+	def findings(view):
+		return {(k, w.replace("props.params.", "props.")) for k, w in lint.lintView(view, rel)}
+	now = findings(cur)
+	before = findings(base["view"])
 	for pattern, where in sorted(now):
 		if pattern in V2_PATTERNS and ((pattern, where) not in before or _isStandard(cur)):
 			problems.append("wrapper del v2: {} ({})".format(pattern, where))
@@ -351,6 +360,8 @@ def stageDesign(cur, base):
 		if node is None:
 			problems.append("{}: sigue en un repeater".format(s["id"]))
 			continue
+		if node.get("type") == "ia.container.flex":
+			continue  # containers with custom.item (empty legacy items, option groups with items inside) are not fields
 		props = node.get("props") or {}
 		style = props.get("style") or {}
 		isObject = node.get("type") == "ia.display.view" and str(props.get("path", "")).startswith("Objects/")

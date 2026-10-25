@@ -49,7 +49,18 @@ Los objetos se generan con `.claude/skills/papo-design/scripts/build_objects.py`
 
 ## Herramienta
 
-`.claude/skills/papo-design/scripts/papo_objects.py` convierte formularios (simula por defecto, `--apply` escribe con backup). Verifica que las fuentes de respuesta (ítems, sus bindings salvo `answer`, orden) no cambien y que solo se reescriban vistas con Gson canónico.
+`.claude/skills/papo-design/scripts/papo_objects.py` (v2.0) convierte formularios (simula por defecto, `--apply` escribe con backup):
+
+- **Fila de lista**: fila = un campo + una etiqueta de pregunta (o el campo es la fila) → un objeto con la pregunta adentro (`showQuestion`), alto estándar 50 px (o el de la fila si era mayor). La pregunta sale del texto fijo o, si la etiqueta consultaba `papoitem`, del mismo `papoItemID`
+- **Celda de grilla**: solo el campo; la celda conserva su layout
+- **Repeater** (`Fundamental Views/Checkbox`): un objeto por instancia, con `registerTypeID` leído de `papoitem` (SELECT) y la respuesta guardada en la instancia como respuesta inicial
+- `--legacy`: quita handlers de guardado legacy que nadie envía y el `custom.answers` reactivo de los grupos y del supervisor (v2, paso 4) si nada lo usa
+- `--form-class`: agrega `PAPO/Form` a la raíz
+- Conserva el valor inicial de cada campo (los guardados en el Designer) y su respuesta
+- No reemplaza un componente que otro componente referencia (`view_refs.py` resuelve `this.`, `parent.`, `../`, `/root/…`, `getChild`), ni uno con otros `custom.item` adentro
+- Verifica la recolección (ítems, bindings, orden, contenedor) y que no aparezcan referencias rotas
+
+Simulación completa (papo-design + papo_objects, 2026-10-25), validada con papo-qa contra el original: **234 de 237 formularios pasan** las etapas 1–6; fallan solo los 3 de Cubiertas (sin wrappers del v2, caso manual). Grafo del proyecto convertido: 0 referencias no resueltas nuevas y 17 mensajes desbalanceados menos. Quedan nativos 89 campos (70 referenciados por otro componente, 19 con lógica propia).
 
 Simulación sobre los 239 formularios: 238 convertibles, 4,555 campos (2,209 checkbox, 1,604 text field, 594 numéricos con 231 rangos, 148 dropdowns: 125 por etiqueta y 23 por valor). 186 campos quedan nativos por tener lógica propia. Rechazado: `FU10-0202_start` (JSON no canónico).
 

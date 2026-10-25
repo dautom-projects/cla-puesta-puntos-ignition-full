@@ -109,6 +109,11 @@ class PipelineTest(unittest.TestCase):
 		_embeds(v)[0]["props"].setdefault("style", {})["width"] = "250px"
 		self.assertIn("5", self.run_case(v))
 
+	def test_collection_broken_reference(self):
+		v = copy.deepcopy(self.clean)
+		_embeds(v)[0]["propConfig"]["props.params.fontSize"] = {"binding": {"config": {"path": "../NoExiste.props.value"}, "type": "property"}}
+		self.assertIn("2", self.run_case(v))
+
 	def test_contract_unknown_param(self):
 		v = copy.deepcopy(self.clean)
 		_embeds(v)[0]["props"]["params"]["foo"] = 1
