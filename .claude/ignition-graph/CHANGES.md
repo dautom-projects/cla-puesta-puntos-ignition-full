@@ -1,60 +1,42 @@
 # Cambios desde la corrida anterior
 
-- Nodos nuevos: 2 · eliminados: 0
-- Relaciones nuevas: 9 · eliminadas: 3
-- Recursos con cambios internos: 6
+- Nodos nuevos: 7 · eliminados: 0
+- Relaciones nuevas: 92 · eliminadas: 4
+- Recursos con cambios internos: 4
 
-## Nodos nuevos (2)
+## Nodos nuevos (7)
 
-- Clases de estilo: **PAPO/Field/Dropdown** (cla-project)
-- Clases de estilo: **PAPO/Form** (cla-project)
+- Vistas: **Objects/DateTime** (cla-project)
+- Vistas: **Objects/OptionGroup** (cla-project)
+- Vistas: **Page/Embedded/Ensamble/Form_EA11-1601_start_PruebaPiloto** (cla-project)
+- Vistas: **Page/Embedded/F&A/Form_AC10-0201_start_PruebaPiloto** (cla-project)
+- Vistas: **Page/Embedded/F&A/Form_GR10-0501_start_PruebaPiloto** (cla-project)
+- Vistas: **Page/Embedded/OREC/Form_CU11-0101_start_PruebaPiloto** (cla-project)
+- Vistas: **Page/Embedded/OREC/Form_PO11-0101-2_start_PruebaPiloto** (cla-project)
 
-## Cambios internos (6)
+## Cambios internos (4)
 
 _Renombres de customs, params, handlers, componentes, funciones de script..._
 
-### Objects/Checkbox (cla-project, vista)
-- params nuevos: ['answer', 'question', 'value']
-- params quitados: ['item', 'registerTypeID']
-- component_customs quitados: ['item.answer', 'item.papoItemID', 'item.registerTypeID']
-- style_classes nuevos: ['PAPO/Field/Checkbox']
-
 ### Objects/Dropdown (cla-project, vista)
-- params nuevos: ['answer', 'answerFrom', 'question', 'value']
-- params quitados: ['fieldBasis', 'item', 'registerTypeID']
-- component_customs quitados: ['item.answer', 'item.papoItemID', 'item.registerTypeID']
-- style_classes nuevos: ['PAPO/Field/Dropdown']
-- style_classes quitados: ['dropdown']
+- params nuevos: ['emptyAnswer']
+
+### Objects/NumericField (cla-project, vista)
+- params nuevos: ['emptyAnswer']
+- transforms: 3 → 4
+- n_scripts: 3 → 4
+
+### Objects/TextField (cla-project, vista)
+- params nuevos: ['emptyAnswer']
 - transforms: 1 → 2
 - n_scripts: 1 → 2
 
-### Objects/Label (cla-project, vista)
-- params nuevos: ['answer', 'question']
-- params quitados: ['fieldBasis', 'item', 'registerTypeID']
-- component_customs quitados: ['item.answer', 'item.papoItemID', 'item.registerTypeID']
-- style_classes nuevos: ['PAPO/Field/TagValue']
-- style_classes quitados: ['text-data-2']
-
-### Objects/NumericField (cla-project, vista)
-- params nuevos: ['answer', 'question', 'value']
-- params quitados: ['fieldBasis', 'item', 'registerTypeID']
-- component_customs quitados: ['item.answer', 'item.papoItemID', 'item.registerTypeID']
-- style_classes nuevos: ['PAPO/Field/Input']
-
-### Objects/TextField (cla-project, vista)
-- params nuevos: ['answer', 'question', 'value']
-- params quitados: ['fieldBasis', 'item', 'registerTypeID']
-- component_customs quitados: ['item.answer', 'item.papoItemID', 'item.registerTypeID']
-- style_classes nuevos: ['PAPO/Field/Input']
-
 ### Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto (cla-project, vista)
-- component_customs quitados: ['borderColor', 'color']
-- style_classes nuevos: ['PAPO/Form']
-- style_classes quitados: ['PAPO/Field/Checkbox']
-- transforms: 64 → 15
-- n_scripts: 57 → 21
+- message_handlers quitados: ['saveFourHourRegister']
+- sends quitados: ['refreshPeriodic', 'refreshPreviewTable', 'refreshTable']
+- n_scripts: 21 → 20
 
 ## Relaciones
 
-- nuevas: embebe/abre 3, usa estilo 6
-- eliminadas: usa estilo 3
+- nuevas: usa tag 3, llama 17, embebe/abre 19, maneja 5, envia 5, usa sesion 7, usa estilo 36
+- eliminadas: maneja 1, envia 3

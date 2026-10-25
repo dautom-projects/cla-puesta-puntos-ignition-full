@@ -1,7 +1,7 @@
 # Mapa de dependencias Ignition
 
 - Proyectos: 1 (cla-project)
-- Vistas: 344
+- Vistas: 351
 - Scripts de proyecto: 23
 - Eventos (gateway y sesion): 2
 - Mensajes: 90
@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 105
 - Session props: 5
-- Relaciones: 4461 (usa tag 717, llama 651, embebe/abre 93, maneja 421, monta 8, envia 676, usa sesion 269, usa estilo 1626)
+- Relaciones: 4549 (usa tag 720, llama 668, embebe/abre 112, maneja 425, monta 8, envia 678, usa sesion 276, usa estilo 1662)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -17,68 +17,68 @@
 _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 
 ### Vistas
-- **Alerts/alert** (cla-project) — directo 1, transitivo 265
-- **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 265
-- **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 101
+- **Alerts/alert** (cla-project) — directo 1, transitivo 270
+- **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 270
+- **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 106
 - **Page/Embedded/Metalurgia/Fundamental Views/Checkbox** (cla-project) — directo 19, transitivo 19
 - **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
 - **Page/Embedded/Title_Header** (cla-project) — directo 5, transitivo 9
 - **Page/Embedded/Title_Large** (cla-project) — directo 5, transitivo 7
-- **Node/MixingDashboard/Mixing Trend/Framework/FormRepeater** (cla-project) — directo 1, transitivo 5
-- **Node/MixingDashboard/TankMetric** (cla-project) — directo 1, transitivo 5
-- **Node/MixingDashboard/TankInfo** (cla-project) — directo 3, transitivo 4
+- **Objects/Checkbox** (cla-project) — directo 6, transitivo 6
+- **Objects/Dropdown** (cla-project) — directo 5, transitivo 5
+- **Objects/NumericField** (cla-project) — directo 5, transitivo 5
 
 ### Scripts
-- **logging** (cla-project) — directo 10, transitivo 272
-- **alerts** (cla-project) — directo 19, transitivo 264
-- **papo_core.ui** (cla-project) — directo 240, transitivo 242
-- **papo_core.register** (cla-project) — directo 236, transitivo 238
-- **papo_core.sign** (cla-project) — directo 96, transitivo 99
+- **logging** (cla-project) — directo 10, transitivo 277
+- **alerts** (cla-project) — directo 19, transitivo 269
+- **papo_core.ui** (cla-project) — directo 245, transitivo 247
+- **papo_core.register** (cla-project) — directo 241, transitivo 243
+- **papo_core.sign** (cla-project) — directo 101, transitivo 104
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
-- **papo_core.items** (cla-project) — directo 7, transitivo 8
+- **papo_core.items** (cla-project) — directo 9, transitivo 15
 - **mes_core.workOrder** (cla-project) — directo 4, transitivo 7
 - **mes_core.schedule** (cla-project) — directo 3, transitivo 7
 
 ### Mensajes
-- **deleteArea** (cla-project) — directo 6, transitivo 268
-- **deleteEquipment** (cla-project) — directo 6, transitivo 268
-- **deleteLine** (cla-project) — directo 6, transitivo 268
-- **deletePlant** (cla-project) — directo 6, transitivo 268
-- **deleteReason** (cla-project) — directo 6, transitivo 268
-- **deleteRelation** (cla-project) — directo 6, transitivo 268
-- **insertArea** (cla-project) — directo 6, transitivo 268
-- **insertEquipment** (cla-project) — directo 6, transitivo 268
-- **insertLine** (cla-project) — directo 6, transitivo 268
-- **insertPlant** (cla-project) — directo 6, transitivo 268
+- **deleteArea** (cla-project) — directo 6, transitivo 273
+- **deleteEquipment** (cla-project) — directo 6, transitivo 273
+- **deleteLine** (cla-project) — directo 6, transitivo 273
+- **deletePlant** (cla-project) — directo 6, transitivo 273
+- **deleteReason** (cla-project) — directo 6, transitivo 273
+- **deleteRelation** (cla-project) — directo 6, transitivo 273
+- **insertArea** (cla-project) — directo 6, transitivo 273
+- **insertEquipment** (cla-project) — directo 6, transitivo 273
+- **insertLine** (cla-project) — directo 6, transitivo 273
+- **insertPlant** (cla-project) — directo 6, transitivo 273
 
 ### Tags
 - **[UNS]Clarios/Andina/OREC/Linea 1/UI/EJ11-0101** ((tags)) — directo 62, transitivo 64
-- **[UNS]Clarios/Andina/FA/Granja_Acidos/UI/GR10_0501** ((tags)) — directo 13, transitivo 13
+- **[UNS]Clarios/Andina/FA/Granja_Acidos/UI/GR10_0501** ((tags)) — directo 14, transitivo 14
 - **[UNS]Clarios/Andina** ((tags)) — directo 5, transitivo 10
+- **[UNS]Clarios/Andina/FA/Terminado/UI/AC10-0201** ((tags)) — directo 7, transitivo 9
 - **[UNS]Clarios/Andina/FA/Formacion/UI/AC10-0202** ((tags)) — directo 8, transitivo 8
 - **[UNS]Clarios/Andina/OREC/UI_JCI/EJ07_0101** ((tags)) — directo 8, transitivo 8
 - **[uns]VIC/Manufacturing/Electrode Anode/Mixing Anode/ProcessMixing/CmcMixer/CmcWeight/Act_Value** ((tags)) — directo 8, transitivo 8
-- **[UNS]Clarios/Andina/FA/Terminado/UI/AC10-0201** ((tags)) — directo 6, transitivo 8
 - **[uns]VIC/Manufacturing/Electrode Cathode/Mixing Cathode/ProcessMixing/SlurryPdMixer/Temperature/Act_Value** ((tags)) — directo 6, transitivo 8
 - **[UNS]Clarios/Pacifico/Cubiertas/IMM 15/UI/Schedule/Dataset_excel** ((tags)) — directo 1, transitivo 8
 - **[uns]VIC/Manufacturing/Electrode Anode/Mixing Anode/ProcessMixing/SlurryPdMixer1/Temperature/Act_Value** ((tags)) — directo 6, transitivo 7
 
 ### Clases de estilo
-- **container-borders-dautom-widget** (cla-project) — directo 268, transitivo 280
-- **text-description-centered** (cla-project) — directo 11, transitivo 273
-- **text-titles** (cla-project) — directo 243, transitivo 269
-- **Utilities/m-r-16** (cla-project) — directo 3, transitivo 268
-- **Alerts/alertTitle** (cla-project) — directo 2, transitivo 267
-- **alert-icons-margin** (cla-project) — directo 2, transitivo 267
-- **container-alarms** (cla-project) — directo 2, transitivo 267
-- **container-borders-dautom-alert** (cla-project) — directo 2, transitivo 267
-- **container-padding-30** (cla-project) — directo 2, transitivo 267
-- **text-description** (cla-project) — directo 2, transitivo 267
+- **container-borders-dautom-widget** (cla-project) — directo 273, transitivo 285
+- **text-description-centered** (cla-project) — directo 11, transitivo 278
+- **text-titles** (cla-project) — directo 248, transitivo 274
+- **Utilities/m-r-16** (cla-project) — directo 3, transitivo 273
+- **Alerts/alertTitle** (cla-project) — directo 2, transitivo 272
+- **alert-icons-margin** (cla-project) — directo 2, transitivo 272
+- **container-alarms** (cla-project) — directo 2, transitivo 272
+- **container-borders-dautom-alert** (cla-project) — directo 2, transitivo 272
+- **container-padding-30** (cla-project) — directo 2, transitivo 272
+- **text-description** (cla-project) — directo 2, transitivo 272
 
 ### Session props
-- **session.custom.dbConnection** (cla-project) — directo 262, transitivo 269
-- **session.custom.userSource** (cla-project) — directo 2, transitivo 102
+- **session.custom.dbConnection** (cla-project) — directo 269, transitivo 276
+- **session.custom.userSource** (cla-project) — directo 2, transitivo 107
 - **session.custom.adminPermissions** (cla-project) — directo 3, transitivo 6
 - **session.custom.filterOverview** (cla-project) — directo 1, transitivo 2
 - **session.custom.shift** (cla-project) — directo 1, transitivo 1
