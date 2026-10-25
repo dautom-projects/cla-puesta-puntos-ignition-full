@@ -108,6 +108,8 @@ Usar `/bug <descripción>` (`.claude/commands/bug.md`):
 6. Commit `fix: <bug>` + filas en DEPLOY_INVENTORY.md (Project Library antes que vistas)
 7. Esperar ~10 s (escaneo del gateway) y Update Project en el Designer; si cambiaron relaciones, re-correr ignition-graph
 
+Cambios de estandarización de formularios: pasar antes el pipeline de QA (`.claude/skills/papo-qa/`, `papo_qa.py --views <vistas> --graph`) y commitear por partes; plan en `/Users/dautom/.claude/plans/sorted-questing-sunrise.md`
+
 ## Reglas críticas al editar view.json
 
 1. **SIEMPRE hacer backup antes** de tocar un view.json

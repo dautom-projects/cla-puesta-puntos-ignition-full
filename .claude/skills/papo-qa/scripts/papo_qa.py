@@ -1,0 +1,514 @@
+"""
+QA pipeline for PAPO Form views (gate before every standardization commit).
+
+Compares each view against its version in a baseline commit and runs the stages:
+	1 Estructura      JSON parses, Gson-canonical, same line endings as the baseline
+	2 Recolección     same custom.item (papoItemID, registerTypeID, bindings), same order and
+	                  container (FlexContainerGroupN / FlexContainerSupervisor); insights intact
+	3 Respuestas      every converted field answers like the original (sample values and the
+	                  answer kept while the object is not mounted)
+	4 Flujo v2        standard wrappers, no legacy handlers, no new "papo_db"
+	5 Diseño          PAPO/Form root, standard fields, no fixed px widths, no new missing classes
+	6 Contrato        params passed to Objects/* exist with the right direction
+	7 Grafo           no new unresolved references or unbalanced messages (--graph)
+	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
+	9 Visual          manual checklist written to the report
+
+Version: 1.0.0
+
+Changelog:
+	2026-10-25 | William M. | v1.0.0 - Initial version
+
+Args (CLI):
+	--views (str...): View folders or view.json paths
+	--all-forms: Every Form_* view
+	--baseline (str): Git commit to compare against. Default: HEAD
+	--pair (str str): Current view.json and baseline view.json (repeatable, for tests)
+	--graph: Run stage 7 (rebuilds the dependency graph in a temp folder)
+	--compare-db (int int): registerhistory IDs of the pilot and the original record
+	--report (str): Markdown report path (default: print)
+
+Returns:
+	Exit code 0 when every stage passed, 1 otherwise
+"""
+
+import argparse
+import collections
+import datetime
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-design", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-lint", "scripts"))
+import papo_design as design
+import papo_lint as lint
+
+REPO = design.REPO_ROOT
+VIEWS = design.VIEWS_DIR
+STYLES = design.STYLES_DIR
+GRAPH_SCRIPT = os.path.expanduser("~/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/"
+	"633c31c8-b0a2-47fe-b7be-af38b4898a5a/97e4ea7a-da70-497a-8659-a5b60afe96ca/skills/ignition-graph/scripts/build_graph.py")
+DB_ENV = os.path.expanduser("~/.config/papo-sql/claude_ro.env")
+
+GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
+V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDataRoot", "formAnswerRecopile")
+VALUE_PROP = {"ia.input.checkbox": ("selected", False), "ia.input.numeric-entry-field": ("value", None),
+	"ia.input.text-field": ("text", ""), "ia.input.dropdown": ("value", None)}
+EMPTY_DASH = 'return value if value else "-"'
+STAGES = collections.OrderedDict([("1", "Estructura"), ("2", "Recolección"), ("3", "Respuestas"), ("4", "Flujo v2"),
+	("5", "Diseño"), ("6", "Contrato de objetos"), ("7", "Grafo"), ("8", "Datos"), ("9", "Visual")])
+
+
+# ==================== SOURCES OF ANSWERS ====================
+
+def answerSources(view):
+	"""List answer sources in recopile order with their container; repeater instances expanded."""
+	out = []
+
+	def walk(node, group, path):
+		name = node.get("meta", {}).get("name", "")
+		if GROUP.match(name):
+			group = name
+		if "item" in node.get("custom", {}):
+			item = node["custom"]["item"] if isinstance(node["custom"]["item"], dict) else {}
+			others = {k: v for k, v in node.get("propConfig", {}).items() if k.startswith("custom.item") and k != "custom.item.answer"}
+			out.append({"id": item.get("papoItemID"), "type": item.get("registerTypeID"),
+				"bindings": json.dumps(others, sort_keys=True), "group": group, "path": path, "node": node})
+		props = node.get("props") or {}
+		if node.get("type") == "ia.display.flex-repeater" and props.get("instances") is not None:
+			for i, inst in enumerate(props["instances"]):
+				item = inst.get("item") or {}
+				out.append({"id": inst.get("papoItemID", item.get("papoItemID")), "type": item.get("registerTypeID"),
+					"bindings": "{}", "group": group, "path": "{}#{}".format(path, i), "node": None,
+					"instance": inst, "repeaterView": props.get("path")})
+			return
+		for child in node.get("children", []):
+			walk(child, group, path + "/" + child.get("meta", {}).get("name", "?"))
+
+	walk(view["root"], "root", "root")
+	return out
+
+
+def _key(source):
+	return (source["id"], source["type"], source["bindings"], source["group"])
+
+
+# ==================== ANSWER FUNCTIONS ====================
+
+def _code(transform):
+	return " ".join((transform.get("code") or "").split())
+
+
+def nativeAnswer(source):
+	"""Return (fn, default) of the original field, or (None, reason) when its logic is not recognized."""
+	if source.get("instance") is not None:
+		if str(source.get("repeaterView", "")).endswith("Fundamental Views/Checkbox"):
+			return (lambda v: "Cumple" if v else "No Cumple"), "No Cumple"
+		return None, "repeater no reconocido"
+	node = source["node"]
+	ctype = node.get("type")
+	if ctype not in VALUE_PROP:
+		return None, "tipo {}".format(ctype)
+	prop, componentDefault = VALUE_PROP[ctype]
+	binding = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
+	if binding.get("type") != "property" or binding.get("config", {}).get("path") != "this.props." + prop:
+		return None, "respuesta con binding propio"
+	default = (node.get("props") or {}).get(prop, componentDefault)
+	transforms = binding.get("transforms", [])
+	if not transforms:
+		return (lambda v: v), default
+	if len(transforms) > 1:
+		return None, "varias transformaciones"
+	t = transforms[0]
+	if t.get("type") == "map":
+		table = [(m.get("input"), m.get("output")) for m in t.get("mappings", [])]
+		fallback = t.get("fallback")
+
+		def mapped(v):
+			for k, out in table:
+				if k == v:
+					return out
+			return fallback
+		return mapped, default
+	if t.get("type") == "script" and _code(t) == EMPTY_DASH:
+		return (lambda v: v if v else "-"), default
+	if t.get("type") == "script" and "self.props.options" in (t.get("code") or "") and 'item["label"]' in (t.get("code") or ""):
+		options = (node.get("props") or {}).get("options") or []
+
+		def label(v, opts=options):
+			for o in opts:
+				if str(o.get("value")) == str(v):
+					return o.get("label")
+			return ""
+		return label, default
+	return None, "script no reconocido"
+
+
+def objectAnswer(node):
+	"""Return (fn, default) for an embedded standard object, mirroring Objects/* answer bindings."""
+	path = node["props"].get("path", "")
+	p = node["props"].get("params", {})
+	empty = p.get("emptyAnswer")
+
+	def withEmpty(v):
+		return v if empty is None else (v if v else empty)
+	if path == "Objects/Checkbox":
+		return (lambda v: p.get("trueValue") if v else p.get("falseValue")), p.get("answer")
+	if path in ("Objects/NumericField", "Objects/TextField"):
+		return withEmpty, p.get("answer")
+	if path == "Objects/Dropdown":
+		if p.get("answerFrom") == "label":
+			opts = p.get("options") or []
+
+			def label(v):
+				for o in opts:
+					if str(o.get("value")) == str(v):
+						return o.get("label")
+				return withEmpty("")
+			return label, p.get("answer")
+		return withEmpty, p.get("answer")
+	return None, None
+
+
+def samplesFor(source, node):
+	"""Sample field values to compare answers."""
+	ctype = (source.get("node") or {}).get("type") or "ia.input.checkbox"
+	if ctype == "ia.input.checkbox" or source.get("instance") is not None:
+		return [True, False]
+	if ctype == "ia.input.numeric-entry-field":
+		return [None, "", 0, 7.5, 42]
+	if ctype == "ia.input.dropdown":
+		opts = (node["props"].get("params", {}).get("options") or (source["node"].get("props") or {}).get("options") or [])
+		return [None, ""] + [o.get("value") for o in opts]
+	return [None, "", "ok"]
+
+
+# ==================== STAGES ====================
+
+def stageStructure(cur, base, curPath):
+	_, crlf, canonical = design.loadView(curPath)
+	problems = []
+	if not canonical:
+		problems.append("no es Gson canónico")
+	if base is not None and crlf != base["crlf"]:
+		problems.append("cambió el fin de línea")
+	return problems
+
+
+def stageCollection(cur, base):
+	problems = []
+	a, b = answerSources(base["view"]), answerSources(cur)
+	if [_key(s) for s in a] != [_key(s) for s in b]:
+		for i, (x, y) in enumerate(zip(a, b)):
+			if _key(x) != _key(y):
+				problems.append("ítem {}: antes {} en {}, ahora {} en {}".format(i, x["id"], x["group"], y["id"], y["group"]))
+				break
+		if len(a) != len(b):
+			problems.append("{} ítems antes, {} ahora".format(len(a), len(b)))
+	if base["view"].get("propConfig", {}).get("custom.insights") != cur.get("propConfig", {}).get("custom.insights"):
+		problems.append("cambió el binding de custom.insights")
+	obs = [c for c in cur["root"].get("children", []) if c.get("meta", {}).get("name") == "TextField"]
+	baseObs = [c for c in base["view"]["root"].get("children", []) if c.get("meta", {}).get("name") == "TextField"]
+	if baseObs and (not obs or obs[0].get("type") != "ia.input.text-field"):
+		problems.append("falta el TextField de Observaciones")
+	return problems
+
+
+def stageAnswers(cur, base):
+	problems = []
+	checked = 0
+	for old, new in zip(answerSources(base["view"]), answerSources(cur)):
+		node = new.get("node")
+		if not node or node.get("type") != "ia.display.view" or not str(node["props"].get("path", "")).startswith("Objects/"):
+			continue
+		if old.get("node") is not None and old["node"].get("type") == "ia.display.view":
+			continue  # already an object in the baseline: stage 6 covers it
+		fnOld, defOld = nativeAnswer(old)
+		fnNew, defNew = objectAnswer(node)
+		if fnOld is None:
+			problems.append("{} ({}): el original tiene lógica no reconocida ({})".format(new["id"], new["path"], defOld))
+			continue
+		if fnNew is None:
+			problems.append("{}: objeto sin regla de respuesta".format(new["id"]))
+			continue
+		for value in samplesFor(old, node):
+			if fnOld(value) != fnNew(value):
+				problems.append("{}: con valor {!r} el original responde {!r} y el objeto {!r}".format(new["id"], value, fnOld(value), fnNew(value)))
+				break
+		expected = fnOld(defOld)
+		if expected != defNew:
+			problems.append("{}: respuesta sin abrir la sección {!r}, el original guardaba {!r}".format(new["id"], defNew, expected))
+		checked += 1
+	return problems, checked
+
+
+def _isStandard(view):
+	return "PAPO/Form" in str(((view["root"].get("props") or {}).get("style") or {}).get("classes", "")).split()
+
+
+def _handlers(view):
+	out = []
+
+	def walk(node):
+		for h in (node.get("scripts") or {}).get("messageHandlers", []):
+			out.append((node.get("meta", {}).get("name"), h.get("messageType")))
+		for c in node.get("children", []):
+			walk(c)
+	walk(view["root"])
+	return out
+
+
+def stageFlow(cur, base, rel):
+	problems = []
+	# Findings compared by location: a new one fails even if another one was removed
+	now = set(lint.lintView(cur, rel))
+	before = set(lint.lintView(base["view"], rel))
+	for pattern, where in sorted(now):
+		if pattern in V2_PATTERNS and ((pattern, where) not in before or _isStandard(cur)):
+			problems.append("wrapper del v2: {} ({})".format(pattern, where))
+		if pattern == "hardcodedDb" and (pattern, where) not in before:
+			problems.append('"papo_db" nuevo en {}'.format(where))
+	if _isStandard(cur):
+		legacy = [m for owner, m in _handlers(cur) if not (owner == "root" and m == "saveDataRoot")]
+		if legacy:
+			problems.append("handlers legacy: {}".format(", ".join(sorted(set(legacy)))))
+	return problems
+
+
+def _classes(view):
+	tokens = set()
+
+	def walk(node):
+		for t in str(((node.get("props") or {}).get("style") or {}).get("classes", "")).split():
+			tokens.add(t)
+		for c in node.get("children", []):
+			walk(c)
+	walk(view["root"])
+	return tokens
+
+
+def _classExists(name):
+	return os.path.exists(os.path.join(STYLES, name, "style.json"))
+
+
+def stageDesign(cur, base):
+	problems = []
+	missingNow = {c for c in _classes(cur) if not _classExists(c)}
+	missingBefore = {c for c in _classes(base["view"]) if not _classExists(c)}
+	if missingNow - missingBefore:
+		problems.append("clases inexistentes nuevas: {}".format(", ".join(sorted(missingNow - missingBefore))))
+	if not _isStandard(cur):
+		return problems + ["la raíz no tiene PAPO/Form"]
+	for s in answerSources(cur):
+		node = s.get("node")
+		if node is None:
+			problems.append("{}: sigue en un repeater".format(s["id"]))
+			continue
+		props = node.get("props") or {}
+		style = props.get("style") or {}
+		isObject = node.get("type") == "ia.display.view" and str(props.get("path", "")).startswith("Objects/")
+		if not isObject and not any(c.startswith("PAPO/Field/") for c in str(style.get("classes", "")).split()):
+			problems.append("{}: campo sin estándar ({})".format(s["id"], node.get("type")))
+		width = str(style.get("width", ""))
+		if width.endswith("px"):
+			problems.append("{}: ancho fijo {}".format(s["id"], width))
+	return problems
+
+
+_OBJECT_CACHE = {}
+
+
+def _objectView(path):
+	if path not in _OBJECT_CACHE:
+		p = os.path.join(VIEWS, path, "view.json")
+		_OBJECT_CACHE[path] = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
+	return _OBJECT_CACHE[path]
+
+
+def stageContract(cur):
+	problems = []
+
+	def walk(node):
+		props = node.get("props") or {}
+		if node.get("type") == "ia.display.view" and str(props.get("path", "")).startswith("Objects/"):
+			obj = _objectView(props["path"])
+			if obj is None:
+				problems.append("{}: no existe".format(props["path"]))
+			else:
+				known = set(obj.get("params", {}))
+				passed = set(props.get("params", {})) | {k.split(".", 2)[2] for k in node.get("propConfig", {}) if k.startswith("props.params.")}
+				unknown = passed - known
+				if unknown:
+					problems.append("{} recibe parámetros que no existen: {}".format(props["path"], ", ".join(sorted(unknown))))
+				directions = {k[len("params."):]: v.get("paramDirection") for k, v in obj.get("propConfig", {}).items() if k.startswith("params.")}
+				if directions.get("answer") != "output":
+					problems.append("{}: answer no es de salida".format(props["path"]))
+				if "value" in known and directions.get("value") != "inout":
+					problems.append("{}: value no es inout".format(props["path"]))
+				if "item" in node.get("custom", {}):
+					b = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding", {})
+					if b.get("config", {}).get("path") != "this.props.params.answer":
+						problems.append("{}: custom.item.answer no lee params.answer".format(node["custom"]["item"].get("papoItemID")))
+		for c in node.get("children", []):
+			walk(c)
+	walk(cur["root"])
+	return sorted(set(problems))
+
+
+def stageGraph(baseline):
+	"""Rebuild the graph in a temp folder and compare unresolved references and messages with the baseline."""
+	if not os.path.exists(GRAPH_SCRIPT):
+		return ["no se encontró ignition-graph"]
+	out = tempfile.mkdtemp(prefix="papo-qa-graph-")
+	subprocess.run([sys.executable, GRAPH_SCRIPT, REPO, "--out", out], capture_output=True, text=True)
+	now = json.load(open(os.path.join(out, "impact.json"), encoding="utf-8"))
+	raw = subprocess.run(["git", "-C", REPO, "show", "{}:.claude/ignition-graph/impact.json".format(baseline)], capture_output=True, text=True)
+	if raw.returncode:
+		return ["el baseline no tiene grafo"]
+	before = json.loads(raw.stdout)
+
+	def refs(d):
+		return {(kind, target, src) for kind, targets in d["unresolved"].items() for target, srcs in targets.items() for src in srcs}
+
+	def msgs(d):
+		return {(k, m) for k, v in d["analisis"]["mensajes"].items() for m in v}
+	problems = ["referencia no resuelta nueva: {} {} desde {}".format(*r) for r in sorted(refs(now) - refs(before))]
+	problems += ["mensaje desbalanceado nuevo: {} ({})".format(m, k) for k, m in sorted(msgs(now) - msgs(before))]
+	return problems
+
+
+def stageData(pilotID, originalID):
+	"""Compare the DataAnswer of two registerhistory rows (SELECT only)."""
+	env = dict(os.environ)
+	for line in open(DB_ENV):
+		k, _, v = line.strip().partition("=")
+		env[k] = v
+	q = ("SET NOCOUNT ON; SELECT ID, PapoID, RegisterTypeID, DataAnswer FROM registerhistory WHERE ID IN ({}, {}) "
+		"FOR JSON PATH").format(int(pilotID), int(originalID))
+	r = subprocess.run(["docker", "exec", "-e", "SQLCMDUSER", "-e", "SQLCMDPASSWORD", "mssql", "/opt/mssql-tools18/bin/sqlcmd",
+		"-S", "localhost", "-d", "cla-db-papo", "-C", "-y", "0", "-Q", q], capture_output=True, text=True, env=env)
+	rows = {row["ID"]: row for row in json.loads("".join(l for l in r.stdout.splitlines() if not l.startswith("JSON_")) or "[]")}
+	if len(rows) != 2:
+		return ["no se encontraron los dos registros"]
+
+	def items(row):
+		return [i for i in json.loads(row["DataAnswer"])["items"] if "papoItemID" in i]
+
+	def kind(v):
+		if v in ("Cumple", "No Cumple", "No cumple", "-", ""):
+			return repr(v) if v in ("", "-") else "cumple/no cumple"
+		return type(v).__name__
+	a, b = items(rows[int(pilotID)]), items(rows[int(originalID)])
+	problems = []
+	if [i["papoItemID"] for i in a] != [i["papoItemID"] for i in b]:
+		problems.append("los ítems o su orden difieren ({} contra {})".format(len(a), len(b)))
+	for x, y in zip(a, b):
+		if x.get("registerTypeID") != y.get("registerTypeID"):
+			problems.append("{}: registerTypeID {} contra {}".format(x["papoItemID"], x.get("registerTypeID"), y.get("registerTypeID")))
+		if kind(x.get("answer")) != kind(y.get("answer")) and None not in (x.get("answer"), y.get("answer")):
+			problems.append("{}: formato {} contra {}".format(x["papoItemID"], kind(x.get("answer")), kind(y.get("answer"))))
+	return problems
+
+
+CHECKLIST = """- [ ] Designer y Chrome se ven igual (Sections, botones, campos, valores de tag)
+- [ ] Abrir la sección, llenar, cerrar y reabrir: los valores siguen
+- [ ] Numérico fuera de rango en rojo
+- [ ] Guardar un registro y correr `--compare-db <piloto> <original>`
+- [ ] Reporte PDF del registro guardado
+- [ ] Tiempo de apertura de la sección más grande (anotar segundos)"""
+
+
+# ==================== MAIN ====================
+
+def baselineOf(path, ref):
+	rel = os.path.relpath(path, REPO)
+	r = subprocess.run(["git", "-C", REPO, "show", "{}:{}".format(ref, rel)], capture_output=True)
+	if r.returncode:
+		return None
+	raw = r.stdout.decode("utf-8")
+	return {"view": json.loads(raw), "crlf": "\r\n" in raw}
+
+
+def checkView(curPath, base):
+	cur = json.load(open(curPath, encoding="utf-8"))
+	rel = os.path.relpath(os.path.dirname(curPath), VIEWS)
+	results = collections.OrderedDict()
+	results["1"] = stageStructure(cur, base, curPath)
+	if base is None:
+		results["2"] = ["sin baseline (vista nueva): no se puede comparar"]
+		base = {"view": cur, "crlf": False}
+	else:
+		results["2"] = stageCollection(cur, base)
+	answers, checked = stageAnswers(cur, base)
+	results["3"] = answers
+	results["4"] = stageFlow(cur, base, rel)
+	results["5"] = stageDesign(cur, base)
+	results["6"] = stageContract(cur)
+	return results, checked, len(answerSources(cur))
+
+
+def main():
+	parser = argparse.ArgumentParser(description="Pipeline de QA de formularios PAPO")
+	parser.add_argument("--views", nargs="*")
+	parser.add_argument("--all-forms", action="store_true")
+	parser.add_argument("--baseline", default="HEAD")
+	parser.add_argument("--pair", nargs=2, action="append", metavar=("ACTUAL", "BASELINE"))
+	parser.add_argument("--graph", action="store_true")
+	parser.add_argument("--compare-db", nargs=2, type=int, metavar=("PILOTO", "ORIGINAL"))
+	parser.add_argument("--report")
+	args = parser.parse_args()
+
+	runs = []
+	for path in design.resolveViews(args) if (args.views or args.all_forms) else []:
+		runs.append((path, baselineOf(path, args.baseline)))
+	for current, basePath in args.pair or []:
+		raw = open(basePath, encoding="utf-8", newline="").read()
+		runs.append((os.path.abspath(current), {"view": json.loads(raw), "crlf": "\r\n" in raw}))
+
+	lines = ["# QA de formularios PAPO", "", "Generado: {} · Baseline: `{}` · Vistas: {}".format(
+		datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), args.baseline, len(runs)), ""]
+	failed = False
+	summary = collections.Counter()
+	detail = []
+	for path, base in runs:
+		results, checked, items = checkView(path, base)
+		bad = [s for s, p in results.items() if p]
+		failed = failed or bool(bad)
+		summary["pasa" if not bad else "falla"] += 1
+		name = os.path.relpath(os.path.dirname(path), VIEWS) if path.startswith(VIEWS) else path
+		detail.append("### `{}` · {} · {} ítems, {} respuestas comparadas".format(name, "PASA" if not bad else "FALLA", items, checked))
+		for stage, problems in results.items():
+			mark = "✅" if not problems else "❌"
+			detail.append("- {} {} {}".format(mark, stage, STAGES[stage]) + ("" if not problems else ": " + "; ".join(problems[:5]) + (" (+{})".format(len(problems) - 5) if len(problems) > 5 else "")))
+		detail.append("")
+	extra = []
+	if args.graph:
+		problems = stageGraph(args.baseline)
+		failed = failed or bool(problems)
+		extra.append("- {} 7 Grafo{}".format("✅" if not problems else "❌", "" if not problems else ": " + "; ".join(problems[:8])))
+	if args.compare_db:
+		problems = stageData(*args.compare_db)
+		failed = failed or bool(problems)
+		extra.append("- {} 8 Datos (registros {} y {}){}".format("✅" if not problems else "❌", args.compare_db[0], args.compare_db[1], "" if not problems else ": " + "; ".join(problems[:8])))
+	lines.append("Resultado: **{}** · {} vistas pasan, {} fallan".format("PASA" if not failed else "FALLA", summary["pasa"], summary["falla"]))
+	lines.append("")
+	if extra:
+		lines += ["## Etapas globales", ""] + extra + [""]
+	lines += ["## Por vista", ""] + detail + ["## 9 Visual (manual)", "", CHECKLIST, ""]
+	report = "\n".join(lines)
+	if args.report:
+		os.makedirs(os.path.dirname(os.path.abspath(args.report)), exist_ok=True)
+		open(args.report, "w", encoding="utf-8").write(report)
+		print("Reporte: {} · {}".format(args.report, "PASA" if not failed else "FALLA"))
+	else:
+		print(report)
+	return 1 if failed else 0
+
+
+if __name__ == "__main__":
+	sys.exit(main())
