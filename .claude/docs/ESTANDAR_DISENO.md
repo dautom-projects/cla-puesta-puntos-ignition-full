@@ -41,7 +41,7 @@ La recolección de respuestas no cambia. Sigue igual el flujo del "Procedimiento
 
 Títulos con la clase `text-titles`: el color `#002C36` escrito en el campo pasa al token `--cla-text-question` (mismo color, ahora sale del tema).
 
-Qué se queda en la vista: `position`, `width` (los campos que lo tomaban de `dropdown` conservan `250px`), márgenes y paddings entre campos, y todos los bindings. El valor estático de una propiedad que su propio binding sobrescribe se quita (no tiene efecto).
+Qué se queda en la vista: `position`, márgenes y paddings entre campos, y todos los bindings. Sin anchos fijos: en una fila el ancho lo da el `basis` del campo; en una columna que estira, el campo ocupa la celda; en una columna alineada al inicio o al centro, el campo lleva `width: 100%` para ocupar la celda (79 campos en todo el proyecto). El `width: 250px` que daba la clase `dropdown` no se conserva. El valor estático de una propiedad que su propio binding sobrescribe se quita (no tiene efecto).
 
 ## Herramienta: papo-design
 
@@ -54,7 +54,7 @@ Garantías en cada vista (si alguna falla, la vista no se escribe):
 - Solo reescribe vistas cuya serialización Gson es canónica, y conserva CRLF
 - Backup antes de escribir y relectura después
 
-Simulación sobre las 239 vistas (2026-10-24): 238 aplicables, 5,902 componentes (2,248 checkbox, 1,730 text field, 647 numéricos, 611 labels de tag, 244 títulos, 238 Observaciones, 158 dropdowns, 26 date-time), todas con la recolección idéntica. Rechazada: `FU10-0202_start` (JSON no canónico). Quedan en el campo, para revisar a mano: 37 numéricos con un color fijo sin binding y 11 casos aislados (bordes o colores de un checkbox, `textAlign` de 3 labels).
+Simulación sobre las 239 vistas (2026-10-24): 238 aplicables, 5,902 componentes (2,248 checkbox, 1,730 text field, 647 numéricos, 611 labels de tag, 244 títulos, 238 Observaciones, 158 dropdowns, 26 date-time), todas con la recolección idéntica. Rechazada: `FU10-0202_start` (JSON no canónico). Además, 79 campos en columnas que no estiran reciben `width: 100%`. Quedan en el campo, para revisar a mano: 37 numéricos con un color fijo sin binding y 11 casos aislados (bordes o colores de un checkbox, `textAlign` de 3 labels).
 
 Medición: papo-lint (v1.1.0) reporta `Form_*: campos sin clase de diseño PAPO/Field/*`. Línea base: 188 vistas (el piloto ya en 0).
 

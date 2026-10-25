@@ -8,10 +8,12 @@ binding (propConfig), the component tree and the order of components stay
 identical, so papo_core.register.recopile collects the same items in the same
 order (SAT "Procedimiento de estandarizacion v2"). Dry run by default.
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
+	2026-10-24 | William M. | v1.1.0 - No fixed width from the old dropdown class; fields fill
+		non-stretching column cells (width 100%)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -122,7 +124,7 @@ def _sameValue(value, allowed):
 	return any(value == a and type(value) == type(a) for a in allowed)
 
 
-def _applyClass(component, targetClass, stats, role):
+def _applyClass(component, parent, targetClass, stats, role):
 	"""Point the component style at targetClass and drop the inline keys the class already defines."""
 	if "props.style.classes" in component.get("propConfig", {}):
 		stats["skip: clases con binding"][role] += 1
@@ -135,12 +137,16 @@ def _applyClass(component, targetClass, stats, role):
 		stats["ya estándar"][role] += 1
 		return False
 
-	# Old classes are replaced; the layout they carried stays inline
+	# Old classes are replaced. A class that carried a fixed width leaves none behind: in a row the
+	# field's basis sets the width; in a column that does not stretch, the field fills the cell
+	parentProps = (parent or {}).get("props", {})
+	inColumn = parentProps.get("direction") == "column"
+	stretches = parentProps.get("alignItems", "stretch") == "stretch"
 	kept = []
 	for token in tokens:
 		if token in RULES["replacedClasses"]:
-			for key, value in RULES["replacedClasses"][token].items():
-				style.setdefault(key, value)
+			if RULES["replacedClasses"][token].get("carriedWidth") and inColumn and not stretches:
+				style.setdefault("width", RULES["columnFillWidth"])
 		else:
 			kept.append(token)
 
@@ -182,20 +188,20 @@ def standardize(root, stats):
 	"""Apply the design rules to every component of the view tree."""
 	insights = RULES["insightsField"]
 
-	def walk(component, isRootChild):
+	def walk(component, parent):
 		ctype = component.get("type", "")
 		name = component.get("meta", {}).get("name", "")
 		custom = component.get("custom", {})
 		if "item" in custom and ctype in RULES["fieldClasses"]:
-			_applyClass(component, RULES["fieldClasses"][ctype], stats, ctype.split(".")[-1])
-		elif isRootChild and ctype == insights["type"] and name == insights["name"]:
-			_applyClass(component, insights["class"], stats, "observaciones")
+			_applyClass(component, parent, RULES["fieldClasses"][ctype], stats, ctype.split(".")[-1])
+		elif parent is root and ctype == insights["type"] and name == insights["name"]:
+			_applyClass(component, parent, insights["class"], stats, "observaciones")
 		elif ctype == "ia.display.label" and RULES["titles"]["class"] in str((component.get("props", {}).get("style") or {}).get("classes", "")).split():
 			_applyTitle(component, stats)
 		for child in component.get("children", []):
-			walk(child, component is root)
+			walk(child, component)
 
-	walk(root, False)
+	walk(root, None)
 
 
 # ==================== MAIN ====================

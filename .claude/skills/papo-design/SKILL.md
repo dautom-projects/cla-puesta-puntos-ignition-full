@@ -33,7 +33,7 @@ python3 .claude/skills/papo-design/scripts/papo_design.py --views "Page/Embedded
 
 ## Reglas
 
-`scripts/rules.json`: tipo de componente → clase, clases viejas que se reemplazan (y el layout que dejan en el campo, p. ej. `dropdown` → `width: 250px`), valores que la clase ya define (se quitan del campo solo si coinciden) y colores de títulos que pasan a tokens. Los estáticos que su propio binding sobrescribe se quitan.
+`scripts/rules.json`: tipo de componente → clase, clases viejas que se reemplazan (sin dejar anchos fijos: la de `dropdown` traía 250 px; en columnas que no estiran el campo queda con `width: 100%`), valores que la clase ya define (se quitan del campo solo si coinciden) y colores de títulos que pasan a tokens. Los estáticos que su propio binding sobrescribe se quitan.
 
 ## Después de aplicar
 
