@@ -1233,11 +1233,11 @@
                             },
                             "props": {
                               "params": {
-                                "answer": "",
+                                "answer": null,
                                 "maxValue": 54,
                                 "minValue": 50,
                                 "showQuestion": false,
-                                "value": ""
+                                "value": null
                               },
                               "path": "Objects/NumericField",
                               "style": {
@@ -7392,15 +7392,7 @@
             "scripts": {
               "customMethods": [],
               "extensionFunctions": null,
-              "messageHandlers": [
-                {
-                  "messageType": "saveFourHourRegister",
-                  "pageScope": true,
-                  "script": "\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer4\").refreshBinding(\"custom.{}\".format(path))\n\t\n\tlistCustom \u003d [\n\t\t\"answers.one_hour\",\n\t\t\"answers.half_hour\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswer30min \u003d self.view.custom.answers.half_hour\n\tanswer1hour \u003d self.view.custom.answers.one_hour\n\t\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY RegisterCode DESC\n\t\"\"\"\n\n\n\t#result \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\t#regCode \u003d result.getValueAt(0,0)\n\t\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\t\n\t\t\n\tif result.getRowCount() \u003e 0:\n\t\tregCode \u003d result.getValueAt(0, 0)\n\telse:\n\t\tregCode \u003d 0\t\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tstatus \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(3, system.util.jsonEncode(answer30min), regCode)  # 30 minutos\n\tinsert_answer(1, system.util.jsonEncode(answer1hour), regCode)  # 1 hora\n\t\n\tself.view.params.lastRegisterType \u003d 4\n\t\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
-                  "sessionScope": false,
-                  "viewScope": false
-                }
-              ]
+              "messageHandlers": []
             },
             "type": "ia.input.button"
           },
