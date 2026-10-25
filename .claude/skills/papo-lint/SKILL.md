@@ -37,6 +37,9 @@ Opciones: `--project <carpeta>` (otro proyecto), `--out <archivo>`, `--stdout`.
 | Form_*: toggleFlexRoot | Ausente o con params distintos de `["sectionIndex"]` |
 | Form_*: saveDataRoot / answerRecopile | Ausente o con lógica propia (no llama a `papo_core.register`) |
 | Form_*: diseño de campos | Componentes con `custom.item` sin clase `PAPO/Field/*` (se corrige con papo-design, ver `ESTANDAR_DISENO.md`) |
+| Form_*: campo nativo convertible | Campo con `custom.item` que `papo_objects` puede convertir a objeto estándar |
+| Form_*: handler fuera del estándar | Cualquier message handler que no sea `saveDataRoot` en la raíz (los de guardado legacy se quitan con `papo_objects --legacy`) |
+| Form_*: raíz sin `PAPO/Form` | El formulario todavía no está en el estándar (tema corregido y clases) |
 
 La plantilla de referencia es `Page/Embedded/Ensamble/Form_EA11-1501_30min` (0 hallazgos).
 

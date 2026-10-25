@@ -7,11 +7,12 @@ last RegisterCode ordered by Timestamp, project.papo_core prefix, legacy
 view.custom keys and missing papo_core wrappers in Form_* views). Writes a
 Markdown report with a summary per pattern and the detail per view.
 
-Version: 1.1.0
+Version: 1.2.0
 
 Changelog:
 	2026-10-22 | William M. | v1.0.0 - Initial version
 	2026-10-24 | William M. | v1.1.0 - Pattern formFieldDesign (fields without PAPO/Field/* class or Objects/*)
+	2026-10-25 | William M. | v1.2.0 - Patterns formNativeField, formLegacyHandler, formRootClass
 
 Args (CLI):
 	--project (str): Ignition project folder. Default: <repo>/cla-project
@@ -32,6 +33,13 @@ import re
 import sys
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+
+# Answer rules of the object converter (optional: the linter still runs without it)
+try:
+	sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "papo-design", "scripts"))
+	from papo_objects import answerRule as _answerRule
+except Exception:
+	_answerRule = None
 VIEWS_REL = os.path.join("com.inductiveautomation.perspective", "views")
 
 LEGACY_KEYS = ("answers", "formato", "test", "flexGroupCount", "flexCount", "refreshSecond",
@@ -52,6 +60,9 @@ PATTERNS = collections.OrderedDict([
 	("formSaveDataRoot", "Form_*: saveDataRoot sin papo_core.register"),
 	("formAnswerRecopile", "Form_*: answerRecopile sin papo_core.register"),
 	("formFieldDesign", "Form_*: campos sin clase de diseño PAPO/Field/*"),
+	("formNativeField", "Form_*: campo nativo que puede ser objeto estándar (papo_objects)"),
+	("formLegacyHandler", "Form_*: message handler fuera del estándar (solo root/saveDataRoot)"),
+	("formRootClass", "Form_*: raíz sin la clase PAPO/Form"),
 ])
 
 RE_DB = re.compile(r"""["']papo_db["']""")
@@ -225,7 +236,46 @@ def lintView(view, viewPath):
 		pending = _fieldsWithoutDesign(view.get("root") or {})
 		if pending:
 			findings.append(("formFieldDesign", "{} campos sin clase PAPO/Field/* (papo-design)".format(pending)))
+
+		# Standard objects: native fields the converter can turn into Objects/*
+		native = _convertibleNatives(view.get("root") or {})
+		if native:
+			findings.append(("formNativeField", "{} campos convertibles".format(native)))
+
+		root = view.get("root") or {}
+		for owner, messageType in _handlers(root, True):
+			if not (owner == "root" and messageType == "saveDataRoot"):
+				findings.append(("formLegacyHandler", "{} en {}".format(messageType, owner)))
+		classes = str(((root.get("props") or {}).get("style") or {}).get("classes", "")).split()
+		if "PAPO/Form" not in classes:
+			findings.append(("formRootClass", "sin PAPO/Form"))
 	return findings
+
+
+def _convertibleNatives(component):
+	"""Count native fields whose answer rule papo_objects can reproduce with a standard object."""
+	if _answerRule is None:
+		return 0
+	count = 0
+	if "item" in (component.get("custom") or {}) and component.get("type") != "ia.display.view":
+		try:
+			count += 1 if _answerRule(component) else 0
+		except Exception:
+			pass
+	for child in component.get("children") or []:
+		count += _convertibleNatives(child)
+	return count
+
+
+def _handlers(component, isRoot):
+	"""(owner, messageType) of every message handler in the component tree."""
+	out = []
+	name = "root" if isRoot else (component.get("meta") or {}).get("name", "?")
+	for h in ((component.get("scripts") or {}).get("messageHandlers") or []):
+		out.append((name, h.get("messageType")))
+	for child in component.get("children") or []:
+		out.extend(_handlers(child, False))
+	return out
 
 
 def _fieldsWithoutDesign(component):
