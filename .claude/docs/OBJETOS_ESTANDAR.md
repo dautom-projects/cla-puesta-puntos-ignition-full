@@ -1,29 +1,6 @@
 # Objetos estándar de PAPO
 
-## Diseño estándar de campos (clases de estilo)
-
-Piloto: `Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto` (copia de `Form_EA11-0901_1h`, 2026-10-24).
-
-**Solo se parametriza el diseño.** Los campos siguen siendo los mismos componentes del formulario, con el mismo `custom.item` (procedimiento v2, paso 4) y los mismos bindings de `answer`; `recopile` y `save` no cambian. Lo único que cambia es `props.style` de cada campo: el diseño sale de una clase de estilo por tipo de campo, así que cambiar la clase cambia todos los formularios que la usan.
-
-Clases en `cla-project/com.inductiveautomation.perspective/style-classes/Objects/`:
-
-| Clase | Campo | Diseño | Reemplaza |
-|---|---|---|---|
-| `Objects/NumericField` | `ia.input.numeric-entry-field` | fondo `--cla-page-bg`, bordes redondeados 15 px, margen 1 px (izquierdo 0) | clase `dropdown` + `marginLeft: 0`, o bordes 10 px escritos en el campo |
-| `Objects/TextField` | `ia.input.text-field` | igual que NumericField | clase `dropdown` |
-| `Objects/Checkbox` | `ia.input.checkbox` | vacía por ahora (punto único para darles diseño) | sin estilo |
-| `Objects/TagLabel` | `ia.display.label` con `custom.item` (valor de tag) | Arial 16 px, negrita, centrado, color `#1199C7`, sangría 20 px | clase `text-data-2` + `color` y `paddingLeft` escritos en el campo |
-
-Lo que se queda en el formulario:
-
-- Tamaño y posición: `position` del campo y `width: 250px` en los campos que lo tomaban de la clase `dropdown`
-- Tamaño de letra: binding a `view.custom.fontSize` (se agregó a los 2 TextField, que no lo tenían)
-- Colores por rango: los bindings `custom.color` / `custom.borderColor` de cada numérico, sin cambios
-
-Aplicar a otro formulario: cambiar solo `props.style` de los campos con `custom.item` a `{"classes": "<clase>"}` (más `width` si venía de `dropdown`); no tocar `custom`, `propConfig` de respuestas, nombres ni contenedores. Verificar que `recopile` da los mismos ítems en el mismo orden y revisar en el Designer.
-
-Descartado en el piloto (2026-10-24): reemplazar los campos por las vistas `Objects/*` embebidas. Cambiaba de dónde sale la respuesta; queda para cuando se decida cambiar la lógica de guardado.
+El estándar de diseño de los formularios (clases `PAPO/Field/*`, herramienta papo-design, despliegue por fases) está en `ESTANDAR_DISENO.md`. Las vistas `Objects/*` no se usan: embebidas cambiarían de dónde sale la respuesta (descartado en el piloto del 2026-10-24).
 
 ## Vistas `Objects/*` (sin uso)
 

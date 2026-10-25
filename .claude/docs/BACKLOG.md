@@ -31,7 +31,8 @@
 
 - Aplicar formulario por formulario (un commit por formulario, `git revert` para deshacer); ver `OBJETOS_ESTANDAR.md`
 - Agregar a papo-lint el patrón "campos fuera de objetos estándar" para medir la adopción
-- Piloto de diseño en `Form_EA11-0901_1h_PruebaPiloto` (2026-10-24, clases `Objects/*` en style-classes): revisar en el Designer contra `Form_EA11-0901_1h`. Si pasa, aplicar las mismas clases a `Form_EA11-0901_1h` y a las demás variantes de EA11-0901. Pendiente de decidir: clases para las etiquetas de pregunta y los subtítulos de la grilla
+- Diseño estándar (`ESTANDAR_DISENO.md`, herramienta papo-design): revisar el piloto `Form_EA11-0901_1h_PruebaPiloto` en el Designer; si pasa, desplegar por fases (familia EA11-0901 + `Metalurgia/Fundamental Views/Checkbox`, luego por área). Simulado: 238 de 239 formularios aplicables con la recolección idéntica; `FU10-0202_start` a mano
+- Siguiente nivel del diseño: clases para preguntas, subtítulos y encabezados (confirmar antes que una clase en la label equivale a `textStyle`), tokens `--papo-*` en el tema, plantilla para formularios nuevos
 
 ## Mejoras opcionales (fuera de la estandarización básica)
 

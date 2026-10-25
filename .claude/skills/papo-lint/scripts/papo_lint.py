@@ -7,10 +7,11 @@ last RegisterCode ordered by Timestamp, project.papo_core prefix, legacy
 view.custom keys and missing papo_core wrappers in Form_* views). Writes a
 Markdown report with a summary per pattern and the detail per view.
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
 	2026-10-22 | William M. | v1.0.0 - Initial version
+	2026-10-24 | William M. | v1.1.0 - Pattern formFieldDesign (fields without PAPO/Field/* class)
 
 Args (CLI):
 	--project (str): Ignition project folder. Default: <repo>/cla-project
@@ -50,6 +51,7 @@ PATTERNS = collections.OrderedDict([
 	("formToggleParams", "Form_*: toggleFlexRoot con params distintos de [sectionIndex]"),
 	("formSaveDataRoot", "Form_*: saveDataRoot sin papo_core.register"),
 	("formAnswerRecopile", "Form_*: answerRecopile sin papo_core.register"),
+	("formFieldDesign", "Form_*: campos sin clase de diseño PAPO/Field/*"),
 ])
 
 RE_DB = re.compile(r"""["']papo_db["']""")
@@ -218,7 +220,24 @@ def lintView(view, viewPath):
 				findings.append((key, "sin {}".format(label)))
 			elif "papo_core.register" not in (item.get("script") or ""):
 				findings.append((key, "{} con lógica propia".format(label)))
+
+		# Design standard: every component with custom.item uses a PAPO/Field/* class
+		pending = _fieldsWithoutDesign(view.get("root") or {})
+		if pending:
+			findings.append(("formFieldDesign", "{} campos sin clase PAPO/Field/* (papo-design)".format(pending)))
 	return findings
+
+
+def _fieldsWithoutDesign(component):
+	"""Count components with custom.item whose style has no PAPO/Field/* class."""
+	count = 0
+	if "item" in (component.get("custom") or {}):
+		classes = str(((component.get("props") or {}).get("style") or {}).get("classes", "")).split()
+		if not any(c.startswith("PAPO/Field/") for c in classes):
+			count += 1
+	for child in component.get("children") or []:
+		count += _fieldsWithoutDesign(child)
+	return count
 
 
 def _collectViews(viewsRoot, only):

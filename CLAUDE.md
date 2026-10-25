@@ -53,7 +53,7 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - `Page/PopUps/Authenticator` — popup para que el supervisor firme sin cerrar la sesión del operario
 - `Page/Overview_Papos` — lista de tarjetas de formularios; `Page/Embedded/Embedded_PAPO` — tarjeta individual
 - Reportes (EA11-0901, etc.) — generan el PDF del formulario
-- `Objects/` — objetos estándar de campo (Checkbox, TextField, NumericField, Dropdown, Label); ver `.claude/docs/OBJETOS_ESTANDAR.md`
+- `Objects/` — vistas de campo reutilizables, sin uso (embebidas cambiarían la recolección); ver `.claude/docs/OBJETOS_ESTANDAR.md`
 
 ## Despliegue
 
@@ -95,6 +95,7 @@ Módulos (`papo_core/<modulo>/code.py`, funciones públicas):
 - **dbConnection** siempre de `view.custom` o `session.custom`, NUNCA hardcodear "papo_db"
 - Turnos: nunca system.date.getHour24(); usar java.util.Calendar con TimeZone America/Bogota
 - Deploy: siempre desplegar el módulo del Project Library antes que la vista que lo llama
+- Diseño: los campos con `custom.item` usan las clases `PAPO/Field/*` (herramienta papo-design); en la vista solo layout y bindings, nada de colores, bordes ni tipografía escritos en el campo. Ver `.claude/docs/ESTANDAR_DISENO.md`
 
 ## Flujo para corregir bugs
 
@@ -139,7 +140,8 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de papo_db generado desde la base viva (notas de dominio, conteos y catálogos)
 - `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
 - `.claude/docs/BACKLOG.md` — pendientes y horizonte del proyecto
-- `.claude/docs/OBJETOS_ESTANDAR.md` — contrato y uso de los objetos estándar de `Objects/`
+- `.claude/docs/ESTANDAR_DISENO.md` — estándar de diseño de formularios (clases `PAPO/`, papo-design, despliegue por fases)
+- `.claude/docs/OBJETOS_ESTANDAR.md` — contrato de las vistas `Objects/` (sin uso)
 - `.claude/docs/LINT_REPORT.md` — hallazgos de papo-lint por patrón y por vista (`.claude/skills/papo-lint/`)
 
 ## Estado actual
