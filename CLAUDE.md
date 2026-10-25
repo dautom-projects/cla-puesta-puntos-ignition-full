@@ -53,7 +53,7 @@ ENTERPRISE → SITE → AREA → LINE → CELL
 - `Page/PopUps/Authenticator` — popup para que el supervisor firme sin cerrar la sesión del operario
 - `Page/Overview_Papos` — lista de tarjetas de formularios; `Page/Embedded/Embedded_PAPO` — tarjeta individual
 - Reportes (EA11-0901, etc.) — generan el PDF del formulario
-- `Objects/` — vistas de campo reutilizables, sin uso (embebidas cambiarían la recolección); ver `.claude/docs/OBJETOS_ESTANDAR.md`
+- `Objects/` — objetos estándar de campo (v2): el `custom.item` queda en el formulario y lee la salida `answer` del objeto; en piloto en `Form_EA11-0901_1h_PruebaPiloto`. Ver `.claude/docs/OBJETOS_ESTANDAR.md`
 
 ## Despliegue
 
@@ -141,7 +141,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
 - `.claude/docs/BACKLOG.md` — pendientes y horizonte del proyecto
 - `.claude/docs/ESTANDAR_DISENO.md` — estándar de diseño de formularios (clases `PAPO/`, papo-design, despliegue por fases)
-- `.claude/docs/OBJETOS_ESTANDAR.md` — contrato de las vistas `Objects/` (sin uso)
+- `.claude/docs/OBJETOS_ESTANDAR.md` — contrato de los objetos `Objects/` (v2), condiciones y herramienta papo_objects
 - `.claude/docs/LINT_REPORT.md` — hallazgos de papo-lint por patrón y por vista (`.claude/skills/papo-lint/`)
 
 ## Estado actual

@@ -35,6 +35,8 @@
 - Siguiente nivel del diseño: clases para preguntas, subtítulos y encabezados (confirmar antes que una clase en la label equivale a `textStyle`), tokens `--papo-*` en el tema, plantilla para formularios nuevos
 - Tema `cla-light`/`cla-dark` roto (`:root` sin cerrar: ~75 reglas que el Designer descarta; selectores de input que no coinciden; `boder-color`; dropdowns a 150 px fijos). Parche propuesto en `.claude/docs/theme/`, sin instalar: probar en PAPOS (reinicio de Perspective) y decidir. Ver "Evaluación" en `ESTANDAR_DISENO.md`. Piloto instalado en PAPOS el 2026-10-24 (bloque con alcance `PAPO/Form`, solo el piloto): revisar Designer contra Chrome y decidir si se aplica el parche global
 
+- Objetos v2 en el piloto (2026-10-24): verificar en sesión que los valores se conservan al cerrar/reabrir la sección, guardar un registro y comparar con el original, medir la carga. Si pasa: `papo_objects.py` simula 238 formularios convertibles (4,555 campos)
+
 ## Mejoras opcionales (fuera de la estandarización básica)
 
 - Preguntas en una consulta por vista: hoy hay ~3,520 bindings que consultan `papoitem` uno por pregunta en 153 vistas. `papo_core.items.getQuestions(value)` y `getQuestionText(value)` ya existen (sin uso); se probaron y revirtieron en el piloto EC07-0101 barcada por no ser parte del estándar

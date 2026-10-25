@@ -1,57 +1,53 @@
-# Objetos estándar de PAPO
+# Objetos estándar de PAPO (v2)
 
-El estándar de diseño de los formularios (clases `PAPO/Field/*`, herramienta papo-design, despliegue por fases) está en `ESTANDAR_DISENO.md`. Las vistas `Objects/*` no se usan: embebidas cambiarían de dónde sale la respuesta (descartado en el piloto del 2026-10-24).
+Vistas `Objects/*` que encapsulan el diseño y el comportamiento de un campo: el mapeo Cumple/No Cumple, el color por rango, la respuesta del dropdown y el texto de la pregunta. El formulario solo pasa parámetros. Diseño de las clases y el tema: `ESTANDAR_DISENO.md`.
 
-## Vistas `Objects/*` (sin uso)
+Piloto: `Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto` (2026-10-24): 42 campos como objetos (13 checkbox, 27 numéricos, 2 text field) y 26 valores de tag nativos.
 
-Vistas reutilizables para los campos de los formularios Form_*, en
-`cla-project/com.inductiveautomation.perspective/views/Objects/`. Reemplazarían las ~123 variantes de bindings con las que hoy se arman checkbox, text field, numeric, dropdown y label (inventario del 2026-10-22: 5,539 campos con `custom.item` en 238 vistas). Ningún formulario las usa.
+## Cómo se recolecta la respuesta (no cambia el v2)
 
-## Contrato común
+El `custom.item` sigue en el componente del formulario dentro de `FlexContainerGroupN` (procedimiento v2, paso 4). Ese componente ahora es un `ia.display.view`:
 
-Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que guarda la respuesta se llama siempre `Field` y tiene `custom.item = {papoItemID, answer, registerTypeID}`.
+- `custom.item`: el mismo `{papoItemID, registerTypeID}` estático del campo original, y sus bindings si los tenía
+- `custom.item.answer` ← `this.props.params.answer`: la respuesta que el objeto manda a la vista principal según lo que hizo el operario
+- `papo_core.register.recopile` y `save` no cambian: leen `custom.item` igual que antes, en el mismo orden
 
-| Parámetro | Dirección | Default | Uso |
+## Contrato
+
+| Parámetro | Dirección | Uso |
+|---|---|---|
+| `value` | inout | Valor del campo. Queda guardado en el formulario: si la sección se cierra y se reabre, el objeto vuelve con lo que había |
+| `answer` | output | Respuesta que el formulario guarda en `custom.item.answer` |
+| `question` | input | Texto de la pregunta (el del formulario). Vacío + `papoItemID` = descripción de `papoitem` |
+| `fontSize` | input | Tamaño de letra; el formulario lo enlaza a `view.custom.fontSize` |
+| `showQuestion`, `questionBasis` | input | Pregunta dentro del objeto (lista) u oculta (grilla, la pregunta es una etiqueta del formulario) |
+
+| Objeto | Campo | `answer` | Parámetros propios |
 |---|---|---|---|
-| `papoItemID` | input | null | Ítem de la pregunta |
-| `registerTypeID` | input | null | Tipo de registro del formulario (el `view.custom.registerTypeID` de la vista que lo usa) |
-| `fontSize` | input | 17 | Tamaño de letra de pregunta y campo |
-| `item` | **output** | {} | `{papoItemID, answer, registerTypeID}`, enlazado a `/root/Field.custom.item` |
+| `Objects/Checkbox` | checkbox (la pregunta es su texto) | `trueValue` si está marcado, `falseValue` si no | `trueValue` ("Cumple"), `falseValue` ("No Cumple") |
+| `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`), `placeholder` |
+| `Objects/TextField` | text field | el texto | `placeholder` |
+| `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` |
+| `Objects/Label` | valor de tag (solo lectura) | el valor del tag | `tagPath` |
 
-- Texto de la pregunta: `papo_core.items.getQuestionText(value)` con `{papoItemID, dbConnection}` (consulta individual a `papoitem`, igual que hoy; sin SQL en la vista).
-- Conexión: `view.custom.dbConnection` enlazado a `session.custom.dbConnection`.
-- Filas con pregunta separada (TextField, NumericField, Dropdown, Label): `showQuestion` (true), `questionBasis` ("450px") y `fieldBasis` ("224px").
+Diseño interno: cada `Field` usa su clase `PAPO/Field/*`; dentro de un formulario con `PAPO/Form` recibe además el tema corregido.
 
-## Objetos
+## Condiciones (estudio del 2026-10-24)
 
-| Objeto | Componente `Field` | Respuesta (`item.answer`) | Parámetros propios |
-|---|---|---|---|
-| `Objects/Checkbox` | `ia.input.checkbox` (la pregunta es su texto) | `trueValue` si está marcado, `falseValue` si no | `trueValue` ("Cumple"), `falseValue` ("No Cumple") |
-| `Objects/TextField` | `ia.input.text-field` | `props.text` | `placeholder` ("Escriba aqui") |
-| `Objects/NumericField` | `ia.input.numeric-entry-field` | `props.value` | `minValue`, `maxValue` (null = sin rango; colores con `papo_core.items.getRangeColor`), `placeholder` |
-| `Objects/Dropdown` | `ia.input.dropdown` | `props.value` | `options` ([{label, value}]), `placeholder` ("Seleccione") |
-| `Objects/Label` | `ia.display.label` | `props.text` (valor del tag) | `tagPath` (ruta completa del tag, binding indirecto) |
+1. **Un objeto en una sección cerrada no corre.** El montaje de vistas lo decide el cliente ("The state of what views are mounted is driven by the frontend, not the backend", Carl Gould, Inductive Automation); una sección con `display: false` no monta sus objetos. Por eso:
+   - `value` es inout: lo escrito no se pierde al cerrar la sección
+   - el formulario guarda una respuesta inicial en `props.params.answer` igual a la que guardaba el campo sin tocar (checkbox: `falseValue`; texto: `""`; dropdown por etiqueta: `""`)
+2. **Los valores de tag quedan nativos** (componente del formulario con la clase `PAPO/Field/TagValue`): el original guarda el valor del tag aunque la sección no se abra, y un objeto sin montar no puede leerlo
+3. **Solo se convierten campos cuya respuesta es el valor del campo** (checkbox con map true/false; dropdown con la búsqueda de etiqueta estándar). Los que tienen lógica propia quedan nativos
 
-`trueValue`/`falseValue` existen para que cada formulario guarde exactamente lo mismo que guarda hoy: los reportes PDF dependen de esos textos.
+## Herramienta
 
-## Uso en un formulario
+`.claude/skills/papo-design/scripts/papo_objects.py` convierte formularios (simula por defecto, `--apply` escribe con backup). Verifica que las fuentes de respuesta (ítems, sus bindings salvo `answer`, orden) no cambien y que solo se reescriban vistas con Gson canónico.
 
-**Flex Repeater (recomendado)**: un repeater dentro del `FlexContainerGroupN`, con `path` = el objeto y una instancia por pregunta. El objeto escribe `item` de vuelta en cada instancia y `papo_core.register.recopile` lo lee desde `props.instances` (mismo mecanismo que usa hoy `Metalurgia/Fundamental Views/Checkbox` en 61 repeaters).
+Simulación sobre los 239 formularios: 238 convertibles, 4,555 campos (2,209 checkbox, 1,604 text field, 594 numéricos con 231 rangos, 148 dropdowns: 125 por etiqueta y 23 por valor). 186 campos quedan nativos por tener lógica propia. Rechazado: `FU10-0202_start` (JSON no canónico).
 
-```json
-{"instancePosition": {}, "instanceStyle": {"classes": ""}, "papoItemID": 5134, "registerTypeID": 7}
-```
+## Pendiente de verificar en el piloto
 
-**Vista embebida suelta** (`ia.display.view`): sirve para layouts mezclados, pero hoy `recopile` no lee `props.params.item` de una vista embebida. Usarla requiere primero ese cambio en `papo_core.register` (ver BACKLOG.md).
-
-## Aplicación
-
-1. Formulario por formulario, en su propio commit `refactor: objetos estándar en Form_X`, para poder deshacer uno solo con `git revert <sha>`.
-2. Reemplazar solo los campos; no tocar Sections, FlexContainerGroups ni contenedores (el acordeón y `register.save` dependen de esos nombres).
-3. Conservar los mismos `papoItemID` y la misma respuesta guardada (`trueValue`/`falseValue`, formato numérico).
-4. Backup, lint (`/bug` paso 5), fila en `DEPLOY_INVENTORY.md`, y verificar en el Designer: aspecto, guardado en `registerhistory` y reporte PDF si aplica.
-
-## Pendiente de verificar
-
-- Los objetos se generaron en disco. Su `resource.json` no tiene `lastModificationSignature`; confirmar que el gateway los carga al reiniciar `PAPOS` (y que el Designer los muestra en `Objects/`).
-- `resource.json` está en `.gitignore`: en un clone limpio estos objetos (como el resto de vistas) no traen `resource.json`.
+- Abrir la sección, llenar, cerrar y reabrir: los valores siguen
+- Guardar un registro y compararlo en `registerhistory` con uno de `Form_EA11-0901_1h`
+- Numérico fuera de rango en rojo; tiempo de carga de la sección (42 vistas embebidas; en el foro reportan que cada vista con íconos descarga la librería de íconos)

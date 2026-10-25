@@ -3,19 +3,16 @@
     "dbConnection": "papo_db"
   },
   "params": {
-    "fieldBasis": "224px",
+    "answer": "",
+    "answerFrom": "label",
     "fontSize": 17,
-    "item": {
-      "answer": "",
-      "papoItemID": null,
-      "registerTypeID": null
-    },
     "options": [],
     "papoItemID": null,
     "placeholder": "Seleccione",
-    "questionBasis": "450px",
-    "registerTypeID": null,
-    "showQuestion": true
+    "question": "",
+    "questionBasis": "60%",
+    "showQuestion": true,
+    "value": null
   },
   "propConfig": {
     "custom.dbConnection": {
@@ -27,22 +24,33 @@
       },
       "persistent": true
     },
-    "params.fieldBasis": {
+    "params.answer": {
+      "binding": {
+        "config": {
+          "struct": {
+            "answerFrom": "{view.params.answerFrom}",
+            "options": "{view.params.options}",
+            "value": "{view.params.value}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t# Answer is the selected option label, or its value when answerFrom is \"value\"\n\tif value[\"answerFrom\"] \u003d\u003d \"value\":\n\t\treturn value[\"value\"]\n\tfor option in value[\"options\"] or []:\n\t\tif str(option[\"value\"]) \u003d\u003d str(value[\"value\"]):\n\t\t\treturn option[\"label\"]\n\treturn \"\"\n",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    },
+    "params.answerFrom": {
       "paramDirection": "input",
       "persistent": true
     },
     "params.fontSize": {
       "paramDirection": "input",
-      "persistent": true
-    },
-    "params.item": {
-      "binding": {
-        "config": {
-          "path": "/root/Field.custom.item"
-        },
-        "type": "property"
-      },
-      "paramDirection": "output",
       "persistent": true
     },
     "params.options": {
@@ -57,23 +65,27 @@
       "paramDirection": "input",
       "persistent": true
     },
-    "params.questionBasis": {
+    "params.question": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.registerTypeID": {
+    "params.questionBasis": {
       "paramDirection": "input",
       "persistent": true
     },
     "params.showQuestion": {
       "paramDirection": "input",
       "persistent": true
+    },
+    "params.value": {
+      "paramDirection": "inout",
+      "persistent": true
     }
   },
   "props": {
     "defaultSize": {
-      "height": 60,
-      "width": 900
+      "height": 40,
+      "width": 400
     }
   },
   "root": {
@@ -81,6 +93,9 @@
       {
         "meta": {
           "name": "Question"
+        },
+        "position": {
+          "shrink": 0
         },
         "propConfig": {
           "position.basis": {
@@ -104,13 +119,14 @@
               "config": {
                 "struct": {
                   "dbConnection": "{view.custom.dbConnection}",
-                  "papoItemID": "{view.params.papoItemID}"
+                  "papoItemID": "{view.params.papoItemID}",
+                  "question": "{view.params.question}"
                 },
                 "waitOnAll": true
               },
               "transforms": [
                 {
-                  "code": "\treturn papo_core.items.getQuestionText(value)",
+                  "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
                   "type": "script"
                 }
               ],
@@ -129,45 +145,14 @@
         "type": "ia.display.label"
       },
       {
-        "custom": {
-          "item": {}
-        },
         "meta": {
           "name": "Field"
         },
+        "position": {
+          "basis": "0px",
+          "grow": 1
+        },
         "propConfig": {
-          "custom.item.answer": {
-            "binding": {
-              "config": {
-                "path": "this.props.value"
-              },
-              "type": "property"
-            }
-          },
-          "custom.item.papoItemID": {
-            "binding": {
-              "config": {
-                "path": "view.params.papoItemID"
-              },
-              "type": "property"
-            }
-          },
-          "custom.item.registerTypeID": {
-            "binding": {
-              "config": {
-                "path": "view.params.registerTypeID"
-              },
-              "type": "property"
-            }
-          },
-          "position.basis": {
-            "binding": {
-              "config": {
-                "path": "view.params.fieldBasis"
-              },
-              "type": "property"
-            }
-          },
           "props.options": {
             "binding": {
               "config": {
@@ -191,12 +176,21 @@
               },
               "type": "property"
             }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.params.value"
+              },
+              "type": "property"
+            }
           }
         },
         "props": {
           "placeholder": {},
           "style": {
-            "classes": "dropdown"
+            "classes": "PAPO/Field/Dropdown"
           }
         },
         "type": "ia.input.dropdown"
@@ -206,7 +200,7 @@
       "name": "root"
     },
     "props": {
-      "alignItems": "center",
+      "alignItems": "stretch",
       "style": {
         "overflow": "hidden"
       }

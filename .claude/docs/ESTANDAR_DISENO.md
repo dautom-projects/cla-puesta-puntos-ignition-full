@@ -67,6 +67,10 @@ Medición: papo-lint (v1.1.0) reporta `Form_*: campos sin clase de diseño PAPO/
 
 En cada fase: desplegar primero `style-classes/PAPO/` y después las vistas; fila en `DEPLOY_INVENTORY.md`; papo-lint antes y después.
 
+## Objetos estándar v2 (piloto 2026-10-24)
+
+Además de las clases, los campos interactivos del piloto son objetos `Objects/*` que encapsulan diseño y comportamiento. El `custom.item` sigue en el formulario y lee la respuesta que manda el objeto, así que el flujo del v2 no cambia. Contrato, condiciones y simulación: `OBJETOS_ESTANDAR.md`.
+
 ## Siguiente nivel (no aplicado)
 
 - **Etiquetas de pregunta, subtítulos y encabezados** (4,668 dentro de los grupos: 3,485 normales, 520 negrita, 499 negrita centrada): clases `PAPO/Text/Question`, `PAPO/Text/Subtitle`, `PAPO/Text/Header`. Antes hay que confirmar en el Designer que una clase en la label (que estila el contenedor) produce lo mismo que `textStyle` (que estila el texto); si es así, la herramienta las agrega con la misma verificación

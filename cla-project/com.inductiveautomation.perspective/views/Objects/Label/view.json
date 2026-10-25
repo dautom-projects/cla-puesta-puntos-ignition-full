@@ -3,12 +3,11 @@
     "dbConnection": "papo_db"
   },
   "params": {
-    "fieldBasis": "224px",
+    "answer": null,
     "fontSize": 17,
-    "item": {},
     "papoItemID": null,
-    "questionBasis": "450px",
-    "registerTypeID": null,
+    "question": "",
+    "questionBasis": "60%",
     "showQuestion": true,
     "tagPath": ""
   },
@@ -22,33 +21,29 @@
       },
       "persistent": true
     },
-    "params.fieldBasis": {
-      "paramDirection": "input",
+    "params.answer": {
+      "binding": {
+        "config": {
+          "expression": "{/root/Field.props.text}"
+        },
+        "type": "expr"
+      },
+      "paramDirection": "output",
       "persistent": true
     },
     "params.fontSize": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.item": {
-      "binding": {
-        "config": {
-          "path": "/root/Field.custom.item"
-        },
-        "type": "property"
-      },
-      "paramDirection": "output",
-      "persistent": true
-    },
     "params.papoItemID": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.questionBasis": {
+    "params.question": {
       "paramDirection": "input",
       "persistent": true
     },
-    "params.registerTypeID": {
+    "params.questionBasis": {
       "paramDirection": "input",
       "persistent": true
     },
@@ -63,8 +58,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 60,
-      "width": 900
+      "height": 40,
+      "width": 400
     }
   },
   "root": {
@@ -74,7 +69,7 @@
           "name": "Question"
         },
         "position": {
-          "basis": "450px"
+          "shrink": 0
         },
         "propConfig": {
           "position.basis": {
@@ -98,13 +93,14 @@
               "config": {
                 "struct": {
                   "dbConnection": "{view.custom.dbConnection}",
-                  "papoItemID": "{view.params.papoItemID}"
+                  "papoItemID": "{view.params.papoItemID}",
+                  "question": "{view.params.question}"
                 },
                 "waitOnAll": true
               },
               "transforms": [
                 {
-                  "code": "\treturn papo_core.items.getQuestionText(value)",
+                  "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
                   "type": "script"
                 }
               ],
@@ -123,48 +119,14 @@
         "type": "ia.display.label"
       },
       {
-        "custom": {
-          "item": {}
-        },
         "meta": {
           "name": "Field"
         },
         "position": {
-          "basis": "224px"
+          "basis": "0px",
+          "grow": 1
         },
         "propConfig": {
-          "custom.item.answer": {
-            "binding": {
-              "config": {
-                "path": "this.props.text"
-              },
-              "type": "property"
-            }
-          },
-          "custom.item.papoItemID": {
-            "binding": {
-              "config": {
-                "path": "view.params.papoItemID"
-              },
-              "type": "property"
-            }
-          },
-          "custom.item.registerTypeID": {
-            "binding": {
-              "config": {
-                "path": "view.params.registerTypeID"
-              },
-              "type": "property"
-            }
-          },
-          "position.basis": {
-            "binding": {
-              "config": {
-                "path": "view.params.fieldBasis"
-              },
-              "type": "property"
-            }
-          },
           "props.text": {
             "binding": {
               "config": {
@@ -189,9 +151,7 @@
         },
         "props": {
           "style": {
-            "classes": "text-data-2",
-            "color": "#1199C7",
-            "paddingLeft": 20
+            "classes": "PAPO/Field/TagValue"
           }
         },
         "type": "ia.display.label"
@@ -201,7 +161,7 @@
       "name": "root"
     },
     "props": {
-      "alignItems": "center",
+      "alignItems": "stretch",
       "style": {
         "overflow": "hidden"
       }

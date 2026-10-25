@@ -35,6 +35,14 @@ python3 .claude/skills/papo-design/scripts/papo_design.py --views "Page/Embedded
 
 `scripts/rules.json`: tipo de componente → clase, clases viejas que se reemplazan (sin dejar anchos fijos: la de `dropdown` traía 250 px; en columnas que no estiran el campo queda con `width: 100%`), valores que la clase ya define (se quitan del campo solo si coinciden) y colores de títulos que pasan a tokens. Los estáticos que su propio binding sobrescribe se quitan.
 
+## Objetos estándar (v2)
+
+`scripts/papo_objects.py` reemplaza los campos interactivos por `Objects/*` embebidos: el `custom.item` queda en el componente del formulario y su `answer` lee la salida `answer` del objeto. Mismas garantías de recolección (ítems, bindings y orden). Ver `.claude/docs/OBJETOS_ESTANDAR.md`.
+
+```bash
+python3 .claude/skills/papo-design/scripts/papo_objects.py --views "Page/Embedded/Ensamble/Form_EA11-0901_1h"
+```
+
 ## Después de aplicar
 
 1. `python3 .claude/skills/papo-lint/scripts/papo_lint.py --views <vistas>`: el patrón `formFieldDesign` debe quedar en 0

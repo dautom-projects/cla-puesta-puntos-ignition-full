@@ -11,7 +11,7 @@ Version: 1.1.0
 
 Changelog:
 	2026-10-22 | William M. | v1.0.0 - Initial version
-	2026-10-24 | William M. | v1.1.0 - Pattern formFieldDesign (fields without PAPO/Field/* class)
+	2026-10-24 | William M. | v1.1.0 - Pattern formFieldDesign (fields without PAPO/Field/* class or Objects/*)
 
 Args (CLI):
 	--project (str): Ignition project folder. Default: <repo>/cla-project
@@ -232,8 +232,11 @@ def _fieldsWithoutDesign(component):
 	"""Count components with custom.item whose style has no PAPO/Field/* class."""
 	count = 0
 	if "item" in (component.get("custom") or {}):
-		classes = str(((component.get("props") or {}).get("style") or {}).get("classes", "")).split()
-		if not any(c.startswith("PAPO/Field/") for c in classes):
+		props = component.get("props") or {}
+		classes = str((props.get("style") or {}).get("classes", "")).split()
+		# A standard object (Objects/*) carries its own PAPO/Field/* design
+		isObject = component.get("type") == "ia.display.view" and str(props.get("path", "")).startswith("Objects/")
+		if not isObject and not any(c.startswith("PAPO/Field/") for c in classes):
 			count += 1
 	for child in component.get("children") or []:
 		count += _fieldsWithoutDesign(child)
