@@ -1,9 +1,34 @@
 # Objetos estándar de PAPO
 
-Vistas reutilizables para los campos de los formularios Form_*, en
-`cla-project/com.inductiveautomation.perspective/views/Objects/`. Reemplazan las ~123 variantes de bindings con las que hoy se arman checkbox, text field, numeric, dropdown y label (inventario del 2026-10-22: 5,539 campos con `custom.item` en 238 vistas).
+## Diseño estándar de campos (clases de estilo)
 
-Piloto: `Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto` (copia de `Form_EA11-0901_1h`, 68 campos como objetos embebidos, 2026-10-24). La adopción va formulario por formulario (ver "Aplicación").
+Piloto: `Page/Embedded/Ensamble/Form_EA11-0901_1h_PruebaPiloto` (copia de `Form_EA11-0901_1h`, 2026-10-24).
+
+**Solo se parametriza el diseño.** Los campos siguen siendo los mismos componentes del formulario, con el mismo `custom.item` (procedimiento v2, paso 4) y los mismos bindings de `answer`; `recopile` y `save` no cambian. Lo único que cambia es `props.style` de cada campo: el diseño sale de una clase de estilo por tipo de campo, así que cambiar la clase cambia todos los formularios que la usan.
+
+Clases en `cla-project/com.inductiveautomation.perspective/style-classes/Objects/`:
+
+| Clase | Campo | Diseño | Reemplaza |
+|---|---|---|---|
+| `Objects/NumericField` | `ia.input.numeric-entry-field` | fondo `--cla-page-bg`, bordes redondeados 15 px, margen 1 px (izquierdo 0) | clase `dropdown` + `marginLeft: 0`, o bordes 10 px escritos en el campo |
+| `Objects/TextField` | `ia.input.text-field` | igual que NumericField | clase `dropdown` |
+| `Objects/Checkbox` | `ia.input.checkbox` | vacía por ahora (punto único para darles diseño) | sin estilo |
+| `Objects/TagLabel` | `ia.display.label` con `custom.item` (valor de tag) | Arial 16 px, negrita, centrado, color `#1199C7`, sangría 20 px | clase `text-data-2` + `color` y `paddingLeft` escritos en el campo |
+
+Lo que se queda en el formulario:
+
+- Tamaño y posición: `position` del campo y `width: 250px` en los campos que lo tomaban de la clase `dropdown`
+- Tamaño de letra: binding a `view.custom.fontSize` (se agregó a los 2 TextField, que no lo tenían)
+- Colores por rango: los bindings `custom.color` / `custom.borderColor` de cada numérico, sin cambios
+
+Aplicar a otro formulario: cambiar solo `props.style` de los campos con `custom.item` a `{"classes": "<clase>"}` (más `width` si venía de `dropdown`); no tocar `custom`, `propConfig` de respuestas, nombres ni contenedores. Verificar que `recopile` da los mismos ítems en el mismo orden y revisar en el Designer.
+
+Descartado en el piloto (2026-10-24): reemplazar los campos por las vistas `Objects/*` embebidas. Cambiaba de dónde sale la respuesta; queda para cuando se decida cambiar la lógica de guardado.
+
+## Vistas `Objects/*` (sin uso)
+
+Vistas reutilizables para los campos de los formularios Form_*, en
+`cla-project/com.inductiveautomation.perspective/views/Objects/`. Reemplazarían las ~123 variantes de bindings con las que hoy se arman checkbox, text field, numeric, dropdown y label (inventario del 2026-10-22: 5,539 campos con `custom.item` en 238 vistas). Ningún formulario las usa.
 
 ## Contrato común
 
@@ -14,11 +39,9 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 | `papoItemID` | input | null | Ítem de la pregunta |
 | `registerTypeID` | input | null | Tipo de registro del formulario (el `view.custom.registerTypeID` de la vista que lo usa) |
 | `fontSize` | input | 17 | Tamaño de letra de pregunta y campo |
-| `question` | input | "" | Texto de la pregunta que da el formulario; vacío = descripción de `papoitem` |
-| `value` | **inout** | según el objeto | Valor del campo (Checkbox, TextField, NumericField, Dropdown). Queda guardado en el formulario, así que la respuesta no se pierde si la sección se cierra y se vuelve a abrir |
 | `item` | **output** | {} | `{papoItemID, answer, registerTypeID}`, enlazado a `/root/Field.custom.item` |
 
-- Texto de la pregunta: `papo_core.items.getQuestionText(value)` con `{papoItemID, question, showQuestion, dbConnection}`. Si `question` trae texto se usa ese; si la pregunta está oculta (`showQuestion` false) no consulta; si no, consulta `papoitem` (sin SQL en la vista). Los textos de `papoitem` no tienen tildes y traen IZQ/DER, setpoints y numeración, así que los formularios pasan su propio texto.
+- Texto de la pregunta: `papo_core.items.getQuestionText(value)` con `{papoItemID, dbConnection}` (consulta individual a `papoitem`, igual que hoy; sin SQL en la vista).
 - Conexión: `view.custom.dbConnection` enlazado a `session.custom.dbConnection`.
 - Filas con pregunta separada (TextField, NumericField, Dropdown, Label): `showQuestion` (true), `questionBasis` ("450px") y `fieldBasis` ("224px").
 
@@ -42,29 +65,7 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 {"instancePosition": {}, "instanceStyle": {"classes": ""}, "papoItemID": 5134, "registerTypeID": 7}
 ```
 
-**Vista embebida en la celda** (`ia.display.view`, usada en el piloto): para formularios en grilla (columnas Receta 1/2/3, IZQ/DER). Cada campo se reemplaza por el objeto en la misma posición; las etiquetas y encabezados de la grilla quedan igual.
-
-**El `custom.item` se queda en el componente del formulario** (procedimiento v2, paso 4, y "Ruta de desarrollo": `FlexContainerGroupN > Componente (custom.item)`). `recopile` solo lee `custom.item` del árbol del formulario, así que el `ia.display.view` lleva el `custom.item` estático del campo original, y el objeto toma de ahí `papoItemID` y `registerTypeID` y devuelve la respuesta. No se cambia `papo_core.register`.
-
-```json
-{"type": "ia.display.view", "meta": {"name": "NumericEntryField"}, "position": {"basis": "32px"},
- "custom": {"item": {"papoItemID": 11406, "registerTypeID": 1}},
- "props": {"path": "Objects/NumericField", "style": {"width": "100%"},
-           "params": {"showQuestion": false, "fieldBasis": "100%", "minValue": 40, "maxValue": 50}},
- "propConfig": {
-   "custom.item.answer": {"binding": {"type": "property", "config": {"path": "this.props.params.item.answer"}}},
-   "props.params.papoItemID": {"binding": {"type": "property", "config": {"path": "this.custom.item.papoItemID"}}},
-   "props.params.registerTypeID": {"binding": {"type": "property", "config": {"path": "this.custom.item.registerTypeID"}}},
-   "props.params.fontSize": {"binding": {"type": "property", "config": {"path": "view.custom.fontSize"}}}}}
-```
-
-- `custom.item`: el mismo `{papoItemID, registerTypeID}` del campo original; `answer` enlazado a `this.props.params.item.answer`
-- `position`: la del campo original
-- `style`: `width: 100%` si la celda es una columna; `minHeight: 32px` si es una fila
-- Checkbox: `question` = texto que tenía el checkbox; `trueValue`/`falseValue` = salidas del map original
-- NumericField: `minValue`/`maxValue` = `custom.rang_down`/`rang_up` o el rango escrito en el transform de color
-- Label (tag): `props.params.tagPath` con expresión `{view.custom.path} + "/<Tag>"` (equivale al binding indirecto `{1}/<Tag>`)
-- A verificar: una vista embebida dentro de una sección cerrada (`display: false`) probablemente no arranca; si el operario guarda sin abrir la sección, el ítem se guarda igual (está en el `custom.item` del formulario) pero con `answer` nulo (antes, en un checkbox sin marcar, "No Cumple")
+**Vista embebida suelta** (`ia.display.view`): sirve para layouts mezclados, pero hoy `recopile` no lee `props.params.item` de una vista embebida. Usarla requiere primero ese cambio en `papo_core.register` (ver BACKLOG.md).
 
 ## Aplicación
 
@@ -75,6 +76,5 @@ Cada objeto es una fila (`root` flex, `alignItems: center`). El componente que g
 
 ## Pendiente de verificar
 
-- El gateway carga los objetos y el piloto (log `Setting LastModification to "external"`, 2026-10-24). Falta la revisión visual del piloto en el Designer y un guardado real comparado con `Form_EA11-0901_1h` en `registerhistory`.
-- Confirmar en una sesión que el valor se conserva al cerrar y reabrir la sección (parámetro `value` inout).
+- Los objetos se generaron en disco. Su `resource.json` no tiene `lastModificationSignature`; confirmar que el gateway los carga al reiniciar `PAPOS` (y que el Designer los muestra en `Objects/`).
 - `resource.json` está en `.gitignore`: en un clone limpio estos objetos (como el resto de vistas) no traen `resource.json`.

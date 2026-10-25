@@ -122,18 +122,14 @@ def getQuestionText(value):
 	Falls back to a single-item query only when the item is not in the map
 	(for example, a question that belongs to another PAPO).
 
-	Version: 1.1.0
+	Version: 1.0.0
 
 	Changelog:
 		2026-10-22 | William M. | v1.0.0 - Initial version (EC07-0101 barcada pilot)
-		2026-10-24 | William M. | v1.1.0 - Text given by the form (question) wins over
-			papoitem; hidden questions (showQuestion false) skip the query
 
 	Args:
 		value (dict): Expression structure with:
 			papoItemID (int): Item ID of the label (this.custom.papoItemID)
-			question (str): Optional text given by the form (view.params.question)
-			showQuestion (bool): Optional; False when the object hides the question
 			questions (dict): Question map from getQuestions (view.custom.questions)
 			dbConnection (str): Database connection for the fallback query
 
@@ -143,16 +139,6 @@ def getQuestionText(value):
 	logger = system.util.getLogger("papo_core.items.getQuestionText")
 
 	try:
-		# Text given by the form wins over the papoitem description
-		question = value.get("question")
-		if question:
-			return question
-
-		# Hidden question: no text needed, skip the query
-		showQuestion = value.get("showQuestion")
-		if showQuestion is not None and not showQuestion:
-			return ""
-
 		papoItemID = value.get("papoItemID")
 		if papoItemID is None or papoItemID == "":
 			return ""
