@@ -7,9 +7,9 @@
 - Mensajes: 90
 - Tags referenciados: 264
 - Paginas y docks: 8
-- Clases de estilo: 104
+- Clases de estilo: 103
 - Session props: 5
-- Relaciones: 4460 (usa tag 717, llama 651, embebe/abre 93, maneja 421, monta 8, envia 676, usa sesion 269, usa estilo 1625)
+- Relaciones: 4455 (usa tag 717, llama 651, embebe/abre 90, maneja 421, monta 8, envia 676, usa sesion 269, usa estilo 1623)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -36,7 +36,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **papo_core.sign** (cla-project) — directo 96, transitivo 99
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
-- **papo_core.items** (cla-project) — directo 7, transitivo 8
+- **papo_core.items** (cla-project) — directo 7, transitivo 7
 - **mes_core.workOrder** (cla-project) — directo 4, transitivo 7
 - **mes_core.schedule** (cla-project) — directo 3, transitivo 7
 
