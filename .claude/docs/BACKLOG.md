@@ -33,6 +33,7 @@
 - Agregar a papo-lint el patrón "campos fuera de objetos estándar" para medir la adopción
 - Diseño estándar (`ESTANDAR_DISENO.md`, herramienta papo-design): revisar el piloto `Form_EA11-0901_1h_PruebaPiloto` en el Designer; si pasa, desplegar por fases (familia EA11-0901 + `Metalurgia/Fundamental Views/Checkbox`, luego por área). Simulado: 238 de 239 formularios aplicables con la recolección idéntica; `FU10-0202_start` a mano
 - Siguiente nivel del diseño: clases para preguntas, subtítulos y encabezados (confirmar antes que una clase en la label equivale a `textStyle`), tokens `--papo-*` en el tema, plantilla para formularios nuevos
+- Tema `cla-light`/`cla-dark` roto (`:root` sin cerrar: ~75 reglas que el Designer descarta; selectores de input que no coinciden; `boder-color`; dropdowns a 150 px fijos). Parche propuesto en `.claude/docs/theme/`, sin instalar: probar en PAPOS (reinicio de Perspective) y decidir. Ver "Evaluación" en `ESTANDAR_DISENO.md`
 
 ## Mejoras opcionales (fuera de la estandarización básica)
 

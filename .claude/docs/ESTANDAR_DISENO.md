@@ -74,3 +74,35 @@ En cada fase: desplegar primero `style-classes/PAPO/` y después las vistas; fil
 - **Formularios nuevos desde plantilla**: generar el `view.json` de un PAPO nuevo desde `papoitem` con la estructura del v2 (Sections, `FlexContainerGroupN`, campos con `custom.item`) y las clases `PAPO/` desde el inicio. Con 77 familias y 3.1 variantes de media, generar las variantes de una familia desde una sola definición evita copiar y pegar vistas
 - **papo-lint como compuerta**: correrlo antes de cada despliegue y no subir vistas con hallazgos nuevos
 - El stylesheet avanzado del proyecto (Tailwind con prefijo `psc-`) sirve para utilidades de layout; el diseño por rol queda en las clases `PAPO/`
+
+## Evaluación: mover el diseño base al tema (2026-10-24)
+
+Producción y PAPOS corren 8.1.19: no hay stylesheet avanzado (llegó en 8.1.22), así que las opciones son clases de estilo del proyecto o el tema del gateway. El Designer de 8.1.19 dibuja con JxBrowser 7.12.1 (Chromium 86).
+
+### Estado del tema actual (`cla-light.css`, `cla-dark.css`)
+
+1. `:root{` (línea 4) nunca se cierra. Las ~75 reglas de componentes de las líneas 36 a 579 (botones `button-*`, `button-questions` de las Sections, popup, checkbox, dropdown, inputs) quedan anidadas dentro de `:root`, y la llave suelta de la línea 581 cierra el bloque. Un navegador sin CSS Nesting (el Chromium 86 del Designer, Chrome anterior a 112) descarta esas reglas; uno moderno las aplica (las que empiezan con `div[...]` solo desde Chrome 120). El Designer y los clientes pueden verse distinto
+2. La regla de inputs no coincide con ningún componente: el text field dibuja el `<input>` como raíz (no hay un `div` con `data-component`) y el numérico es `ia.input.numeric-entry-field`, no `ia.input.numeric-entry` (verificado en el bundle de Perspective 8.1.19)
+3. `boder-color` (12 veces) no es una propiedad CSS: los bordes de hover de los botones nunca aplicaron
+4. `.ia_dropdown { width: 150px !important }` fuerza todos los dropdowns a 150 px en navegadores modernos, contra el estándar sin anchos fijos
+5. La regla de inputs usa `!important` en `color` y `border`: si llegara a aplicar, taparía los colores por rango que los formularios ponen con bindings
+6. `cla-dark.css` tiene los mismos colores que `cla-light.css`: no es un tema oscuro
+7. Un cambio de tema solo se ve tras reiniciar el gateway o el módulo Perspective (y F5 en los clientes), y afecta a todos los proyectos del gateway que usan ese tema
+
+### Qué puede hacer cada capa en 8.1.19
+
+| | Clase de estilo del proyecto | Tema del gateway |
+|---|---|---|
+| Dónde vive | En el proyecto, en git; se despliega con las vistas | En el gateway, fuera de git; copia manual y reinicio |
+| Qué alcanza | El elemento raíz del componente | Cualquier selector: partes internas (ícono del checkbox, input interno del numérico, opciones del dropdown, placeholder) y estados (`:hover`, `:focus`, `:disabled`) |
+| Prioridad | Pierde contra `props.style` del campo | Pierde contra `props.style`, salvo con `!important` |
+| Aplicar a un tipo sin tocar campos | No | Sí |
+
+### Recomendación
+
+- **No mover el diseño base al tema.** Bordes, fondo y letra de los campos siguen en las clases `PAPO/Field/*`: papo-design las pone sin costo, viajan con el proyecto y no piden reinicio. Así el diseño de un formulario vive en un solo lugar
+- **Usar el tema solo para lo que una clase no alcanza**: partes internas, estados y los tokens de color
+- **Antes, corregir el tema.** Propuesta lista, sin instalar: `theme/cla-light.fix.patch` y `theme/cla-dark.fix.patch` (cierran `:root`, quitan la llave suelta, corrigen `boder-color` y los selectores de input, quitan `!important` del input base y el `width: 150px` de los dropdowns). Efecto: el Designer y todos los navegadores pasan a ver lo mismo. En navegadores modernos cambian los dropdowns (sin 150 px fijos), el borde base de los inputs y los bordes de hover de los botones
+- **Versionar el tema**: copiar `data/modules/com.inductiveautomation.perspective/themes/cla-*.css` al repo y registrar su despliegue en `DEPLOY_INVENTORY.md` como un recurso más
+
+Prueba antes de instalar el parche en PAPOS (requiere reiniciar Perspective): comparar el Designer y Chrome en el piloto (Sections, botones, checkbox, dropdown, numéricos fuera de rango en rojo) y en una vista de otro módulo (`Node/MixingDashboard`, `Alerts`).
