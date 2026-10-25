@@ -123,7 +123,7 @@ def _formatTime(value):
 	if value is None:
 		return None
 	millis = value.get("$ts") if isinstance(value, dict) else value
-	moment = datetime.datetime.utcfromtimestamp(millis / 1000.0) - datetime.timedelta(hours=5)
+	moment = datetime.datetime.fromtimestamp(millis / 1000.0, datetime.timezone(datetime.timedelta(hours=-5)))
 	return moment.strftime("%I:%M:%S %p").lstrip("0")
 
 
