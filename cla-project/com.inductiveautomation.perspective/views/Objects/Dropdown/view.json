@@ -5,6 +5,7 @@
   "params": {
     "answer": "",
     "answerFrom": "label",
+    "emptyAnswer": null,
     "fontSize": 17,
     "options": [],
     "papoItemID": null,
@@ -29,6 +30,7 @@
         "config": {
           "struct": {
             "answerFrom": "{view.params.answerFrom}",
+            "emptyAnswer": "{view.params.emptyAnswer}",
             "options": "{view.params.options}",
             "value": "{view.params.value}"
           },
@@ -36,7 +38,7 @@
         },
         "transforms": [
           {
-            "code": "\t# Answer is the selected option label, or its value when answerFrom is \"value\"\n\tif value[\"answerFrom\"] \u003d\u003d \"value\":\n\t\treturn value[\"value\"]\n\tfor option in value[\"options\"] or []:\n\t\tif str(option[\"value\"]) \u003d\u003d str(value[\"value\"]):\n\t\t\treturn option[\"label\"]\n\treturn \"\"\n",
+            "code": "\t# Answer is the selected option label, or its value when answerFrom is \"value\"\n\tif value[\"answerFrom\"] \u003d\u003d \"value\":\n\t\tif value[\"emptyAnswer\"] is None:\n\t\t\treturn value[\"value\"]\n\t\treturn value[\"value\"] if value[\"value\"] else value[\"emptyAnswer\"]\n\tfor option in value[\"options\"] or []:\n\t\tif str(option[\"value\"]) \u003d\u003d str(value[\"value\"]):\n\t\t\treturn option[\"label\"]\n\treturn \"\"\n",
             "type": "script"
           }
         ],
@@ -46,6 +48,10 @@
       "persistent": true
     },
     "params.answerFrom": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.emptyAnswer": {
       "paramDirection": "input",
       "persistent": true
     },
@@ -84,7 +90,7 @@
   },
   "props": {
     "defaultSize": {
-      "height": 40,
+      "height": 50,
       "width": 400
     }
   },

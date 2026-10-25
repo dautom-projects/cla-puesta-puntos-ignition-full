@@ -21,6 +21,7 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 | `question` | input | Texto de la pregunta (el del formulario). Vacío + `papoItemID` = descripción de `papoitem` |
 | `fontSize` | input | Tamaño de letra; el formulario lo enlaza a `view.custom.fontSize` |
 | `showQuestion`, `questionBasis` | input | Pregunta dentro del objeto (lista) u oculta (grilla, la pregunta es una etiqueta del formulario) |
+| `emptyAnswer` | input | Respuesta cuando el valor está vacío (p. ej. `"-"`); vacía (`null`) = el valor tal cual. Misma regla que el transform `return value if value else "-"` de los formularios |
 
 | Objeto | Campo | `answer` | Parámetros propios |
 |---|---|---|---|
@@ -28,6 +29,8 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 | `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`), `placeholder` |
 | `Objects/TextField` | text field | el texto | `placeholder` |
 | `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` |
+| `Objects/OptionGroup` | radio group (una opción entre varias) | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos) |
+| `Objects/DateTime` | selector de fecha u hora | el valor con `format` (por defecto `h:mm:ss a`, como los formularios) | `pickerType` ("time"), `format` |
 | `Objects/Label` | valor de tag (solo lectura) | el valor del tag | `tagPath` |
 
 Diseño interno: cada `Field` usa su clase `PAPO/Field/*`; dentro de un formulario con `PAPO/Form` recibe además el tema corregido.
@@ -39,6 +42,10 @@ Diseño interno: cada `Field` usa su clase `PAPO/Field/*`; dentro de un formular
    - el formulario guarda una respuesta inicial en `props.params.answer` igual a la que guardaba el campo sin tocar (checkbox: `falseValue`; texto: `""`; dropdown por etiqueta: `""`)
 2. **Los valores de tag quedan nativos** (componente del formulario con la clase `PAPO/Field/TagValue`): el original guarda el valor del tag aunque la sección no se abra, y un objeto sin montar no puede leerlo
 3. **Solo se convierten campos cuya respuesta es el valor del campo** (checkbox con map true/false; dropdown con la búsqueda de etiqueta estándar). Los que tienen lógica propia quedan nativos
+
+## Generación
+
+Los objetos se generan con `.claude/skills/papo-design/scripts/build_objects.py` (una sola definición; `--check` muestra qué cambiaría). Para cambiar un objeto se edita el generador y se vuelve a correr; no se editan los `view.json` a mano.
 
 ## Herramienta
 

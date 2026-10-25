@@ -14,10 +14,11 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
+	2026-10-25 | William M. | v1.1.0 - emptyAnswer, Objects/OptionGroup and Objects/DateTime
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -104,6 +105,27 @@ def _code(transform):
 	return " ".join((transform.get("code") or "").split())
 
 
+def _optionTexts(node):
+	"""Texts of the checkboxes an option group answers with, in the order of its script."""
+	binding = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
+	code = (binding.get("transforms") or [{}])[0].get("code") or ""
+	if binding.get("type") != "property" or "answerReturn[value.index(True)] if any(value) else \"-\"" not in code:
+		return None
+	children = {c.get("meta", {}).get("name"): c for c in node.get("children", [])}
+	names = re.findall(r'getChild\("([^"]+)"\)', code)
+	texts = [(children.get(n, {}).get("props") or {}).get("text") for n in names]
+	return texts if names and None not in texts else None
+
+
+def _formatTime(value):
+	"""h:mm:ss a in the gateway time zone (America/Bogota) for a stored Perspective date."""
+	if value is None:
+		return None
+	millis = value.get("$ts") if isinstance(value, dict) else value
+	moment = datetime.datetime.utcfromtimestamp(millis / 1000.0) - datetime.timedelta(hours=5)
+	return moment.strftime("%I:%M:%S %p").lstrip("0")
+
+
 def nativeAnswer(source):
 	"""Return (fn, default) of the original field, or (None, reason) when its logic is not recognized."""
 	if source.get("instance") is not None:
@@ -112,6 +134,18 @@ def nativeAnswer(source):
 		return None, "repeater no reconocido"
 	node = source["node"]
 	ctype = node.get("type")
+	if ctype == "ia.container.flex" and "checkboxAnswers" in node.get("custom", {}):
+		options = _optionTexts(node)
+		if options is None:
+			return None, "grupo de opción no reconocido"
+		answers = node["custom"].get("checkboxAnswers") or []
+		chosen = [o for o, on in zip(options, answers) if on]
+		return (lambda v: v if v else "-"), (chosen[0] if chosen else None)
+	if ctype == "ia.input.date-time-input":
+		b = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
+		if b.get("config", {}).get("path") == "this.props.value" and 'SimpleDateFormat("h:mm:ss a"' in json.dumps(b.get("transforms", [])):
+			return _formatTime, (node.get("props") or {}).get("value")
+		return None, "fecha con lógica no reconocida"
 	if ctype not in VALUE_PROP:
 		return None, "tipo {}".format(ctype)
 	prop, componentDefault = VALUE_PROP[ctype]
@@ -161,6 +195,10 @@ def objectAnswer(node):
 		return (lambda v: p.get("trueValue") if v else p.get("falseValue")), p.get("answer")
 	if path in ("Objects/NumericField", "Objects/TextField"):
 		return withEmpty, p.get("answer")
+	if path == "Objects/OptionGroup":
+		return withEmpty, p.get("answer")
+	if path == "Objects/DateTime":
+		return (_formatTime if p.get("format") == "h:mm:ss a" else None), p.get("answer")
 	if path == "Objects/Dropdown":
 		if p.get("answerFrom") == "label":
 			opts = p.get("options") or []
@@ -178,6 +216,10 @@ def objectAnswer(node):
 def samplesFor(source, node):
 	"""Sample field values to compare answers."""
 	ctype = (source.get("node") or {}).get("type") or "ia.input.checkbox"
+	if ctype == "ia.container.flex":
+		return [None] + list(node["props"].get("params", {}).get("options") or [])
+	if ctype == "ia.input.date-time-input":
+		return [None, {"$ts": 1788367051480}, {"$ts": 1788300000000}]
 	if ctype == "ia.input.checkbox" or source.get("instance") is not None:
 		return [True, False]
 	if ctype == "ia.input.numeric-entry-field":

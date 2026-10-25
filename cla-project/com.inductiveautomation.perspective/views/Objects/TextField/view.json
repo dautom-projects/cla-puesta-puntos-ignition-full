@@ -4,6 +4,7 @@
   },
   "params": {
     "answer": "",
+    "emptyAnswer": null,
     "fontSize": 17,
     "papoItemID": null,
     "placeholder": "Escriba aqui",
@@ -25,11 +26,25 @@
     "params.answer": {
       "binding": {
         "config": {
-          "expression": "{view.params.value}"
+          "struct": {
+            "emptyAnswer": "{view.params.emptyAnswer}",
+            "value": "{view.params.value}"
+          },
+          "waitOnAll": true
         },
-        "type": "expr"
+        "transforms": [
+          {
+            "code": "\t# Answer is the value, or emptyAnswer when the value is empty and emptyAnswer is set\n\tif value[\"emptyAnswer\"] is None:\n\t\treturn value[\"value\"]\n\treturn value[\"value\"] if value[\"value\"] else value[\"emptyAnswer\"]\n",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
       },
       "paramDirection": "output",
+      "persistent": true
+    },
+    "params.emptyAnswer": {
+      "paramDirection": "input",
       "persistent": true
     },
     "params.fontSize": {
@@ -63,7 +78,7 @@
   },
   "props": {
     "defaultSize": {
-      "height": 40,
+      "height": 50,
       "width": 400
     }
   },
