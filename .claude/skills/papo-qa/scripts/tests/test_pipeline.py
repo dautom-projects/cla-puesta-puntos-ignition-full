@@ -150,6 +150,12 @@ class PipelineTest(unittest.TestCase):
 		_embeds(v)[0]["props"].setdefault("style", {})["width"] = "250px"
 		self.assertIn("5", self.run_case(v))
 
+	def test_design_section_too_short(self):
+		v = copy.deepcopy(self.clean)
+		group = [g for g in v["root"]["children"] if "baseBasisPx" in g.get("custom", {})][0]
+		group["custom"]["baseBasisPx"] = int(qa._rowsHeight(group)) - 100
+		self.assertIn("5", self.run_case(v))
+
 	def test_collection_broken_reference(self):
 		v = copy.deepcopy(self.clean)
 		_embeds(v)[0]["propConfig"]["props.params.fontSize"] = {"binding": {"config": {"path": "../NoExiste.props.value"}, "type": "property"}}

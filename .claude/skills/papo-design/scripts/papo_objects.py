@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.1.0
+Version: 2.2.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -26,6 +26,8 @@ Changelog:
 	2026-10-25 | William M. | v2.1.0 - Carry every field prop (checkbox text and state text, question as
 		placeholder, enabled, value/option bindings) or keep the field native; rows only in column
 		groups; a row without a question takes the full width
+	2026-10-25 | William M. | v2.2.0 - Section height (custom.baseBasisPx) grows with the rows; an option
+		group keeps the width of its question label
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -450,6 +452,10 @@ def fieldEmbed(field, parent, grand, rule, stats):
 			return None
 		params.update(question[0], showQuestion=question[2])
 		bindings.update(question[1])
+		# The question keeps the width of the original label, so the options start where the checkboxes did
+		basis = str(([c for c in field.get("children", []) if c.get("type") == "ia.display.label"] or [{}])[0].get("position", {}).get("basis", ""))
+		if basis.endswith("px") or basis.endswith("%"):
+			params["questionBasis"] = basis
 	else:
 		params["showQuestion"] = False
 	local[OBJECTS[field["type"]]] += 1
@@ -603,8 +609,27 @@ def _conflict(references, removed, keepItem):
 	return False
 
 
+def _pxSum(group):
+	total = 0.0
+	for child in group.get("children", []):
+		basis = str(child.get("position", {}).get("basis", ""))
+		if basis.endswith("px"):
+			try:
+				total += float(basis[:-2])
+			except ValueError:
+				pass
+	return total
+
+
+def _sectionHeights(view):
+	"""Groups whose expanded height is fixed (custom.baseBasisPx, used by papo_core.ui.toggleSection)."""
+	return {g["meta"]["name"]: g for g in view["root"].get("children", []) if GROUP.match(g.get("meta", {}).get("name", ""))
+		and isinstance((g.get("custom") or {}).get("baseBasisPx"), (int, float)) and "custom.baseBasisPx" not in g.get("propConfig", {})}
+
+
 def standardize(view, options, stats):
 	"""Convert the view in place."""
+	heights = {name: _pxSum(g) for name, g in _sectionHeights(view).items()}
 	if options.get("legacy"):
 		dropLegacyAnswers(view, stats)
 		for name in dropLegacy(view, stats):
@@ -651,6 +676,12 @@ def standardize(view, options, stats):
 			walk(child, childPath, node, parent)
 
 	walk(view["root"], ("root",), None, None)
+	# Rows taller than before: the expanded section grows by the same amount (otherwise its end is cut)
+	for name, group in _sectionHeights(view).items():
+		grown = _pxSum(group) - heights.get(name, 0)
+		if name in heights and grown > 0:
+			group["custom"]["baseBasisPx"] = int(round(group["custom"]["baseBasisPx"] + grown))
+			stats["secciones con más alto"] += 1
 	if options.get("formClass"):
 		style = view["root"].setdefault("props", {}).setdefault("style", {})
 		tokens = str(style.get("classes", "")).split()

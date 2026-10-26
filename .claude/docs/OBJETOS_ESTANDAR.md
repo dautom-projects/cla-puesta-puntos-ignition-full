@@ -1,4 +1,4 @@
-# Objetos estándar de PAPO (v2.2)
+# Objetos estándar de PAPO (v2.3)
 
 Vistas `Objects/*` que encapsulan el diseño y el comportamiento de un campo: el mapeo Cumple/No Cumple, el color por rango, la respuesta del dropdown y el texto de la pregunta. El formulario solo pasa parámetros. Diseño de las clases y el tema: `ESTANDAR_DISENO.md`.
 
@@ -34,7 +34,7 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 | `Objects/DateTime` | selector de fecha u hora | el valor con `format` (por defecto `h:mm:ss a`, como los formularios) | `pickerType` ("time"), `format` |
 | `Objects/Label` | valor de tag (solo lectura) | el valor del tag | `tagPath` |
 
-Diseño interno: cada `Field` usa su clase `PAPO/Field/*`; dentro de un formulario con `PAPO/Form` recibe además el tema corregido.
+Diseño interno: cada `Field` usa su clase `PAPO/Field/*`; dentro de un formulario con `PAPO/Form` recibe además el tema corregido. La raíz de cada objeto es `position: relative`: el `<input>` oculto del checkbox y del radio de Perspective es `position: absolute` y, sin un contenedor posicionado, quedaba ubicado respecto a la raíz del Template; en secciones largas, al hacer clic el navegador desplazaba la página hasta él y se veía en blanco (v2.3).
 
 ## Condiciones (estudio del 2026-10-24)
 
@@ -50,12 +50,14 @@ Los objetos se generan con `.claude/skills/papo-design/scripts/build_objects.py`
 
 ## Herramienta
 
-`.claude/skills/papo-design/scripts/papo_objects.py` (v2.1) convierte formularios (simula por defecto, `--apply` escribe con backup):
+`.claude/skills/papo-design/scripts/papo_objects.py` (v2.2) convierte formularios (simula por defecto, `--apply` escribe con backup):
 
 - **Fila de lista** (solo en grupos en columna): fila = un campo + una etiqueta de pregunta (o el campo es la fila) → un objeto con la pregunta adentro (`showQuestion`), alto estándar 50 px (o el de la fila si era mayor). La pregunta sale del texto fijo o, si la etiqueta consultaba `papoitem`, del mismo `papoItemID`. Una fila sin pregunta deja el campo a todo el ancho
 - **Celda de grilla** (y grupos en fila, como `FlexContainerSupervisor`): solo el campo; la celda conserva su layout
 - **Todas las propiedades del campo pasan al objeto**: valor, `enabled`, placeholder, opciones y el texto del checkbox, fijos o con binding. Los textos que consultaban la descripción en `papoitem` pasan como `papoItemID` (la consulta queda en el objeto); el mapa ✔ / ✘ del estado como `trueText` / `falseText`; otro binding se copia al parámetro si resuelve igual desde el objeto. Las variantes de "Escriba aqui" quedan en el placeholder estándar. Si una propiedad no tiene parámetro (p. ej. `inputBounds`) el campo queda nativo
 - **Repeater** (`Fundamental Views/Checkbox`): un objeto por instancia, con `registerTypeID` leído de `papoitem` (SELECT) y la respuesta guardada en la instancia como respuesta inicial
+- **Alto de la sección**: `papo_core.ui.toggleSection` abre cada grupo con el alto fijo de `custom.baseBasisPx`; si las filas estándar suman más que las originales, ese alto crece lo mismo (si no, el final de la sección queda cortado)
+- **Grupo de opción**: la pregunta conserva el ancho de su etiqueta original (`questionBasis`), así las opciones empiezan donde estaban los checkbox
 - `--legacy`: quita handlers de guardado legacy que nadie envía y el `custom.answers` reactivo de los grupos y del supervisor (v2, paso 4) si nada lo usa
 - `--form-class`: agrega `PAPO/Form` a la raíz
 - Conserva el valor inicial de cada campo (los guardados en el Designer) y su respuesta
@@ -63,6 +65,8 @@ Los objetos se generan con `.claude/skills/papo-design/scripts/build_objects.py`
 - Verifica la recolección (ítems, bindings, orden, contenedor) y que no aparezcan referencias rotas
 
 Simulación completa (papo-design + papo_objects v2.1, 2026-10-25), validada con papo-qa v1.2 contra el original (incluida la comparación de lo que ve el operario en cada campo): **234 de 237 formularios pasan** las etapas 1–6; fallan solo los 3 de Cubiertas (sin wrappers del v2, caso manual). 4,986 objetos (2,502 checkbox, 1,724 texto, 609 numéricos, 110 dropdowns, 26 fechas, 15 grupos de opción), 870 filas de lista. Quedan nativos 92 campos (70 referenciados por otro componente, 19 con lógica propia, 3 con propiedades sin parámetro). Grafo del proyecto convertido (v2.0): 0 referencias no resueltas nuevas y 17 mensajes desbalanceados menos.
+
+Simulación de todo el proyecto: `python3 .claude/skills/papo-qa/scripts/simulate_all.py` (lee los originales de git, no escribe nada). Con v2.2: 234 de 237 pasan y 62 secciones crecen de alto.
 
 Corrección v2.1 (revisión del usuario en los pilotos, 2026-10-25): la v2.0 perdía la pregunta de 772 checkbox que la consultaban en `papoitem` y la de los placeholders que mostraban la pregunta (516), no pasaba `enabled: false` (36 campos) ni los bindings de valor a tags (57), y trataba el supervisor como fila de lista (pregunta vacía al 60 %). El radio group no tenía `orientation`/`align`/`radioStyle` y las opciones saltaban de línea.
 

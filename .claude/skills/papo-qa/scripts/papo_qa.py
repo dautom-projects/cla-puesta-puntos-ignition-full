@@ -9,19 +9,22 @@ Compares each view against its version in a baseline commit and runs the stages:
 	                  answer kept while the object is not mounted) and shows and does the same:
 	                  question / checkbox text, placeholder, enabled, value and option bindings
 	4 Flujo v2        standard wrappers, no legacy handlers, no new "papo_db"
-	5 Diseño          PAPO/Form root, standard fields, no fixed px widths, no new missing classes
+	5 Diseño          PAPO/Form root, standard fields, no fixed px widths, no new missing classes,
+	                  expanded sections as tall as their rows (custom.baseBasisPx)
 	6 Contrato        params passed to Objects/* exist with the right direction
 	7 Grafo           no new unresolved references or unbalanced messages (--graph)
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.2.0
+Version: 1.3.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
 	2026-10-25 | William M. | v1.1.0 - emptyAnswer, Objects/OptionGroup and Objects/DateTime; new broken component references fail stage 2
 	2026-10-25 | William M. | v1.2.0 - Stage 3 also compares the field props the operator sees (text, placeholder,
 		enabled, bindings); an unknown prop of a converted field fails
+	2026-10-25 | William M. | v1.3.0 - Stage 5: an expanded section must fit its rows as before (custom.baseBasisPx);
+		stage 3: an option group keeps the width of its question
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -441,6 +444,9 @@ def stageFieldProps(cur, base):
 		if expected != shown:
 			problems.append("{}: la pregunta era {} y el objeto muestra {}".format(where, str(expected)[:90], str(shown)[:90]))
 		if ctype == "ia.container.flex":
+			width = str(labels[0].get("position", {}).get("basis", "")) if labels else ""
+			if (width.endswith("px") or width.endswith("%")) and params.get("questionBasis") != width:
+				problems.append("{}: la pregunta medía {} y ahora {}".format(where, width, params.get("questionBasis", "60%")))
 			continue
 		# Placeholder, enabled, value and option bindings
 		if ctype in ("ia.input.numeric-entry-field", "ia.input.text-field", "ia.input.dropdown") and _placeholderOf(field) != _objectPlaceholder(embed):
@@ -528,8 +534,34 @@ def _classExists(name):
 	return os.path.exists(os.path.join(STYLES, name, "style.json"))
 
 
+def _rowsHeight(group):
+	total = 0.0
+	for child in group.get("children", []):
+		basis = str(child.get("position", {}).get("basis", ""))
+		if basis.endswith("px"):
+			try:
+				total += float(basis[:-2])
+			except ValueError:
+				pass
+	return total
+
+
+def _sectionOverflow(view):
+	"""Per group with a fixed expanded height: px of rows beyond custom.baseBasisPx."""
+	out = {}
+	for g in view["root"].get("children", []):
+		height = (g.get("custom") or {}).get("baseBasisPx")
+		if GROUP.match(g.get("meta", {}).get("name", "")) and isinstance(height, (int, float)):
+			out[g["meta"]["name"]] = _rowsHeight(g) - height
+	return out
+
+
 def stageDesign(cur, base):
 	problems = []
+	before = _sectionOverflow(base["view"])
+	for name, overflow in sorted(_sectionOverflow(cur).items()):
+		if overflow > max(0, before.get(name, 0)):
+			problems.append("{}: las filas miden {:.0f} px más que la sección abierta (custom.baseBasisPx)".format(name, overflow))
 	missingNow = {c for c in _classes(cur) if not _classExists(c)}
 	missingBefore = {c for c in _classes(base["view"]) if not _classExists(c)}
 	if missingNow - missingBefore:
@@ -639,12 +671,21 @@ def stageData(pilotID, originalID):
 		return type(v).__name__
 	a, b = items(rows[int(pilotID)]), items(rows[int(originalID)])
 	problems = []
-	if [i["papoItemID"] for i in a] != [i["papoItemID"] for i in b]:
-		problems.append("los ítems o su orden difieren ({} contra {})".format(len(a), len(b)))
-	for x, y in zip(a, b):
+	idsA, idsB = [i["papoItemID"] for i in a], [i["papoItemID"] for i in b]
+	onlyA, onlyB = [i for i in idsA if i not in idsB], [i for i in idsB if i not in idsA]
+	if onlyA or onlyB:
+		problems.append("ítems solo en el piloto: {} · solo en el original: {} ({} contra {})".format(onlyA or "-", onlyB or "-", len(a), len(b)))
+	if [i for i in idsA if i in idsB] != [i for i in idsB if i in idsA]:
+		problems.append("los ítems comunes están en otro orden")
+	byID = {i["papoItemID"]: i for i in b}
+	for x in a:
+		y = byID.get(x["papoItemID"])
+		if y is None:
+			continue
 		if x.get("registerTypeID") != y.get("registerTypeID"):
 			problems.append("{}: registerTypeID {} contra {}".format(x["papoItemID"], x.get("registerTypeID"), y.get("registerTypeID")))
-		if kind(x.get("answer")) != kind(y.get("answer")) and None not in (x.get("answer"), y.get("answer")):
+		# Empty, unanswered option ("-") or unavailable (tag without value) answers depend on what was filled
+		if kind(x.get("answer")) != kind(y.get("answer")) and not {x.get("answer"), y.get("answer")} & {None, "", "-"}:
 			problems.append("{}: formato {} contra {}".format(x["papoItemID"], kind(x.get("answer")), kind(y.get("answer"))))
 	return problems
 
