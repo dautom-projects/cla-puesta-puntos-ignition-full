@@ -1,5 +1,7 @@
 # Procedimiento de estandarización — vistas Form_* a papo_core
 
+> Versión 2 (wrappers de `papo_core`). La versión vigente es la v3: `PROCEDIMIENTO_ESTANDARIZACION_V3.md`, que incluye estos pasos.
+
 Plantilla: `cla-project/com.inductiveautomation.perspective/views/Page/Embedded/Ensamble/Form_EA11-1501_30min/view.json` (sin firma). Variante con `supervisorOpt`: `Page/Embedded/Ensamble/Form_EA11-0901_1h`. Extraído el 2026-10-22.
 
 **Alcance:** solo vistas `Form_*`, módulos `papo_core.ui` y `papo_core.register`. Las firmas de operario y supervisor viven en `Page/Digitalizacion_Template` y quedan **fuera** de este procedimiento.

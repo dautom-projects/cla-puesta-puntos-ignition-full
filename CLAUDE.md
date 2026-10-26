@@ -137,7 +137,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `cla-project/ignition/script-python/papo_core/` — código fuente del package papo_core (referencia de los módulos)
 - `.claude/docs/USAGE.md` — referencia de funciones de papo_core y desde dónde se llaman
 - `.claude/docs/MIGRATION_STATUS.md` — estado de migración de las vistas Form_* por módulo
-- `.claude/docs/PROCEDIMIENTO_ESTANDARIZACION.md` — pasos de estandarización por vista
+- `.claude/docs/PROCEDIMIENTO_ESTANDARIZACION_V3.md` — procedimiento de estandarización v3 (objetos estándar, clases PAPO/, preguntas desde papoItemID, herramientas y QA); `PROCEDIMIENTO_ESTANDARIZACION.md` es la v2 aplicada (wrappers de papo_core)
 - `.claude/docs/CONTEXT_AUTOMATIZACION_JSON.md` — cómo inyectar wrappers en view.json
 - `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de papo_db generado desde la base viva (notas de dominio, conteos y catálogos)
 - `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
