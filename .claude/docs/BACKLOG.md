@@ -58,7 +58,7 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` y `F&A/Form__end` (sin referencia en el nombre), desde el checkpoint `1a0ba2b`. No se estandarizan; decidir si se borran
 
-- `Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedan nativos en el estándar porque cada contenedor de fila (`FlexContainer_N`) lee el `props.value` de su campo; convertirlos pide cambiar esa referencia a mano (revisar qué hace el contenedor con el valor)
+- ~~`Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedaban nativos porque cada fila tenía un `custom.answers` legacy que leía el valor del campo~~ corregido (papo_objects v2.11 quita el recolector de fila; los 42 son `Objects/Dropdown`)
 
 ## Errores de los reportes (encontrados al revisar los PDF de los pilotos, 2026-10-26)
 
