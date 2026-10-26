@@ -1077,7 +1077,7 @@
             "classes": "text-titles"
           },
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -1291,7 +1291,9 @@
             "children": [
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4364
+                  }
                 },
                 "meta": {
                   "name": "Checkbox"
@@ -1303,33 +1305,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -1348,7 +1324,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -1356,22 +1332,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -1387,7 +1373,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4365
+                  }
                 },
                 "meta": {
                   "name": "TextField_Corr"
@@ -1401,17 +1389,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -1428,31 +1408,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -1465,7 +1453,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4366
+                  }
                 },
                 "meta": {
                   "name": "TextField_Obs"
@@ -1479,17 +1469,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -1506,39 +1488,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -1571,7 +1553,9 @@
             "children": [
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4367
+                  }
                 },
                 "meta": {
                   "name": "Checkbox"
@@ -1583,33 +1567,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -1628,7 +1586,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -1636,22 +1594,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -1667,7 +1635,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4368
+                  }
                 },
                 "meta": {
                   "name": "TextField_Corr"
@@ -1681,17 +1651,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -1708,31 +1670,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -1745,7 +1715,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4369
+                  }
                 },
                 "meta": {
                   "name": "TextField_Obs"
@@ -1759,17 +1731,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -1786,39 +1750,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -1851,7 +1815,9 @@
             "children": [
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4370
+                  }
                 },
                 "meta": {
                   "name": "Checkbox"
@@ -1863,33 +1829,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -1908,7 +1848,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -1916,22 +1856,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -1947,7 +1897,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4371
+                  }
                 },
                 "meta": {
                   "name": "TextField_Corr"
@@ -1961,17 +1913,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -1988,31 +1932,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2025,7 +1977,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4372
+                  }
                 },
                 "meta": {
                   "name": "TextField_Obs"
@@ -2039,17 +1993,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2066,39 +2012,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -2131,7 +2077,9 @@
             "children": [
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4373
+                  }
                 },
                 "meta": {
                   "name": "Checkbox"
@@ -2143,33 +2091,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -2188,7 +2110,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -2196,22 +2118,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2227,7 +2159,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4374
+                  }
                 },
                 "meta": {
                   "name": "TextField_Corr"
@@ -2241,17 +2175,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2268,31 +2194,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2305,7 +2239,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4375
+                  }
                 },
                 "meta": {
                   "name": "TextField_Obs"
@@ -2319,17 +2255,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2346,39 +2274,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -2411,7 +2339,9 @@
             "children": [
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4376
+                  }
                 },
                 "meta": {
                   "name": "Checkbox"
@@ -2423,33 +2353,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -2468,7 +2372,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -2476,22 +2380,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2507,7 +2421,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4377
+                  }
                 },
                 "meta": {
                   "name": "TextField_Corr"
@@ -2521,17 +2437,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2548,31 +2456,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2585,7 +2501,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4378
+                  }
                 },
                 "meta": {
                   "name": "TextField_Obs"
@@ -2599,17 +2517,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2626,39 +2536,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -2691,7 +2601,9 @@
             "children": [
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4379
+                  }
                 },
                 "meta": {
                   "name": "Checkbox"
@@ -2703,33 +2615,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
-                      },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -2748,7 +2634,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -2756,22 +2642,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2787,7 +2683,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4380
+                  }
                 },
                 "meta": {
                   "name": "TextField_Corr"
@@ -2801,17 +2699,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2828,31 +2718,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -2865,7 +2763,9 @@
               },
               {
                 "custom": {
-                  "item": {}
+                  "item": {
+                    "papoItemID": 4381
+                  }
                 },
                 "meta": {
                   "name": "TextField_Obs"
@@ -2879,17 +2779,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -2906,39 +2798,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -2985,35 +2877,8 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.selected"
+                        "path": "this.props.params.answer"
                       },
-                      "transforms": [
-                        {
-                          "fallback": "none",
-                          "inputType": "scalar",
-                          "mappings": [
-                            {
-                              "input": true,
-                              "output": "Cumple"
-                            },
-                            {
-                              "input": false,
-                              "output": "No Cumple"
-                            }
-                          ],
-                          "outputType": "scalar",
-                          "type": "map"
-                        }
-                      ],
-                      "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "path": "parent.custom.papoItemID"
-                      },
-                      "enabled": false,
                       "type": "property"
                     }
                   },
@@ -3031,7 +2896,7 @@
                       "type": "property"
                     }
                   },
-                  "props.style.fontSize": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
                         "path": "view.custom.fontSize"
@@ -3039,22 +2904,32 @@
                       "type": "property"
                     }
                   },
-                  "props.text": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
-                "type": "ia.input.checkbox"
+                "props": {
+                  "params": {
+                    "answer": "No Cumple",
+                    "falseValue": "No Cumple",
+                    "question": "",
+                    "trueValue": "Cumple",
+                    "value": false
+                  },
+                  "path": "Objects/Checkbox",
+                  "style": {
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -3086,18 +2961,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetCorr}"
-                      },
-                      "enabled": false,
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -3114,31 +2980,39 @@
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               },
               {
                 "meta": {
@@ -3167,18 +3041,9 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
-                    }
-                  },
-                  "custom.item.papoItemID": {
-                    "binding": {
-                      "config": {
-                        "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                      },
-                      "enabled": false,
-                      "type": "expr"
                     }
                   },
                   "custom.item.registerTypeID": {
@@ -3195,39 +3060,39 @@
                       "type": "property"
                     }
                   },
-                  "custom.key.answer": {
+                  "props.params.fontSize": {
                     "binding": {
                       "config": {
-                        "path": "this.props.text"
+                        "path": "view.custom.fontSize"
                       },
                       "type": "property"
                     }
                   },
-                  "props.placeholder": {
+                  "props.params.papoItemID": {
                     "binding": {
                       "config": {
                         "path": "this.custom.item.papoItemID"
                       },
-                      "enabled": false,
-                      "transforms": [
-                        {
-                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   }
                 },
                 "props": {
-                  "placeholder": "Escriba aqui",
+                  "params": {
+                    "answer": "",
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/TextField",
                   "style": {
-                    "classes": "dropdown",
-                    "fontSize": 17,
-                    "marginLeft": 0
-                  }
+                    "alignSelf": "stretch",
+                    "minHeight": "32px"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.text-field"
+                "type": "ia.display.view"
               }
             ],
             "custom": {
@@ -3352,12 +3217,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -3367,18 +3232,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -3497,12 +3361,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -3512,18 +3376,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -3646,12 +3509,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -3661,18 +3524,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -3791,12 +3653,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -3806,18 +3668,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -3940,12 +3801,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -3955,18 +3816,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4085,12 +3945,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4100,18 +3960,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4234,12 +4093,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4249,18 +4108,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4379,12 +4237,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4394,18 +4252,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4528,12 +4385,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4543,18 +4400,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4673,12 +4529,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4688,18 +4544,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4822,12 +4677,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4837,18 +4692,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -4967,12 +4821,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -4982,18 +4836,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5116,12 +4969,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -5131,18 +4984,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5261,12 +5113,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -5276,18 +5128,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5410,12 +5261,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -5425,18 +5276,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5555,12 +5405,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -5570,18 +5420,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5704,12 +5553,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -5719,18 +5568,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5849,12 +5697,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -5864,18 +5712,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -5998,12 +5845,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6013,18 +5860,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -6143,12 +5989,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6158,18 +6004,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -6292,12 +6137,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6307,18 +6152,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -6437,12 +6281,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6452,18 +6296,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -6586,12 +6429,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6601,18 +6444,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -6731,12 +6573,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6746,18 +6588,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -6880,12 +6721,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -6895,18 +6736,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7025,12 +6865,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7040,18 +6880,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7174,12 +7013,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7189,18 +7028,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7319,12 +7157,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7334,18 +7172,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7468,12 +7305,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7483,18 +7320,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7613,12 +7449,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7628,18 +7464,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7762,12 +7597,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7777,18 +7612,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -7907,12 +7741,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -7922,18 +7756,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -8085,18 +7918,9 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.text"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
-                            }
-                          },
-                          "custom.item.papoItemID": {
-                            "binding": {
-                              "config": {
-                                "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                              },
-                              "enabled": false,
-                              "type": "expr"
                             }
                           },
                           "custom.item.registerTypeID": {
@@ -8113,40 +7937,39 @@
                               "type": "property"
                             }
                           },
-                          "custom.key.answer": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.props.text"
+                                "path": "view.custom.fontSize"
                               },
                               "type": "property"
                             }
                           },
-                          "props.placeholder": {
+                          "props.params.papoItemID": {
                             "binding": {
                               "config": {
                                 "path": "this.custom.item.papoItemID"
                               },
-                              "enabled": false,
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
+                          "params": {
+                            "answer": "",
+                            "questionAsPlaceholder": true,
+                            "showQuestion": false,
+                            "value": ""
+                          },
+                          "path": "Objects/TextField",
                           "style": {
-                            "classes": "dropdown",
-                            "fontSize": 17,
                             "marginBottom": 0,
                             "marginTop": 0
-                          }
+                          },
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -8268,12 +8091,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -8281,7 +8104,7 @@
                               "type": "property"
                             }
                           },
-                          "props.value": {
+                          "props.params.value": {
                             "binding": {
                               "config": {
                                 "expression": "now()"
@@ -8297,18 +8120,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -8453,8 +8275,7 @@
                             "enabled": false
                           },
                           "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
+                            "classes": "PAPO/Field/Input"
                           }
                         },
                         "type": "ia.input.numeric-entry-field"
@@ -8601,8 +8422,7 @@
                             "enabled": false
                           },
                           "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
+                            "classes": "PAPO/Field/Input"
                           }
                         },
                         "type": "ia.input.numeric-entry-field"
@@ -8750,8 +8570,7 @@
                             "enabled": false
                           },
                           "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
+                            "classes": "PAPO/Field/Input"
                           }
                         },
                         "type": "ia.input.numeric-entry-field"
@@ -8876,12 +8695,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -8891,18 +8710,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9025,12 +8843,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9038,7 +8856,7 @@
                               "type": "property"
                             }
                           },
-                          "props.value": {
+                          "props.params.value": {
                             "binding": {
                               "config": {
                                 "expression": "{...../FlexContainer_12/FlexContainer_0/FlexContainer/NumericEntryField_0.props.value} + {...../FlexContainer_12/FlexContainer_2/FlexContainer/NumericEntryField_0.props.value} + {...../FlexContainer_13/FlexContainer_0/FlexContainer/NumericEntryField_0.props.value}"
@@ -9048,18 +8866,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9212,12 +9029,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9227,18 +9044,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9357,12 +9173,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9372,18 +9188,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9506,12 +9321,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9521,18 +9336,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9651,12 +9465,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9666,18 +9480,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9800,12 +9613,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9815,18 +9628,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -9945,12 +9757,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -9960,18 +9772,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -10094,12 +9905,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -10109,18 +9920,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -10239,12 +10049,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -10254,18 +10064,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -10408,12 +10217,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -10423,18 +10232,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -10556,12 +10364,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -10571,18 +10379,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -10705,12 +10512,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -10720,18 +10527,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -10853,12 +10659,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -10868,18 +10674,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -11002,12 +10807,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -11017,18 +10822,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -11181,12 +10985,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -11196,18 +11000,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -11326,12 +11129,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -11341,18 +11144,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -11474,18 +11276,9 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.text"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
-                            }
-                          },
-                          "custom.item.papoItemID": {
-                            "binding": {
-                              "config": {
-                                "expression": "{parent.custom.papoItemID} + {parent.custom.offsetObs}"
-                              },
-                              "enabled": false,
-                              "type": "expr"
                             }
                           },
                           "custom.item.registerTypeID": {
@@ -11502,40 +11295,39 @@
                               "type": "property"
                             }
                           },
-                          "custom.key.answer": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
-                                "path": "this.props.text"
+                                "path": "view.custom.fontSize"
                               },
                               "type": "property"
                             }
                           },
-                          "props.placeholder": {
+                          "props.params.papoItemID": {
                             "binding": {
                               "config": {
                                 "path": "this.custom.item.papoItemID"
                               },
-                              "enabled": false,
-                              "transforms": [
-                                {
-                                  "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                                  "type": "script"
-                                }
-                              ],
                               "type": "property"
                             }
                           }
                         },
                         "props": {
-                          "placeholder": "Escriba Aqui",
+                          "params": {
+                            "answer": "",
+                            "questionAsPlaceholder": true,
+                            "showQuestion": false,
+                            "value": ""
+                          },
+                          "path": "Objects/TextField",
                           "style": {
-                            "classes": "dropdown",
-                            "fontSize": 17,
                             "marginBottom": 0,
                             "marginTop": 0
-                          }
+                          },
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.text-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -11657,12 +11449,12 @@
                           "custom.item.answer": {
                             "binding": {
                               "config": {
-                                "path": "this.props.value"
+                                "path": "this.props.params.answer"
                               },
                               "type": "property"
                             }
                           },
-                          "props.style.fontSize": {
+                          "props.params.fontSize": {
                             "binding": {
                               "config": {
                                 "path": "view.custom.fontSize"
@@ -11672,18 +11464,17 @@
                           }
                         },
                         "props": {
-                          "align": "left",
-                          "format": "none",
-                          "placeholder": "Esciba aqui",
-                          "spinner": {
-                            "enabled": false
+                          "params": {
+                            "answer": "",
+                            "showQuestion": false,
+                            "value": ""
                           },
-                          "style": {
-                            "classes": "dropdown",
-                            "marginLeft": 0
-                          }
+                          "path": "Objects/NumericField",
+                          "style": {},
+                          "useDefaultViewHeight": false,
+                          "useDefaultViewWidth": false
                         },
-                        "type": "ia.input.numeric-entry-field"
+                        "type": "ia.display.view"
                       }
                     ],
                     "custom": {
@@ -11737,21 +11528,6 @@
           "shrink": 0
         },
         "propConfig": {
-          "custom.answers": {
-            "binding": {
-              "config": {
-                "struct": {},
-                "waitOnAll": true
-              },
-              "transforms": [
-                {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
-            }
-          },
           "custom.refreshSecond": {
             "binding": {
               "config": {
@@ -11828,8 +11604,7 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
-            "backgroundColor": "#FFFFFF",
-            "classes": "dropdown",
+            "classes": "PAPO/Field/Input",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -11871,15 +11646,7 @@
             "scripts": {
               "customMethods": [],
               "extensionFunctions": null,
-              "messageHandlers": [
-                {
-                  "messageType": "saveEndShift",
-                  "pageScope": true,
-                  "script": "\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer1\").refreshBinding(\"custom.{}\".format(path))\n\t\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.ControlRechazos\"\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\n\tanswerCont \u003d self.view.custom.answers.ControlRechazos\n\t\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\tstatus \u003d \"Finalizado\"\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY ID DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(8, system.util.jsonEncode(answerCont),regCode)  \n \t# ---- UI refresh (same convention you used) ----\n \tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n \tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n \tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n \tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
-                  "sessionScope": false,
-                  "viewScope": false
-                }
-              ]
+              "messageHandlers": []
             },
             "type": "ia.input.button"
           },
@@ -11935,7 +11702,7 @@
     "props": {
       "direction": "column",
       "style": {
-        "classes": "container-borders-dautom-widget",
+        "classes": "container-borders-dautom-widget PAPO/Form",
         "marginLeft": 10,
         "paddingLeft": 10
       }
