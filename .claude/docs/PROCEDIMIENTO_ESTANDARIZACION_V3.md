@@ -77,7 +77,7 @@ root (clases: ... PAPO/Form)
 
 ---
 
-# Vista: Form_XXXX_<tipo> (start, end, 1h, 30min, SKU…)
+# Vista: Form_XXXX_tipo (start, end, 1h, 30min, SKU…)
 
 ---
 
