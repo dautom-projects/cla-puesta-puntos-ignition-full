@@ -125,7 +125,7 @@
             "classes": "text-titles"
           },
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -231,53 +231,23 @@
         "children": [
           {
             "custom": {
-              "item": {}
+              "item": {
+                "papoItemID": 3093
+              }
             },
             "meta": {
               "name": "Checkbox0"
             },
             "position": {
-              "basis": "49px",
+              "basis": "50px",
               "shrink": 0
             },
             "propConfig": {
               "custom.item.answer": {
                 "binding": {
                   "config": {
-                    "path": "this.props.selected"
+                    "path": "this.props.params.answer"
                   },
-                  "transforms": [
-                    {
-                      "fallback": "none",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "Cumple"
-                        },
-                        {
-                          "input": false,
-                          "output": "No Cumple"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
-              "custom.item.papoItemID": {
-                "binding": {
-                  "config": {
-                    "path": "parent.custom.basePapo"
-                  },
-                  "transforms": [
-                    {
-                      "code": "\tindex \u003d int(self.meta.name.replace(\"Checkbox\",\"\"))\n\treturn value + index",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               },
@@ -295,7 +265,7 @@
                   "type": "property"
                 }
               },
-              "props.style.fontSize": {
+              "props.params.fontSize": {
                 "binding": {
                   "config": {
                     "path": "view.custom.fontSize"
@@ -303,72 +273,49 @@
                   "type": "property"
                 }
               },
-              "props.text": {
+              "props.params.papoItemID": {
                 "binding": {
                   "config": {
                     "path": "this.custom.item.papoItemID"
                   },
-                  "transforms": [
-                    {
-                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               }
             },
-            "type": "ia.input.checkbox"
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
           },
           {
             "custom": {
-              "item": {}
+              "item": {
+                "papoItemID": 3095
+              }
             },
             "meta": {
               "name": "Checkbox2"
             },
             "position": {
-              "basis": "49px",
+              "basis": "50px",
               "shrink": 0
             },
             "propConfig": {
               "custom.item.answer": {
                 "binding": {
                   "config": {
-                    "path": "this.props.selected"
+                    "path": "this.props.params.answer"
                   },
-                  "transforms": [
-                    {
-                      "fallback": "none",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "Cumple"
-                        },
-                        {
-                          "input": false,
-                          "output": "No Cumple"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
-              "custom.item.papoItemID": {
-                "binding": {
-                  "config": {
-                    "path": "parent.custom.basePapo"
-                  },
-                  "transforms": [
-                    {
-                      "code": "\tindex \u003d int(self.meta.name.replace(\"Checkbox\",\"\"))\n\treturn value + index",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               },
@@ -386,7 +333,7 @@
                   "type": "property"
                 }
               },
-              "props.style.fontSize": {
+              "props.params.fontSize": {
                 "binding": {
                   "config": {
                     "path": "view.custom.fontSize"
@@ -394,26 +341,33 @@
                   "type": "property"
                 }
               },
-              "props.text": {
+              "props.params.papoItemID": {
                 "binding": {
                   "config": {
                     "path": "this.custom.item.papoItemID"
                   },
-                  "transforms": [
-                    {
-                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               }
             },
-            "type": "ia.input.checkbox"
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
           }
         ],
         "custom": {
-          "baseBasisPx": 110,
+          "baseBasisPx": 112,
           "basePapo": 3093
         },
         "meta": {
@@ -537,53 +491,23 @@
         "children": [
           {
             "custom": {
-              "item": {}
+              "item": {
+                "papoItemID": 3094
+              }
             },
             "meta": {
               "name": "Checkbox0"
             },
             "position": {
-              "basis": "49px",
+              "basis": "50px",
               "shrink": 0
             },
             "propConfig": {
               "custom.item.answer": {
                 "binding": {
                   "config": {
-                    "path": "this.props.selected"
+                    "path": "this.props.params.answer"
                   },
-                  "transforms": [
-                    {
-                      "fallback": "none",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "Cumple"
-                        },
-                        {
-                          "input": false,
-                          "output": "No Cumple"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
-              "custom.item.papoItemID": {
-                "binding": {
-                  "config": {
-                    "path": "parent.custom.basePapo"
-                  },
-                  "transforms": [
-                    {
-                      "code": "\tindex \u003d int(self.meta.name.replace(\"Checkbox\",\"\"))\n\treturn value + index",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               },
@@ -601,7 +525,7 @@
                   "type": "property"
                 }
               },
-              "props.style.fontSize": {
+              "props.params.fontSize": {
                 "binding": {
                   "config": {
                     "path": "view.custom.fontSize"
@@ -609,26 +533,33 @@
                   "type": "property"
                 }
               },
-              "props.text": {
+              "props.params.papoItemID": {
                 "binding": {
                   "config": {
                     "path": "this.custom.item.papoItemID"
                   },
-                  "transforms": [
-                    {
-                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               }
             },
-            "type": "ia.input.checkbox"
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
           }
         ],
         "custom": {
-          "baseBasisPx": 65,
+          "baseBasisPx": 66,
           "basePapo": 3094
         },
         "meta": {
@@ -721,53 +652,23 @@
         "children": [
           {
             "custom": {
-              "item": {}
+              "item": {
+                "papoItemID": 3098
+              }
             },
             "meta": {
               "name": "Checkbox0"
             },
             "position": {
-              "basis": "49px",
+              "basis": "50px",
               "shrink": 0
             },
             "propConfig": {
               "custom.item.answer": {
                 "binding": {
                   "config": {
-                    "path": "this.props.selected"
+                    "path": "this.props.params.answer"
                   },
-                  "transforms": [
-                    {
-                      "fallback": "none",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "Cumple"
-                        },
-                        {
-                          "input": false,
-                          "output": "No Cumple"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
-                  "type": "property"
-                }
-              },
-              "custom.item.papoItemID": {
-                "binding": {
-                  "config": {
-                    "path": "parent.custom.basePapo"
-                  },
-                  "transforms": [
-                    {
-                      "code": "\tindex \u003d int(self.meta.name.replace(\"Checkbox\",\"\"))\n\treturn value + index",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               },
@@ -785,7 +686,7 @@
                   "type": "property"
                 }
               },
-              "props.style.fontSize": {
+              "props.params.fontSize": {
                 "binding": {
                   "config": {
                     "path": "view.custom.fontSize"
@@ -793,26 +694,33 @@
                   "type": "property"
                 }
               },
-              "props.text": {
+              "props.params.papoItemID": {
                 "binding": {
                   "config": {
                     "path": "this.custom.item.papoItemID"
                   },
-                  "transforms": [
-                    {
-                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               }
             },
-            "type": "ia.input.checkbox"
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
           }
         ],
         "custom": {
-          "baseBasisPx": 63,
+          "baseBasisPx": 64,
           "basePapo": 3098
         },
         "meta": {
@@ -945,93 +853,62 @@
             "type": "ia.display.label"
           },
           {
-            "children": [
-              {
-                "meta": {
-                  "name": "Label"
-                },
-                "position": {
-                  "basis": "137px"
-                },
-                "propConfig": {
-                  "props.textStyle.fontSize": {
-                    "binding": {
-                      "config": {
-                        "path": "view.custom.fontSize"
-                      },
-                      "type": "property"
-                    }
-                  }
-                },
-                "props": {
-                  "style": {
-                    "paddingLeft": 0
-                  },
-                  "text": "Referencia"
-                },
-                "type": "ia.display.label"
-              },
-              {
-                "custom": {
-                  "item": {
-                    "papoItemID": 7903,
-                    "registerTypeID": 2
-                  }
-                },
-                "meta": {
-                  "name": "NumericEntryField"
-                },
-                "position": {
-                  "basis": "205px"
-                },
-                "propConfig": {
-                  "custom.item.answer": {
-                    "binding": {
-                      "config": {
-                        "path": "this.props.value"
-                      },
-                      "type": "property"
-                    }
-                  },
-                  "props.style.fontSize": {
-                    "binding": {
-                      "config": {
-                        "path": "view.custom.fontSize"
-                      },
-                      "type": "property"
-                    }
-                  }
-                },
-                "props": {
-                  "align": "left",
-                  "format": "none",
-                  "placeholder": "Esciba aqui",
-                  "spinner": {
-                    "enabled": false
-                  },
-                  "style": {
-                    "classes": "dropdown",
-                    "marginLeft": 0
-                  }
-                },
-                "type": "ia.input.numeric-entry-field"
+            "custom": {
+              "item": {
+                "papoItemID": 7903,
+                "registerTypeID": 2
               }
-            ],
+            },
             "meta": {
               "name": "FlexContainer"
             },
             "position": {
-              "basis": "100%",
+              "basis": "50px",
               "shrink": 0
             },
-            "props": {
-              "alignItems": "flex-start"
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
             },
-            "type": "ia.container.flex"
+            "props": {
+              "params": {
+                "answer": "",
+                "question": "",
+                "showQuestion": true,
+                "value": ""
+              },
+              "path": "Objects/NumericField",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
           }
         ],
         "custom": {
-          "baseBasisPx": 82,
+          "baseBasisPx": 132,
           "basePapo": 3098
         },
         "meta": {
@@ -1494,8 +1371,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -1710,8 +1586,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -2046,8 +1921,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -2166,8 +2040,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -2552,8 +2425,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -2672,8 +2544,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -2793,8 +2664,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -3042,8 +2912,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -3292,8 +3161,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -3546,8 +3414,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -3833,8 +3700,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -4083,8 +3949,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -4370,8 +4235,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -4620,8 +4484,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -4874,8 +4737,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -5128,8 +4990,7 @@
                         "enabled": false
                       },
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
+                        "classes": "PAPO/Field/Input"
                       }
                     },
                     "type": "ia.input.numeric-entry-field"
@@ -5318,12 +5179,12 @@
                       "custom.item.answer": {
                         "binding": {
                           "config": {
-                            "path": "this.props.value"
+                            "path": "this.props.params.answer"
                           },
                           "type": "property"
                         }
                       },
-                      "props.style.fontSize": {
+                      "props.params.fontSize": {
                         "binding": {
                           "config": {
                             "path": "view.custom.fontSize"
@@ -5333,18 +5194,17 @@
                       }
                     },
                     "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
+                      "params": {
+                        "answer": "",
+                        "showQuestion": false,
+                        "value": ""
                       },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
+                      "path": "Objects/NumericField",
+                      "style": {},
+                      "useDefaultViewHeight": false,
+                      "useDefaultViewWidth": false
                     },
-                    "type": "ia.input.numeric-entry-field"
+                    "type": "ia.display.view"
                   }
                 ],
                 "meta": {
@@ -5430,12 +5290,12 @@
                       "custom.item.answer": {
                         "binding": {
                           "config": {
-                            "path": "this.props.value"
+                            "path": "this.props.params.answer"
                           },
                           "type": "property"
                         }
                       },
-                      "props.style.fontSize": {
+                      "props.params.fontSize": {
                         "binding": {
                           "config": {
                             "path": "view.custom.fontSize"
@@ -5445,18 +5305,17 @@
                       }
                     },
                     "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
+                      "params": {
+                        "answer": "",
+                        "showQuestion": false,
+                        "value": ""
                       },
-                      "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
+                      "path": "Objects/NumericField",
+                      "style": {},
+                      "useDefaultViewHeight": false,
+                      "useDefaultViewWidth": false
                     },
-                    "type": "ia.input.numeric-entry-field"
+                    "type": "ia.display.view"
                   }
                 ],
                 "meta": {
@@ -5714,8 +5573,8 @@
                     "enabled": false
                   },
                   "style": {
-                    "classes": "dropdown",
-                    "marginLeft": 0
+                    "classes": "PAPO/Field/Input",
+                    "width": "100%"
                   }
                 },
                 "type": "ia.input.numeric-entry-field"
@@ -5884,8 +5743,8 @@
                     "enabled": false
                   },
                   "style": {
-                    "classes": "dropdown",
-                    "marginLeft": 0
+                    "classes": "PAPO/Field/Input",
+                    "width": "100%"
                   }
                 },
                 "type": "ia.input.numeric-entry-field"
@@ -6008,8 +5867,7 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
-            "backgroundColor": "#FFFFFF",
-            "classes": "dropdown",
+            "classes": "PAPO/Field/Input",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -6051,15 +5909,7 @@
             "scripts": {
               "customMethods": [],
               "extensionFunctions": null,
-              "messageHandlers": [
-                {
-                  "messageType": "saveStartRegister-2501-2h",
-                  "pageScope": true,
-                  "script": "\tsystem.perspective.sendMessage(\"resetTable\", payload\u003d{})\n\t\n\tlistCustom \u003d [\n\t\t\"answers\"\n\t]\n\t\n\tfor path in listCustom:\n\t\tself.parent.parent.getChild(\"FlexContainer3\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer1\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer2\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer4\").refreshBinding(\"custom.{}\".format(path))\n\t\tself.parent.parent.getChild(\"FlexContainer5\").refreshBinding(\"custom.{}\".format(path))\n\t\n\t\n\tlistCustom \u003d [\n\t\t\"answers.condiciones\",\n\t\t\"answers.probador1\",\n\t\t\"answers.soldador\",\n\t\t\"answers.probador2\",\n\t\t\"answers.condiciones30\"\n\t\t\n\t]\n\tfor path in listCustom:\n\t\tself.view.refreshBinding(\"custom.{}\".format(path))\n\t\t\n\tanswerCond \u003d self.view.custom.answers.condiciones\n\tanswerProb1 \u003d self.view.custom.answers.probador1\n\tanswerSol \u003d self.view.custom.answers.soldador\n\tanswerProb2 \u003d self.view.custom.answers.probador2\n\tanswerCond30 \u003d self.view.custom.answers.condiciones30\n\t\n\tpapoID \u003d self.view.params.papoID\n\tuser \u003d self.session.props.auth.user.userName\n\tworkstationNodeID \u003d self.view.params.workstationnodeID\n\tworkstationID \u003d self.view.params.workstationID\n\tnodeID \u003d self.view.params.nodeID\n\t\n\t\n\tnow \u003d system.date.now()\n\t\n\tfrom java.lang import String\n\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 RegisterCode\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY RegisterCode DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tregCode \u003d result.getValueAt(0,0)\n\t\n\tquery \u003d \"\"\"\n\t\tSELECT TOP 1 Status\n\t\tFROM registerhistory\n\t\tWHERE WorkstationNodeID\u003d? AND PapoID\u003d?\n\t\tORDER BY Timestamp DESC\n\t\"\"\"\n\n\n\tresult \u003d system.db.runPrepQuery(query, [workstationNodeID,papoID], \"papo_db\")\n\t\n\tstatus \u003d result.getValueAt(0,0)\n\t\n\tregisterTypeID \u003d self.view.custom.registerTypeID\n\n\tdef insert_answer(registerTypeID, answerJson, regCode):\n\t\tif not answerJson:\n\t\t\treturn\n\t\tquery \u003d \"\"\"\n\t\t\tINSERT INTO registerhistory (\n\t\t\t\t[Timestamp],\n\t\t\t\tDataAnswer,\n\t\t\t\tStatus,\n\t\t\t\tPapoID,\n\t\t\t\tRegisterTypeID,\n\t\t\t\t[User],\n\t\t\t\tWorkstationNodeID,\n\t\t\t\tNodeID,\n\t\t\t\tWorkstationID,\n\t\t\t\tRegisterCode\n\t\t\t)\n\t\t\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ? ,?)\n\t\t\"\"\"\n\t\t\n\t\t# ⚠️ Aseguramos que sea String plano\n\t\tdata_answer_str \u003d String(answerJson)\n\t\t\n\t\tparams \u003d [\n\t\t\tnow,\n\t\t\tdata_answer_str,\n\t\t\tstatus,\n\t\t\tpapoID,\n\t\t\tregisterTypeID,\n\t\t\tuser,\n\t\t\tworkstationNodeID,\n\t\t\tnodeID,\n\t\t\tworkstationID,\n\t\t\tregCode\n\t\t]\n\t\tsystem.db.runPrepUpdate(query, params, \"papo_db\")\n\t\n\t# --- Insertar directo los tres JSON ---\n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerCond), regCode)\n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerProb1), regCode)\n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerSol), regCode)  \n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerProb2), regCode)  \n\tinsert_answer(registerTypeID, system.util.jsonEncode(answerCond30), regCode)  \n\t\n\t\n\tsystem.perspective.sendMessage(\"refreshTable\",   {\"estado\": True},  scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"closeEmbeded\",   {\"estado\": False}, scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPeriodic\",{\"min\": 0},        scope\u003d\"session\")\n\tsystem.perspective.sendMessage(\"refreshPreviewTable\", payload\u003d[], scope\u003d\"session\")",
-                  "sessionScope": false,
-                  "viewScope": false
-                }
-              ]
+              "messageHandlers": []
             },
             "type": "ia.input.button"
           },
@@ -6123,7 +5973,7 @@
     "props": {
       "direction": "column",
       "style": {
-        "classes": "container-borders-dautom-widget",
+        "classes": "container-borders-dautom-widget PAPO/Form",
         "marginLeft": 10,
         "overflow": "scroll",
         "paddingLeft": 10
