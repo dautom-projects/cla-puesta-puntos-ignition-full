@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.8.0
+Version: 2.9.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -45,6 +45,9 @@ Changelog:
 	2026-10-26 | William M. | v2.8.0 - No repeater container: each instance of a Fundamental Views/Checkbox repeater is a
 		row of the group (Objects/Checkbox named like any component), like the list forms; the section height counts
 		the repeater rows before the change
+	2026-10-26 | William M. | v2.9.0 - Sections fit their rows (fitSections): an open group keeps its height
+		(shrink 0) and custom.baseBasisPx is at least the rows plus their margins and the group padding, so no row is
+		squeezed and the end of the section is not cut
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -693,6 +696,50 @@ def _pxSum(group):
 	return total
 
 
+def _vertical(style, side):
+	"""Top or bottom margin/padding of a style in px (own side first, then the shorthand number)."""
+	style = style or {}
+	for key in (side, side.rstrip("TopBottom")):
+		value = style.get(key)
+		if isinstance(value, (int, float)):
+			return float(value)
+		if isinstance(value, str) and value.endswith("px"):
+			try:
+				return float(value[:-2])
+			except ValueError:
+				return 0.0
+	return 0.0
+
+
+def _rowsHeight(group):
+	"""Height the rows of a group need: their px heights, their margins and the group padding and border."""
+	total = _pxSum(group)
+	for child in group.get("children", []):
+		style = (child.get("props") or {}).get("style") or {}
+		total += _vertical(style, "marginTop") + _vertical(style, "marginBottom")
+	style = (group.get("props") or {}).get("style") or {}
+	total += _vertical(style, "paddingTop") + _vertical(style, "paddingBottom")
+	total += _vertical(style, "borderTopWidth") + _vertical(style, "borderBottomWidth")
+	return total
+
+
+def fitSections(view, stats):
+	"""An open section keeps its height and fits its rows (no squeezed row, no cut end).
+
+	papo_core.ui.toggleSection opens a group with the fixed height custom.baseBasisPx. A group that can shrink is
+	squeezed to the visible height of the form, and a height below its rows compresses them.
+	"""
+	for name, group in _sectionHeights(view).items():
+		position = group.setdefault("position", {})
+		if position.get("shrink", 1) != 0:
+			position["shrink"] = 0
+			stats["secciones que ya no se encogen"] += 1
+		needed = int(-(-_rowsHeight(group) // 1))
+		if needed > group["custom"]["baseBasisPx"]:
+			group["custom"]["baseBasisPx"] = needed
+			stats["secciones ajustadas a sus filas"] += 1
+
+
 def _sectionHeights(view):
 	"""Groups whose expanded height is fixed (custom.baseBasisPx, used by papo_core.ui.toggleSection)."""
 	return {g["meta"]["name"]: g for g in view["root"].get("children", []) if GROUP.match(g.get("meta", {}).get("name", ""))
@@ -801,6 +848,7 @@ def standardize(view, options, stats):
 		if name in heights and grown > 0:
 			group["custom"]["baseBasisPx"] = int(round(group["custom"]["baseBasisPx"] + grown))
 			stats["secciones con más alto"] += 1
+	fitSections(view, stats)
 	if options.get("formClass"):
 		style = view["root"].setdefault("props", {}).setdefault("style", {})
 		tokens = str(style.get("classes", "")).split()

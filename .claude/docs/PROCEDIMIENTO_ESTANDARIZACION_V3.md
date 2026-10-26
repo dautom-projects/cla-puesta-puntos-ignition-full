@@ -95,7 +95,8 @@ self.view.getChild("root").toggleFlexRoot(sectionIndex)
 ```
 
 - [ ] Eliminar `custom.answers` de cada `FlexContainerGroup` y del supervisor (script reactivo legacy, duplica `answerRecopile`)
-- [ ] `custom.baseBasisPx` de cada grupo: es el alto con que `toggleSection` abre la sección. Si los objetos suman más alto que las filas originales, el alto crece lo mismo (si no, el final de la sección queda cortado)
+- [ ] `custom.baseBasisPx` de cada grupo: es el alto con que `toggleSection` abre la sección. Debe alcanzar para todas sus filas con sus márgenes y el padding del grupo (si no, las filas se comprimen y el final queda cortado)
+- [ ] Cada `FlexContainerGroupN` con `shrink: 0`: abierto conserva su alto y el formulario hace scroll (si puede encogerse, el navegador lo achica a lo que se ve)
 
 ---
 

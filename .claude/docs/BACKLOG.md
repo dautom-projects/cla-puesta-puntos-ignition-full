@@ -43,18 +43,18 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `Ensamble/Form_EA11-1601_start` (desde 2026-08-31): `Checkbox_4`/`_5` y `_6`/`_7` de "Estado Termoselladora" tienen el mismo `papoItemID` (11190 y 11191): preguntas repetidas en pantalla y en el registro, y faltan 11192 y 11193
 - `F&A/Form_GR10-0501_start` (desde el checkpoint `1a0ba2b`, 2026-10-22): en `FlexContainerGroup13/S4` las etiquetas de 5997 y 5998 pasaron a numéricos con ID calculado (`basePapo + índice`) que da 5999 y 6000, repetidos; 5981 se repite 35 veces y 6192 dos (ya en julio)
 - `OREC/Form_PO11-0101-2_start`: 5168 se guarda dos veces (ya en septiembre)
-- `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado)
+- `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado) — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
 - `papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196: es el dato, se ve igual en el original
 - `OREC/Form_CU11-0101_start`: no existe `FlexContainerGroup7`; `papo_core.register.save` recorre los grupos 1..N y los 4 checkbox de `FlexContainerGroup8` nunca se guardan
 - ~~Supervisor guardado con `papoItemID` nulo en `Ensamble/Form_EA11-1601_start` y `Form_EA11-2601_start`~~ corregido el 2026-10-26 (11233 y 11355). Queda `OREC/Form_PO07-0101_start` (`FlexContainer15/TextField`, `papoItemID` nulo)
 - `F&A/Form_AC10-0201_start`: "Cubierta sin rayones." aparece dos veces en "Condiciones de operacion" y varias preguntas largas se cortan en su fila (también en el original)
 - `custom.insights` de los formularios (original y estándar): `preInsight` usa `initialPapoDateTime` y solo se recalcula cuando cambia el texto de Observaciones; si el operario no escribe nada se guarda el turno y la hora del diseño ("T: 3, H: 14:35" en un registro de las 07:55; en el PDF de PO11-0101 sale "T: 3, H: 14:13")
 
-- `F&A/Form_GR10-0501_start` a 1920x1080: filas más bajas que su alto en 10 secciones (Tanque soda 4, Tanque ácido puro 3, Tanques 1–7 y Torres 1 cada una); igual en el original y en el piloto
+- `F&A/Form_GR10-0501_start` a 1920x1080: filas más bajas que su alto en 10 secciones (Tanque soda 4, Tanque ácido puro 3, Tanques 1–7 y Torres 1 cada una); igual en el original y en el piloto — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
 - `F&A/Form_GR10-0501_start` (original): 7 checkbox de "Tanque soda" y "Tanque ácido puro" muestran el error de su binding de pregunta; en el piloto la pregunta sale de `papoItemID` y no falla
 - Numéricos con rango en los originales (AC10, CU11, PO11, GR10, EA11-0901): dentro de rango el texto es gris o gris oscuro; `getRangeColor` del estándar lo deja negro (el rojo fuera de rango es igual)
 
-- `OREC/Form_PO11-0101-2_start`: "Estado - Antes del arranque o Durante el proceso" se abre más baja que sus filas (`custom.baseBasisPx` 417 para 424 px de filas) y una fila queda comprimida; igual en el original. En "Molinos" el original también comprimía una fila; el estándar ya no
+- `OREC/Form_PO11-0101-2_start`: "Estado - Antes del arranque o Durante el proceso" se abre más baja que sus filas (`custom.baseBasisPx` 417 para 424 px de filas) y una fila queda comprimida; igual en el original. En "Molinos" el original también comprimía una fila; el estándar ya no — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
 
 - Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` y `F&A/Form__end` (sin referencia en el nombre), desde el checkpoint `1a0ba2b`. No se estandarizan; decidir si se borran
 
