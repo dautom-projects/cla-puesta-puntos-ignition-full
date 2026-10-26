@@ -56,7 +56,7 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - `OREC/Form_PO11-0101-2_start`: "Estado - Antes del arranque o Durante el proceso" se abre más baja que sus filas (`custom.baseBasisPx` 417 para 424 px de filas) y una fila queda comprimida; igual en el original. En "Molinos" el original también comprimía una fila; el estándar ya no
 
-- Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` (desde el checkpoint `1a0ba2b`). No se estandarizan; decidir si se borran
+- Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` y `F&A/Form__end` (sin referencia en el nombre), desde el checkpoint `1a0ba2b`. No se estandarizan; decidir si se borran
 
 ## Errores de los reportes (encontrados al revisar los PDF de los pilotos, 2026-10-26)
 
