@@ -10,7 +10,7 @@
 
 | Pendiente | Vistas | Detalle |
 |---|:-:|---|
-| Cubiertas (`Form_PL11-0101-CA_start`, `-CU_start`, `-S&A_start`) | 3 | Guardado inline con `"papo_db"` hardcodeado y `ORDER BY ID DESC`. Confirmar si existe un AREA "Cubiertas" en `node`; si no, retirarlas a favor de `General/` y `POLY/`; si existe, migrarlas tomando `General/Form_PL11-0101-*` como base y corregir `basePapo: 1010446` → `10446` en CU_start |
+| Cubiertas (`Form_PL11-0101-CA_start`, `-CU_start`, `-S&A_start`) | 3 | Migradas al v2 y estandarizadas el 2026-10-26 (decisión del usuario; no existe el AREA "Cubiertas" en `node` y el Template abre `General/`). Quedan errores del original frente a `General/`: `basePapo: 1010446` (→ `10446`) en CU_start y las filas de 9186/9187 que no tiene CA_start |
 | `Title/Title_0` en `Page/Embedded/Title_Header` y `Title_Large` | 2 (~9 en cascada) | Reemplazar por la clase de `Title/` que corresponda |
 | Clases de UserManagement | 9 | `UserManagement/MainFont`, `Page/Page`, `ScheduleManagement/Headers`, `ScheduleManagement/InputFont`, `InputFont` → renombrar a `UserManagement/*` o crear las que falten |
 | Bloque `params.ds` / yieldCalc | 60 | Binding deshabilitado que llama a `yieldCalc*.report` (no existen). Quitar `propConfig.params.ds*` y los params sin uso |

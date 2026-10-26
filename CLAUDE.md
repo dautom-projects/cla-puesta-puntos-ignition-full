@@ -152,7 +152,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - papo_core creado y en despliegue a producción
 - Migración Form_* (ver `.claude/docs/MIGRATION_STATUS.md`, corrida 2026-10-22):
   - 235 completas (ui + register), 3 parciales, 0 sin migrar
-  - Parciales: Cubiertas `Form_PL11-0101-CA_start`, `-CU_start`, `-S&A_start` (solo confirmSave)
+  - Parciales: Cubiertas `Form_PL11-0101-CA_start`, `-CU_start`, `-S&A_start` (solo confirmSave); migradas al v2 el 2026-10-26
   - 94 usan además `sign.supervisorOpt` en onStartup
 - Digitalizacion_Template: firmas aún inline (0 llamadas a papo_core); signOperator, requestSupervisorAuth, signSupervisor y authenticateAndSign sin uso todavía
 
