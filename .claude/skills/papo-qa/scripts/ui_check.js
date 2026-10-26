@@ -15,7 +15,7 @@
  * Each section also reports its opening time (openMs) and the range color of its numerics (numericColors),
  * to compare between the two forms. Run it at 1920 x 1080, the size the application is built for.
  *
- * Version: 1.3.1
+ * Version: 1.3.2
  *
  * Changelog:
  *   2026-10-25 | William M. | v1.0.0 - Initial version
@@ -26,6 +26,8 @@
  *   2026-10-26 | William M. | v1.3.0 - Dropdowns (a warning when there is no option to choose), time pickers
  *     at a fixed time, section opening time and numeric range colors
  *   2026-10-26 | William M. | v1.3.1 - Hidden rows (display none) are not reported as squeezed nor as the end
+ *   2026-10-26 | William M. | v1.3.2 - Forms without sections (an _end with only Observaciones) are found by their
+ *     Guardar button
  *
  * Usage (browser console or a javascript tool on the Template page):
  *   <contents of this file>; await papoUiCheck({register: "Inicio", fill: true, save: false})
@@ -120,12 +122,20 @@ window.papoUiCheck = async function (opts) {
 	button.click();
 	await sleep(4000);
 	// The form root holds the Section buttons (original or standard form)
-	const form = (document.querySelector(".psc-button-questions, .psc-button-questions-2") || {}).parentElement;
+	let form = (document.querySelector(".psc-button-questions, .psc-button-questions-2") || {}).parentElement;
+	if (!form) {
+		// A form without sections (e.g. an _end with only Observaciones): the container of Guardar and the text field
+		let node = all('[data-component="ia.input.button"]').find((e) => text(e) === "Guardar" && e.offsetParent !== null);
+		while (node && !node.querySelector('[data-component="ia.input.text-field"]')) {
+			node = node.parentElement;
+		}
+		form = node;
+	}
 	if (!form) {
 		report.problems.push("no se encontró el formulario");
 		return report;
 	}
-	report.standard = form.classList.contains("psc-PAPO/Form");
+	report.standard = form.classList.contains("psc-PAPO/Form") || !!form.closest(".psc-PAPO\\/Form");
 	const sections = all(".psc-button-questions, .psc-button-questions-2", form);
 
 	for (const section of sections) {
