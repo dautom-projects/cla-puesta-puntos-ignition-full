@@ -4697,6 +4697,8 @@
                     "props": {
                       "params": {
                         "answer": null,
+                        "maxValue": 12.6,
+                        "minValue": 12.4,
                         "showQuestion": false,
                         "value": null
                       },
@@ -7013,7 +7015,10 @@
                     "custom": {
                       "item": {
                         "papoItemID": 5848
-                      }
+                      },
+                      "rang_down": 0,
+                      "rang_up": 12.75,
+                      "start": 25
                     },
                     "meta": {
                       "name": "NumericEntryField_3"
@@ -7022,10 +7027,38 @@
                       "basis": "32px"
                     },
                     "propConfig": {
+                      "custom.borderColor": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.value"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\n\tminimo \u003d self.custom.rang_down\n\tmaximo \u003d self.custom.rang_up\n\t\n\tif value \u003d\u003d \"\":\n\t\tvalue \u003d \"#C0C0C0\"\n\t\t\n\telse:\n\t\t\n\t\tif value \u003e\u003d maximo:\n\t\t\tvalue \u003d \"#C0C0C0\"\n\t\telse:\n\t\t\tvalue \u003d \"#F70808\"\n\t\n\treturn value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
+                      "custom.color": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.value"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\n\tminimo \u003d self.custom.rang_down\n\tmaximo \u003d self.custom.rang_up\n\t\n\tif value \u003d\u003d \"\":\n\t\t\tvalue \u003d \"#C0C0C0\"\n\t\t\n\telse:\n\t\n\t\tif value \u003e\u003d maximo:\n\t\t\tvalue \u003d \"#000000\"\n\t\telse:\n\t\t\tvalue \u003d \"#F70808\"\n\t\n\treturn value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      },
                       "custom.item.answer": {
                         "binding": {
                           "config": {
-                            "path": "this.props.params.answer"
+                            "path": "this.props.value"
                           },
                           "type": "property"
                         }
@@ -7038,7 +7071,23 @@
                           "type": "property"
                         }
                       },
-                      "props.params.fontSize": {
+                      "props.style.borderColor": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.borderColor"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.color": {
+                        "binding": {
+                          "config": {
+                            "path": "this.custom.color"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.style.fontSize": {
                         "binding": {
                           "config": {
                             "path": "view.custom.fontSize"
@@ -7048,19 +7097,17 @@
                       }
                     },
                     "props": {
-                      "params": {
-                        "answer": null,
-                        "maxValue": 12.75,
-                        "minValue": 0,
-                        "showQuestion": false,
-                        "value": null
+                      "align": "left",
+                      "format": "none",
+                      "placeholder": "Escriba Aqui",
+                      "spinner": {
+                        "enabled": false
                       },
-                      "path": "Objects/NumericField",
-                      "style": {},
-                      "useDefaultViewHeight": false,
-                      "useDefaultViewWidth": false
+                      "style": {
+                        "classes": "PAPO/Field/Input"
+                      }
                     },
-                    "type": "ia.display.view"
+                    "type": "ia.input.numeric-entry-field"
                   }
                 ],
                 "custom": {
