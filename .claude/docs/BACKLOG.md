@@ -49,6 +49,11 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - ~~Supervisor guardado con `papoItemID` nulo en `Ensamble/Form_EA11-1601_start` y `Form_EA11-2601_start`~~ corregido el 2026-10-26 (11233 y 11355). Queda `OREC/Form_PO07-0101_start` (`FlexContainer15/TextField`, `papoItemID` nulo)
 - `Ensamble/Form_EA11-0901_2h` y `_4h`: el ítem 207 se usa para tres preguntas distintas ("Apariencia de borne.", "Prueba de desgarre soldadura de punto.", "Alineación de soldadura")
 - `F&A/Form_AC10-0201_start`: "Cubierta sin rayones." aparece dos veces en "Condiciones de operacion" y varias preguntas largas se cortan en su fila (también en el original)
+- `custom.insights` de los formularios (original y estándar): `preInsight` usa `initialPapoDateTime` y solo se recalcula cuando cambia el texto de Observaciones; si el operario no escribe nada se guarda el turno y la hora del diseño ("T: 3, H: 14:35" en un registro de las 07:55; en el PDF de PO11-0101 sale "T: 3, H: 14:13")
+
+## Errores de los reportes (encontrados al revisar los PDF de los pilotos, 2026-10-26)
+
+- Reporte `Clarios/Andina/Ensamble/EA11-1601`: el PDF falla con error 500 en los dos ciclos de prueba (`java.lang.StackOverflowError` en `RMLinkedText.getXString`, recursión del texto que pagina). Ya pasó el 2026-10-21, antes de los objetos estándar; la plantilla no cambia desde el checkpoint `1a0ba2b` y el original y el piloto guardan el mismo DataAnswer (`--compare-db --exact`). Sospecha: textos con el desborde por defecto en cajas más bajas que una línea (p. ej. "3" + salto de línea en x=346 y=38, 20×10 con letra de 12, y `@twohourN.papoItemID11208@` con salto de línea en cajas de 10 de alto). Revisarlo en el Designer (Overflow → Shrink) y probar el PDF
 
 ## Preguntas desde papoitem (fases 2 y 3)
 
