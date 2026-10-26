@@ -204,6 +204,7 @@ Parámetros comunes: `question`, `papoItemID`, `showQuestion`, `questionBasis`, 
 
 - [ ] **Lista** (grupo en columna): la fila completa (contenedor + etiqueta de pregunta + campo) se reemplaza por **un objeto con la pregunta adentro** (`showQuestion: true`), alto estándar 50 px (o el de la fila si era mayor), pregunta 60 % / campo 40 %
 - [ ] **Grilla** (y grupos en fila, como el supervisor): solo el campo; la celda y la etiqueta de la grilla quedan como estaban (`showQuestion: false`)
+- [ ] **Repeater** (`Fundamental Views/Checkbox`, formularios de OREC): **no se usa**. Cada instancia pasa a ser una fila del grupo, igual que una lista: un `Objects/Checkbox` por pregunta con su `custom.item` fijo (`papoItemID` y `registerTypeID`), nombre normal (`Checkbox`, `Checkbox_0`…) y alto de 50 px (o el del elemento del repeater)
 
 ### Ejemplo (checkbox de una fila de lista, `F&A/Form_AC10-0201_start`)
 

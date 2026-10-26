@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.7.1
+Version: 2.8.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -42,6 +42,9 @@ Changelog:
 		base text wins (docs/sql/preguntas_texto_base.json)
 	2026-10-26 | William M. | v2.7.1 - A numeric field without a stored value starts with "" (what the native field
 		saves when the operator does not touch it), not None
+	2026-10-26 | William M. | v2.8.0 - No repeater container: each instance of a Fundamental Views/Checkbox repeater is a
+		row of the group (Objects/Checkbox named like any component), like the list forms; the section height counts
+		the repeater rows before the change
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -557,8 +560,25 @@ def _registerTypes(ids):
 	return {row["ID"]: row["RegisterTypeID"] for row in rows}
 
 
-def repeaterBlock(repeater, stats):
-	"""Container with one Objects/Checkbox per instance of a Fundamental Views/Checkbox repeater."""
+def _freeName(base, taken):
+	"""First free component name in the Perspective way: Checkbox, Checkbox_0, Checkbox_1..."""
+	name, n = base, 0
+	while name in taken:
+		name, n = "{}_{}".format(base, n), n + 1
+	taken.add(name)
+	return name
+
+
+def _rowPosition(props):
+	"""Row of a repeater instance: its element position when it has a px height, else the standard list row (50 px)."""
+	position = props.get("elementPosition") or {}
+	if str(position.get("basis", "")).endswith("px"):
+		return position
+	return {"basis": "{}px".format(ROW_BASIS), "shrink": 0}
+
+
+def repeaterRows(repeater, stats, taken):
+	"""One Objects/Checkbox row per instance of a Fundamental Views/Checkbox repeater (no container, like a list)."""
 	props = repeater.get("props") or {}
 	instances = props.get("instances") or []
 	ids = [inst.get("papoItemID", (inst.get("item") or {}).get("papoItemID")) for inst in instances]
@@ -568,16 +588,15 @@ def repeaterBlock(repeater, stats):
 	children = []
 	for n, (inst, pid) in enumerate(zip(instances, ids), 1):
 		item = {"papoItemID": pid, "registerTypeID": types[pid]}
-		node = {"custom": {"item": item}, "meta": {"name": "Item{}".format(n)}, "propConfig": {}, "props": {}, "type": "ia.input.checkbox"}
+		node = {"custom": {"item": item}, "meta": {"name": _freeName("Checkbox", taken)}, "propConfig": {}, "props": {}, "type": "ia.input.checkbox"}
 		# Unmounted, the original read the answer stored in the instance; mounted, the checkbox starts unchecked
 		stored = (inst.get("item") or {}).get("answer") or "No Cumple"
 		params = {"question": "", "trueValue": "Cumple", "falseValue": "No Cumple", "value": False, "answer": stored}
-		children.append(_embed(node, node["meta"], props.get("elementPosition", {}), {}, params,
+		children.append(_embed(node, node["meta"], _rowPosition(props), {}, params,
 			{"props.params.papoItemID": _prop("this.custom.item.papoItemID")}, "Objects/Checkbox"))
 		stats["Objects/Checkbox"] += 1
 	stats["repeaters"] += 1
-	return {"children": children, "meta": copy.deepcopy(repeater["meta"]), "position": copy.deepcopy(repeater.get("position", {})),
-		"props": {"direction": props.get("direction", "row"), "style": copy.deepcopy(props.get("style", {}))}, "type": "ia.container.flex"}
+	return children
 
 
 # ==================== LEGACY HANDLERS ====================
@@ -660,6 +679,12 @@ def _pxSum(group):
 	total = 0.0
 	for child in group.get("children", []):
 		basis = str(child.get("position", {}).get("basis", ""))
+		if child.get("type") == "ia.display.flex-repeater":
+			# A repeater takes its instances' rows when they have a px height, else its own height
+			props = child.get("props") or {}
+			element = str((props.get("elementPosition") or {}).get("basis", ""))
+			if element.endswith("px"):
+				basis = "{}px".format(float(element[:-2]) * len(props.get("instances") or []))
 		if basis.endswith("px"):
 			try:
 				total += float(basis[:-2])
@@ -745,9 +770,11 @@ def standardize(view, options, stats):
 			childPath = path + (child.get("meta", {}).get("name", "?"),)
 			if child.get("type") == "ia.display.flex-repeater":
 				if options.get("repeaters") and (child.get("props") or {}).get("path") == REPEATER_VIEW and not _conflict(references, childPath, False):
-					block = repeaterBlock(child, stats)
-					if block:
-						node["children"][i] = block
+					taken = {c.get("meta", {}).get("name") for c in node.get("children", []) if c is not child}
+					rows = repeaterRows(child, stats, taken)
+					if rows:
+						# Replaced by its rows after the loop (the list keeps the position of the repeater)
+						node["children"][i] = rows
 						continue
 				stats["repeaters sin convertir"] += 1
 				continue
@@ -764,6 +791,8 @@ def standardize(view, options, stats):
 				if node["children"][i] is not child or child.get("type") != "ia.container.flex":
 					continue
 			walk(child, childPath, node, parent)
+		if any(isinstance(c, list) for c in node.get("children", [])):
+			node["children"] = [row for c in node["children"] for row in (c if isinstance(c, list) else [c])]
 
 	walk(view["root"], ("root",), None, None)
 	# Rows taller than before: the expanded section grows by the same amount (otherwise its end is cut)
