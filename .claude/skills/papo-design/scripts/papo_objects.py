@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.10.0
+Version: 2.10.1
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -51,6 +51,9 @@ Changelog:
 	2026-10-26 | William M. | v2.9.1 - Hidden rows (position.display false) do not count in the section height
 	2026-10-26 | William M. | v2.10.0 - Items of docs/sql/preguntas_texto_fijo.json keep their question written in
 		the form (short texts under a heading)
+	2026-10-26 | William M. | v2.10.1 - The legacy cleanup removes, with custom.answers, the group timer that only
+		refreshed it (custom.refreshSecond: now(1000) + refreshBinding("custom.{}".format("answers"))); a group whose
+		own scripts use custom.answers otherwise keeps it
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -625,21 +628,63 @@ def sentMessages():
 	return _SENT
 
 
+_REFRESH_ONLY = {"answers", "custom.{}", "custom.answers"}
+
+
+def _answerScripts(group):
+	"""(refreshers, otherUse): custom props whose change script only refreshes custom.answers (the legacy timer), and
+	whether another script of the group mentions answers (then custom.answers stays)."""
+	refreshers, otherUse = [], False
+	for prop, config in (group.get("propConfig") or {}).items():
+		code = ((config.get("onChange") or {}).get("script") or "") if isinstance(config.get("onChange"), dict) else ""
+		if "answers" not in code:
+			continue
+		if prop.startswith("custom.") and "refreshBinding" in code and set(re.findall(r'"([^"]*)"', code)) <= _REFRESH_ONLY:
+			refreshers.append(prop)
+		else:
+			otherUse = True
+	return refreshers, otherUse
+
+
 def dropLegacyAnswers(view, stats):
-	"""Remove the reactive custom.answers of FlexContainerGroupN / FlexContainerSupervisor (v2, paso 4)."""
+	"""Remove the reactive custom.answers of FlexContainerGroupN / FlexContainerSupervisor (v2, paso 4), with the
+	group timer that only refreshed it."""
 	references = view_refs.refs(view)
 	for child in view["root"].get("children", []):
 		name = child.get("meta", {}).get("name", "")
 		if not GROUP.match(name) or ("answers" not in child.get("custom", {}) and "custom.answers" not in child.get("propConfig", {})):
 			continue
 		path = ("root", name)
-		used = any(t == path and r.startswith("custom.answers") and o != path for o, t, r in references)
+		refreshers, otherUse = _answerScripts(child)
+		used = otherUse or any(t == path and r.startswith("custom.answers") and o != path for o, t, r in references)
+		used = used or any(t == path and o != path and any(r.startswith(p) for p in refreshers) for o, t, r in references)
 		if used:
 			stats["custom.answers en uso: " + name] += 1
 			continue
 		child.get("custom", {}).pop("answers", None)
 		child.get("propConfig", {}).pop("custom.answers", None)
 		stats["custom.answers legacy quitados"] += 1
+		for prop in refreshers:
+			child.get("custom", {}).pop(prop.split(".", 1)[1], None)
+			child.get("propConfig", {}).pop(prop, None)
+			stats["temporizadores de custom.answers quitados"] += 1
+
+
+def dropOrphanRefreshers(view, stats):
+	"""Group timers left behind by an earlier cleanup: they refresh a custom.answers that no longer exists."""
+	references = view_refs.refs(view)
+	for child in view["root"].get("children", []):
+		name = child.get("meta", {}).get("name", "")
+		if not GROUP.match(name) or "answers" in child.get("custom", {}) or "custom.answers" in child.get("propConfig", {}):
+			continue
+		path = ("root", name)
+		refreshers, otherUse = _answerScripts(child)
+		for prop in refreshers:
+			if any(t == path and o != path and r.startswith(prop) for o, t, r in references):
+				continue
+			child.get("custom", {}).pop(prop.split(".", 1)[1], None)
+			child.get("propConfig", {}).pop(prop, None)
+			stats["temporizadores de custom.answers quitados"] += 1
 
 
 def dropLegacy(view, stats):
@@ -802,6 +847,7 @@ def standardize(view, options, stats):
 	heights = {name: _pxSum(g) for name, g in _sectionHeights(view).items()}
 	if options.get("legacy"):
 		dropLegacyAnswers(view, stats)
+		dropOrphanRefreshers(view, stats)
 		for name in dropLegacy(view, stats):
 			stats["handlers no estándar que quedan: " + name] += 1
 	references = view_refs.refs(view)
