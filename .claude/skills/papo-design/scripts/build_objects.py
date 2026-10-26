@@ -5,7 +5,7 @@ Edit this file and run it to change every object at once; forms only pass parame
 Contract (all objects): question, papoItemID, fontSize (input) · value (inout) · answer (output).
 Inputs also take enabled. List layout: showQuestion, questionBasis. See .claude/docs/OBJETOS_ESTANDAR.md.
 
-Version: 2.2.0
+Version: 2.3.0
 
 Changelog:
 	2026-10-24 | William M. | v2.0.0 - value inout, answer output, options/answerFrom (Dropdown)
@@ -13,6 +13,8 @@ Changelog:
 	2026-10-25 | William M. | v2.2.0 - enabled; question resolved once in view.custom.question; Checkbox
 		trueText/falseText; questionAsPlaceholder; Dropdown showClearIcon and "Seleccionar";
 		OptionGroup in one row (orientation, align, radioStyle)
+	2026-10-25 | William M. | v2.3.0 - Root with position relative: the hidden input of checkboxes and radios
+		stays inside the object (clicking one no longer scrolls the page away in long sections)
 
 Args (CLI):
 	--check: Only report which objects would change
@@ -101,8 +103,9 @@ def view(params, directions, answer, children):
 	propConfig["params.answer"] = dict(answer, paramDirection="output", persistent=True)
 	return {"custom": {"dbConnection": "papo_db", "question": ""}, "params": params, "propConfig": propConfig,
 		"props": {"defaultSize": {"height": 50, "width": 400}},
+		# position relative: containing block of the absolute hidden <input> of checkboxes and radios
 		"root": {"children": children, "meta": {"name": "root"},
-			"props": {"alignItems": "stretch", "style": {"overflow": "hidden"}}, "type": "ia.container.flex"}}
+			"props": {"alignItems": "stretch", "style": {"overflow": "hidden", "position": "relative"}}, "type": "ia.container.flex"}}
 
 
 def questionLabel():
