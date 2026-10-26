@@ -1,4 +1,4 @@
-# Objetos estándar de PAPO (v2.3)
+# Objetos estándar de PAPO (v2.4)
 
 Vistas `Objects/*` que encapsulan el diseño y el comportamiento de un campo: el mapeo Cumple/No Cumple, el color por rango, la respuesta del dropdown y el texto de la pregunta. El formulario solo pasa parámetros. Diseño de las clases y el tema: `ESTANDAR_DISENO.md`.
 
@@ -30,7 +30,7 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 | `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`), `placeholder` ("Escriba aqui"), `questionAsPlaceholder` (la pregunta como placeholder) |
 | `Objects/TextField` | text field | el texto | `placeholder`, `questionAsPlaceholder` |
 | `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` ("Seleccionar"), `showClearIcon` |
-| `Objects/OptionGroup` | radio group (una opción entre varias) en una fila, alineado con la pregunta | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos) |
+| `Objects/OptionGroup` | radio group (una opción entre varias) en una fila, alineado con la pregunta | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos). Cada radio lleva `selected` calculado desde `value` (v2.4): el radio de Perspective renderiza `<input name="radio" checked={selected}>` y, sin `selected`, el input quedaba sin controlar y la primera opción podía quedar marcada en el navegador sin estarlo, de modo que el primer clic no hacía nada |
 | `Objects/DateTime` | selector de fecha u hora | el valor con `format` (por defecto `h:mm:ss a`, como los formularios) | `pickerType` ("time"), `format` |
 | `Objects/Label` | valor de tag (solo lectura) | el valor del tag | `tagPath` |
 

@@ -5,7 +5,7 @@ Edit this file and run it to change every object at once; forms only pass parame
 Contract (all objects): question, papoItemID, fontSize (input) · value (inout) · answer (output).
 Inputs also take enabled. List layout: showQuestion, questionBasis. See .claude/docs/OBJETOS_ESTANDAR.md.
 
-Version: 2.3.0
+Version: 2.4.0
 
 Changelog:
 	2026-10-24 | William M. | v2.0.0 - value inout, answer output, options/answerFrom (Dropdown)
@@ -15,6 +15,8 @@ Changelog:
 		OptionGroup in one row (orientation, align, radioStyle)
 	2026-10-25 | William M. | v2.3.0 - Root with position relative: the hidden input of checkboxes and radios
 		stays inside the object (clicking one no longer scrolls the page away in long sections)
+	2026-10-25 | William M. | v2.4.0 - OptionGroup radios carry selected from value: the radio inputs are always
+		controlled (the first option could stay checked in the browser and ignore the first click)
 
 Args (CLI):
 	--check: Only report which objects would change
@@ -66,6 +68,9 @@ ANSWER_DATETIME = (
 
 QUESTION_TEXT = "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)"
 QUESTION = "{view.custom.question}"
+# Radios of an option group: every radio says whether it is the value (a radio without "selected" leaves
+# its <input> uncontrolled and the browser can keep a stale check that swallows the first click)
+RADIOS = "\treturn [{\"text\": option, \"value\": option, \"selected\": option == value[\"value\"]} for option in value[\"options\"] or []]"
 # Checkbox text: the state text when trueText/falseText are set (e.g. ✔ / ✘), otherwise the question
 CHECKBOX_TEXT = ("if(coalesce({view.params.trueText}, \"\") + coalesce({view.params.falseText}, \"\") != \"\", "
 	"if({view.params.value}, {view.params.trueText}, {view.params.falseText}), {view.custom.question})")
@@ -179,9 +184,7 @@ def definitions():
 			dict(COMMON_DIR, options="input", emptyAnswer="input", value="inout", **LIST_DIR),
 			struct(("emptyAnswer", "value"), ANSWER_VALUE),
 			[questionLabel(), field("ia.input.radio-group", {"props.value": prop("view.params.value", True),
-				"props.radios": {"binding": {"config": {"path": "view.params.options"},
-					"transforms": [{"code": "\treturn [{\"text\": option, \"value\": option} for option in value or []]", "type": "script"}],
-					"type": "property"}},
+				"props.radios": struct(("options", "value"), RADIOS),
 				"props.style.fontSize": FONT}, {"align": "center", "orientation": "row",
 				"radioStyle": {"paddingBottom": 0, "paddingLeft": 0, "paddingRight": 24, "paddingTop": 0},
 				"style": {"classes": "PAPO/Field/Checkbox"}, "textPosition": "right"},
