@@ -1,4 +1,4 @@
-# Objetos estándar de PAPO (v2)
+# Objetos estándar de PAPO (v2.2)
 
 Vistas `Objects/*` que encapsulan el diseño y el comportamiento de un campo: el mapeo Cumple/No Cumple, el color por rango, la respuesta del dropdown y el texto de la pregunta. El formulario solo pasa parámetros. Diseño de las clases y el tema: `ESTANDAR_DISENO.md`.
 
@@ -18,18 +18,19 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 |---|---|---|
 | `value` | inout | Valor del campo. Queda guardado en el formulario: si la sección se cierra y se reabre, el objeto vuelve con lo que había |
 | `answer` | output | Respuesta que el formulario guarda en `custom.item.answer` |
-| `question` | input | Texto de la pregunta (el del formulario). Vacío + `papoItemID` = descripción de `papoitem` |
+| `question` | input | Texto de la pregunta (el del formulario). Vacío + `papoItemID` = descripción de `papoitem`. Se resuelve una vez en `view.custom.question` |
+| `enabled` | input | `false` = campo deshabilitado (solo lectura), como los campos con `enabled: false` del original |
 | `fontSize` | input | Tamaño de letra; el formulario lo enlaza a `view.custom.fontSize` |
 | `showQuestion`, `questionBasis` | input | Pregunta dentro del objeto (lista) u oculta (grilla, la pregunta es una etiqueta del formulario) |
 | `emptyAnswer` | input | Respuesta cuando el valor está vacío (p. ej. `"-"`); vacía (`null`) = el valor tal cual. Misma regla que el transform `return value if value else "-"` de los formularios |
 
 | Objeto | Campo | `answer` | Parámetros propios |
 |---|---|---|---|
-| `Objects/Checkbox` | checkbox (la pregunta es su texto) | `trueValue` si está marcado, `falseValue` si no | `trueValue` ("Cumple"), `falseValue` ("No Cumple") |
-| `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`), `placeholder` |
-| `Objects/TextField` | text field | el texto | `placeholder` |
-| `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` |
-| `Objects/OptionGroup` | radio group (una opción entre varias) | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos) |
+| `Objects/Checkbox` | checkbox (la pregunta es su texto) | `trueValue` si está marcado, `falseValue` si no | `trueValue` ("Cumple"), `falseValue` ("No Cumple"); `trueText` / `falseText`: texto según el estado en vez de la pregunta (p. ej. ✔ / ✘) |
+| `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`), `placeholder` ("Escriba aqui"), `questionAsPlaceholder` (la pregunta como placeholder) |
+| `Objects/TextField` | text field | el texto | `placeholder`, `questionAsPlaceholder` |
+| `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` ("Seleccionar"), `showClearIcon` |
+| `Objects/OptionGroup` | radio group (una opción entre varias) en una fila, alineado con la pregunta | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos) |
 | `Objects/DateTime` | selector de fecha u hora | el valor con `format` (por defecto `h:mm:ss a`, como los formularios) | `pickerType` ("time"), `format` |
 | `Objects/Label` | valor de tag (solo lectura) | el valor del tag | `tagPath` |
 
@@ -49,10 +50,11 @@ Los objetos se generan con `.claude/skills/papo-design/scripts/build_objects.py`
 
 ## Herramienta
 
-`.claude/skills/papo-design/scripts/papo_objects.py` (v2.0) convierte formularios (simula por defecto, `--apply` escribe con backup):
+`.claude/skills/papo-design/scripts/papo_objects.py` (v2.1) convierte formularios (simula por defecto, `--apply` escribe con backup):
 
-- **Fila de lista**: fila = un campo + una etiqueta de pregunta (o el campo es la fila) → un objeto con la pregunta adentro (`showQuestion`), alto estándar 50 px (o el de la fila si era mayor). La pregunta sale del texto fijo o, si la etiqueta consultaba `papoitem`, del mismo `papoItemID`
-- **Celda de grilla**: solo el campo; la celda conserva su layout
+- **Fila de lista** (solo en grupos en columna): fila = un campo + una etiqueta de pregunta (o el campo es la fila) → un objeto con la pregunta adentro (`showQuestion`), alto estándar 50 px (o el de la fila si era mayor). La pregunta sale del texto fijo o, si la etiqueta consultaba `papoitem`, del mismo `papoItemID`. Una fila sin pregunta deja el campo a todo el ancho
+- **Celda de grilla** (y grupos en fila, como `FlexContainerSupervisor`): solo el campo; la celda conserva su layout
+- **Todas las propiedades del campo pasan al objeto**: valor, `enabled`, placeholder, opciones y el texto del checkbox, fijos o con binding. Los textos que consultaban la descripción en `papoitem` pasan como `papoItemID` (la consulta queda en el objeto); el mapa ✔ / ✘ del estado como `trueText` / `falseText`; otro binding se copia al parámetro si resuelve igual desde el objeto. Las variantes de "Escriba aqui" quedan en el placeholder estándar. Si una propiedad no tiene parámetro (p. ej. `inputBounds`) el campo queda nativo
 - **Repeater** (`Fundamental Views/Checkbox`): un objeto por instancia, con `registerTypeID` leído de `papoitem` (SELECT) y la respuesta guardada en la instancia como respuesta inicial
 - `--legacy`: quita handlers de guardado legacy que nadie envía y el `custom.answers` reactivo de los grupos y del supervisor (v2, paso 4) si nada lo usa
 - `--form-class`: agrega `PAPO/Form` a la raíz
@@ -60,7 +62,20 @@ Los objetos se generan con `.claude/skills/papo-design/scripts/build_objects.py`
 - No reemplaza un componente que otro componente referencia (`view_refs.py` resuelve `this.`, `parent.`, `../`, `/root/…`, `getChild`), ni uno con otros `custom.item` adentro
 - Verifica la recolección (ítems, bindings, orden, contenedor) y que no aparezcan referencias rotas
 
-Simulación completa (papo-design + papo_objects, 2026-10-25), validada con papo-qa contra el original: **234 de 237 formularios pasan** las etapas 1–6; fallan solo los 3 de Cubiertas (sin wrappers del v2, caso manual). Grafo del proyecto convertido: 0 referencias no resueltas nuevas y 17 mensajes desbalanceados menos. Quedan nativos 89 campos (70 referenciados por otro componente, 19 con lógica propia).
+Simulación completa (papo-design + papo_objects v2.1, 2026-10-25), validada con papo-qa v1.2 contra el original (incluida la comparación de lo que ve el operario en cada campo): **234 de 237 formularios pasan** las etapas 1–6; fallan solo los 3 de Cubiertas (sin wrappers del v2, caso manual). 4,986 objetos (2,502 checkbox, 1,724 texto, 609 numéricos, 110 dropdowns, 26 fechas, 15 grupos de opción), 870 filas de lista. Quedan nativos 92 campos (70 referenciados por otro componente, 19 con lógica propia, 3 con propiedades sin parámetro). Grafo del proyecto convertido (v2.0): 0 referencias no resueltas nuevas y 17 mensajes desbalanceados menos.
+
+Corrección v2.1 (revisión del usuario en los pilotos, 2026-10-25): la v2.0 perdía la pregunta de 772 checkbox que la consultaban en `papoitem` y la de los placeholders que mostraban la pregunta (516), no pasaba `enabled: false` (36 campos) ni los bindings de valor a tags (57), y trataba el supervisor como fila de lista (pregunta vacía al 60 %). El radio group no tenía `orientation`/`align`/`radioStyle` y las opciones saltaban de línea.
+
+## Probar el guardado de un piloto
+
+`Digitalizacion_Template` abre cada formulario por una ruta armada desde el PAPO, así que una copia `_PruebaPiloto` nunca se abre en runtime. Para probarla en el flujo real (guardar, firmar, PDF), se intercambia temporalmente en el gateway local:
+
+```bash
+python3 .claude/skills/papo-qa/scripts/pilot_swap.py on "Page/Embedded/F&A/Form_AC10-0201_start"
+python3 .claude/skills/papo-qa/scripts/pilot_swap.py off --all
+```
+
+`on` guarda un backup y pone el contenido del piloto en el `view.json` del original; `off` lo restaura byte a byte (si el Designer guardó la vista mientras estaba intercambiada, deja esa versión aparte). No se renombra nada ni se toca el Template. No commitear con un intercambio activo: `pilot_swap.py status` lo muestra y papo-qa lo avisa.
 
 Simulación sobre los 239 formularios: 238 convertibles, 4,555 campos (2,209 checkbox, 1,604 text field, 594 numéricos con 231 rangos, 148 dropdowns: 125 por etiqueta y 23 por valor). 186 campos quedan nativos por tener lógica propia. Rechazado: `FU10-0202_start` (JSON no canónico).
 

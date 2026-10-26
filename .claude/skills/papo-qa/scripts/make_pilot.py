@@ -4,19 +4,23 @@ Creates a pilot copy of a form (<Form>_PruebaPiloto), applies the full standard 
 Steps: copy view.json/thumbnail -> papo_design -> papo_objects (--legacy --form-class) ->
 papo_qa against the original (stages 1-7) -> report in .claude/docs/qa/piloto-<form>.md.
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
+	2026-10-25 | William M. | v1.1.0 - --rebuild regenerates an existing pilot (backup first)
 
 Args (CLI):
 	form (str): Form folder relative to views/ (e.g. "Page/Embedded/F&A/Form_AC10-0201_start")
+	--rebuild: Regenerate the pilot when it exists (refused if it has changes not committed)
 
 Returns:
 	Exit code of the QA (0 = passes)
 """
 
+import argparse
 import collections
+import datetime
 import os
 import shutil
 import subprocess
@@ -33,17 +37,31 @@ RESOURCE = ('{\n  "scope": "G",\n  "version": 1,\n  "restricted": false,\n  "ove
 
 
 def main():
-	form = sys.argv[1].strip("/")
+	parser = argparse.ArgumentParser(description="Crea o regenera la copia piloto de un formulario")
+	parser.add_argument("form")
+	parser.add_argument("--rebuild", action="store_true")
+	args = parser.parse_args()
+	form = args.form.strip("/")
 	source = os.path.join(design.VIEWS_DIR, form)
 	target = source + "_PruebaPiloto"
 	if os.path.exists(target):
-		print("Ya existe: {}".format(target))
-		return 1
-	os.makedirs(target)
+		if not args.rebuild:
+			print("Ya existe: {} (usar --rebuild)".format(target))
+			return 1
+		rel = os.path.relpath(target, design.REPO_ROOT)
+		if subprocess.run(["git", "-C", design.REPO_ROOT, "status", "--porcelain", "--", rel], capture_output=True, text=True).stdout.strip():
+			print("El piloto tiene cambios sin commit (guardados del Designer): commitealos antes")
+			return 1
+		backup = os.path.join(design.REPO_ROOT, ".claude", "backups", datetime.date.today().isoformat(), "make-pilot", rel)
+		os.makedirs(os.path.dirname(backup), exist_ok=True)
+		shutil.copy2(os.path.join(target, "view.json"), os.path.join(os.path.dirname(backup), os.path.basename(rel) + ".view.json"))
+	else:
+		os.makedirs(target)
 	shutil.copy2(os.path.join(source, "view.json"), os.path.join(target, "view.json"))
 	if os.path.exists(os.path.join(source, "thumbnail.png")):
 		shutil.copy2(os.path.join(source, "thumbnail.png"), os.path.join(target, "thumbnail.png"))
-	open(os.path.join(target, "resource.json"), "w").write(RESOURCE)
+	if not os.path.exists(os.path.join(target, "resource.json")):
+		open(os.path.join(target, "resource.json"), "w").write(RESOURCE)
 
 	path = os.path.join(target, "view.json")
 	view, crlf, canonical = design.loadView(path)

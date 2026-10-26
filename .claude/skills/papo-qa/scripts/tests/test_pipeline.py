@@ -58,13 +58,22 @@ class PipelineTest(unittest.TestCase):
 		dropLegacy(pilot["root"])
 		cls.clean = pilot
 
-	def run_case(self, view, raw=None):
+	def run_case(self, view, raw=None, base=None):
 		folder = tempfile.mkdtemp(prefix="papo-qa-test-")
 		path = os.path.join(folder, "Form_Test", "view.json")
 		os.makedirs(os.path.dirname(path))
 		open(path, "w", encoding="utf-8").write(raw if raw is not None else qa.design.gsonDump(view))
-		results, _, _ = qa.checkView(path, self.base)
+		results, _, _ = qa.checkView(path, base or self.base)
 		return {stage for stage, problems in results.items() if problems}
+
+	def pair(self, objectPath):
+		"""(baseline copy, its native field, current copy, the object that replaced it) for one object type."""
+		base, cur = copy.deepcopy(self.base), copy.deepcopy(self.clean)
+		for old, new in zip(qa.answerSources(base["view"]), qa.answerSources(cur)):
+			node = new.get("node") or {}
+			if node.get("type") == "ia.display.view" and node["props"]["path"] == objectPath:
+				return base, old["node"], cur, node
+		raise AssertionError("sin " + objectPath)
 
 	def test_clean_copy_passes(self):
 		self.assertEqual(self.run_case(self.clean), set())
@@ -88,6 +97,38 @@ class PipelineTest(unittest.TestCase):
 		box = [n for n in _embeds(v) if n["props"]["path"] == "Objects/Checkbox"][0]
 		box["props"]["params"]["falseValue"] = "No cumple"
 		self.assertIn("3", self.run_case(v))
+
+	def test_props_lost_checkbox_question(self):
+		_, _, v, box = self.pair("Objects/Checkbox")
+		box["props"]["params"]["question"] = ""
+		self.assertIn("3", self.run_case(v))
+
+	def test_props_question_from_item(self):
+		# The original checkbox showed the papoitem description; a static text on the object is not the same
+		base, field, v, _ = self.pair("Objects/Checkbox")
+		field.setdefault("propConfig", {})["props.text"] = {"binding": {"config": {"path": "this.custom.item.papoItemID"},
+			"transforms": [{"code": "\tquery = \"SELECT Description FROM papoitem WHERE ID = ?\"", "type": "script"}], "type": "property"}}
+		self.assertIn("3", self.run_case(v, base=base))
+
+	def test_props_enabled_changed(self):
+		_, _, v, node = self.pair("Objects/NumericField")
+		node["props"]["params"]["enabled"] = False
+		self.assertIn("3", self.run_case(v))
+
+	def test_props_placeholder_changed(self):
+		_, _, v, node = self.pair("Objects/NumericField")
+		node["props"]["params"]["placeholder"] = "Otro texto"
+		self.assertIn("3", self.run_case(v))
+
+	def test_props_lost_value_binding(self):
+		base, field, v, _ = self.pair("Objects/NumericField")
+		field.setdefault("propConfig", {})["props.value"] = {"binding": {"config": {"mode": "direct", "tagPath": "[default]X"}, "type": "tag"}}
+		self.assertIn("3", self.run_case(v, base=base))
+
+	def test_props_unknown_prop(self):
+		base, field, v, _ = self.pair("Objects/NumericField")
+		field["props"]["inputBounds"] = {"maximum": 100, "minimum": 0}
+		self.assertIn("3", self.run_case(v, base=base))
 
 	def test_flow_missing_wrapper(self):
 		v = copy.deepcopy(self.clean)

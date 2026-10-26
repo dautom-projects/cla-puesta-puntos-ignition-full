@@ -108,7 +108,7 @@ Usar `/bug <descripción>` (`.claude/commands/bug.md`):
 6. Commit `fix: <bug>` + filas en DEPLOY_INVENTORY.md (Project Library antes que vistas)
 7. Esperar ~10 s (escaneo del gateway) y Update Project en el Designer; si cambiaron relaciones, re-correr ignition-graph
 
-Cambios de estandarización de formularios: pasar antes el pipeline de QA (`.claude/skills/papo-qa/`, `papo_qa.py --views <vistas> --graph`) y commitear por partes; plan en `/Users/dautom/.claude/plans/sorted-questing-sunrise.md`
+Cambios de estandarización de formularios: pasar antes el pipeline de QA (`.claude/skills/papo-qa/`, `papo_qa.py --views <vistas> --graph`) y commitear por partes; plan en `/Users/dautom/.claude/plans/sorted-questing-sunrise.md`. Para probar el guardado de un piloto `_PruebaPiloto` desde el flujo real: `pilot_swap.py on <formulario>` / `off --all` (nunca commitear con un intercambio activo)
 
 ## Reglas críticas al editar view.json
 

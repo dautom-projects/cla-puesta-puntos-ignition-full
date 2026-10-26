@@ -6,19 +6,26 @@ FlexContainerGroupN / FlexContainerSupervisor; its answer reads the object's out
 "answer", so papo_core.register.recopile collects the same items in the same order.
 
 Modes (per row of a group):
-	row       a list row (container + question label + one field, or a field that is the row)
-	          becomes one object with the question inside (showQuestion true)
-	field     in grids, only the field is replaced and the cell keeps its layout
+	row       a list row of a column group (container + question label + one field, or a field
+	          that is the row) becomes one object with the question inside (showQuestion true)
+	field     in grids and row groups (FlexContainerSupervisor), only the field is replaced and
+	          the cell keeps its layout
+Every prop of the field is carried to the object: static values and bindings become params
+(value, enabled, placeholder, options, the checkbox text...). A field with a prop the object
+cannot take stays native.
 	repeater  a Flex Repeater of Fundamental Views/Checkbox becomes one object per instance
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.0.0
+Version: 2.1.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
 	2026-10-25 | William M. | v2.0.0 - Row and repeater modes, emptyAnswer, checkbox fallback,
 		option groups, date-time, legacy cleanup, PAPO/Form, reference safety
+	2026-10-25 | William M. | v2.1.0 - Carry every field prop (checkbox text and state text, question as
+		placeholder, enabled, value/option bindings) or keep the field native; rows only in column
+		groups; a row without a question takes the full width
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -68,6 +75,26 @@ DEFAULTS = {"Objects/NumericField": (None, None), "Objects/TextField": ("", "")}
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
 RE_RANGE = re.compile(r"([\d.]+)\s*<=\s*value\s*<=\s*([\d.]+)")
 DESCRIPTION_QUERY = "SELECT Description FROM papoitem WHERE ID = ?"
+# Field props each object takes as a param (static value or binding)
+FIELD_PARAMS = {
+	"ia.input.checkbox": {"selected": "value", "enabled": "enabled"},
+	"ia.input.numeric-entry-field": {"value": "value", "placeholder": "placeholder", "enabled": "enabled"},
+	"ia.input.text-field": {"text": "value", "placeholder": "placeholder", "enabled": "enabled"},
+	"ia.input.dropdown": {"value": "value", "options": "options", "placeholder": "placeholder", "enabled": "enabled",
+		"showClearIcon": "showClearIcon"},
+	"ia.input.date-time-input": {"value": "value", "pickerType": "pickerType", "enabled": "enabled"},
+}
+# Props the object sets itself (standard design or fixed behavior); the checkbox text is resolved apart
+OBJECT_SETS = {
+	"ia.input.checkbox": ("text", "checkedIcon", "uncheckedIcon", "direction"),
+	"ia.input.numeric-entry-field": ("align", "format", "spinner", "containerStyle", "borderColor"),
+	"ia.input.text-field": ("spellcheck",),
+	"ia.input.dropdown": (),
+	"ia.input.date-time-input": ("formattedValue",),
+}
+# Spellings of the default placeholder ("Escriba aqui") found in the forms
+RE_DEFAULT_PLACEHOLDER = re.compile(r"^\s*esc?r?i?ba(\s+aqu[ií])?\s*$", re.I)
+DROPDOWN_PLACEHOLDER = "Seleccionar"
 REPEATER_VIEW = "Page/Embedded/Metalurgia/Fundamental Views/Checkbox"
 ROW_BASIS = 50
 
@@ -142,8 +169,8 @@ def _rangeOf(component):
 	return None
 
 
-def objectParams(component, rule, stats):
-	"""Static params and extra bindings of the object that replaces a field."""
+def objectParams(component, rule, stats, moved=False):
+	"""Params and bindings of the object that replaces a field, or None when one of its props cannot be carried."""
 	ctype = component["type"]
 	props = component.get("props") or {}
 	propConfig = component.get("propConfig", {})
@@ -159,6 +186,7 @@ def objectParams(component, rule, stats):
 		chosen = [o for o, on in zip(rule["options"], answers) if on]
 		params.update(options=rule["options"], emptyAnswer="-", value=chosen[0] if chosen else None,
 			answer=chosen[0] if chosen else "-")
+		return params, bindings
 	elif kind == "time":
 		value = props.get("value")
 		params.update(pickerType=props.get("pickerType", "time"), format="h:mm:ss a", value=value, answer=qa._formatTime(value))
@@ -174,9 +202,7 @@ def objectParams(component, rule, stats):
 		params.update(value=value, answerFrom="label" if labelMode else "value", answer=answer)
 		if rule.get("empty") is not None:
 			params["emptyAnswer"] = rule["empty"]
-		if "props.options" in propConfig:
-			bindings["props.params.options"] = copy.deepcopy(propConfig["props.options"])
-		else:
+		if "props.options" not in propConfig:
 			params["options"] = props.get("options", [])
 		stats["dropdown " + params["answerFrom"]] += 1
 	else:
@@ -191,6 +217,120 @@ def objectParams(component, rule, stats):
 		if limits:
 			params.update(minValue=limits[0], maxValue=limits[1])
 			stats["numéricos con rango"] += 1
+	carried = carryProps(component, moved)
+	if carried is None:
+		return None
+	params.update(carried[0])
+	bindings.update(carried[1])
+	return params, bindings
+
+
+# ==================== FIELD PROPS ====================
+
+def _itemID():
+	return {"props.params.papoItemID": _prop("this.custom.item.papoItemID")}
+
+
+def _rebase(binding, ctype):
+	"""Binding with the field's own value prop pointed at the object's value param."""
+	prop = VALUE_PROP[ctype].split(".")[-1]
+	text = re.sub(r"\b(this|self)\.props\.{}\b".format(prop), lambda m: m.group(1) + ".props.params.value", json.dumps(binding))
+	return json.loads(text)
+
+
+def _portable(binding, moved):
+	"""True when the binding resolves the same on the object (same place in the tree, or one level up when moved)."""
+	text = json.dumps(binding)
+	if re.search(r"\b(this|self)\.props\.(?!params\.)|\b(this|self)\.custom\.(?!item\b)|self\.(getChild|children)", text):
+		return False
+	return not moved or not re.search(r'"path": "(parent\.|\.)|\{(parent\.|\.)|self\.(parent|getSibling)', text)
+
+
+def _describesItem(component, binding):
+	"""True when the binding shows the description of the field's own papoItemID (papoitem query)."""
+	transforms = (binding or {}).get("transforms", [])
+	if not binding or binding.get("type") != "property" or len(transforms) != 1 or DESCRIPTION_QUERY not in _code(transforms[0]):
+		return False
+	path = binding.get("config", {}).get("path")
+	if path == "this.custom.item.papoItemID":
+		return True
+	item = component.get("propConfig", {}).get("custom.item.papoItemID", {}).get("binding") or {}
+	return bool(path) and item.get("type") == "property" and not item.get("transforms") and item.get("config", {}).get("path") == path
+
+
+def _stateTexts(binding, ctype):
+	"""(trueText, falseText) when the binding maps the checkbox state to two texts (e.g. ✔ / ✘)."""
+	if not binding or binding.get("type") != "property" or binding.get("config") != {"path": VALUE_PROP[ctype]}:
+		return None
+	transforms = binding.get("transforms", [])
+	if len(transforms) != 1 or transforms[0].get("type") != "map":
+		return None
+	table = {m.get("input"): m.get("output") for m in transforms[0].get("mappings", [])}
+	if set(table) != {True, False} or not all(isinstance(v, str) for v in table.values()):
+		return None
+	return table[True], table[False]
+
+
+def checkboxText(component, moved):
+	"""Params and bindings that show the checkbox text on the object, or None when it cannot be carried."""
+	config = component.get("propConfig", {}).get("props.text") or {}
+	binding = config.get("binding")
+	if set(config) - {"binding", "persistent"}:
+		return None
+	if not binding:
+		return {"question": (component.get("props") or {}).get("text", "") or ""}, {}
+	if _describesItem(component, binding):
+		return {"question": ""}, _itemID()
+	state = _stateTexts(binding, component["type"])
+	if state:
+		return {"question": "", "trueText": state[0], "falseText": state[1]}, {}
+	binding = _rebase(binding, component["type"])
+	return ({"question": ""}, {"props.params.question": {"binding": binding}}) if _portable(binding, moved) else None
+
+
+def carryProps(component, moved):
+	"""Params and bindings for the field props (enabled, placeholder, value and option bindings...), or None."""
+	ctype = component["type"]
+	props = component.get("props") or {}
+	mapping = FIELD_PARAMS[ctype]
+	if component.get("events") or component.get("scripts"):
+		return None
+	if any(k != "style" and k not in mapping and k not in OBJECT_SETS[ctype] for k in props):
+		return None
+	params, bindings = {}, {}
+	if props.get("enabled") is False:
+		params["enabled"] = False
+	if props.get("showClearIcon"):
+		params["showClearIcon"] = True
+	placeholder = props.get("placeholder")
+	if ctype == "ia.input.dropdown":
+		text = placeholder.get("text") if isinstance(placeholder, dict) else None
+		if text and text != DROPDOWN_PLACEHOLDER:
+			params["placeholder"] = text
+	elif isinstance(placeholder, str) and placeholder and not RE_DEFAULT_PLACEHOLDER.match(placeholder):
+		params["placeholder"] = placeholder
+	for key, config in component.get("propConfig", {}).items():
+		if key.startswith("custom.item"):
+			continue
+		if config.get("onChange"):
+			return None
+		if not key.startswith("props.") or key.startswith("props.style") or (key == "props.text" and ctype == "ia.input.checkbox"):
+			continue
+		name = key[len("props."):]
+		root = name.split(".")[0]
+		if root in OBJECT_SETS[ctype]:
+			continue
+		binding = config.get("binding")
+		if root not in mapping or not binding or (name != root and name != "placeholder.text"):
+			return None
+		if root == "placeholder" and ctype != "ia.input.dropdown" and _describesItem(component, binding):
+			params["questionAsPlaceholder"] = True
+			bindings.update(_itemID())
+			continue
+		binding = _rebase(binding, ctype)
+		if not _portable(binding, moved):
+			return None
+		bindings["props.params." + mapping[root]] = dict(config, binding=binding)
 	return params, bindings
 
 
@@ -234,8 +374,11 @@ def rowCandidate(row):
 			for k, v in field.get("propConfig", {}).items()):
 		return None
 	if field["type"] == "ia.input.checkbox" and not labels:
-		question = _questionOf(field, field.get("propConfig", {}).get("props.text", {}).get("binding"), row)
+		question = ("checkbox", None)
 	elif labels:
+		# A checkbox with its own text next to a question label is a cell, not a row
+		if field["type"] == "ia.input.checkbox" and ((field.get("props") or {}).get("text") or "props.text" in field.get("propConfig", {})):
+			return None
 		label = labels[0]
 		question = _questionOf(label, label.get("propConfig", {}).get("props.text", {}).get("binding"), row)
 	else:
@@ -271,35 +414,80 @@ def _cellStyle(field, parent, grand):
 	return style
 
 
+def _optionQuestion(group):
+	"""(params, bindings, shown) of the question of an option group: its label, static or the item description."""
+	labels = [c for c in group.get("children", []) if c.get("type") == "ia.display.label"]
+	if not labels:
+		return {"question": ""}, {}, False
+	binding = labels[0].get("propConfig", {}).get("props.text", {}).get("binding")
+	if len(labels) > 1:
+		return None
+	if not binding:
+		return {"question": (labels[0].get("props") or {}).get("text", "") or ""}, {}, True
+	transforms = binding.get("transforms", [])
+	if (binding.get("type") == "property" and binding.get("config") == {"path": "parent.custom.item.papoItemID"}
+			and len(transforms) == 1 and DESCRIPTION_QUERY in _code(transforms[0])):
+		return {"question": ""}, _itemID(), True
+	return None
+
+
 def fieldEmbed(field, parent, grand, rule, stats):
-	params, bindings = objectParams(field, rule, stats)
-	params["showQuestion"] = rule["kind"] == "options"
+	"""Object for a field in a cell (the cell keeps its layout), or None when the field stays native."""
+	local = collections.Counter()
+	result = objectParams(field, rule, local)
+	if result is None:
+		return None
+	params, bindings = result
 	if field["type"] == "ia.input.checkbox":
-		params.pop("showQuestion")
-		params["question"] = (field.get("props") or {}).get("text", "")
-	if rule["kind"] == "options":
-		bindings["props.params.papoItemID"] = _prop("this.custom.item.papoItemID")
-	stats[OBJECTS[field["type"]]] += 1
+		text = checkboxText(field, False)
+		if text is None:
+			return None
+		params.update(text[0])
+		bindings.update(text[1])
+	elif rule["kind"] == "options":
+		question = _optionQuestion(field)
+		if question is None:
+			return None
+		params.update(question[0], showQuestion=question[2])
+		bindings.update(question[1])
+	else:
+		params["showQuestion"] = False
+	local[OBJECTS[field["type"]]] += 1
+	stats.update(local)
 	return _embed(field, field["meta"], field.get("position", {}), _cellStyle(field, parent, grand), params, bindings, OBJECTS[field["type"]])
 
 
 def rowEmbed(row, field, question, rule, stats):
-	params, bindings = objectParams(field, rule, stats)
+	"""Object for a whole list row (question inside), or None when the row is not converted as a row."""
+	moved = field is not row
+	local = collections.Counter()
+	result = objectParams(field, rule, local, moved)
+	if result is None:
+		return None
+	params, bindings = result
 	kind, value = question
-	if kind == "text":
+	if kind == "checkbox":
+		text = checkboxText(field, moved)
+		if text is None:
+			return None
+		params.update(text[0])
+		bindings.update(text[1])
+	elif kind == "text":
 		params["question"] = value
 	elif kind == "item":
 		params.update(question="", papoItemID=value)
 	else:
 		params["question"] = ""
-		bindings["props.params.papoItemID"] = _prop("this.custom.item.papoItemID")
+		bindings.update(_itemID())
 	if field["type"] != "ia.input.checkbox":
-		params["showQuestion"] = True
+		# A row without a question keeps the field at full width
+		params["showQuestion"] = question != ("text", "")
 	basis = str(row.get("position", {}).get("basis", ""))
 	height = int(float(basis[:-2])) if basis.endswith("px") else 0
 	position = {"basis": "{}px".format(max(height, ROW_BASIS)), "shrink": 0}
-	stats["filas de lista"] += 1
-	stats[OBJECTS[field["type"]]] += 1
+	local["filas de lista"] += 1
+	local[OBJECTS[field["type"]]] += 1
+	stats.update(local)
 	return _embed(field, row["meta"], position, {}, params, bindings, OBJECTS[field["type"]])
 
 
@@ -431,7 +619,11 @@ def standardize(view, options, stats):
 		if _conflict(references, path, True):
 			stats["nativos (referenciados)"] += 1
 			return node
-		return fieldEmbed(node, parent, grand, rule, stats)
+		embed = fieldEmbed(node, parent, grand, rule, stats)
+		if embed is None:
+			stats["nativos (propiedades sin parámetro)"] += 1
+			return node
+		return embed
 
 	def walk(node, path, parent, grand):
 		for i, child in enumerate(node.get("children", [])):
@@ -444,11 +636,14 @@ def standardize(view, options, stats):
 						continue
 				stats["repeaters sin convertir"] += 1
 				continue
-			if options.get("rows") and GROUP.match(node.get("meta", {}).get("name", "")):
+			# Rows only in column groups; in row groups (FlexContainerSupervisor) each child is a cell
+			if options.get("rows") and GROUP.match(node.get("meta", {}).get("name", "")) and (node.get("props") or {}).get("direction") == "column":
 				candidate = rowCandidate(child)
 				if candidate and answerRule(candidate[0]) and not _conflict(references, childPath, child is candidate[0]):
-					node["children"][i] = rowEmbed(child, candidate[0], candidate[1], answerRule(candidate[0]), stats)
-					continue
+					embed = rowEmbed(child, candidate[0], candidate[1], answerRule(candidate[0]), stats)
+					if embed is not None:
+						node["children"][i] = embed
+						continue
 			if "item" in child.get("custom", {}) and child.get("type") in OBJECTS:
 				node["children"][i] = convertField(child, childPath, node, parent)
 				if node["children"][i] is not child or child.get("type") != "ia.container.flex":

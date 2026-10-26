@@ -29,13 +29,21 @@ python3 .claude/skills/papo-qa/scripts/papo_qa.py --compare-db <ID piloto> <ID o
 
 Sale con código 1 si alguna etapa falla.
 
+Crear o regenerar un piloto (copia `_PruebaPiloto` con el estándar completo y su reporte de QA):
+
+```bash
+python3 .claude/skills/papo-qa/scripts/make_pilot.py "Page/Embedded/F&A/Form_AC10-0201_start" [--rebuild]
+```
+
+Probar el guardado de un piloto desde el flujo real (el Template abre el original por ruta): `pilot_swap.py on <formulario>` pone el piloto en la ruta del original (con backup) y `pilot_swap.py off --all` lo restaura. No commitear con un intercambio activo (`pilot_swap.py status`).
+
 ## Etapas
 
 | # | Etapa | Qué valida |
 |---|---|---|
 | 1 | Estructura | JSON parsea, Gson canónico, mismo fin de línea que el baseline |
 | 2 | Recolección | Mismos `custom.item` (papoItemID, registerTypeID, bindings), orden y contenedor; instancias de repeater expandidas; `custom.insights` y el TextField de Observaciones intactos |
-| 3 | Respuestas | Cada campo convertido a objeto responde igual que el original con valores de muestra, y su respuesta inicial (sección sin abrir) es la del campo sin tocar |
+| 3 | Respuestas | Cada campo convertido a objeto responde igual que el original con valores de muestra, y su respuesta inicial (sección sin abrir) es la del campo sin tocar. Además muestra y hace lo mismo: pregunta o texto del checkbox, placeholder, `enabled`, bindings de valor y de opciones; una propiedad del original que el objeto no recibe falla |
 | 4 | Flujo v2 | Ningún hallazgo nuevo de wrappers del v2 ni de `"papo_db"` (comparado por ubicación); en vistas con `PAPO/Form`, sin handlers legacy |
 | 5 | Diseño | Raíz con `PAPO/Form`, todo campo es objeto o tiene `PAPO/Field/*`, sin anchos fijos en px, sin clases inexistentes nuevas |
 | 6 | Contrato | Los parámetros que pasa el formulario existen en el objeto; `answer` de salida, `value` inout; `custom.item.answer` lee `params.answer` |

@@ -6,7 +6,8 @@ Compares each view against its version in a baseline commit and runs the stages:
 	2 Recolección     same custom.item (papoItemID, registerTypeID, bindings), same order and
 	                  container (FlexContainerGroupN / FlexContainerSupervisor); insights intact
 	3 Respuestas      every converted field answers like the original (sample values and the
-	                  answer kept while the object is not mounted)
+	                  answer kept while the object is not mounted) and shows and does the same:
+	                  question / checkbox text, placeholder, enabled, value and option bindings
 	4 Flujo v2        standard wrappers, no legacy handlers, no new "papo_db"
 	5 Diseño          PAPO/Form root, standard fields, no fixed px widths, no new missing classes
 	6 Contrato        params passed to Objects/* exist with the right direction
@@ -14,11 +15,13 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.1.0
+Version: 1.2.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
 	2026-10-25 | William M. | v1.1.0 - emptyAnswer, Objects/OptionGroup and Objects/DateTime; new broken component references fail stage 2
+	2026-10-25 | William M. | v1.2.0 - Stage 3 also compares the field props the operator sees (text, placeholder,
+		enabled, bindings); an unknown prop of a converted field fails
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -48,6 +51,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-design", "scripts"))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-lint", "scripts"))
 import papo_design as design
 import papo_lint as lint
+import pilot_swap
 import view_refs
 
 REPO = design.REPO_ROOT
@@ -62,6 +66,16 @@ V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDat
 VALUE_PROP = {"ia.input.checkbox": ("selected", False), "ia.input.numeric-entry-field": ("value", None),
 	"ia.input.text-field": ("text", ""), "ia.input.dropdown": ("value", None)}
 EMPTY_DASH = 'return value if value else "-"'
+DESCRIPTION_QUERY = "SELECT Description FROM papoitem WHERE ID = ?"
+RE_DEFAULT_PLACEHOLDER = re.compile(r"^\s*esc?r?i?ba(\s+aqu[ií])?\s*$", re.I)
+OWN_VALUE = {"ia.input.checkbox": "selected", "ia.input.numeric-entry-field": "value", "ia.input.text-field": "text",
+	"ia.input.dropdown": "value", "ia.input.date-time-input": "value"}
+# Props every object sets the same way for all forms (standard design or behavior)
+STANDARD_PROPS = {"style", "checkedIcon", "uncheckedIcon", "direction", "align", "format", "spinner", "containerStyle",
+	"borderColor", "spellcheck", "formattedValue", "pickerType"}
+CARRIED_PROPS = {"text", "placeholder", "enabled", "options", "showClearIcon"}
+# Object param -> field prop it carries, when the names differ
+PARAM_PROPS = {"Objects/Checkbox": {"question": "text", "value": "selected"}, "Objects/TextField": {"value": "text"}}
 STAGES = collections.OrderedDict([("1", "Estructura"), ("2", "Recolección"), ("3", "Respuestas"), ("4", "Flujo v2"),
 	("5", "Diseño"), ("6", "Contrato de objetos"), ("7", "Grafo"), ("8", "Datos"), ("9", "Visual")])
 
@@ -295,6 +309,165 @@ def stageAnswers(cur, base):
 	return problems, checked
 
 
+# ==================== FIELD PROPS (what the operator sees and can do) ====================
+
+def _itemRef(node):
+	"""Identity of a component papoItemID: the static id, or its binding."""
+	b = node.get("propConfig", {}).get("custom.item.papoItemID")
+	return json.dumps(b, sort_keys=True) if b else ((node.get("custom") or {}).get("item") or {}).get("papoItemID")
+
+
+def _onValue(binding, ctype):
+	"""Binding JSON with the field value prop written as the object value param."""
+	prop = OWN_VALUE.get(ctype, "value")
+	return re.sub(r"\b(this|self)\.props\.{}\b".format(prop), lambda m: m.group(1) + ".props.params.value", json.dumps(binding, sort_keys=True))
+
+
+def _textOf(owner, prop, parent, ctype=None):
+	"""What a text prop of a native component shows: ("text", s), ("item", ref), ("state", t, f) or ("binding", json)."""
+	config = owner.get("propConfig", {}).get(prop) or {}
+	b = config.get("binding")
+	if not b:
+		value = owner.get("props") or {}
+		for part in prop.split(".")[1:]:
+			value = value.get(part) if isinstance(value, dict) else None
+		return ("text", value or "")
+	t = b.get("transforms", [])
+	path = b.get("config", {}).get("path")
+	if b.get("type") == "property" and len(t) == 1 and DESCRIPTION_QUERY in _code(t[0]) and path:
+		item = owner.get("propConfig", {}).get("custom.item.papoItemID", {}).get("binding") or {}
+		if path == "this.custom.item.papoItemID" or (item.get("config") == {"path": path} and not item.get("transforms")):
+			return ("item", _itemRef(owner))
+		if path == "parent.custom.item.papoItemID" and parent is not None:
+			return ("item", _itemRef(parent))
+		source = owner if path.startswith("this.custom.") else parent if path.startswith("parent.custom.") else None
+		if source is not None and path.count(".") == 2:
+			static = (source.get("custom") or {}).get(path.split(".")[2])
+			if isinstance(static, int) and "custom." + path.split(".")[2] not in source.get("propConfig", {}):
+				return ("item", static)
+	if ctype and b.get("type") == "property" and b.get("config") == {"path": "this.props." + OWN_VALUE[ctype]} and len(t) == 1 and t[0].get("type") == "map":
+		table = {m.get("input"): m.get("output") for m in t[0].get("mappings", [])}
+		if set(table) == {True, False}:
+			return ("state", table[True], table[False])
+	return ("binding", _onValue(b, ctype))
+
+
+def _objectQuestion(embed):
+	"""What the object shows as its question (or checkbox text), in the terms of _textOf."""
+	p = embed["props"].get("params", {})
+	pc = embed.get("propConfig", {})
+	if p.get("trueText") or p.get("falseText"):
+		return ("state", p.get("trueText"), p.get("falseText"))
+	if "props.params.question" in pc:
+		return ("binding", json.dumps(pc["props.params.question"]["binding"], sort_keys=True))
+	if p.get("question"):
+		return ("text", p["question"])
+	b = pc.get("props.params.papoItemID", {}).get("binding")
+	if b and b.get("config") == {"path": "this.custom.item.papoItemID"} and not b.get("transforms"):
+		return ("item", _itemRef(embed))
+	if p.get("papoItemID") is not None:
+		return ("item", p["papoItemID"])
+	return ("text", "")
+
+
+def _placeholderOf(node):
+	ctype = node.get("type")
+	if ctype == "ia.input.dropdown":
+		text = ((node.get("props") or {}).get("placeholder") or {}).get("text")
+		return ("text", "default") if not text or text == "Seleccionar" else ("text", text)
+	if "props.placeholder" in node.get("propConfig", {}):
+		return _textOf(node, "props.placeholder", None, ctype)
+	text = (node.get("props") or {}).get("placeholder")
+	return ("text", "default") if not text or RE_DEFAULT_PLACEHOLDER.match(text) else ("text", text)
+
+
+def _objectPlaceholder(embed):
+	p = embed["props"].get("params", {})
+	pc = embed.get("propConfig", {})
+	if p.get("questionAsPlaceholder"):
+		return _objectQuestion(embed)
+	if "props.params.placeholder" in pc:
+		return ("binding", json.dumps(pc["props.params.placeholder"]["binding"], sort_keys=True))
+	text = p.get("placeholder")
+	return ("text", "default") if not text or RE_DEFAULT_PLACEHOLDER.match(text) or text == "Seleccionar" else ("text", text)
+
+
+def _boundOrStatic(node, prop, default, ctype):
+	cfg = node.get("propConfig", {}).get("props." + prop)
+	if cfg and cfg.get("binding"):
+		return ("binding", _onValue(cfg["binding"], ctype))
+	value = (node.get("props") or {}).get(prop)
+	return ("static", default if value is None else value)
+
+
+def _objectBoundOrStatic(embed, param, default):
+	cfg = embed.get("propConfig", {}).get("props.params." + param)
+	if cfg and cfg.get("binding"):
+		return ("binding", json.dumps(cfg["binding"], sort_keys=True))
+	value = embed["props"].get("params", {}).get(param)
+	return ("static", default if value is None else value)
+
+
+def stageFieldProps(cur, base):
+	"""Problems where a converted field no longer shows or does what the original did."""
+	problems = []
+	baseNodes = view_refs.index(base["view"])
+	for old, new in zip(answerSources(base["view"]), answerSources(cur)):
+		embed, field = new.get("node"), old.get("node")
+		if not embed or not field or embed.get("type") != "ia.display.view" or field.get("type") == "ia.display.view":
+			continue
+		if not str(embed["props"].get("path", "")).startswith("Objects/"):
+			continue
+		ctype = field.get("type")
+		where = "{} ({})".format(new["id"], new["path"])
+		oldPath, newPath = tuple(old["path"].split("/")), tuple(new["path"].split("/"))
+		parent = baseNodes.get(oldPath[:-1])
+		params = embed["props"].get("params", {})
+		# Question or checkbox text
+		if ctype == "ia.container.flex":
+			labels = [c for c in field.get("children", []) if c.get("type") == "ia.display.label"]
+			expected = _textOf(labels[0], "props.text", field) if labels else ("text", "")
+			shown = _objectQuestion(embed) if params.get("showQuestion", True) else ("text", "")
+		elif oldPath != newPath:
+			row = baseNodes.get(newPath)
+			labels = [c for c in (row or {}).get("children", []) if c.get("type") == "ia.display.label"]
+			expected = _textOf(labels[0], "props.text", row) if labels else (_textOf(field, "props.text", parent, ctype) if ctype == "ia.input.checkbox" else ("text", ""))
+			shown = _objectQuestion(embed) if ctype == "ia.input.checkbox" or params.get("showQuestion", True) else ("text", "")
+		elif ctype == "ia.input.checkbox":
+			expected, shown = _textOf(field, "props.text", parent, ctype), _objectQuestion(embed)
+		else:
+			expected = ("text", "")
+			shown = _objectQuestion(embed) if params.get("showQuestion", True) else ("text", "")
+		if expected != shown:
+			problems.append("{}: la pregunta era {} y el objeto muestra {}".format(where, str(expected)[:90], str(shown)[:90]))
+		if ctype == "ia.container.flex":
+			continue
+		# Placeholder, enabled, value and option bindings
+		if ctype in ("ia.input.numeric-entry-field", "ia.input.text-field", "ia.input.dropdown") and _placeholderOf(field) != _objectPlaceholder(embed):
+			problems.append("{}: el placeholder era {} y ahora es {}".format(where, str(_placeholderOf(field))[:80], str(_objectPlaceholder(embed))[:80]))
+		if _boundOrStatic(field, "enabled", True, ctype) != _objectBoundOrStatic(embed, "enabled", True):
+			problems.append("{}: cambió enabled".format(where))
+		valueBinding = field.get("propConfig", {}).get("props." + OWN_VALUE.get(ctype, "value"), {}).get("binding")
+		objectValue = embed.get("propConfig", {}).get("props.params.value", {}).get("binding")
+		if (valueBinding and _onValue(valueBinding, ctype)) != (objectValue and json.dumps(objectValue, sort_keys=True)):
+			problems.append("{}: se perdió el binding del valor".format(where))
+		if ctype == "ia.input.dropdown":
+			if "props.options" in field.get("propConfig", {}) and _boundOrStatic(field, "options", [], ctype) != _objectBoundOrStatic(embed, "options", []):
+				problems.append("{}: cambiaron las opciones".format(where))
+			if bool((field.get("props") or {}).get("showClearIcon")) != bool(params.get("showClearIcon")):
+				problems.append("{}: cambió showClearIcon".format(where))
+		# Anything else the original field had
+		known = STANDARD_PROPS | CARRIED_PROPS | {OWN_VALUE.get(ctype, "value")}
+		extra = [k for k in (field.get("props") or {}) if k not in known]
+		extra += [k for k, v in field.get("propConfig", {}).items() if k.startswith("props.") and k[6:].split(".")[0] not in known]
+		extra += [k for k, v in field.get("propConfig", {}).items() if v.get("onChange") and not k.startswith("custom.item")]
+		if field.get("events") or field.get("scripts"):
+			extra.append("events/scripts")
+		if extra:
+			problems.append("{}: el campo tenía {} y el objeto no lo recibe".format(where, ", ".join(sorted(set(extra)))))
+	return problems
+
+
 def _isStandard(view):
 	return "PAPO/Form" in str(((view["root"].get("props") or {}).get("style") or {}).get("classes", "")).split()
 
@@ -316,7 +489,15 @@ def stageFlow(cur, base, rel):
 	# Findings compared by location: a new one fails even if another one was removed
 	# A binding moved to the object (props.X -> props.params.X) keeps its location
 	def findings(view):
-		return {(k, w.replace("props.params.", "props.")) for k, w in lint.lintView(view, rel)}
+		nodes = {"/".join(k): v for k, v in view_refs.index(view).items()}
+
+		def where(w):
+			owner, _, location = w.partition(" · ")
+			path = ((nodes.get(owner) or {}).get("props") or {}).get("path", "")
+			for param, prop in PARAM_PROPS.get(path, {}).items():
+				location = location.replace("props.params.{}.".format(param), "props.{}.".format(prop))
+			return owner + (" · " + location.replace("props.params.", "props.") if location else "")
+		return {(k, where(w)) for k, w in lint.lintView(view, rel)}
 	now = findings(cur)
 	before = findings(base["view"])
 	for pattern, where in sorted(now):
@@ -498,7 +679,7 @@ def checkView(curPath, base):
 	else:
 		results["2"] = stageCollection(cur, base)
 	answers, checked = stageAnswers(cur, base)
-	results["3"] = answers
+	results["3"] = answers + stageFieldProps(cur, base)
 	results["4"] = stageFlow(cur, base, rel)
 	results["5"] = stageDesign(cur, base)
 	results["6"] = stageContract(cur)
@@ -526,10 +707,16 @@ def main():
 	lines = ["# QA de formularios PAPO", "", "Generado: {} · Baseline: `{}` · Vistas: {}".format(
 		datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), args.baseline, len(runs)), ""]
 	failed = False
+	swapped = pilot_swap.activeSwaps()
+	if swapped:
+		lines += ["⚠ Intercambio de pilotos activo (no commitear): {}. Restaurar con `pilot_swap.py off --all`.".format(", ".join(swapped)), ""]
+		print("⚠ intercambio de pilotos activo: " + ", ".join(swapped))
 	summary = collections.Counter()
 	detail = []
 	for path, base in runs:
 		results, checked, items = checkView(path, base)
+		if os.path.relpath(os.path.dirname(path), VIEWS) in swapped:
+			results["1"] = results["1"] + ["el piloto está intercambiado en esta ruta"]
 		bad = [s for s, p in results.items() if p]
 		failed = failed or bool(bad)
 		summary["pasa" if not bad else "falla"] += 1
