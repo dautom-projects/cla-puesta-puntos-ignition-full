@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.9.3
+Version: 1.10.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -42,6 +42,8 @@ Changelog:
 	2026-10-26 | William M. | v1.9.2 - A native numeric without a stored value answers "" when untouched (seen in
 		EA11-0901_4h: 24 of 24), not None
 	2026-10-26 | William M. | v1.9.3 - Stage 5: hidden rows (position.display false) take no height in a section
+	2026-10-26 | William M. | v1.10.0 - FIXED_TEXTS: items whose question stays written in the form
+		(docs/sql/preguntas_texto_fijo.json)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -86,6 +88,9 @@ DB_ENV = os.path.expanduser("~/.config/papo-sql/claude_ro.env")
 # Items whose papoitem text stays as it is although the form showed another (decision per item)
 BASE_TEXT_FILE = os.path.join(REPO, ".claude", "docs", "sql", "preguntas_texto_base.json")
 BASE_TEXTS = {int(k) for k in (json.load(open(BASE_TEXT_FILE, encoding="utf-8")) if os.path.exists(BASE_TEXT_FILE) else {}) if k.isdigit()}
+# Items whose question stays written in the form, not read from papoitem (short texts under a heading)
+FIXED_TEXT_FILE = os.path.join(REPO, ".claude", "docs", "sql", "preguntas_texto_fijo.json")
+FIXED_TEXTS = {int(k) for k in (json.load(open(FIXED_TEXT_FILE, encoding="utf-8")) if os.path.exists(FIXED_TEXT_FILE) else {}) if k.isdigit()}
 
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
 V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDataRoot", "formAnswerRecopile")

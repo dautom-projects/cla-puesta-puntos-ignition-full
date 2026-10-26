@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.9.1
+Version: 2.10.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -49,6 +49,8 @@ Changelog:
 		(shrink 0) and custom.baseBasisPx is at least the rows plus their margins and the group padding, so no row is
 		squeezed and the end of the section is not cut
 	2026-10-26 | William M. | v2.9.1 - Hidden rows (position.display false) do not count in the section height
+	2026-10-26 | William M. | v2.10.0 - Items of docs/sql/preguntas_texto_fijo.json keep their question written in
+		the form (short texts under a heading)
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -316,8 +318,8 @@ def _fixedQuestion(component, text, texts):
 	pid = _staticItemID(component)
 	if not text or pid is None:
 		return {"question": text or ""}, {}
-	if pid in _SHARED:
-		# One papoItemID for several questions of the view: each keeps its own text
+	if pid in _SHARED or pid in qa.FIXED_TEXTS:
+		# One papoItemID for several questions of the view, or a short text under a heading: the text stays
 		return {"question": text}, {}
 	if texts is not None:
 		texts.append({"papoItemID": pid, "text": text})
