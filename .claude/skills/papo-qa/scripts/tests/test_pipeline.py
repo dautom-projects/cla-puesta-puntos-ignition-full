@@ -43,11 +43,12 @@ class PipelineTest(unittest.TestCase):
 	def setUpClass(cls):
 		cls.base = {"view": json.loads(_git(ORIGINAL_COMMIT, PILOT)), "crlf": False}
 		pilot = json.loads(_git("HEAD", PILOT))
-		# Clean copy: the two known pending issues fixed (default answer of 11408, legacy handler)
+		# Clean copy: the two known pending issues fixed (default answer of 11408: "" like the native numeric
+		# without a stored value, legacy handler)
 		for n in _embeds(pilot):
 			if n["custom"]["item"]["papoItemID"] == 11408:
-				n["props"]["params"]["answer"] = None
-				n["props"]["params"]["value"] = None
+				n["props"]["params"]["answer"] = ""
+				n["props"]["params"]["value"] = ""
 
 		def dropLegacy(n):
 			scripts = n.get("scripts") or {}
