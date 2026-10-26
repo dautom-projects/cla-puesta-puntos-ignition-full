@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.9.0
+Version: 1.9.2
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -37,6 +37,10 @@ Changelog:
 		original's color script (ranges.py)
 	2026-10-26 | William M. | v1.9.0 - Stage 3: a question of an item listed in docs/sql/preguntas_texto_base.json (the
 		form showed a cut of the base text) reads the base text without an UPDATE
+	2026-10-26 | William M. | v1.9.1 - Stage 1 skips the line-ending check when git normalizes the file (eol=lf):
+		a CRLF working copy is stored as LF either way
+	2026-10-26 | William M. | v1.9.2 - A native numeric without a stored value answers "" when untouched (seen in
+		EA11-0901_4h: 24 of 24), not None
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -84,7 +88,7 @@ BASE_TEXTS = {int(k) for k in (json.load(open(BASE_TEXT_FILE, encoding="utf-8"))
 
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
 V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDataRoot", "formAnswerRecopile")
-VALUE_PROP = {"ia.input.checkbox": ("selected", False), "ia.input.numeric-entry-field": ("value", None),
+VALUE_PROP = {"ia.input.checkbox": ("selected", False), "ia.input.numeric-entry-field": ("value", ""),
 	"ia.input.text-field": ("text", ""), "ia.input.dropdown": ("value", None)}
 EMPTY_DASH = 'return value if value else "-"'
 OPENS_NOW = "hora de apertura"
@@ -283,12 +287,18 @@ def samplesFor(source, node):
 
 # ==================== STAGES ====================
 
+def _gitNormalizesEol(path):
+	"""True when .gitattributes stores the file with LF whatever the working copy has."""
+	out = subprocess.run(["git", "-C", REPO, "check-attr", "eol", "--", os.path.relpath(path, REPO)], capture_output=True, text=True).stdout
+	return out.strip().endswith(": lf")
+
+
 def stageStructure(cur, base, curPath):
 	_, crlf, canonical = design.loadView(curPath)
 	problems = []
 	if not canonical:
 		problems.append("no es Gson canónico")
-	if base is not None and crlf != base["crlf"]:
+	if base is not None and crlf != base["crlf"] and not _gitNormalizesEol(curPath):
 		problems.append("cambió el fin de línea")
 	return problems
 

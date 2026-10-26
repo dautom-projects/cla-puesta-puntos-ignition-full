@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.7.0
+Version: 2.7.1
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -40,6 +40,8 @@ Changelog:
 	2026-10-26 | William M. | v2.7.0 - An item saved for several questions of a view (e.g. 207 in EA11-0901_2h: the
 		1-hour section repeats 30-minute checks) keeps each fixed question; --questions-sql skips the items whose
 		base text wins (docs/sql/preguntas_texto_base.json)
+	2026-10-26 | William M. | v2.7.1 - A numeric field without a stored value starts with "" (what the native field
+		saves when the operator does not touch it), not None
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -89,7 +91,8 @@ VALUE_PROP = {
 	"ia.input.dropdown": "this.props.value",
 	"ia.input.date-time-input": "this.props.value",
 }
-DEFAULTS = {"Objects/NumericField": (None, None), "Objects/TextField": ("", "")}
+# Value and answer of a field without a stored value (the native component saves "" when nobody touches it)
+DEFAULTS = {"Objects/NumericField": ("", ""), "Objects/TextField": ("", "")}
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
 DESCRIPTION_QUERY = "SELECT Description FROM papoitem WHERE ID = ?"
 # Field props each object takes as a param (static value or binding)
