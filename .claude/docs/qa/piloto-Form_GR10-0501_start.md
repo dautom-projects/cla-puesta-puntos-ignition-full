@@ -1,6 +1,8 @@
 # QA de formularios PAPO
 
-Generado: 2026-10-26 07:07 · Baseline: `HEAD` · Vistas: 1
+Generado: 2026-10-26 07:36 · Baseline: `HEAD` · Vistas: 1
+
+⚠ Intercambio de pilotos activo (no commitear): Page/Embedded/Ensamble/Form_EA11-0901_1h, Page/Embedded/Ensamble/Form_EA11-1601_start, Page/Embedded/F&A/Form_AC10-0201_start, Page/Embedded/OREC/Form_CU11-0101_start, Page/Embedded/OREC/Form_PO11-0101-2_start. Restaurar con `pilot_swap.py off --all`.
 
 Resultado: **PASA** · 1 vistas pasan, 0 fallan
 
