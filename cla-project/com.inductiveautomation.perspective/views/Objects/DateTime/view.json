@@ -3,6 +3,17 @@
     "dbConnection": "papo_db",
     "question": ""
   },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\t# A time field starts with the time the form opens, like the native date-time input\n\tif self.params.startNow and self.params.value is None:\n\t\tself.params.value \u003d system.date.now()"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
   "params": {
     "answer": null,
     "enabled": true,
@@ -13,6 +24,7 @@
     "question": "",
     "questionBasis": "60%",
     "showQuestion": true,
+    "startNow": false,
     "value": null
   },
   "propConfig": {
@@ -97,7 +109,15 @@
       "paramDirection": "input",
       "persistent": true
     },
+    "params.startNow": {
+      "paramDirection": "input",
+      "persistent": true
+    },
     "params.value": {
+      "onChange": {
+        "enabled": null,
+        "script": "\t# The form can push its empty value after the object started: keep the opening time\n\tif currentValue.value is None and self.params.startNow:\n\t\tself.params.value \u003d system.date.now()"
+      },
       "paramDirection": "inout",
       "persistent": true
     }

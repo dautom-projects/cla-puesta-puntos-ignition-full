@@ -5,7 +5,7 @@ Edit this file and run it to change every object at once; forms only pass parame
 Contract (all objects): question, papoItemID, fontSize (input) · value (inout) · answer (output).
 Inputs also take enabled. List layout: showQuestion, questionBasis. See .claude/docs/OBJETOS_ESTANDAR.md.
 
-Version: 2.4.0
+Version: 2.5.0
 
 Changelog:
 	2026-10-24 | William M. | v2.0.0 - value inout, answer output, options/answerFrom (Dropdown)
@@ -17,6 +17,8 @@ Changelog:
 		stays inside the object (clicking one no longer scrolls the page away in long sections)
 	2026-10-25 | William M. | v2.4.0 - OptionGroup radios carry selected from value: the radio inputs are always
 		controlled (the first option could stay checked in the browser and ignore the first click)
+	2026-10-26 | William M. | v2.5.0 - DateTime startNow: without a value it starts with the time the form opens,
+		like the native date-time input (also when the form pushes the empty value after the object started)
 
 Args (CLI):
 	--check: Only report which objects would change
@@ -68,6 +70,12 @@ ANSWER_DATETIME = (
 
 QUESTION_TEXT = "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)"
 QUESTION = "{view.custom.question}"
+# DateTime with startNow: the native date-time input of the forms shows the time the form opens
+START_NOW = {"system": {"onStartup": {"config": {"script": "\t# A time field starts with the time the form opens, like the native date-time input\n"
+	"\tif self.params.startNow and self.params.value is None:\n\t\tself.params.value = system.date.now()"}, "scope": "G", "type": "script"}}}
+# The form can push its empty value after the object started: the field keeps a time, as the native one does
+KEEP_TIME = ("\t# The form can push its empty value after the object started: keep the opening time\n"
+	"\tif currentValue.value is None and self.params.startNow:\n\t\tself.params.value = system.date.now()")
 # Radios of an option group: every radio says whether it is the value (a radio without "selected" leaves
 # its <input> uncontrolled and the browser can keep a stale check that swallows the first click)
 RADIOS = "\treturn [{\"text\": option, \"value\": option, \"selected\": option == value[\"value\"]} for option in value[\"options\"] or []]"
@@ -100,17 +108,20 @@ def questionText():
 		"transforms": [{"code": QUESTION_TEXT, "type": "script"}], "type": "expr-struct"}}
 
 
-def view(params, directions, answer, children):
+def view(params, directions, answer, children, events=None, onChange=None):
 	propConfig = {"custom.dbConnection": dict(prop("session.custom.dbConnection"), persistent=True),
 		"custom.question": dict(questionText(), persistent=True)}
 	for name, direction in directions.items():
 		propConfig["params." + name] = {"paramDirection": direction, "persistent": True}
+	for name, script in (onChange or {}).items():
+		propConfig["params." + name]["onChange"] = {"enabled": None, "script": script}
 	propConfig["params.answer"] = dict(answer, paramDirection="output", persistent=True)
-	return {"custom": {"dbConnection": "papo_db", "question": ""}, "params": params, "propConfig": propConfig,
+	extra = {"events": events} if events else {}
+	return dict(extra, **{"custom": {"dbConnection": "papo_db", "question": ""}, "params": params, "propConfig": propConfig,
 		"props": {"defaultSize": {"height": 50, "width": 400}},
 		# position relative: containing block of the absolute hidden <input> of checkboxes and radios
 		"root": {"children": children, "meta": {"name": "root"},
-			"props": {"alignItems": "stretch", "style": {"overflow": "hidden", "position": "relative"}}, "type": "ia.container.flex"}}
+			"props": {"alignItems": "stretch", "style": {"overflow": "hidden", "position": "relative"}}, "type": "ia.container.flex"}})
 
 
 def questionLabel():
@@ -190,12 +201,12 @@ def definitions():
 				"style": {"classes": "PAPO/Field/Checkbox"}, "textPosition": "right"},
 				position={"basis": "auto", "grow": 1, "shrink": 0})]),
 		# Date or time picker; answer = the value formatted with format (default: time as text)
-		"DateTime": view(dict(COMMON, pickerType="time", format="h:mm:ss a", value=None, answer=None, **LIST),
-			dict(COMMON_DIR, pickerType="input", format="input", value="inout", **LIST_DIR),
+		"DateTime": view(dict(COMMON, pickerType="time", format="h:mm:ss a", startNow=False, value=None, answer=None, **LIST),
+			dict(COMMON_DIR, pickerType="input", format="input", startNow="input", value="inout", **LIST_DIR),
 			struct(("format", "value"), ANSWER_DATETIME),
 			[questionLabel(), field("ia.input.date-time-input", {"props.value": prop("view.params.value", True),
 				"props.pickerType": prop("view.params.pickerType"), "props.style.fontSize": FONT},
-				{"style": {"classes": "PAPO/Field/Input"}})]),
+				{"style": {"classes": "PAPO/Field/Input"}})], events=START_NOW, onChange={"value": KEEP_TIME}),
 		# Read-only tag value; answer = the value read from tagPath
 		"Label": view(dict(COMMON_LABEL, tagPath="", answer=None, **LIST), dict(COMMON_LABEL_DIR, tagPath="input", **LIST_DIR),
 			expr("{/root/Field.props.text}"),
