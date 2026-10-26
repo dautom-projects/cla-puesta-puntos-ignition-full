@@ -12,10 +12,12 @@
  * standard confirmation (Guardar -> Si). The same values on the original and on the pilot must give
  * the same DataAnswer (papo_qa.py --compare-db PILOT ORIGINAL --exact).
  *
- * Version: 1.0.0
+ * Version: 1.1.0
  *
  * Changelog:
  *   2026-10-25 | William M. | v1.0.0 - Initial version
+ *   2026-10-26 | William M. | v1.1.0 - Fields scrolled into view before the click; jumps over 100 px; numeric
+ *     fields through their edit mode; form root found by its sections; visible register button only
  *
  * Usage (browser console or a javascript tool on the Template page):
  *   <contents of this file>; await papoUiCheck({register: "Inicio", fill: true, save: false})
@@ -66,7 +68,8 @@ window.papoUiCheck = async function (opts) {
 		return field.querySelector("input").value === value;
 	};
 
-	const button = all('[data-component="ia.input.button"]').find((e) => text(e) === o.register);
+	// Visible buttons only: the Template also has a hidden repeater with the same labels
+	const button = all('[data-component="ia.input.button"]').find((e) => text(e) === o.register && e.offsetParent !== null);
 	if (!button) {
 		report.problems.push("no se encontró el botón " + o.register);
 		return report;
