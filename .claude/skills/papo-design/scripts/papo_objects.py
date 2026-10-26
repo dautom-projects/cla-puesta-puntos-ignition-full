@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.5.0
+Version: 2.6.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -35,6 +35,8 @@ Changelog:
 		basePapo + index (and similar) bindings is computed with item_ids.py and the binding removed
 	2026-10-26 | William M. | v2.5.0 - Time fields: startNow instead of the value stored in the design (the native
 		date-time input shows the time the form opens)
+	2026-10-26 | William M. | v2.6.0 - Numeric range from the field's own color script (ranges.py): start +/- rang
+		is carried, and a red that is not a closed range (only a lower bound) leaves the field native
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -64,6 +66,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-qa", "scripts"))
 import item_ids
+import ranges
 import papo_design as design
 import view_refs
 import papo_qa as qa
@@ -85,7 +88,6 @@ VALUE_PROP = {
 }
 DEFAULTS = {"Objects/NumericField": (None, None), "Objects/TextField": ("", "")}
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
-RE_RANGE = re.compile(r"([\d.]+)\s*<=\s*value\s*<=\s*([\d.]+)")
 DESCRIPTION_QUERY = "SELECT Description FROM papoitem WHERE ID = ?"
 # Field props each object takes as a param (static value or binding)
 FIELD_PARAMS = {
@@ -170,15 +172,8 @@ def _relative(binding):
 
 
 def _rangeOf(component):
-	custom = component.get("custom", {})
-	if "rang_down" in custom and "rang_up" in custom:
-		return custom["rang_down"], custom["rang_up"]
-	color = component.get("propConfig", {}).get("custom.color")
-	if color:
-		match = RE_RANGE.search(color["binding"]["transforms"][0].get("code") or "")
-		if match:
-			return tuple(float(x) if "." in x else int(x) for x in match.groups())
-	return None
+	"""Closed range that paints like the field's own color script (ranges.rangeOf), None or ranges.UNSUPPORTED."""
+	return ranges.rangeOf(component)
 
 
 def objectParams(component, rule, stats, moved=False):
@@ -228,6 +223,10 @@ def objectParams(component, rule, stats, moved=False):
 		if rule["empty"] is not None:
 			params["emptyAnswer"] = rule["empty"]
 		limits = _rangeOf(component) if ctype == "ia.input.numeric-entry-field" else None
+		if limits == ranges.UNSUPPORTED:
+			# Its red is not a closed range (e.g. only a lower bound): the field keeps its own color logic
+			stats["numéricos nativos (color fuera de rango propio)"] += 1
+			return None
 		if limits:
 			params.update(minValue=limits[0], maxValue=limits[1])
 			stats["numéricos con rango"] += 1

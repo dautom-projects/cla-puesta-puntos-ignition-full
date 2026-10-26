@@ -27,7 +27,7 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 | Objeto | Campo | `answer` | Parámetros propios |
 |---|---|---|---|
 | `Objects/Checkbox` | checkbox (la pregunta es su texto) | `trueValue` si está marcado, `falseValue` si no | `trueValue` ("Cumple"), `falseValue` ("No Cumple"); `trueText` / `falseText`: texto según el estado en vez de la pregunta (p. ej. ✔ / ✘) |
-| `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`), `placeholder` ("Escriba aqui"), `questionAsPlaceholder` (la pregunta como placeholder) |
+| `Objects/NumericField` | numérico | el valor | `minValue`, `maxValue` (color por rango con `papo_core.items.getRangeColor`; el convertidor los deduce ejecutando el script de color del original y deja el campo nativo si su rojo no es un rango cerrado, p. ej. solo un mínimo), `placeholder` ("Escriba aqui"), `questionAsPlaceholder` (la pregunta como placeholder) |
 | `Objects/TextField` | text field | el texto | `placeholder`, `questionAsPlaceholder` |
 | `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` ("Seleccionar"), `showClearIcon` |
 | `Objects/OptionGroup` | radio group (una opción entre varias) en una fila, alineado con la pregunta | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos). Cada radio lleva `selected` calculado desde `value` (v2.4): el radio de Perspective renderiza `<input name="radio" checked={selected}>` y, sin `selected`, el input quedaba sin controlar y la primera opción podía quedar marcada en el navegador sin estarlo, de modo que el primer clic no hacía nada |

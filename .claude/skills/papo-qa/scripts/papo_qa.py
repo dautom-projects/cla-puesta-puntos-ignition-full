@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.7.0
+Version: 1.8.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -33,6 +33,8 @@ Changelog:
 		fixed in custom.item with the same value collects the same item
 	2026-10-26 | William M. | v1.7.0 - Time fields open with the current time: the object needs startNow; --exact
 		compares times of day by format only (each save opens at another time)
+	2026-10-26 | William M. | v1.8.0 - Stage 3: a converted numeric must turn red for the same values as the
+		original's color script (ranges.py)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -65,6 +67,7 @@ import item_ids
 import papo_design as design
 import papo_lint as lint
 import pilot_swap
+import ranges
 import view_refs
 
 REPO = design.REPO_ROOT
@@ -307,6 +310,25 @@ def stageCollection(cur, base):
 	return problems
 
 
+def _rangeProblems(old, node, itemID):
+	"""A converted numeric turns red (out of range) for the same values as the original color script."""
+	native = old.get("node") or {}
+	if native.get("type") != "ia.input.numeric-entry-field" or node["props"].get("path") != "Objects/NumericField":
+		return []
+	params = node["props"].get("params", {})
+	low, high = params.get("minValue"), params.get("maxValue")
+	if not ranges.colorScripts(native):
+		return [] if low is None and high is None else ["{}: el original no se pinta por rango y el objeto tiene rango {}–{}".format(itemID, low, high)]
+	for value in ranges.probes(native, [v for v in (low, high) if isinstance(v, (int, float))]):
+		red = ranges.isRed(native, value)
+		if red is None:
+			return ["{}: no se pudo evaluar el color del original con {!r}".format(itemID, value)]
+		if red != ranges.objectRed(low, high, value):
+			return ["{}: con {!r} el original {} rojo y el objeto {} (rango {}–{})".format(itemID, value,
+				"pinta" if red else "no pinta", "sí" if not red else "no", low, high)]
+	return []
+
+
 def stageAnswers(cur, base):
 	problems = []
 	checked = 0
@@ -324,6 +346,7 @@ def stageAnswers(cur, base):
 		if fnNew is None:
 			problems.append("{}: objeto sin regla de respuesta".format(new["id"]))
 			continue
+		problems += _rangeProblems(old, node, new["id"])
 		for value in samplesFor(old, node):
 			if fnOld(value) != fnNew(value):
 				problems.append("{}: con valor {!r} el original responde {!r} y el objeto {!r}".format(new["id"], value, fnOld(value), fnNew(value)))
