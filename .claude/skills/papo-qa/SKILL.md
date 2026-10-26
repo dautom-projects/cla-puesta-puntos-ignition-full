@@ -39,6 +39,8 @@ Prueba de UI y guardado en el navegador (`scripts/ui_check.js`, se ejecuta dentr
 
 Simular el estándar en todo el proyecto (originales leídos de git; no escribe nada): `python3 .claude/skills/papo-qa/scripts/simulate_all.py`.
 
+Estandarizar familias completas de un área, un commit por familia (fase 3): `python3 .claude/skills/papo-qa/scripts/standardize_family.py "<área>" <familia>... [--dry-run]`. Por cada familia convierte (papo-design + papo_objects `--legacy --form-class --static-ids`), corre el QA 1–7 con grafo contra HEAD, agrega su fila a `DEPLOY_INVENTORY.md` y commitea; se detiene en la primera que falle. Antes: el SQL de preguntas del área aplicado en la base, sin intercambios de pilotos activos y sin guardados del Designer sin commit. Toma solo `Form_<familia>_<tipo>` sin espacios (las copias como `Form_AC10-0201_30min D` no las abre el Template).
+
 Probar el guardado de un piloto desde el flujo real (el Template abre el original por ruta): `pilot_swap.py on <formulario>` pone el piloto en la ruta del original (con backup) y `pilot_swap.py off --all` lo restaura. No commitear con un intercambio activo (`pilot_swap.py status`).
 
 ## Etapas
