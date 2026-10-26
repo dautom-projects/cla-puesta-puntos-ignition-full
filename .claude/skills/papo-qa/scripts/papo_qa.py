@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.9.2
+Version: 1.9.3
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -41,6 +41,7 @@ Changelog:
 		a CRLF working copy is stored as LF either way
 	2026-10-26 | William M. | v1.9.2 - A native numeric without a stored value answers "" when untouched (seen in
 		EA11-0901_4h: 24 of 24), not None
+	2026-10-26 | William M. | v1.9.3 - Stage 5: hidden rows (position.display false) take no height in a section
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -652,6 +653,9 @@ def _classExists(name):
 def _rowsHeight(group):
 	total = 0.0
 	for child in group.get("children", []):
+		if child.get("position", {}).get("display") is False and "position.display" not in child.get("propConfig", {}):
+			# A hidden row takes no height
+			continue
 		basis = str(child.get("position", {}).get("basis", ""))
 		if basis.endswith("px"):
 			try:

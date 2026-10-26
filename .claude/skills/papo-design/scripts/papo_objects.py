@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.9.0
+Version: 2.9.1
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -48,6 +48,7 @@ Changelog:
 	2026-10-26 | William M. | v2.9.0 - Sections fit their rows (fitSections): an open group keeps its height
 		(shrink 0) and custom.baseBasisPx is at least the rows plus their margins and the group padding, so no row is
 		squeezed and the end of the section is not cut
+	2026-10-26 | William M. | v2.9.1 - Hidden rows (position.display false) do not count in the section height
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -681,6 +682,9 @@ def _conflict(references, removed, keepItem):
 def _pxSum(group):
 	total = 0.0
 	for child in group.get("children", []):
+		if child.get("position", {}).get("display") is False and "position.display" not in child.get("propConfig", {}):
+			# A hidden row takes no height
+			continue
 		basis = str(child.get("position", {}).get("basis", ""))
 		if child.get("type") == "ia.display.flex-repeater":
 			# A repeater takes its instances' rows when they have a px height, else its own height
@@ -715,6 +719,8 @@ def _rowsHeight(group):
 	"""Height the rows of a group need: their px heights, their margins and the group padding and border."""
 	total = _pxSum(group)
 	for child in group.get("children", []):
+		if child.get("position", {}).get("display") is False and "position.display" not in child.get("propConfig", {}):
+			continue
 		style = (child.get("props") or {}).get("style") or {}
 		total += _vertical(style, "marginTop") + _vertical(style, "marginBottom")
 	style = (group.get("props") or {}).get("style") or {}

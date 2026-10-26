@@ -15,7 +15,7 @@
  * Each section also reports its opening time (openMs) and the range color of its numerics (numericColors),
  * to compare between the two forms. Run it at 1920 x 1080, the size the application is built for.
  *
- * Version: 1.3.0
+ * Version: 1.3.1
  *
  * Changelog:
  *   2026-10-25 | William M. | v1.0.0 - Initial version
@@ -25,6 +25,7 @@
  *     the old text); a text that does not stay is reported
  *   2026-10-26 | William M. | v1.3.0 - Dropdowns (a warning when there is no option to choose), time pickers
  *     at a fixed time, section opening time and numeric range colors
+ *   2026-10-26 | William M. | v1.3.1 - Hidden rows (display none) are not reported as squeezed nor as the end
  *
  * Usage (browser console or a javascript tool on the Template page):
  *   <contents of this file>; await papoUiCheck({register: "Inicio", fill: true, save: false})
@@ -158,7 +159,8 @@ window.papoUiCheck = async function (opts) {
 			continue;
 		}
 		const box = group.getBoundingClientRect();
-		const kids = [...group.children];
+		// Hidden rows (display none) take no space: they are neither squeezed nor the end of the section
+		const kids = [...group.children].filter((k) => getComputedStyle(k).display !== "none");
 		s.rows = kids.length;
 		// Fit: the last row ends inside the open section and no row is squeezed below its basis
 		const last = kids[kids.length - 1];
