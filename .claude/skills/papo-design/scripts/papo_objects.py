@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.10.1
+Version: 2.11.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -54,6 +54,8 @@ Changelog:
 	2026-10-26 | William M. | v2.10.1 - The legacy cleanup removes, with custom.answers, the group timer that only
 		refreshed it (custom.refreshSecond: now(1000) + refreshBinding("custom.{}".format("answers"))); a group whose
 		own scripts use custom.answers otherwise keeps it
+	2026-10-26 | William M. | v2.11.0 - The legacy cleanup also removes the custom.answers collector of inner
+		containers (rows of FU10-0202_dia): it read the field value and kept the field native as "referenced"
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -670,6 +672,43 @@ def dropLegacyAnswers(view, stats):
 			stats["temporizadores de custom.answers quitados"] += 1
 
 
+def _isCollector(binding):
+	"""The legacy custom.answers binding that gathers the custom.item of the container (gather_items)."""
+	code = json.dumps((binding or {}).get("transforms", []))
+	return "gather_items" in code or "recolecta los custom.item" in code
+
+
+def dropNestedLegacyAnswers(view, stats):
+	"""Remove the legacy custom.answers collector of inner containers (rows), with its timer, when nothing reads it.
+
+	The save flow collects custom.item with papo_core.register.recopile; this per-row copy only read the field value
+	and made the converter keep the field native (referenced by its row)."""
+	references = view_refs.refs(view)
+
+	def walk(node, path):
+		for child in node.get("children", []):
+			childPath = path + (child.get("meta", {}).get("name", "?"),)
+			config = (child.get("propConfig") or {}).get("custom.answers") or {}
+			if len(childPath) > 2 and _isCollector(config.get("binding")):
+				refreshers, otherUse = _answerScripts(child)
+				used = otherUse or any(t == childPath and o != childPath and (r.startswith("custom.answers")
+					or any(r.startswith(p) for p in refreshers)) for o, t, r in references)
+				if used:
+					stats["custom.answers de fila en uso"] += 1
+				else:
+					child.get("custom", {}).pop("answers", None)
+					child["propConfig"].pop("custom.answers", None)
+					for prop in refreshers:
+						child.get("custom", {}).pop(prop.split(".", 1)[1], None)
+						child["propConfig"].pop(prop, None)
+					if not child["propConfig"]:
+						child.pop("propConfig")
+					stats["custom.answers de fila quitados"] += 1
+			walk(child, childPath)
+
+	walk(view["root"], ("root",))
+
+
 def dropOrphanRefreshers(view, stats):
 	"""Group timers left behind by an earlier cleanup: they refresh a custom.answers that no longer exists."""
 	references = view_refs.refs(view)
@@ -847,6 +886,7 @@ def standardize(view, options, stats):
 	heights = {name: _pxSum(g) for name, g in _sectionHeights(view).items()}
 	if options.get("legacy"):
 		dropLegacyAnswers(view, stats)
+		dropNestedLegacyAnswers(view, stats)
 		dropOrphanRefreshers(view, stats)
 		for name in dropLegacy(view, stats):
 			stats["handlers no estándar que quedan: " + name] += 1
