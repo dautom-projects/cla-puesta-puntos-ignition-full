@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.3.0
+Version: 1.4.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -25,6 +25,8 @@ Changelog:
 		enabled, bindings); an unknown prop of a converted field fails
 	2026-10-25 | William M. | v1.3.0 - Stage 5: an expanded section must fit its rows as before (custom.baseBasisPx);
 		stage 3: an option group keeps the width of its question
+	2026-10-25 | William M. | v1.4.0 - --exact: stage 8 compares every answer (records saved with the same values
+		by ui_check.js on the original and on the pilot)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -33,6 +35,7 @@ Args (CLI):
 	--pair (str str): Current view.json and baseline view.json (repeatable, for tests)
 	--graph: Run stage 7 (rebuilds the dependency graph in a temp folder)
 	--compare-db (int int): registerhistory IDs of the pilot and the original record
+	--exact: with --compare-db, every answer must be equal (both saved with ui_check.js)
 	--report (str): Markdown report path (default: print)
 
 Returns:
@@ -648,7 +651,7 @@ def stageGraph(baseline):
 	return problems
 
 
-def stageData(pilotID, originalID):
+def stageData(pilotID, originalID, exact=False):
 	"""Compare the DataAnswer of two registerhistory rows (SELECT only)."""
 	env = dict(os.environ)
 	for line in open(DB_ENV):
@@ -684,6 +687,10 @@ def stageData(pilotID, originalID):
 			continue
 		if x.get("registerTypeID") != y.get("registerTypeID"):
 			problems.append("{}: registerTypeID {} contra {}".format(x["papoItemID"], x.get("registerTypeID"), y.get("registerTypeID")))
+		if exact:
+			if x.get("answer") != y.get("answer"):
+				problems.append("{}: respuesta {!r} contra {!r}".format(x["papoItemID"], x.get("answer"), y.get("answer")))
+			continue
 		# Empty, unanswered option ("-") or unavailable (tag without value) answers depend on what was filled
 		if kind(x.get("answer")) != kind(y.get("answer")) and not {x.get("answer"), y.get("answer")} & {None, "", "-"}:
 			problems.append("{}: formato {} contra {}".format(x["papoItemID"], kind(x.get("answer")), kind(y.get("answer"))))
@@ -735,6 +742,7 @@ def main():
 	parser.add_argument("--pair", nargs=2, action="append", metavar=("ACTUAL", "BASELINE"))
 	parser.add_argument("--graph", action="store_true")
 	parser.add_argument("--compare-db", nargs=2, type=int, metavar=("PILOTO", "ORIGINAL"))
+	parser.add_argument("--exact", action="store_true")
 	parser.add_argument("--report")
 	args = parser.parse_args()
 
@@ -773,7 +781,7 @@ def main():
 		failed = failed or bool(problems)
 		extra.append("- {} 7 Grafo{}".format("✅" if not problems else "❌", "" if not problems else ": " + "; ".join(problems[:8])))
 	if args.compare_db:
-		problems = stageData(*args.compare_db)
+		problems = stageData(args.compare_db[0], args.compare_db[1], args.exact)
 		failed = failed or bool(problems)
 		extra.append("- {} 8 Datos (registros {} y {}){}".format("✅" if not problems else "❌", args.compare_db[0], args.compare_db[1], "" if not problems else ": " + "; ".join(problems[:8])))
 	lines.append("Resultado: **{}** · {} vistas pasan, {} fallan".format("PASA" if not failed else "FALLA", summary["pasa"], summary["falla"]))

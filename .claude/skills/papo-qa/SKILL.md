@@ -35,6 +35,8 @@ Crear o regenerar un piloto (copia `_PruebaPiloto` con el estándar completo y s
 python3 .claude/skills/papo-qa/scripts/make_pilot.py "Page/Embedded/F&A/Form_AC10-0201_start" [--rebuild]
 ```
 
+Prueba de UI y guardado en el navegador (`scripts/ui_check.js`, se ejecuta dentro del cliente Perspective en la página de `Digitalizacion_Template`): abre un registro, recorre cada sección y verifica que no se corte el final, que no haya textos cortados, checkbox sin texto o preguntas repetidas, que las opciones queden en una línea, que marcar no desplace la página y que los valores sigan al cerrar y reabrir; luego llena todo con valores fijos y, con `save: true`, guarda por la confirmación estándar. Mismo flujo sobre el original y sobre el piloto (`pilot_swap.py`) y después `papo_qa.py --compare-db <piloto> <original> --exact`: con los mismos datos, las respuestas deben ser iguales.
+
 Simular el estándar en todo el proyecto (originales leídos de git; no escribe nada): `python3 .claude/skills/papo-qa/scripts/simulate_all.py`.
 
 Probar el guardado de un piloto desde el flujo real (el Template abre el original por ruta): `pilot_swap.py on <formulario>` pone el piloto en la ruta del original (con backup) y `pilot_swap.py off --all` lo restaura. No commitear con un intercambio activo (`pilot_swap.py status`).

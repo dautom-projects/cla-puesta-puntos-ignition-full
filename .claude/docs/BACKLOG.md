@@ -37,6 +37,16 @@
 
 - Objetos v2 en el piloto (2026-10-24): verificar en sesión que los valores se conservan al cerrar/reabrir la sección, guardar un registro y comparar con el original, medir la carga. Si pasa: `papo_objects.py` simula 238 formularios convertibles (4,555 campos)
 
+## Errores de los formularios originales (encontrados con los pilotos, 2026-10-25)
+
+El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
+- `Ensamble/Form_EA11-1601_start` (desde 2026-08-31): `Checkbox_4`/`_5` y `_6`/`_7` de "Estado Termoselladora" tienen el mismo `papoItemID` (11190 y 11191): preguntas repetidas en pantalla y en el registro, y faltan 11192 y 11193
+- `F&A/Form_GR10-0501_start` (desde el checkpoint `1a0ba2b`, 2026-10-22): en `FlexContainerGroup13/S4` las etiquetas de 5997 y 5998 pasaron a numéricos con ID calculado (`basePapo + índice`) que da 5999 y 6000, repetidos; 5981 se repite 35 veces y 6192 dos (ya en julio)
+- `OREC/Form_PO11-0101-2_start`: 5168 se guarda dos veces (ya en septiembre)
+- `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado)
+- `papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196: es el dato, se ve igual en el original
+- `F&A/Form_AC10-0201_start`: "Cubierta sin rayones." aparece dos veces en "Condiciones de operacion" y varias preguntas largas se cortan en su fila (también en el original)
+
 ## Mejoras opcionales (fuera de la estandarización básica)
 
 - Preguntas en una consulta por vista: hoy hay ~3,520 bindings que consultan `papoitem` uno por pregunta en 153 vistas. `papo_core.items.getQuestions(value)` y `getQuestionText(value)` ya existen (sin uso); se probaron y revirtieron en el piloto EC07-0101 barcada por no ser parte del estándar
