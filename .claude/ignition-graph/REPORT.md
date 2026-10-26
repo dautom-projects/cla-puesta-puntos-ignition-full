@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 105
 - Session props: 5
-- Relaciones: 4780 (usa tag 720, llama 666, embebe/abre 512, maneja 334, monta 8, envia 353, usa sesion 276, usa estilo 1911)
+- Relaciones: 4789 (usa tag 720, llama 666, embebe/abre 516, maneja 334, monta 8, envia 353, usa sesion 276, usa estilo 1916)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -19,10 +19,10 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 ### Vistas
 - **Alerts/alert** (cla-project) — directo 1, transitivo 270
 - **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 270
-- **Objects/Checkbox** (cla-project) — directo 154, transitivo 156
-- **Objects/TextField** (cla-project) — directo 123, transitivo 125
+- **Objects/Checkbox** (cla-project) — directo 155, transitivo 157
+- **Objects/TextField** (cla-project) — directo 125, transitivo 127
 - **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 106
-- **Objects/Dropdown** (cla-project) — directo 90, transitivo 92
+- **Objects/Dropdown** (cla-project) — directo 91, transitivo 93
 - **Objects/NumericField** (cla-project) — directo 60, transitivo 62
 - **Objects/OptionGroup** (cla-project) — directo 11, transitivo 13
 - **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
@@ -33,7 +33,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **alerts** (cla-project) — directo 19, transitivo 269
 - **papo_core.ui** (cla-project) — directo 245, transitivo 247
 - **papo_core.register** (cla-project) — directo 241, transitivo 243
-- **papo_core.items** (cla-project) — directo 9, transitivo 186
+- **papo_core.items** (cla-project) — directo 9, transitivo 188
 - **papo_core.sign** (cla-project) — directo 101, transitivo 104
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
