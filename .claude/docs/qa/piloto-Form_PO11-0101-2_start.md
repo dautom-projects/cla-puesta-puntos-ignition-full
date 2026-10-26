@@ -1,6 +1,6 @@
 # QA de formularios PAPO
 
-Generado: 2026-10-26 11:34 · Baseline: `HEAD` · Vistas: 1
+Generado: 2026-10-26 11:57 · Baseline: `HEAD` · Vistas: 1
 
 Resultado: **PASA** · 1 vistas pasan, 0 fallan
 
