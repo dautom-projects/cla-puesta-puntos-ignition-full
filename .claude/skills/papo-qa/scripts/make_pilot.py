@@ -73,7 +73,7 @@ def main():
 	design.writeView(path, view, crlf)
 	counts = collections.Counter()
 	status, detail = objects.processView(path, True, os.path.join(target, ".bk"), counts,
-		{"rows": True, "repeaters": True, "legacy": True, "formClass": True})
+		{"rows": True, "repeaters": True, "legacy": True, "formClass": True, "staticIDs": True})
 	shutil.rmtree(os.path.join(target, ".bk"), ignore_errors=True)
 	print("{} · {} · {}".format(form, status, detail))
 	print("Detalle: " + ", ".join("{} {}".format(n, k) for k, n in counts.most_common()))

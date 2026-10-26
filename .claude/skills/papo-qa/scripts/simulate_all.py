@@ -35,7 +35,7 @@ import papo_design as design
 import papo_objects as objects
 import papo_qa as qa
 
-OPTIONS = {"rows": True, "repeaters": True, "legacy": True, "formClass": True}
+OPTIONS = {"rows": True, "repeaters": True, "legacy": True, "formClass": True, "staticIDs": True}
 
 
 def _forms(ref):

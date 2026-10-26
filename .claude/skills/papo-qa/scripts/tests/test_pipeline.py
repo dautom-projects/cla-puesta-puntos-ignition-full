@@ -99,16 +99,34 @@ class PipelineTest(unittest.TestCase):
 		self.assertIn("3", self.run_case(v))
 
 	def test_props_lost_checkbox_question(self):
+		# No question text and no papoItemID: the checkbox shows nothing
 		_, _, v, box = self.pair("Objects/Checkbox")
 		box["props"]["params"]["question"] = ""
+		box["propConfig"].pop("props.params.papoItemID", None)
 		self.assertIn("3", self.run_case(v))
 
 	def test_props_question_from_item(self):
 		# The original checkbox showed the papoitem description; a static text on the object is not the same
-		base, field, v, _ = self.pair("Objects/Checkbox")
+		base, field, v, box = self.pair("Objects/Checkbox")
 		field.setdefault("propConfig", {})["props.text"] = {"binding": {"config": {"path": "this.custom.item.papoItemID"},
 			"transforms": [{"code": "\tquery = \"SELECT Description FROM papoitem WHERE ID = ?\"", "type": "script"}], "type": "property"}}
+		box["props"]["params"]["question"] = "Otro texto"
+		box["propConfig"].pop("props.params.papoItemID", None)
 		self.assertIn("3", self.run_case(v, base=base))
+
+	def test_props_question_text_not_in_base(self):
+		# A fixed question now read from papoItemID must already be the papoitem text
+		base, field, v, _ = self.pair("Objects/Checkbox")
+		field.setdefault("props", {})["text"] = "Texto que no está en papoitem"
+		self.assertIn("3", self.run_case(v, base=base))
+
+	def test_collection_fixed_id_differs(self):
+		# A computed papoItemID fixed in custom.item with another value collects another item
+		base, field, v, box = self.pair("Objects/Checkbox")
+		field["custom"]["item"].pop("papoItemID", None)
+		field.setdefault("propConfig", {})["custom.item.papoItemID"] = {"binding": {"config": {"expression": "100 + 67"}, "type": "expr"}}
+		box["custom"]["item"]["papoItemID"] = 168
+		self.assertIn("2", self.run_case(v, base=base))
 
 	def test_props_enabled_changed(self):
 		_, _, v, node = self.pair("Objects/NumericField")

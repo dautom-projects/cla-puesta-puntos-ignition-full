@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.5.0
+Version: 1.6.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -29,6 +29,8 @@ Changelog:
 		by ui_check.js on the original and on the pilot)
 	2026-10-26 | William M. | v1.5.0 - Stage 3: a fixed question may read papoItemID when papoitem.Description has
 		the same text (SELECT); the description query with display transforms counts as the item description
+	2026-10-26 | William M. | v1.6.0 - Stage 2 compares the runtime papoItemID (item_ids.py): a computed ID now
+		fixed in custom.item with the same value collects the same item
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -57,6 +59,7 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-design", "scripts"))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-lint", "scripts"))
+import item_ids
 import papo_design as design
 import papo_lint as lint
 import pilot_swap
@@ -91,8 +94,13 @@ STAGES = collections.OrderedDict([("1", "Estructura"), ("2", "Recolección"), ("
 # ==================== SOURCES OF ANSWERS ====================
 
 def answerSources(view):
-	"""List answer sources in recopile order with their container; repeater instances expanded."""
+	"""List answer sources in recopile order with their container; repeater instances expanded.
+
+	The id is the runtime papoItemID (item_ids.py) when it can be computed, so a computed ID and the same ID
+	fixed in custom.item give the same source; the papoItemID binding then stays out of the bindings.
+	"""
 	out = []
+	runtime = item_ids.resolve(view)
 
 	def walk(node, group, path):
 		name = node.get("meta", {}).get("name", "")
@@ -101,7 +109,12 @@ def answerSources(view):
 		if "item" in node.get("custom", {}):
 			item = node["custom"]["item"] if isinstance(node["custom"]["item"], dict) else {}
 			others = {k: v for k, v in node.get("propConfig", {}).items() if k.startswith("custom.item") and k != "custom.item.answer"}
-			out.append({"id": item.get("papoItemID"), "type": item.get("registerTypeID"),
+			pid = runtime.get(tuple(path.split("/")))
+			if isinstance(pid, int) and not isinstance(pid, bool):
+				others.pop("custom.item.papoItemID", None)
+			else:
+				pid = item.get("papoItemID")
+			out.append({"id": pid, "type": item.get("registerTypeID"),
 				"bindings": json.dumps(others, sort_keys=True), "group": group, "path": path, "node": node})
 		props = node.get("props") or {}
 		if node.get("type") == "ia.display.flex-repeater" and props.get("instances") is not None:
@@ -319,8 +332,22 @@ def stageAnswers(cur, base):
 
 # ==================== FIELD PROPS (what the operator sees and can do) ====================
 
+# Runtime papoItemID of the components of the views being compared (id(node) -> value), see _runtimeIDs
+_RUNTIME = {}
+
+
+def _runtimeIDs(view):
+	"""Remember the runtime papoItemID of every component of a view for _itemRef."""
+	nodes = view_refs.index(view)
+	for path, value in item_ids.resolve(view).items():
+		if isinstance(value, int) and not isinstance(value, bool):
+			_RUNTIME[id(nodes[path])] = value
+
+
 def _itemRef(node):
-	"""Identity of a component papoItemID: the static id, or its binding."""
+	"""Identity of a component papoItemID: its runtime value when computable, else the static id or its binding."""
+	if id(node) in _RUNTIME:
+		return _RUNTIME[id(node)]
 	b = node.get("propConfig", {}).get("custom.item.papoItemID")
 	return json.dumps(b, sort_keys=True) if b else ((node.get("custom") or {}).get("item") or {}).get("papoItemID")
 
@@ -447,6 +474,9 @@ def stageFieldProps(cur, base):
 	"""Problems where a converted field no longer shows or does what the original did."""
 	problems = []
 	baseNodes = view_refs.index(base["view"])
+	_RUNTIME.clear()
+	_runtimeIDs(base["view"])
+	_runtimeIDs(cur)
 	for old, new in zip(answerSources(base["view"]), answerSources(cur)):
 		embed, field = new.get("node"), old.get("node")
 		if not embed or not field or embed.get("type") != "ia.display.view" or field.get("type") == "ia.display.view":

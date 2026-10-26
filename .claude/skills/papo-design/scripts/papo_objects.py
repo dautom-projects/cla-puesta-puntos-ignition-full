@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.3.0
+Version: 2.4.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -31,6 +31,8 @@ Changelog:
 	2026-10-26 | William M. | v2.3.0 - Questions always from papoItemID: a fixed question text of an item with a
 		known papoItemID becomes the papoitem description (--questions-sql writes the UPDATE when the base
 		differs); display transforms after the description query are dropped
+	2026-10-26 | William M. | v2.4.0 - papoItemID fixed in custom.item (--static-ids): the runtime value of the
+		basePapo + index (and similar) bindings is computed with item_ids.py and the binding removed
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -38,6 +40,7 @@ Args (CLI):
 	--no-rows, --no-repeaters: disable those modes
 	--legacy: remove dead legacy save handlers  --form-class: add PAPO/Form to the root
 	--questions-sql (str): write the UPDATE papoitem script for fixed questions that differ from the base
+	--static-ids: papoItemID fixed in custom.item instead of computed (one logic for every form)
 
 Returns:
 	Exit code 0 when every view passed verification, 1 otherwise
@@ -58,6 +61,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "..", "..", "papo-qa", "scripts"))
+import item_ids
 import papo_design as design
 import view_refs
 import papo_qa as qa
@@ -264,7 +268,7 @@ def _describesItem(component, binding):
 	path = binding.get("config", {}).get("path")
 	if path == "this.custom.item.papoItemID":
 		return True
-	item = component.get("propConfig", {}).get("custom.item.papoItemID", {}).get("binding") or {}
+	item = component.get("propConfig", {}).get("custom.item.papoItemID", {}).get("binding") or _FIXED_FROM.get(id(component)) or {}
 	return bool(path) and item.get("type") == "property" and not item.get("transforms") and item.get("config", {}).get("path") == path
 
 
@@ -654,8 +658,39 @@ def _sectionHeights(view):
 		and isinstance((g.get("custom") or {}).get("baseBasisPx"), (int, float)) and "custom.baseBasisPx" not in g.get("propConfig", {})}
 
 
+# Binding a fixed papoItemID came from (id(node) -> binding), so the description bindings that read the same
+# source are still recognized as the item description after fixItemIDs
+_FIXED_FROM = {}
+
+
+def fixItemIDs(view, stats):
+	"""papoItemID fixed in custom.item: computed bindings get their runtime value, disabled ones are removed."""
+	_FIXED_FROM.clear()
+	ids = item_ids.resolve(view)
+	for path, node in view_refs.index(view).items():
+		propConfig = node.get("propConfig") or {}
+		config = propConfig.get("custom.item.papoItemID")
+		item = (node.get("custom") or {}).get("item")
+		if not config or not isinstance(item, dict) or set(config) - {"binding", "persistent"}:
+			continue
+		value = ids.get(path)
+		disabled = (config.get("binding") or {}).get("enabled") is False
+		if not isinstance(value, int) or isinstance(value, bool):
+			stats["papoItemID sin calcular"] += 1
+			continue
+		item["papoItemID"] = value
+		if not disabled:
+			_FIXED_FROM[id(node)] = config.get("binding")
+		del propConfig["custom.item.papoItemID"]
+		if not propConfig:
+			node.pop("propConfig")
+		stats["papoItemID fijados" + (" (binding desactivado)" if disabled else "")] += 1
+
+
 def standardize(view, options, stats):
 	"""Convert the view in place."""
+	if options.get("staticIDs"):
+		fixItemIDs(view, stats)
 	heights = {name: _pxSum(g) for name, g in _sectionHeights(view).items()}
 	if options.get("legacy"):
 		dropLegacyAnswers(view, stats)
@@ -811,8 +846,10 @@ def main():
 	parser.add_argument("--legacy", action="store_true")
 	parser.add_argument("--form-class", action="store_true")
 	parser.add_argument("--questions-sql")
+	parser.add_argument("--static-ids", action="store_true")
 	args = parser.parse_args()
-	options = {"rows": not args.no_rows, "repeaters": not args.no_repeaters, "legacy": args.legacy, "formClass": args.form_class}
+	options = {"rows": not args.no_rows, "repeaters": not args.no_repeaters, "legacy": args.legacy, "formClass": args.form_class,
+		"staticIDs": args.static_ids}
 
 	stats = collections.Counter()
 	results = collections.OrderedDict()
