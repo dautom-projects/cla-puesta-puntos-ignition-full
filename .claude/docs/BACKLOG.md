@@ -56,7 +56,8 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - `OREC/Form_PO11-0101-2_start`: "Estado - Antes del arranque o Durante el proceso" se abre más baja que sus filas (`custom.baseBasisPx` 417 para 424 px de filas) y una fila queda comprimida; igual en el original. En "Molinos" el original también comprimía una fila; el estándar ya no — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
 
-- Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` y `F&A/Form__end` (sin referencia en el nombre), desde el checkpoint `1a0ba2b`. Y `Page/Embedded/Metalurgia/Fundamental Views/Checkbox`, la plantilla de los repeaters: desde OREC ninguna vista la usa (huérfana en el grafo). No se estandarizan; decidir si se borran
+- Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` y `F&A/Form__end` (sin referencia en el nombre), desde el checkpoint `1a0ba2b`. Se dejan como están, sin estandarizar ni borrar (decisión del usuario, 2026-10-26)
+- `Page/Embedded/Metalurgia/Fundamental Views/Checkbox`, la plantilla de los repeaters: desde OREC ninguna vista la usa (huérfana en el grafo). Decidir si se borra
 
 - ~~`Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedaban nativos porque cada fila tenía un `custom.answers` legacy que leía el valor del campo~~ corregido (papo_objects v2.11 quita el recolector de fila; los 42 son `Objects/Dropdown`)
 
