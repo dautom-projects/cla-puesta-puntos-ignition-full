@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.6.0
+Version: 2.7.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -37,6 +37,9 @@ Changelog:
 		date-time input shows the time the form opens)
 	2026-10-26 | William M. | v2.6.0 - Numeric range from the field's own color script (ranges.py): start +/- rang
 		is carried, and a red that is not a closed range (only a lower bound) leaves the field native
+	2026-10-26 | William M. | v2.7.0 - An item saved for several questions of a view (e.g. 207 in EA11-0901_2h: the
+		1-hour section repeats 30-minute checks) keeps each fixed question; --questions-sql skips the items whose
+		base text wins (docs/sql/preguntas_texto_base.json)
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -294,11 +297,18 @@ def _staticItemID(component):
 	return value if isinstance(value, int) and "custom.item.papoItemID" not in component.get("propConfig", {}) else None
 
 
+# Items of the view being converted that are saved for more than one question (see standardize)
+_SHARED = set()
+
+
 def _fixedQuestion(component, text, texts):
 	"""A fixed question of an item with a known papoItemID reads papoitem; the text goes to texts for the base."""
 	pid = _staticItemID(component)
 	if not text or pid is None:
 		return {"question": text or ""}, {}
+	if pid in _SHARED:
+		# One papoItemID for several questions of the view: each keeps its own text
+		return {"question": text}, {}
 	if texts is not None:
 		texts.append({"papoItemID": pid, "text": text})
 	return {"question": ""}, _itemID()
@@ -692,6 +702,18 @@ def fixItemIDs(view, stats):
 
 def standardize(view, options, stats):
 	"""Convert the view in place."""
+	global _SHARED
+	if "sharedItems" not in options:
+		# First pass on a copy: items whose fixed questions have more than one text in this view
+		found = []
+		standardize(copy.deepcopy(view), dict(options, questionTexts=found, sharedItems=set()), collections.Counter())
+		byID = collections.defaultdict(set)
+		for entry in found:
+			byID[entry["papoItemID"]].add(entry["text"].strip())
+		options = dict(options, sharedItems={pid for pid, texts in byID.items() if len(texts) > 1})
+	_SHARED = options["sharedItems"]
+	if _SHARED:
+		stats["ítems con varias preguntas (texto fijo)"] += len(_SHARED)
 	if options.get("staticIDs"):
 		fixItemIDs(view, stats)
 	heights = {name: _pxSum(g) for name, g in _sectionHeights(view).items()}
@@ -780,6 +802,8 @@ def writeQuestionsSql(found, path):
 	updates, conflicts, missing = [], [], []
 	for pid, entries in byID.items():
 		texts = sorted({e["text"].strip() for e in entries})
+		if pid in qa.BASE_TEXTS:
+			continue
 		if pid not in current:
 			missing.append(pid)
 		elif len(texts) > 1:
@@ -798,6 +822,8 @@ def writeQuestionsSql(found, path):
 		lines += ["-- UPDATE papoitem SET Description = {} WHERE ID = {};".format(_sql(old), pid) for pid, _, old, _ in updates]
 	else:
 		lines.append("-- Sin diferencias: la base ya tiene el texto de cada pregunta.")
+	for pid in sorted(qa.BASE_TEXTS & set(byID)):
+		lines.append("-- TEXTO DE LA BASE {}: se queda el de papoitem (preguntas_texto_base.json)".format(pid))
 	for pid, texts, views in conflicts:
 		lines.append("-- CONFLICTO {}: textos distintos para el mismo ítem en {}: {}".format(pid, ", ".join(views), " | ".join(texts)))
 	for pid in missing:

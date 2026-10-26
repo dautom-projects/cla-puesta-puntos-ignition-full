@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.8.0
+Version: 1.9.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -35,6 +35,8 @@ Changelog:
 		compares times of day by format only (each save opens at another time)
 	2026-10-26 | William M. | v1.8.0 - Stage 3: a converted numeric must turn red for the same values as the
 		original's color script (ranges.py)
+	2026-10-26 | William M. | v1.9.0 - Stage 3: a question of an item listed in docs/sql/preguntas_texto_base.json (the
+		form showed a cut of the base text) reads the base text without an UPDATE
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -76,6 +78,9 @@ STYLES = design.STYLES_DIR
 GRAPH_SCRIPT = os.path.expanduser("~/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/"
 	"633c31c8-b0a2-47fe-b7be-af38b4898a5a/97e4ea7a-da70-497a-8659-a5b60afe96ca/skills/ignition-graph/scripts/build_graph.py")
 DB_ENV = os.path.expanduser("~/.config/papo-sql/claude_ro.env")
+# Items whose papoitem text stays as it is although the form showed another (decision per item)
+BASE_TEXT_FILE = os.path.join(REPO, ".claude", "docs", "sql", "preguntas_texto_base.json")
+BASE_TEXTS = {int(k) for k in (json.load(open(BASE_TEXT_FILE, encoding="utf-8")) if os.path.exists(BASE_TEXT_FILE) else {}) if k.isdigit()}
 
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
 V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDataRoot", "formAnswerRecopile")
@@ -500,7 +505,7 @@ def _sameQuestion(expected, shown):
 	if expected == shown:
 		return True
 	if expected[0] == "text" and expected[1] and shown[0] == "item" and isinstance(shown[1], int):
-		return ((_description(shown[1]) or "").strip() == expected[1].strip())
+		return shown[1] in BASE_TEXTS or ((_description(shown[1]) or "").strip() == expected[1].strip())
 	return False
 
 
