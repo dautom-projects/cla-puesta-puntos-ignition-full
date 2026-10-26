@@ -206,7 +206,7 @@
             "classes": "text-titles"
           },
           "textStyle": {
-            "color": "#002C36",
+            "color": "--cla-text-question",
             "fontWeight": "bold",
             "textAlign": "left"
           }
@@ -357,12 +357,12 @@
                       "custom.item.answer": {
                         "binding": {
                           "config": {
-                            "path": "this.props.value"
+                            "path": "this.props.params.answer"
                           },
                           "type": "property"
                         }
                       },
-                      "props.style.fontSize": {
+                      "props.params.fontSize": {
                         "binding": {
                           "config": {
                             "path": "view.custom.fontSize"
@@ -372,18 +372,19 @@
                       }
                     },
                     "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
+                      "params": {
+                        "answer": "",
+                        "showQuestion": false,
+                        "value": ""
                       },
+                      "path": "Objects/NumericField",
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
+                        "width": "100%"
+                      },
+                      "useDefaultViewHeight": false,
+                      "useDefaultViewWidth": false
                     },
-                    "type": "ia.input.numeric-entry-field"
+                    "type": "ia.display.view"
                   }
                 ],
                 "meta": {
@@ -443,12 +444,12 @@
                       "custom.item.answer": {
                         "binding": {
                           "config": {
-                            "path": "this.props.value"
+                            "path": "this.props.params.answer"
                           },
                           "type": "property"
                         }
                       },
-                      "props.style.fontSize": {
+                      "props.params.fontSize": {
                         "binding": {
                           "config": {
                             "path": "view.custom.fontSize"
@@ -458,18 +459,19 @@
                       }
                     },
                     "props": {
-                      "align": "left",
-                      "format": "none",
-                      "placeholder": "Esciba aqui",
-                      "spinner": {
-                        "enabled": false
+                      "params": {
+                        "answer": "",
+                        "showQuestion": false,
+                        "value": ""
                       },
+                      "path": "Objects/NumericField",
                       "style": {
-                        "classes": "dropdown",
-                        "marginLeft": 0
-                      }
+                        "width": "100%"
+                      },
+                      "useDefaultViewHeight": false,
+                      "useDefaultViewWidth": false
                     },
-                    "type": "ia.input.numeric-entry-field"
+                    "type": "ia.display.view"
                   }
                 ],
                 "meta": {
@@ -577,9 +579,7 @@
                     },
                     "props": {
                       "style": {
-                        "classes": "text-data-2",
-                        "color": "#1199C7",
-                        "paddingLeft": 20
+                        "classes": "PAPO/Field/TagValue"
                       }
                     },
                     "type": "ia.display.label"
@@ -627,21 +627,6 @@
           "shrink": 0
         },
         "propConfig": {
-          "custom.answers": {
-            "binding": {
-              "config": {
-                "struct": {},
-                "waitOnAll": true
-              },
-              "transforms": [
-                {
-                  "code": "\t\n\t\"\"\"Recorre recursivamente todos los hijos del contenedor (self)\n\ty recolecta los custom.item en un JSON único.\"\"\"\n\n\tdef gather_items(component):\n\t\titems \u003d []\n\n\t\t# Si este componente tiene custom.item, lo guardamos\n\t\tif hasattr(component.custom, \"item\"):\n\t\t\titem \u003d component.custom.item\n\t\t\titems.append({\n\t\t\t\t\"papoItemID\": item.get(\"papoItemID\"),\n\t\t\t\t\"registerTypeID\": item.get(\"registerTypeID\"),\n\t\t\t\t\"answer\": item.get(\"answer\")\n\t\t\t})\n\n\t\t# Recorremos hijos recursivamente\n\t\tfor child in component.getChildren():\n\t\t\titems.extend(gather_items(child))\n\n\t\treturn items\n\tall_items \u003d gather_items(self)  # empezamos desde el FlexContainer4\n\t# Agregar observaciones como un item extra\n\tinsight_text \u003d getattr(self.view.custom, \"insights\", None)\n\tregisterType \u003d getattr(self.view.custom, \"registerTypeID\", None)\n\tuser \u003d getattr(self.view.custom, \"user\", None)\n\thour \u003d system.date.now()\n\tif insight_text is not None:\n\t\tall_items.append({\n\t\t\t\"user\": user,\n\t\t\t\"timestamp\": hour,\n\t\t\t\"insights\": insight_text,   # 👈 insights como parte de \"answer\"\n\t\t\t\"registerTypeID\":registerType\n\t\t})\n\n\t\n\treturn {\"items\": all_items}",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
-            }
-          },
           "custom.refreshSecond": {
             "binding": {
               "config": {
@@ -718,8 +703,7 @@
         "props": {
           "placeholder": "Esciba aqui",
           "style": {
-            "backgroundColor": "#FFFFFF",
-            "classes": "dropdown",
+            "classes": "PAPO/Field/Input",
             "marginLeft": 15,
             "marginRight": 30
           }
@@ -812,7 +796,7 @@
     "props": {
       "direction": "column",
       "style": {
-        "classes": "container-borders-dautom-widget",
+        "classes": "container-borders-dautom-widget PAPO/Form",
         "marginLeft": 10,
         "overflow": "hidden",
         "paddingLeft": 10
