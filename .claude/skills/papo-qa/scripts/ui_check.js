@@ -12,12 +12,14 @@
  * standard confirmation (Guardar -> Si). The same values on the original and on the pilot must give
  * the same DataAnswer (papo_qa.py --compare-db PILOT ORIGINAL --exact).
  *
- * Version: 1.1.0
+ * Version: 1.2.0
  *
  * Changelog:
  *   2026-10-25 | William M. | v1.0.0 - Initial version
  *   2026-10-26 | William M. | v1.1.0 - Fields scrolled into view before the click; jumps over 100 px; numeric
  *     fields through their edit mode; form root found by its sections; visible register button only
+ *   2026-10-26 | William M. | v1.2.0 - Text fields and Observaciones committed with Enter key down (they kept
+ *     the old text); a text that does not stay is reported
  *
  * Usage (browser console or a javascript tool on the Template page):
  *   <contents of this file>; await papoUiCheck({register: "Inicio", fill: true, save: false})
@@ -41,11 +43,17 @@ window.papoUiCheck = async function (opts) {
 	// focus out (dispatched: a page in the background does not fire focus events for focus()/blur())
 	const setInput = async (input, value) => {
 		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+		const enter = {key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true};
+		input.focus();
 		input.dispatchEvent(new FocusEvent("focusin", {bubbles: true}));
 		setter.call(input, value);
 		input.dispatchEvent(new Event("input", {bubbles: true}));
 		input.dispatchEvent(new Event("change", {bubbles: true}));
-		input.dispatchEvent(new KeyboardEvent("keyup", {key: "Enter", keyCode: 13, bubbles: true}));
+		// The text field commits on Enter key down; a blur without it puts the old text back
+		input.dispatchEvent(new KeyboardEvent("keydown", enter));
+		input.dispatchEvent(new KeyboardEvent("keyup", enter));
+		await sleep(600);
+		input.blur();
 		input.dispatchEvent(new FocusEvent("focusout", {bubbles: true}));
 		input.dispatchEvent(new FocusEvent("blur"));
 		await sleep(300);
@@ -195,6 +203,9 @@ window.papoUiCheck = async function (opts) {
 			for (const field of all('[data-component="ia.input.text-field"] input, input[data-component="ia.input.text-field"]', group)) {
 				if (!field.disabled && !field.readOnly) {
 					await setInput(field, "QA");
+					if (field.value !== "QA") {
+						s.problems.push("no se pudo escribir en un campo de texto");
+					}
 				}
 			}
 			// Close and reopen: values must survive
@@ -218,6 +229,9 @@ window.papoUiCheck = async function (opts) {
 		const input = obs && (obs.tagName === "INPUT" ? obs : obs.querySelector("input"));
 		if (input) {
 			await setInput(input, "QA");
+			if (input.value !== "QA") {
+				report.problems.push("no se pudo escribir en Observaciones");
+			}
 		}
 	}
 	report.sections.forEach((s) => {

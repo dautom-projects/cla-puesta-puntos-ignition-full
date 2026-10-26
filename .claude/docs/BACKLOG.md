@@ -54,6 +54,7 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 ## Errores de los reportes (encontrados al revisar los PDF de los pilotos, 2026-10-26)
 
 - Reporte `Clarios/Andina/Ensamble/EA11-1601`: el PDF falla con error 500 en los dos ciclos de prueba (`java.lang.StackOverflowError` en `RMLinkedText.getXString`, recursión del texto que pagina). Ya pasó el 2026-10-21, antes de los objetos estándar; la plantilla no cambia desde el checkpoint `1a0ba2b` y el original y el piloto guardan el mismo DataAnswer (`--compare-db --exact`). Sospecha: textos con el desborde por defecto en cajas más bajas que una línea (p. ej. "3" + salto de línea en x=346 y=38, 20×10 con letra de 12, y `@twohourN.papoItemID11208@` con salto de línea en cajas de 10 de alto). Revisarlo en el Designer (Overflow → Shrink) y probar el PDF
+- Reporte `Clarios/Andina/F&A/AC10-0201`: la fila "CUMPLE NIVEL MEDIDO CON GALGA?" (ítem 5840) solo tiene `@register1..4.papoItemID5840@` y una clave `@register.papoItemID5840@` sin número; desde el quinto registro del ciclo la columna sale vacía aunque se guardó "Cumple" (las filas vecinas, 5845 y 6464, van de `register1` a `register12`)
 
 ## Preguntas desde papoitem (fases 2 y 3)
 
