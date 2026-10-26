@@ -4,12 +4,12 @@
 - Vistas: 351
 - Scripts de proyecto: 23
 - Eventos (gateway y sesion): 2
-- Mensajes: 90
+- Mensajes: 76
 - Tags referenciados: 264
 - Paginas y docks: 8
 - Clases de estilo: 105
 - Session props: 5
-- Relaciones: 4549 (usa tag 720, llama 668, embebe/abre 112, maneja 425, monta 8, envia 678, usa sesion 276, usa estilo 1662)
+- Relaciones: 4588 (usa tag 720, llama 667, embebe/abre 191, maneja 405, monta 8, envia 603, usa sesion 276, usa estilo 1718)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -20,23 +20,23 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **Alerts/alert** (cla-project) — directo 1, transitivo 270
 - **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 270
 - **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 106
+- **Objects/Checkbox** (cla-project) — directo 46, transitivo 46
+- **Objects/NumericField** (cla-project) — directo 24, transitivo 24
 - **Page/Embedded/Metalurgia/Fundamental Views/Checkbox** (cla-project) — directo 19, transitivo 19
+- **Objects/Dropdown** (cla-project) — directo 17, transitivo 17
 - **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
+- **Objects/TextField** (cla-project) — directo 11, transitivo 11
 - **Page/Embedded/Title_Header** (cla-project) — directo 5, transitivo 9
-- **Page/Embedded/Title_Large** (cla-project) — directo 5, transitivo 7
-- **Objects/Checkbox** (cla-project) — directo 6, transitivo 6
-- **Objects/Dropdown** (cla-project) — directo 5, transitivo 5
-- **Objects/NumericField** (cla-project) — directo 5, transitivo 5
 
 ### Scripts
-- **logging** (cla-project) — directo 10, transitivo 277
+- **logging** (cla-project) — directo 9, transitivo 277
 - **alerts** (cla-project) — directo 19, transitivo 269
 - **papo_core.ui** (cla-project) — directo 245, transitivo 247
 - **papo_core.register** (cla-project) — directo 241, transitivo 243
 - **papo_core.sign** (cla-project) — directo 101, transitivo 104
+- **papo_core.items** (cla-project) — directo 9, transitivo 54
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
-- **papo_core.items** (cla-project) — directo 9, transitivo 15
 - **mes_core.workOrder** (cla-project) — directo 4, transitivo 7
 - **mes_core.schedule** (cla-project) — directo 3, transitivo 7
 
@@ -165,7 +165,7 @@ _Senal fuerte de un messageType renombrado de un solo lado. Los envios con nombr
 - `signatureTimeout` (cla-project)
 - `trends` (cla-project)
 
-### Se manejan y nadie los envia (32)
+### Se manejan y nadie los envia (18)
 - `createRelation` (cla-project)
 - `deleteSch` (cla-project)
 - `deleteWO` (cla-project)
@@ -174,28 +174,16 @@ _Senal fuerte de un messageType renombrado de un solo lado. Los envios con nombr
 - `refreshTableSch` (cla-project)
 - `saveDataRoot` (cla-project)
 - `saveEndShift` (cla-project)
-- `saveFourHourRegister` (cla-project)
-- `saveHourRegister_test` (cla-project)
 - `saveStartRegister` (cla-project)
 - `saveStartRegister-2201-end` (cla-project)
-- `saveStartRegister-2501-2h` (cla-project)
-- `saveStartRegister-2501-end` (cla-project)
-- `saveStartRegister-4101-1h` (cla-project)
-- `saveStartRegister-4101-end` (cla-project)
-- `saveStartRegister-4101-sku` (cla-project)
-- `saveStartRegister-4101-start` (cla-project)
-- `saveStartRegister-4200-1h` (cla-project)
-- `saveStartRegister-4200-2h` (cla-project)
-- `saveStartRegister-4200-end` (cla-project)
-- `saveStartRegister-4200-mid` (cla-project)
-- `saveStartRegister-4200-start` (cla-project)
 - `saveStartRegister-PTARI` (cla-project)
 - `saveStartShift` (cla-project)
-- `saveTwoHourRegister` (cla-project)
 - `signOperator` (cla-project)
 - `signPapoSup` (cla-project)
 - `signSuper` (cla-project)
 - `signatureSuccess` (cla-project)
+- `testLabel` (cla-project)
+- `updateWaste` (cla-project)
 
 ## No analizado
 
