@@ -1,6 +1,7 @@
 {
   "custom": {
-    "dbConnection": "papo_db"
+    "dbConnection": "papo_db",
+    "question": ""
   },
   "params": {
     "answer": null,
@@ -18,6 +19,26 @@
           "path": "session.custom.dbConnection"
         },
         "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.question": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "papoItemID": "{view.params.papoItemID}",
+            "question": "{view.params.question}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
       },
       "persistent": true
     },
@@ -91,20 +112,9 @@
           "props.text": {
             "binding": {
               "config": {
-                "struct": {
-                  "dbConnection": "{view.custom.dbConnection}",
-                  "papoItemID": "{view.params.papoItemID}",
-                  "question": "{view.params.question}"
-                },
-                "waitOnAll": true
+                "expression": "{view.custom.question}"
               },
-              "transforms": [
-                {
-                  "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
+              "type": "expr"
             }
           },
           "props.textStyle.fontSize": {

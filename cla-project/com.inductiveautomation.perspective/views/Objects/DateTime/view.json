@@ -1,9 +1,11 @@
 {
   "custom": {
-    "dbConnection": "papo_db"
+    "dbConnection": "papo_db",
+    "question": ""
   },
   "params": {
     "answer": null,
+    "enabled": true,
     "fontSize": 17,
     "format": "h:mm:ss a",
     "papoItemID": null,
@@ -20,6 +22,26 @@
           "path": "session.custom.dbConnection"
         },
         "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.question": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "papoItemID": "{view.params.papoItemID}",
+            "question": "{view.params.question}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
       },
       "persistent": true
     },
@@ -41,6 +63,10 @@
         "type": "expr-struct"
       },
       "paramDirection": "output",
+      "persistent": true
+    },
+    "params.enabled": {
+      "paramDirection": "input",
       "persistent": true
     },
     "params.fontSize": {
@@ -111,20 +137,9 @@
           "props.text": {
             "binding": {
               "config": {
-                "struct": {
-                  "dbConnection": "{view.custom.dbConnection}",
-                  "papoItemID": "{view.params.papoItemID}",
-                  "question": "{view.params.question}"
-                },
-                "waitOnAll": true
+                "expression": "{view.custom.question}"
               },
-              "transforms": [
-                {
-                  "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
+              "type": "expr"
             }
           },
           "props.textStyle.fontSize": {
@@ -147,6 +162,14 @@
           "grow": 1
         },
         "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "view.params.enabled"
+              },
+              "type": "property"
+            }
+          },
           "props.pickerType": {
             "binding": {
               "config": {

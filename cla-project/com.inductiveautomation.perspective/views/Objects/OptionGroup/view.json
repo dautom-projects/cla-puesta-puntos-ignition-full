@@ -1,10 +1,12 @@
 {
   "custom": {
-    "dbConnection": "papo_db"
+    "dbConnection": "papo_db",
+    "question": ""
   },
   "params": {
     "answer": "-",
     "emptyAnswer": "-",
+    "enabled": true,
     "fontSize": 17,
     "options": [],
     "papoItemID": null,
@@ -20,6 +22,26 @@
           "path": "session.custom.dbConnection"
         },
         "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.question": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "papoItemID": "{view.params.papoItemID}",
+            "question": "{view.params.question}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
       },
       "persistent": true
     },
@@ -44,6 +66,10 @@
       "persistent": true
     },
     "params.emptyAnswer": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.enabled": {
       "paramDirection": "input",
       "persistent": true
     },
@@ -111,20 +137,9 @@
           "props.text": {
             "binding": {
               "config": {
-                "struct": {
-                  "dbConnection": "{view.custom.dbConnection}",
-                  "papoItemID": "{view.params.papoItemID}",
-                  "question": "{view.params.question}"
-                },
-                "waitOnAll": true
+                "expression": "{view.custom.question}"
               },
-              "transforms": [
-                {
-                  "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
-                  "type": "script"
-                }
-              ],
-              "type": "expr-struct"
+              "type": "expr"
             }
           },
           "props.textStyle.fontSize": {
@@ -143,10 +158,19 @@
           "name": "Field"
         },
         "position": {
-          "basis": "0px",
-          "grow": 1
+          "basis": "auto",
+          "grow": 1,
+          "shrink": 0
         },
         "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "view.params.enabled"
+              },
+              "type": "property"
+            }
+          },
           "props.radios": {
             "binding": {
               "config": {
@@ -180,10 +204,18 @@
           }
         },
         "props": {
-          "layout": "row",
+          "align": "center",
+          "orientation": "row",
+          "radioStyle": {
+            "paddingBottom": 0,
+            "paddingLeft": 0,
+            "paddingRight": 24,
+            "paddingTop": 0
+          },
           "style": {
             "classes": "PAPO/Field/Checkbox"
-          }
+          },
+          "textPosition": "right"
         },
         "type": "ia.input.radio-group"
       }

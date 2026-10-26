@@ -3,13 +3,16 @@ Builds the PAPO standard objects (views/Objects/*/view.json) from one definition
 
 Edit this file and run it to change every object at once; forms only pass parameters.
 Contract (all objects): question, papoItemID, fontSize (input) · value (inout) · answer (output).
-List layout: showQuestion, questionBasis. See .claude/docs/OBJETOS_ESTANDAR.md.
+Inputs also take enabled. List layout: showQuestion, questionBasis. See .claude/docs/OBJETOS_ESTANDAR.md.
 
-Version: 2.1.0
+Version: 2.2.0
 
 Changelog:
 	2026-10-24 | William M. | v2.0.0 - value inout, answer output, options/answerFrom (Dropdown)
 	2026-10-25 | William M. | v2.1.0 - emptyAnswer; Objects/OptionGroup and Objects/DateTime
+	2026-10-25 | William M. | v2.2.0 - enabled; question resolved once in view.custom.question; Checkbox
+		trueText/falseText; questionAsPlaceholder; Dropdown showClearIcon and "Seleccionar";
+		OptionGroup in one row (orientation, align, radioStyle)
 
 Args (CLI):
 	--check: Only report which objects would change
@@ -60,6 +63,12 @@ ANSWER_DATETIME = (
 	"\t\treturn None\n")
 
 QUESTION_TEXT = "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)"
+QUESTION = "{view.custom.question}"
+# Checkbox text: the state text when trueText/falseText are set (e.g. ✔ / ✘), otherwise the question
+CHECKBOX_TEXT = ("if(coalesce({view.params.trueText}, \"\") + coalesce({view.params.falseText}, \"\") != \"\", "
+	"if({view.params.value}, {view.params.trueText}, {view.params.falseText}), {view.custom.question})")
+# Input placeholder: the question when questionAsPlaceholder is set, otherwise the placeholder text
+PLACEHOLDER = "if({view.params.questionAsPlaceholder}, {view.custom.question}, {view.params.placeholder})"
 
 
 def prop(path, bidirectional=False):
@@ -85,11 +94,12 @@ def questionText():
 
 
 def view(params, directions, answer, children):
-	propConfig = {"custom.dbConnection": dict(prop("session.custom.dbConnection"), persistent=True)}
+	propConfig = {"custom.dbConnection": dict(prop("session.custom.dbConnection"), persistent=True),
+		"custom.question": dict(questionText(), persistent=True)}
 	for name, direction in directions.items():
 		propConfig["params." + name] = {"paramDirection": direction, "persistent": True}
 	propConfig["params.answer"] = dict(answer, paramDirection="output", persistent=True)
-	return {"custom": {"dbConnection": "papo_db"}, "params": params, "propConfig": propConfig,
+	return {"custom": {"dbConnection": "papo_db", "question": ""}, "params": params, "propConfig": propConfig,
 		"props": {"defaultSize": {"height": 50, "width": 400}},
 		"root": {"children": children, "meta": {"name": "root"},
 			"props": {"alignItems": "stretch", "style": {"overflow": "hidden"}}, "type": "ia.container.flex"}}
@@ -98,12 +108,14 @@ def view(params, directions, answer, children):
 def questionLabel():
 	return {"meta": {"name": "Question"}, "position": {"shrink": 0},
 		"propConfig": {"position.basis": prop("view.params.questionBasis"), "position.display": prop("view.params.showQuestion"),
-			"props.text": questionText(), "props.textStyle.fontSize": prop("view.params.fontSize")},
+			"props.text": expr(QUESTION), "props.textStyle.fontSize": prop("view.params.fontSize")},
 		"type": "ia.display.label"}
 
 
-def field(ctype, propConfig, props):
-	return {"meta": {"name": "Field"}, "position": {"basis": "0px", "grow": 1}, "propConfig": propConfig,
+def field(ctype, propConfig, props, position=None, enabled=True):
+	if enabled:
+		propConfig = dict(propConfig, **{"props.enabled": prop("view.params.enabled")})
+	return {"meta": {"name": "Field"}, "position": position or {"basis": "0px", "grow": 1}, "propConfig": propConfig,
 		"props": props, "type": ctype}
 
 
@@ -112,8 +124,14 @@ def rangeColor(kind):
 		"\treturn papo_core.items.getRangeColor(value[\"value\"], value[\"minValue\"], value[\"maxValue\"], \"%s\")" % kind)
 
 
-COMMON = {"question": "", "papoItemID": None, "fontSize": 17}
-COMMON_DIR = {"question": "input", "papoItemID": "input", "fontSize": "input"}
+COMMON = {"question": "", "papoItemID": None, "fontSize": 17, "enabled": True}
+COMMON_DIR = {"question": "input", "papoItemID": "input", "fontSize": "input", "enabled": "input"}
+COMMON_LABEL = {k: v for k, v in COMMON.items() if k != "enabled"}
+COMMON_LABEL_DIR = {k: v for k, v in COMMON_DIR.items() if k != "enabled"}
+INPUT_TEXT = {"placeholder": "Escriba aqui", "questionAsPlaceholder": False}
+INPUT_TEXT_DIR = {"placeholder": "input", "questionAsPlaceholder": "input"}
+# Icon color of a disabled checkbox (the forms used the brand blue)
+DISABLED_ICON = {"color": {"disabled": "#1199C7"}}
 LIST = {"showQuestion": True, "questionBasis": "60%"}
 LIST_DIR = {"showQuestion": "input", "questionBasis": "input"}
 FONT = prop("view.params.fontSize")
@@ -122,34 +140,38 @@ FONT = prop("view.params.fontSize")
 def definitions():
 	"""Return {object name: view} for every standard object."""
 	return {
-		# The question is the checkbox text; answer = trueValue / falseValue
-		"Checkbox": view(dict(COMMON, trueValue="Cumple", falseValue="No Cumple", value=False, answer="No Cumple"),
-			dict(COMMON_DIR, trueValue="input", falseValue="input", value="inout"),
+		# The question is the checkbox text (or the state text); answer = trueValue / falseValue
+		"Checkbox": view(dict(COMMON, trueValue="Cumple", falseValue="No Cumple", trueText="", falseText="", value=False,
+				answer="No Cumple"),
+			dict(COMMON_DIR, trueValue="input", falseValue="input", trueText="input", falseText="input", value="inout"),
 			expr("if({view.params.value}, {view.params.trueValue}, {view.params.falseValue})"),
-			[field("ia.input.checkbox", {"props.selected": prop("view.params.value", True), "props.text": questionText(),
-				"props.style.fontSize": FONT}, {"style": {"classes": "PAPO/Field/Checkbox"}})]),
-		"NumericField": view(dict(COMMON, minValue=None, maxValue=None, placeholder="Escriba aqui", emptyAnswer=None,
-				value=None, answer=None, **LIST),
-			dict(COMMON_DIR, minValue="input", maxValue="input", placeholder="input", emptyAnswer="input", value="inout", **LIST_DIR),
+			[field("ia.input.checkbox", {"props.selected": prop("view.params.value", True), "props.text": expr(CHECKBOX_TEXT),
+				"props.style.fontSize": FONT}, {"checkedIcon": DISABLED_ICON, "style": {"classes": "PAPO/Field/Checkbox"},
+				"uncheckedIcon": DISABLED_ICON})]),
+		"NumericField": view(dict(COMMON, minValue=None, maxValue=None, emptyAnswer=None, value=None, answer=None,
+				**dict(INPUT_TEXT, **LIST)),
+			dict(COMMON_DIR, minValue="input", maxValue="input", emptyAnswer="input", value="inout", **dict(INPUT_TEXT_DIR, **LIST_DIR)),
 			struct(("emptyAnswer", "value"), ANSWER_VALUE),
 			[questionLabel(), field("ia.input.numeric-entry-field", {"props.value": prop("view.params.value", True),
-				"props.placeholder": prop("view.params.placeholder"), "props.style.color": rangeColor("text"),
+				"props.placeholder": expr(PLACEHOLDER), "props.style.color": rangeColor("text"),
 				"props.style.borderColor": rangeColor("border"), "props.style.fontSize": FONT},
 				{"align": "left", "format": "none", "spinner": {"enabled": False}, "style": {"classes": "PAPO/Field/Input"}})]),
-		"TextField": view(dict(COMMON, placeholder="Escriba aqui", emptyAnswer=None, value="", answer="", **LIST),
-			dict(COMMON_DIR, placeholder="input", emptyAnswer="input", value="inout", **LIST_DIR),
+		"TextField": view(dict(COMMON, emptyAnswer=None, value="", answer="", **dict(INPUT_TEXT, **LIST)),
+			dict(COMMON_DIR, emptyAnswer="input", value="inout", **dict(INPUT_TEXT_DIR, **LIST_DIR)),
 			struct(("emptyAnswer", "value"), ANSWER_VALUE),
 			[questionLabel(), field("ia.input.text-field", {"props.text": prop("view.params.value", True),
-				"props.placeholder": prop("view.params.placeholder"), "props.style.fontSize": FONT},
+				"props.placeholder": expr(PLACEHOLDER), "props.style.fontSize": FONT},
 				{"style": {"classes": "PAPO/Field/Input"}})]),
-		"Dropdown": view(dict(COMMON, options=[], answerFrom="label", placeholder="Seleccione", emptyAnswer=None,
-				value=None, answer="", **LIST),
-			dict(COMMON_DIR, options="input", answerFrom="input", placeholder="input", emptyAnswer="input", value="inout", **LIST_DIR),
+		"Dropdown": view(dict(COMMON, options=[], answerFrom="label", placeholder="Seleccionar", showClearIcon=False,
+				emptyAnswer=None, value=None, answer="", **LIST),
+			dict(COMMON_DIR, options="input", answerFrom="input", placeholder="input", showClearIcon="input",
+				emptyAnswer="input", value="inout", **LIST_DIR),
 			struct(("answerFrom", "emptyAnswer", "options", "value"), ANSWER_DROPDOWN),
 			[questionLabel(), field("ia.input.dropdown", {"props.value": prop("view.params.value", True),
 				"props.options": prop("view.params.options"), "props.placeholder.text": prop("view.params.placeholder"),
-				"props.style.fontSize": FONT}, {"placeholder": {}, "style": {"classes": "PAPO/Field/Dropdown"}})]),
-		# One choice among options (list of texts); answer = the chosen text, or emptyAnswer
+				"props.showClearIcon": prop("view.params.showClearIcon"), "props.style.fontSize": FONT},
+				{"placeholder": {}, "style": {"classes": "PAPO/Field/Dropdown"}})]),
+		# One choice among options (list of texts) in one row; answer = the chosen text, or emptyAnswer
 		"OptionGroup": view(dict(COMMON, options=[], emptyAnswer="-", value=None, answer="-", **LIST),
 			dict(COMMON_DIR, options="input", emptyAnswer="input", value="inout", **LIST_DIR),
 			struct(("emptyAnswer", "value"), ANSWER_VALUE),
@@ -157,7 +179,10 @@ def definitions():
 				"props.radios": {"binding": {"config": {"path": "view.params.options"},
 					"transforms": [{"code": "\treturn [{\"text\": option, \"value\": option} for option in value or []]", "type": "script"}],
 					"type": "property"}},
-				"props.style.fontSize": FONT}, {"layout": "row", "style": {"classes": "PAPO/Field/Checkbox"}})]),
+				"props.style.fontSize": FONT}, {"align": "center", "orientation": "row",
+				"radioStyle": {"paddingBottom": 0, "paddingLeft": 0, "paddingRight": 24, "paddingTop": 0},
+				"style": {"classes": "PAPO/Field/Checkbox"}, "textPosition": "right"},
+				position={"basis": "auto", "grow": 1, "shrink": 0})]),
 		# Date or time picker; answer = the value formatted with format (default: time as text)
 		"DateTime": view(dict(COMMON, pickerType="time", format="h:mm:ss a", value=None, answer=None, **LIST),
 			dict(COMMON_DIR, pickerType="input", format="input", value="inout", **LIST_DIR),
@@ -166,11 +191,11 @@ def definitions():
 				"props.pickerType": prop("view.params.pickerType"), "props.style.fontSize": FONT},
 				{"style": {"classes": "PAPO/Field/Input"}})]),
 		# Read-only tag value; answer = the value read from tagPath
-		"Label": view(dict(COMMON, tagPath="", answer=None, **LIST), dict(COMMON_DIR, tagPath="input", **LIST_DIR),
+		"Label": view(dict(COMMON_LABEL, tagPath="", answer=None, **LIST), dict(COMMON_LABEL_DIR, tagPath="input", **LIST_DIR),
 			expr("{/root/Field.props.text}"),
 			[questionLabel(), field("ia.display.label", {"props.text": {"binding": {"config": {"fallbackDelay": 2.5,
 				"mode": "indirect", "references": {"1": "{view.params.tagPath}"}, "tagPath": "{1}"}, "type": "tag"}},
-				"props.textStyle.fontSize": FONT}, {"style": {"classes": "PAPO/Field/TagValue"}})]),
+				"props.textStyle.fontSize": FONT}, {"style": {"classes": "PAPO/Field/TagValue"}}, enabled=False)]),
 	}
 
 
