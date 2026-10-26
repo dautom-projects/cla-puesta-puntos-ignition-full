@@ -6,10 +6,11 @@ so a _PruebaPiloto copy is never opened at runtime. "on" puts the pilot content 
 (backup first) on the local gateway; "off" restores the original byte for byte. Nothing is renamed or moved,
 Digitalizacion_Template is not touched. Never commit while a swap is active (papo_qa warns about it).
 
-Version: 1.0.0
+Version: 1.0.1
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
+	2026-10-26 | William M. | v1.0.1 - Warn not to edit the swapped views while the gateway rewrites them
 
 Args (CLI):
 	on <form>...: swap each pilot in (form = view folder, e.g. "Page/Embedded/F&A/Form_AC10-0201_start")
@@ -123,6 +124,9 @@ def main():
 		failed = failed or bool(problem)
 	if forms:
 		print("Espera ~10 s (escaneo del gateway) y, en el Designer, Project → Update Project si tenías la vista abierta.")
+		# The gateway rewrites the whole resource when it picks up an external change: an edit made before
+		# that can be overwritten with the content it read
+		print("No edites esas vistas en los próximos ~15 s: el gateway reescribe el recurso con lo que leyó.")
 	return 1 if failed else 0
 
 
