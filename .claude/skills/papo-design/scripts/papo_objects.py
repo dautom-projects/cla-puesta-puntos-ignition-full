@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.2.0
+Version: 2.3.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -28,12 +28,16 @@ Changelog:
 		groups; a row without a question takes the full width
 	2026-10-25 | William M. | v2.2.0 - Section height (custom.baseBasisPx) grows with the rows; an option
 		group keeps the width of its question label
+	2026-10-26 | William M. | v2.3.0 - Questions always from papoItemID: a fixed question text of an item with a
+		known papoItemID becomes the papoitem description (--questions-sql writes the UPDATE when the base
+		differs); display transforms after the description query are dropped
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
 	--apply: write (default: dry run)  --backup (str): backup folder
 	--no-rows, --no-repeaters: disable those modes
 	--legacy: remove dead legacy save handlers  --form-class: add PAPO/Form to the root
+	--questions-sql (str): write the UPDATE papoitem script for fixed questions that differ from the base
 
 Returns:
 	Exit code 0 when every view passed verification, 1 otherwise
@@ -249,9 +253,13 @@ def _portable(binding, moved):
 
 
 def _describesItem(component, binding):
-	"""True when the binding shows the description of the field's own papoItemID (papoitem query)."""
+	"""True when the binding shows the description of the field's own papoItemID (papoitem query).
+
+	Display transforms after the query (e.g. dropping a prefix) are not kept: the standard question is the
+	papoitem description as it is.
+	"""
 	transforms = (binding or {}).get("transforms", [])
-	if not binding or binding.get("type") != "property" or len(transforms) != 1 or DESCRIPTION_QUERY not in _code(transforms[0]):
+	if not binding or binding.get("type") != "property" or not transforms or DESCRIPTION_QUERY not in _code(transforms[0]):
 		return False
 	path = binding.get("config", {}).get("path")
 	if path == "this.custom.item.papoItemID":
@@ -273,14 +281,30 @@ def _stateTexts(binding, ctype):
 	return table[True], table[False]
 
 
-def checkboxText(component, moved):
+def _staticItemID(component):
+	"""papoItemID of the component when it is fixed in custom.item (not bound)."""
+	value = ((component.get("custom") or {}).get("item") or {}).get("papoItemID")
+	return value if isinstance(value, int) and "custom.item.papoItemID" not in component.get("propConfig", {}) else None
+
+
+def _fixedQuestion(component, text, texts):
+	"""A fixed question of an item with a known papoItemID reads papoitem; the text goes to texts for the base."""
+	pid = _staticItemID(component)
+	if not text or pid is None:
+		return {"question": text or ""}, {}
+	if texts is not None:
+		texts.append({"papoItemID": pid, "text": text})
+	return {"question": ""}, _itemID()
+
+
+def checkboxText(component, moved, texts=None):
 	"""Params and bindings that show the checkbox text on the object, or None when it cannot be carried."""
 	config = component.get("propConfig", {}).get("props.text") or {}
 	binding = config.get("binding")
 	if set(config) - {"binding", "persistent"}:
 		return None
 	if not binding:
-		return {"question": (component.get("props") or {}).get("text", "") or ""}, {}
+		return _fixedQuestion(component, (component.get("props") or {}).get("text", "") or "", texts)
 	if _describesItem(component, binding):
 		return {"question": ""}, _itemID()
 	state = _stateTexts(binding, component["type"])
@@ -344,7 +368,7 @@ def _questionOf(textOwner, binding, row):
 		return ("text", (textOwner.get("props") or {}).get("text", "") or "")
 	transforms = binding.get("transforms", [])
 	path = binding.get("config", {}).get("path", "")
-	if binding.get("type") != "property" or len(transforms) != 1 or DESCRIPTION_QUERY not in " ".join((transforms[0].get("code") or "").split()):
+	if binding.get("type") != "property" or not transforms or DESCRIPTION_QUERY not in " ".join((transforms[0].get("code") or "").split()):
 		return None
 	if path == "this.custom.item.papoItemID":
 		return ("field", None)
@@ -416,7 +440,7 @@ def _cellStyle(field, parent, grand):
 	return style
 
 
-def _optionQuestion(group):
+def _optionQuestion(group, texts=None):
 	"""(params, bindings, shown) of the question of an option group: its label, static or the item description."""
 	labels = [c for c in group.get("children", []) if c.get("type") == "ia.display.label"]
 	if not labels:
@@ -425,7 +449,8 @@ def _optionQuestion(group):
 	if len(labels) > 1:
 		return None
 	if not binding:
-		return {"question": (labels[0].get("props") or {}).get("text", "") or ""}, {}, True
+		fixed = _fixedQuestion(group, (labels[0].get("props") or {}).get("text", "") or "", texts)
+		return fixed[0], fixed[1], True
 	transforms = binding.get("transforms", [])
 	if (binding.get("type") == "property" and binding.get("config") == {"path": "parent.custom.item.papoItemID"}
 			and len(transforms) == 1 and DESCRIPTION_QUERY in _code(transforms[0])):
@@ -433,7 +458,7 @@ def _optionQuestion(group):
 	return None
 
 
-def fieldEmbed(field, parent, grand, rule, stats):
+def fieldEmbed(field, parent, grand, rule, stats, texts=None):
 	"""Object for a field in a cell (the cell keeps its layout), or None when the field stays native."""
 	local = collections.Counter()
 	result = objectParams(field, rule, local)
@@ -441,13 +466,13 @@ def fieldEmbed(field, parent, grand, rule, stats):
 		return None
 	params, bindings = result
 	if field["type"] == "ia.input.checkbox":
-		text = checkboxText(field, False)
+		text = checkboxText(field, False, texts)
 		if text is None:
 			return None
 		params.update(text[0])
 		bindings.update(text[1])
 	elif rule["kind"] == "options":
-		question = _optionQuestion(field)
+		question = _optionQuestion(field, texts)
 		if question is None:
 			return None
 		params.update(question[0], showQuestion=question[2])
@@ -463,7 +488,7 @@ def fieldEmbed(field, parent, grand, rule, stats):
 	return _embed(field, field["meta"], field.get("position", {}), _cellStyle(field, parent, grand), params, bindings, OBJECTS[field["type"]])
 
 
-def rowEmbed(row, field, question, rule, stats):
+def rowEmbed(row, field, question, rule, stats, texts=None):
 	"""Object for a whole list row (question inside), or None when the row is not converted as a row."""
 	moved = field is not row
 	local = collections.Counter()
@@ -473,13 +498,15 @@ def rowEmbed(row, field, question, rule, stats):
 	params, bindings = result
 	kind, value = question
 	if kind == "checkbox":
-		text = checkboxText(field, moved)
+		text = checkboxText(field, moved, texts)
 		if text is None:
 			return None
 		params.update(text[0])
 		bindings.update(text[1])
 	elif kind == "text":
-		params["question"] = value
+		fixed = _fixedQuestion(field, value, texts)
+		params.update(fixed[0])
+		bindings.update(fixed[1])
 	elif kind == "item":
 		params.update(question="", papoItemID=value)
 	else:
@@ -644,7 +671,7 @@ def standardize(view, options, stats):
 		if _conflict(references, path, True):
 			stats["nativos (referenciados)"] += 1
 			return node
-		embed = fieldEmbed(node, parent, grand, rule, stats)
+		embed = fieldEmbed(node, parent, grand, rule, stats, options.get("questionTexts"))
 		if embed is None:
 			stats["nativos (propiedades sin parámetro)"] += 1
 			return node
@@ -665,7 +692,7 @@ def standardize(view, options, stats):
 			if options.get("rows") and GROUP.match(node.get("meta", {}).get("name", "")) and (node.get("props") or {}).get("direction") == "column":
 				candidate = rowCandidate(child)
 				if candidate and answerRule(candidate[0]) and not _conflict(references, childPath, child is candidate[0]):
-					embed = rowEmbed(child, candidate[0], candidate[1], answerRule(candidate[0]), stats)
+					embed = rowEmbed(child, candidate[0], candidate[1], answerRule(candidate[0]), stats, options.get("questionTexts"))
 					if embed is not None:
 						node["children"][i] = embed
 						continue
@@ -689,6 +716,59 @@ def standardize(view, options, stats):
 			style["classes"] = " ".join(tokens + ["PAPO/Form"])
 
 
+def _descriptions(ids):
+	"""papoitem.Description by ID (SELECT on the test database)."""
+	env = dict(os.environ)
+	for line in open(qa.DB_ENV):
+		k, _, v = line.strip().partition("=")
+		env[k] = v
+	q = "SET NOCOUNT ON; SELECT ID, Description FROM papoitem WHERE ID IN ({}) FOR JSON PATH, INCLUDE_NULL_VALUES".format(",".join(str(int(i)) for i in ids))
+	r = subprocess.run(["docker", "exec", "-e", "SQLCMDUSER", "-e", "SQLCMDPASSWORD", "mssql", "/opt/mssql-tools18/bin/sqlcmd",
+		"-S", "localhost", "-d", "cla-db-papo", "-C", "-y", "0", "-Q", q], capture_output=True, text=True, env=env)
+	rows = json.loads("".join(l for l in r.stdout.splitlines() if not l.startswith("JSON_")) or "[]")
+	return {row["ID"]: row["Description"] for row in rows}
+
+
+def _sql(text):
+	return "NULL" if text is None else "N'" + text.replace("'", "''") + "'"
+
+
+def writeQuestionsSql(found, path):
+	"""UPDATE papoitem for fixed questions whose text differs from the base; conflicts are reported, not written."""
+	byID = collections.OrderedDict()
+	for entry in found:
+		byID.setdefault(entry["papoItemID"], []).append(entry)
+	current = _descriptions(list(byID)) if byID else {}
+	updates, conflicts, missing = [], [], []
+	for pid, entries in byID.items():
+		texts = sorted({e["text"].strip() for e in entries})
+		if pid not in current:
+			missing.append(pid)
+		elif len(texts) > 1:
+			conflicts.append((pid, texts, sorted({e["view"] for e in entries})))
+		elif texts[0] != (current[pid] or "").strip():
+			updates.append((pid, texts[0], current[pid], sorted({e["view"] for e in entries})))
+	lines = ["-- Preguntas fijas de los formularios -> papoitem.Description",
+		"-- Generado por papo_objects.py --questions-sql el {}: el formulario lee la pregunta de papoItemID y".format(datetime.date.today().isoformat()),
+		"-- la base queda con el texto que mostraba. Aplicar en cla-db-papo y luego en producción.", ""]
+	if updates:
+		lines += ["SET XACT_ABORT ON;", "BEGIN TRANSACTION;"]
+		for pid, text, old, views in updates:
+			lines.append("-- {} · antes: {}".format(", ".join(views), _sql(old)))
+			lines.append("UPDATE papoitem SET Description = {} WHERE ID = {};".format(_sql(text), pid))
+		lines += ["COMMIT;", "", "-- Rollback:"]
+		lines += ["-- UPDATE papoitem SET Description = {} WHERE ID = {};".format(_sql(old), pid) for pid, _, old, _ in updates]
+	else:
+		lines.append("-- Sin diferencias: la base ya tiene el texto de cada pregunta.")
+	for pid, texts, views in conflicts:
+		lines.append("-- CONFLICTO {}: textos distintos para el mismo ítem en {}: {}".format(pid, ", ".join(views), " | ".join(texts)))
+	for pid in missing:
+		lines.append("-- NO EXISTE en papoitem: {}".format(pid))
+	os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+	open(path, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+	return len(updates), conflicts, missing
+
+
 def processView(path, apply, backupDir, stats, options):
 	"""Convert one view. Returns (status, detail)."""
 	view, usesCrlf, isCanonical = design.loadView(path)
@@ -696,13 +776,17 @@ def processView(path, apply, backupDir, stats, options):
 		return "rechazada", "no es Gson canónico"
 	before = copy.deepcopy(view)
 	viewStats = collections.Counter()
-	standardize(view, options, viewStats)
+	texts = []
+	standardize(view, dict(options, questionTexts=texts), viewStats)
 	if [qa._key(s) for s in qa.answerSources(before)] != [qa._key(s) for s in qa.answerSources(view)]:
 		return "error", "cambió la recolección de respuestas"
 	newBroken = view_refs.broken(view) - view_refs.broken(before)
 	if newBroken:
 		return "error", "referencias rotas nuevas: {}".format(sorted(newBroken)[:2])
 	stats.update(viewStats)
+	if texts:
+		stats["preguntas fijas a papoItemID"] += len(texts)
+		options.setdefault("questionsFound", []).extend(dict(t, view=os.path.relpath(os.path.dirname(path), design.VIEWS_DIR)) for t in texts)
 	converted = sum(v for k, v in viewStats.items() if k.startswith("Objects/"))
 	if view == before:
 		return "sin cambios", ""
@@ -726,6 +810,7 @@ def main():
 	parser.add_argument("--no-repeaters", action="store_true")
 	parser.add_argument("--legacy", action="store_true")
 	parser.add_argument("--form-class", action="store_true")
+	parser.add_argument("--questions-sql")
 	args = parser.parse_args()
 	options = {"rows": not args.no_rows, "repeaters": not args.no_repeaters, "legacy": args.legacy, "formClass": args.form_class}
 
@@ -743,6 +828,9 @@ def main():
 	for path, (status, detail) in results.items():
 		if status not in ("sin cambios",):
 			print("- {} · {} · {}".format(os.path.relpath(os.path.dirname(path), design.VIEWS_DIR), status, detail))
+	if args.questions_sql:
+		updates, conflicts, missing = writeQuestionsSql(options.get("questionsFound", []), args.questions_sql)
+		print("Preguntas: {} UPDATE en {} · {} conflictos · {} ítems inexistentes".format(updates, args.questions_sql, len(conflicts), len(missing)))
 	return 1 if byStatus.get("error") else 0
 
 

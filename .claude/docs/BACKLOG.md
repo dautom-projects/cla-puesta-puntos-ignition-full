@@ -45,7 +45,13 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `OREC/Form_PO11-0101-2_start`: 5168 se guarda dos veces (ya en septiembre)
 - `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado)
 - `papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196: es el dato, se ve igual en el original
+- `OREC/Form_CU11-0101_start`: no existe `FlexContainerGroup7`; `papo_core.register.save` recorre los grupos 1..N y los 4 checkbox de `FlexContainerGroup8` nunca se guardan
+- `Ensamble/Form_EA11-0901_2h` y `_4h`: el ítem 207 se usa para tres preguntas distintas ("Apariencia de borne.", "Prueba de desgarre soldadura de punto.", "Alineación de soldadura")
 - `F&A/Form_AC10-0201_start`: "Cubierta sin rayones." aparece dos veces en "Condiciones de operacion" y varias preguntas largas se cortan en su fila (también en el original)
+
+## Preguntas desde papoitem (fases 2 y 3)
+
+- Simulación del 2026-10-26 (`simulate_all.py --questions-sql`): 246 preguntas fijas de 192 ítems pasan a `papoItemID`; 121 necesitan `UPDATE papoitem` y hay 1 conflicto (mismo ítem con textos distintos). Generar y aplicar el SQL con cada familia, antes de su commit
 
 ## Mejoras opcionales (fuera de la estandarización básica)
 

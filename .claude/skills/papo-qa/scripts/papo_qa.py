@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.4.0
+Version: 1.5.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -27,6 +27,8 @@ Changelog:
 		stage 3: an option group keeps the width of its question
 	2026-10-25 | William M. | v1.4.0 - --exact: stage 8 compares every answer (records saved with the same values
 		by ui_check.js on the original and on the pilot)
+	2026-10-26 | William M. | v1.5.0 - Stage 3: a fixed question may read papoItemID when papoitem.Description has
+		the same text (SELECT); the description query with display transforms counts as the item description
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -340,7 +342,7 @@ def _textOf(owner, prop, parent, ctype=None):
 		return ("text", value or "")
 	t = b.get("transforms", [])
 	path = b.get("config", {}).get("path")
-	if b.get("type") == "property" and len(t) == 1 and DESCRIPTION_QUERY in _code(t[0]) and path:
+	if b.get("type") == "property" and t and DESCRIPTION_QUERY in _code(t[0]) and path:
 		item = owner.get("propConfig", {}).get("custom.item.papoItemID", {}).get("binding") or {}
 		if path == "this.custom.item.papoItemID" or (item.get("config") == {"path": path} and not item.get("transforms")):
 			return ("item", _itemRef(owner))
@@ -414,6 +416,33 @@ def _objectBoundOrStatic(embed, param, default):
 	return ("static", default if value is None else value)
 
 
+_DESCRIPTIONS = {}
+
+
+def _description(pid):
+	"""papoitem.Description of one item (SELECT on the test database, cached)."""
+	if pid not in _DESCRIPTIONS:
+		env = dict(os.environ)
+		for line in open(DB_ENV):
+			k, _, v = line.strip().partition("=")
+			env[k] = v
+		q = "SET NOCOUNT ON; SELECT Description FROM papoitem WHERE ID = {} FOR JSON PATH, INCLUDE_NULL_VALUES".format(int(pid))
+		r = subprocess.run(["docker", "exec", "-e", "SQLCMDUSER", "-e", "SQLCMDPASSWORD", "mssql", "/opt/mssql-tools18/bin/sqlcmd",
+			"-S", "localhost", "-d", "cla-db-papo", "-C", "-y", "0", "-Q", q], capture_output=True, text=True, env=env)
+		rows = json.loads("".join(l for l in r.stdout.splitlines() if not l.startswith("JSON_")) or "[]")
+		_DESCRIPTIONS[pid] = rows[0]["Description"] if rows else None
+	return _DESCRIPTIONS[pid]
+
+
+def _sameQuestion(expected, shown):
+	"""Equal question sources, or a fixed text now read from papoItemID whose description is that text."""
+	if expected == shown:
+		return True
+	if expected[0] == "text" and expected[1] and shown[0] == "item" and isinstance(shown[1], int):
+		return ((_description(shown[1]) or "").strip() == expected[1].strip())
+	return False
+
+
 def stageFieldProps(cur, base):
 	"""Problems where a converted field no longer shows or does what the original did."""
 	problems = []
@@ -444,8 +473,12 @@ def stageFieldProps(cur, base):
 		else:
 			expected = ("text", "")
 			shown = _objectQuestion(embed) if params.get("showQuestion", True) else ("text", "")
-		if expected != shown:
-			problems.append("{}: la pregunta era {} y el objeto muestra {}".format(where, str(expected)[:90], str(shown)[:90]))
+		if not _sameQuestion(expected, shown):
+			if expected[0] == "text" and shown[0] == "item" and isinstance(shown[1], int):
+				problems.append("{}: papoitem {} dice {!r} y el formulario mostraba {!r} (aplicar el SQL de preguntas)".format(
+					where, shown[1], (_description(shown[1]) or "")[:60], expected[1][:60]))
+			else:
+				problems.append("{}: la pregunta era {} y el objeto muestra {}".format(where, str(expected)[:90], str(shown)[:90]))
 		if ctype == "ia.container.flex":
 			width = str(labels[0].get("position", {}).get("basis", "")) if labels else ""
 			if (width.endswith("px") or width.endswith("%")) and params.get("questionBasis") != width:
