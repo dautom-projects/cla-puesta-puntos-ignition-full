@@ -58,6 +58,8 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - Vistas que el Template nunca abre (el tipo de la ruta sale de un mapa fijo sin espacios): `F&A/Form_AC10-0201_30min D`, `_SKU D`, `F&A/Form_AC10-0202_30min D`, `_SKU D`, `_start D` y `F&A/Form__end` (sin referencia en el nombre), desde el checkpoint `1a0ba2b`. No se estandarizan; decidir si se borran
 
+- `Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedan nativos en el estándar porque cada contenedor de fila (`FlexContainer_N`) lee el `props.value` de su campo; convertirlos pide cambiar esa referencia a mano (revisar qué hace el contenedor con el valor)
+
 ## Errores de los reportes (encontrados al revisar los PDF de los pilotos, 2026-10-26)
 
 - Reporte `Clarios/Andina/Ensamble/EA11-1601`: el PDF falla con error 500 en los dos ciclos de prueba (`java.lang.StackOverflowError` en `RMLinkedText.getXString`, recursión del texto que pagina). Ya pasó el 2026-10-21, antes de los objetos estándar; la plantilla no cambia desde el checkpoint `1a0ba2b` y el original y el piloto guardan el mismo DataAnswer (`--compare-db --exact`). Sospecha: textos con el desborde por defecto en cajas más bajas que una línea (p. ej. "3" + salto de línea en x=346 y=38, 20×10 con letra de 12, y `@twohourN.papoItemID11208@` con salto de línea en cajas de 10 de alto). Revisarlo en el Designer (Overflow → Shrink) y probar el PDF

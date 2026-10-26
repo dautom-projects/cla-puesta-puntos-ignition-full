@@ -4,12 +4,12 @@
 - Vistas: 351
 - Scripts de proyecto: 23
 - Eventos (gateway y sesion): 2
-- Mensajes: 74
+- Mensajes: 73
 - Tags referenciados: 264
 - Paginas y docks: 8
 - Clases de estilo: 105
 - Session props: 5
-- Relaciones: 4816 (usa tag 720, llama 667, embebe/abre 417, maneja 382, monta 8, envia 517, usa sesion 276, usa estilo 1829)
+- Relaciones: 4810 (usa tag 720, llama 667, embebe/abre 420, maneja 379, monta 8, envia 506, usa sesion 276, usa estilo 1834)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -21,8 +21,8 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 270
 - **Objects/Checkbox** (cla-project) — directo 127, transitivo 129
 - **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 106
-- **Objects/TextField** (cla-project) — directo 95, transitivo 97
-- **Objects/Dropdown** (cla-project) — directo 56, transitivo 58
+- **Objects/TextField** (cla-project) — directo 97, transitivo 99
+- **Objects/Dropdown** (cla-project) — directo 57, transitivo 59
 - **Objects/NumericField** (cla-project) — directo 36, transitivo 38
 - **Page/Embedded/Metalurgia/Fundamental Views/Checkbox** (cla-project) — directo 19, transitivo 19
 - **Objects/OptionGroup** (cla-project) — directo 10, transitivo 12
@@ -33,7 +33,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **alerts** (cla-project) — directo 19, transitivo 269
 - **papo_core.ui** (cla-project) — directo 245, transitivo 247
 - **papo_core.register** (cla-project) — directo 241, transitivo 243
-- **papo_core.items** (cla-project) — directo 9, transitivo 145
+- **papo_core.items** (cla-project) — directo 9, transitivo 147
 - **papo_core.sign** (cla-project) — directo 101, transitivo 104
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
@@ -165,7 +165,7 @@ _Senal fuerte de un messageType renombrado de un solo lado. Los envios con nombr
 - `signatureTimeout` (cla-project)
 - `trends` (cla-project)
 
-### Se manejan y nadie los envia (16)
+### Se manejan y nadie los envia (15)
 - `createRelation` (cla-project)
 - `deleteSch` (cla-project)
 - `deleteWO` (cla-project)
@@ -173,7 +173,6 @@ _Senal fuerte de un messageType renombrado de un solo lado. Los envios con nombr
 - `refresh` (cla-project)
 - `refreshTableSch` (cla-project)
 - `saveDataRoot` (cla-project)
-- `saveStartRegister` (cla-project)
 - `saveStartRegister-2201-end` (cla-project)
 - `saveStartShift` (cla-project)
 - `signOperator` (cla-project)
