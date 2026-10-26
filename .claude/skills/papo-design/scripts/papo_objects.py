@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.4.0
+Version: 2.5.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -33,6 +33,8 @@ Changelog:
 		differs); display transforms after the description query are dropped
 	2026-10-26 | William M. | v2.4.0 - papoItemID fixed in custom.item (--static-ids): the runtime value of the
 		basePapo + index (and similar) bindings is computed with item_ids.py and the binding removed
+	2026-10-26 | William M. | v2.5.0 - Time fields: startNow instead of the value stored in the design (the native
+		date-time input shows the time the form opens)
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -198,8 +200,10 @@ def objectParams(component, rule, stats, moved=False):
 			answer=chosen[0] if chosen else "-")
 		return params, bindings
 	elif kind == "time":
-		value = props.get("value")
-		params.update(pickerType=props.get("pickerType", "time"), format="h:mm:ss a", value=value, answer=qa._formatTime(value))
+		# The native field opens with the current time (not the value stored in the design): startNow
+		params.update(pickerType=props.get("pickerType", "time"), format="h:mm:ss a", value=None, answer=None)
+		if "props.value" not in propConfig:
+			params["startNow"] = True
 	elif ctype == "ia.input.dropdown":
 		labelMode = kind == "label"
 		value = props.get("value")

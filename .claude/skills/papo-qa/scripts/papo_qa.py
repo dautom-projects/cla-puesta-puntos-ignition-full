@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.6.0
+Version: 1.7.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -31,6 +31,8 @@ Changelog:
 		the same text (SELECT); the description query with display transforms counts as the item description
 	2026-10-26 | William M. | v1.6.0 - Stage 2 compares the runtime papoItemID (item_ids.py): a computed ID now
 		fixed in custom.item with the same value collects the same item
+	2026-10-26 | William M. | v1.7.0 - Time fields open with the current time: the object needs startNow; --exact
+		compares times of day by format only (each save opens at another time)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -77,6 +79,8 @@ V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDat
 VALUE_PROP = {"ia.input.checkbox": ("selected", False), "ia.input.numeric-entry-field": ("value", None),
 	"ia.input.text-field": ("text", ""), "ia.input.dropdown": ("value", None)}
 EMPTY_DASH = 'return value if value else "-"'
+OPENS_NOW = "hora de apertura"
+RE_TIME_OF_DAY = re.compile(r"^\d{1,2}:\d{2}:\d{2} [AP]M$")
 DESCRIPTION_QUERY = "SELECT Description FROM papoitem WHERE ID = ?"
 RE_DEFAULT_PLACEHOLDER = re.compile(r"^\s*esc?r?i?ba(\s+aqu[ií])?\s*$", re.I)
 OWN_VALUE = {"ia.input.checkbox": "selected", "ia.input.numeric-entry-field": "value", "ia.input.text-field": "text",
@@ -182,7 +186,8 @@ def nativeAnswer(source):
 	if ctype == "ia.input.date-time-input":
 		b = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
 		if b.get("config", {}).get("path") == "this.props.value" and any('SimpleDateFormat("h:mm:ss a"' in (t.get("code") or "") for t in b.get("transforms", [])):
-			return _formatTime, (node.get("props") or {}).get("value")
+			# The native date-time input opens with the current time, not the value stored in the design
+			return _formatTime, (OPENS_NOW if "props.value" not in node.get("propConfig", {}) else (node.get("props") or {}).get("value"))
 		return None, "fecha con lógica no reconocida"
 	if ctype not in VALUE_PROP:
 		return None, "tipo {}".format(ctype)
@@ -323,6 +328,12 @@ def stageAnswers(cur, base):
 			if fnOld(value) != fnNew(value):
 				problems.append("{}: con valor {!r} el original responde {!r} y el objeto {!r}".format(new["id"], value, fnOld(value), fnNew(value)))
 				break
+		if defOld == OPENS_NOW:
+			params = node["props"].get("params", {})
+			if not params.get("startNow") or params.get("value") is not None:
+				problems.append("{}: el campo abre con la hora actual y el objeto no tiene startNow".format(new["id"]))
+			checked += 1
+			continue
 		expected = fnOld(defOld)
 		if expected != defNew:
 			problems.append("{}: respuesta sin abrir la sección {!r}, el original guardaba {!r}".format(new["id"], defNew, expected))
@@ -743,14 +754,19 @@ def stageData(pilotID, originalID, exact=False):
 		problems.append("ítems solo en el piloto: {} · solo en el original: {} ({} contra {})".format(onlyA or "-", onlyB or "-", len(a), len(b)))
 	if [i for i in idsA if i in idsB] != [i for i in idsB if i in idsA]:
 		problems.append("los ítems comunes están en otro orden")
-	byID = {i["papoItemID"]: i for i in b}
-	for x in a:
-		y = byID.get(x["papoItemID"])
-		if y is None:
-			continue
+	# Same IDs in the same order: compare position by position (a repeated papoItemID keeps its own answer)
+	if idsA == idsB:
+		pairs = list(zip(a, b))
+	else:
+		byID = {i["papoItemID"]: i for i in b}
+		pairs = [(x, byID[x["papoItemID"]]) for x in a if x["papoItemID"] in byID]
+	for x, y in pairs:
 		if x.get("registerTypeID") != y.get("registerTypeID"):
 			problems.append("{}: registerTypeID {} contra {}".format(x["papoItemID"], x.get("registerTypeID"), y.get("registerTypeID")))
 		if exact:
+			times = [isinstance(v, str) and bool(RE_TIME_OF_DAY.match(v)) for v in (x.get("answer"), y.get("answer"))]
+			if all(times):
+				continue  # time of day: each save opened the form at another time
 			if x.get("answer") != y.get("answer"):
 				problems.append("{}: respuesta {!r} contra {!r}".format(x["papoItemID"], x.get("answer"), y.get("answer")))
 			continue

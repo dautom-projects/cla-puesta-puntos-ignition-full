@@ -1,4 +1,4 @@
-# Objetos estándar de PAPO (v2.4)
+# Objetos estándar de PAPO (v2.5)
 
 Vistas `Objects/*` que encapsulan el diseño y el comportamiento de un campo: el mapeo Cumple/No Cumple, el color por rango, la respuesta del dropdown y el texto de la pregunta. El formulario solo pasa parámetros. Diseño de las clases y el tema: `ESTANDAR_DISENO.md`.
 
@@ -31,7 +31,7 @@ El `custom.item` sigue en el componente del formulario dentro de `FlexContainerG
 | `Objects/TextField` | text field | el texto | `placeholder`, `questionAsPlaceholder` |
 | `Objects/Dropdown` | dropdown | la etiqueta de la opción elegida (`answerFrom: "label"`) o su valor (`"value"`) | `options` (fijas o con el mismo binding que tenía el campo), `placeholder` ("Seleccionar"), `showClearIcon` |
 | `Objects/OptionGroup` | radio group (una opción entre varias) en una fila, alineado con la pregunta | el texto elegido, o `emptyAnswer` ("-") | `options` (lista de textos). Cada radio lleva `selected` calculado desde `value` (v2.4): el radio de Perspective renderiza `<input name="radio" checked={selected}>` y, sin `selected`, el input quedaba sin controlar y la primera opción podía quedar marcada en el navegador sin estarlo, de modo que el primer clic no hacía nada |
-| `Objects/DateTime` | selector de fecha u hora | el valor con `format` (por defecto `h:mm:ss a`, como los formularios) | `pickerType` ("time"), `format` |
+| `Objects/DateTime` | selector de fecha u hora | el valor con `format` (por defecto `h:mm:ss a`, como los formularios) | `pickerType` ("time"), `format`, `startNow`: sin valor arranca con la hora en que se abre el formulario, como el campo nativo (v2.5; un `onChange` en `value` la repone si el formulario empuja su valor vacío después) |
 | `Objects/Label` | valor de tag (solo lectura) | el valor del tag | `tagPath` |
 
 Diseño interno: cada `Field` usa su clase `PAPO/Field/*`; dentro de un formulario con `PAPO/Form` recibe además el tema corregido. La raíz de cada objeto es `position: relative`: el `<input>` oculto del checkbox y del radio de Perspective es `position: absolute` y, sin un contenedor posicionado, quedaba ubicado respecto a la raíz del Template; en secciones largas, al hacer clic el navegador desplazaba la página hasta él y se veía en blanco (v2.3).

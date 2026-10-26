@@ -88,10 +88,16 @@ window.papoUiCheck = async function (opts) {
 	for (const section of sections) {
 		const name = text(section);
 		const s = {name, rows: 0, problems: [], warnings: []};
+		const group = section.nextElementSibling;
+		const isOpen = () => group && getComputedStyle(group).display !== "none" && group.clientHeight > 0;
 		section.click();
 		await sleep(o.wait);
-		const group = section.nextElementSibling;
-		if (!group || getComputedStyle(group).display === "none" || group.clientHeight === 0) {
+		// A section that starts open closes on the first click: open it again
+		if (!isOpen()) {
+			section.click();
+			await sleep(o.wait);
+		}
+		if (!isOpen()) {
 			s.warnings.push("la sección no abrió o está vacía");
 			report.sections.push(s);
 			continue;

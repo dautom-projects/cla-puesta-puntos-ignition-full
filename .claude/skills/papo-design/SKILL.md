@@ -43,7 +43,7 @@ Estándar completo de un formulario (primero clases, luego objetos, luego QA):
 
 ```bash
 python3 .claude/skills/papo-design/scripts/papo_design.py --views "<vista>" --apply
-python3 .claude/skills/papo-design/scripts/papo_objects.py --views "<vista>" --legacy --form-class --apply
+python3 .claude/skills/papo-design/scripts/papo_objects.py --views "<vista>" --legacy --form-class --static-ids --questions-sql <archivo.sql> --apply
 python3 .claude/skills/papo-qa/scripts/papo_qa.py --views "<vista>" --graph
 ```
 
