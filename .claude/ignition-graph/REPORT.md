@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 105
 - Session props: 5
-- Relaciones: 4807 (usa tag 720, llama 666, embebe/abre 532, maneja 334, monta 8, envia 344, usa sesion 279, usa estilo 1924)
+- Relaciones: 4807 (usa tag 720, llama 664, embebe/abre 542, maneja 334, monta 8, envia 344, usa sesion 279, usa estilo 1916)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -19,12 +19,12 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 ### Vistas
 - **Alerts/alert** (cla-project) — directo 1, transitivo 270
 - **Alerts/alertAndComment** (cla-project) — directo 1, transitivo 270
-- **Objects/Checkbox** (cla-project) — directo 163, transitivo 165
+- **Objects/Checkbox** (cla-project) — directo 164, transitivo 166
 - **Objects/TextField** (cla-project) — directo 133, transitivo 135
 - **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 106
-- **Objects/Dropdown** (cla-project) — directo 91, transitivo 93
-- **Objects/NumericField** (cla-project) — directo 60, transitivo 62
-- **Objects/OptionGroup** (cla-project) — directo 11, transitivo 13
+- **Objects/Dropdown** (cla-project) — directo 93, transitivo 95
+- **Objects/NumericField** (cla-project) — directo 64, transitivo 66
+- **Objects/OptionGroup** (cla-project) — directo 14, transitivo 16
 - **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
 - **Page/Embedded/Title_Header** (cla-project) — directo 5, transitivo 9
 
@@ -33,7 +33,7 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **alerts** (cla-project) — directo 19, transitivo 269
 - **papo_core.ui** (cla-project) — directo 245, transitivo 247
 - **papo_core.register** (cla-project) — directo 244, transitivo 246
-- **papo_core.items** (cla-project) — directo 9, transitivo 196
+- **papo_core.items** (cla-project) — directo 7, transitivo 196
 - **papo_core.sign** (cla-project) — directo 101, transitivo 104
 - **mes_core.sql** (cla-project) — directo 4, transitivo 22
 - **mes_core.model** (cla-project) — directo 19, transitivo 21
