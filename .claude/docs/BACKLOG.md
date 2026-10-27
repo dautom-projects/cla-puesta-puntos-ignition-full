@@ -57,6 +57,8 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `custom.insights` de los formularios (original y estándar): `preInsight` usa `initialPapoDateTime` y solo se recalcula cuando cambia el texto de Observaciones; si el operario no escribe nada se guarda el turno y la hora del diseño ("T: 3, H: 14:35" en un registro de las 07:55; en el PDF de PO11-0101 sale "T: 3, H: 14:13")
 
 - `F&A/Form_GR10-0501_start` a 1920x1080: filas más bajas que su alto en 10 secciones (Tanque soda 4, Tanque ácido puro 3, Tanques 1–7 y Torres 1 cada una); igual en el original y en el piloto — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
+- `OREC/Form_EJ11-0101_1h` (también en el original): no guarda nada. Su único ítem (7914 "Referencia", una etiqueta que muestra un tag con color de rango) está en `FlexContainer1`, fuera de un `FlexContainerGroupN`, y sin `custom.item.answer`; los registros de 1 hora solo llevan el comentario
+- `OREC/Form_PO07-0101_start` (también en el original, registro 624 de junio): 10 ítems se guardan dos veces (8108–8112, 8124–8128…), el primero `null`; el reporte toma el primero e imprime "None"
 - `F&A/Form_FO10-0601_input`: el autocompletado de circuitos por número de mesa no funciona (tampoco en el original): el script de `custom.circuitsOptions` / `custom.tableCombined` y sus bindings buscan `FlexContainerGroup1/FlexContainer1`, que no existe (la mesa y "Mesa combinada" están directo en `FlexContainerGroup1`). Corregir la ruta si se quiere el autocompletado
 - `F&A/Form_GR10-0501_start`: 7 checkbox ocultos (`position.display: false`) en "Tanque soda" y "Tanque ácido puro" con `custom.item_dev` (no se recolectan) y un binding de pregunta que lee `custom.item` y falla; no se ven, pero dejan errores en el cliente. Quedan nativos en el estándar. Decidir si se borran
 - Numéricos con rango en los originales (AC10, CU11, PO11, GR10, EA11-0901): dentro de rango el texto es gris o gris oscuro; `getRangeColor` del estándar lo deja negro (el rojo fuera de rango es igual)
@@ -72,7 +74,26 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - Reporte `Clarios/Andina/Ensamble/EA11-1601`: el PDF falla con error 500 en los dos ciclos de prueba (`java.lang.StackOverflowError` en `RMLinkedText.getXString`, recursión del texto que pagina). Ya pasó el 2026-10-21, antes de los objetos estándar; la plantilla no cambia desde el checkpoint `1a0ba2b` y el original y el piloto guardan el mismo DataAnswer (`--compare-db --exact`). Sospecha: textos con el desborde por defecto en cajas más bajas que una línea (p. ej. "3" + salto de línea en x=346 y=38, 20×10 con letra de 12, y `@twohourN.papoItemID11208@` con salto de línea en cajas de 10 de alto). Revisarlo en el Designer (Overflow → Shrink) y probar el PDF
 - Reporte `Clarios/Andina/F&A/AC10-0201`: la fila "CUMPLE NIVEL MEDIDO CON GALGA?" (ítem 5840) solo tiene `@register1..4.papoItemID5840@` y una clave `@register.papoItemID5840@` sin número; desde el quinto registro del ciclo la columna sale vacía aunque se guardó "Cumple" (las filas vecinas, 5845 y 6464, van de `register1` a `register12`)
-- Reporte `Clarios/Andina/OREC/EJ11-0101`: la caja de "Velocidad de las aspas" (placa estándar) muestra dos valores ("7.0 7.0") en el PDF del ciclo de prueba; el original y el estándar guardan el mismo DataAnswer, así que viene de la plantilla
+- Reporte `Clarios/Andina/OREC/EJ11-0101`: la caja de "Velocidad de las aspas" (placa estándar) muestra dos valores ("7.0 7.0") en el PDF del ciclo de prueba; el original y el estándar guardan el mismo DataAnswer, así que viene de la plantilla (la casilla repite la clave: `@shift1.papoItemID4574@ @shift1.papoItemID4574@`, confirmado en la prueba general)
+
+## Errores de los reportes (prueba general, 2026-10-27)
+
+Se corrigen en el Designer (el formulario guarda bien en todos estos casos; comparado celda por celda contra el DataAnswer):
+
+- `F&A/GR10-0501`: la sección "al inicio de cada turno" tiene una columna por turno y su consulta trae los tipos 3, 5, 6, 7 y 8; el Fin cae en el turno de un Inicio y lo reemplaza, así que las respuestas de ese Inicio no salen en el PDF. Además la columna "Tanque 4" usa `register1` tres veces (ítem 6551: `@register1.papoItemID6551@` en x 507, 524 y 540)
+- `F&A/PT11-0104`: las dos casillas del ítem 6257 usan `@register1.cumplepapoItemID6257@` / `nocumple…` (sin punto) y el script crea `register1.cumple.papoItemID6257`: su marca nunca sale
+- `Metalurgia/TR11-0101`: `rangoReprocesed = list(range(6303, 6350))` deja fuera el 6350 ("Objetivo diario a producir, lo conoce?"), así que su marca Cumple / No cumple no sale; `startShift.papoItemID10949` (Supervisor) no lo llena el script
+- `Metalurgia/TR11-0102`: la grilla mensual turno × día (`turnoN.diaD`) sale vacía aunque el Inicio del 27 está guardado con 24 "Cumple"; el script llega al final (el comentario sí sale). Revisar con la vista previa del Designer (papoID 1106, nodeID 10, registerCode 1)
+- `Metalurgia/SO02-4502` (grilla semanal día × turno): tres casillas tienen las claves de dos columnas (`@shift6.papoItemID4501@ @shift7.papoItemID4501@`, `@shift1…4509@ @shift5…4509@`, `@shift16…4521@ @shift17…4521@`)
+- `OREC/EC07-0101`: la referencia de la barcada (ítem 7931) se corta en la casilla de 26 px ("ZN NEGATI" de "ZN NEGATIVA COM 85X")
+- Valores de tag sin dato (PA11-0301 pH, EJ07-0101 Temp_Horno, EJ11-0102 Temp_Horno / Cantidad_Placas): el script hace `str(None)` y el PDF imprime "None". En develop no hay tags; en producción pasa si el tag está en mala calidad
+- El registro de Fin no tiene sección en varios reportes (CG10-0101, FO10-1701-1, PT11-0104, TE11-2601, TE11-0601, FU10-0202, FU11-0101, PA11-0301/0401, RE10-0102, SO02-1006/4502, TR11-0102, CI11-0101, CU11-0101, EC11-0101, EJ07/EJ11, MZ07/MZ11, PO11-0101-N, RJ11-0101-N); confirmar si es lo esperado
+- Textos en vertical (usuario y firma por turno en SO02-1006 / SO02-4502): la herramienta de la prueba no los lee; revisarlos a ojo en el PDF
+
+## Datos y configuración (prueba general, 2026-10-27)
+
+- `nodepapo` 2136 asigna CG10-0101 al nodo 1001 "PC" (tipo `Workstation`): el Template solo saca el área de nodos LINE o CELL y abre `Page/Embedded/None/...` ("View Not Found"). Sus registros anteriores están en las líneas 84 y 85; la prueba se hizo en la 85
+- `papo_core.register._getLastRegisterCode` numera los ciclos por (`WorkstationNodeID`, `PapoID`), pero los reportes y Gestión filtran por (`PapoID`, `NodeID`, `RegisterCode`): si un PAPO se llena en el mismo nodo desde dos estaciones, los ciclos se cruzan. Pasa en PO07-0101 (estaciones 22 y 27 con el código 1) y su PDF mezcla registros de junio. Decidir si el código se toma por nodo
 
 ## Preguntas desde papoitem (fases 2 y 3)
 
