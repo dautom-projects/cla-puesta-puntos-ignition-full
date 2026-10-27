@@ -391,14 +391,8 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.value"
+                        "path": "this.props.params.answer"
                       },
-                      "transforms": [
-                        {
-                          "code": "\n\treturn value if value else \"-\"",
-                          "type": "script"
-                        }
-                      ],
                       "type": "property"
                     }
                   },
@@ -415,91 +409,107 @@
                       ],
                       "type": "property"
                     }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
                   }
                 },
                 "props": {
-                  "options": [
-                    {
-                      "label": 1,
-                      "value": 1
-                    },
-                    {
-                      "label": 2,
-                      "value": 2
-                    },
-                    {
-                      "label": 3,
-                      "value": 3
-                    },
-                    {
-                      "label": 4,
-                      "value": 4
-                    },
-                    {
-                      "label": 5,
-                      "value": 5
-                    },
-                    {
-                      "label": 6,
-                      "value": 6
-                    },
-                    {
-                      "label": 7,
-                      "value": 7
-                    },
-                    {
-                      "label": 8,
-                      "value": 8
-                    },
-                    {
-                      "label": 9,
-                      "value": 9
-                    },
-                    {
-                      "label": 10,
-                      "value": 10
-                    },
-                    {
-                      "label": 11,
-                      "value": 11
-                    },
-                    {
-                      "label": 12,
-                      "value": 12
-                    },
-                    {
-                      "label": 13,
-                      "value": 13
-                    },
-                    {
-                      "label": 14,
-                      "value": 14
-                    },
-                    {
-                      "label": 15,
-                      "value": 15
-                    },
-                    {
-                      "label": 16,
-                      "value": 16
-                    },
-                    {
-                      "label": 17,
-                      "value": 17
-                    },
-                    {
-                      "label": 18,
-                      "value": 18
-                    }
-                  ],
+                  "params": {
+                    "answer": 1,
+                    "answerFrom": "value",
+                    "emptyAnswer": "-",
+                    "options": [
+                      {
+                        "label": 1,
+                        "value": 1
+                      },
+                      {
+                        "label": 2,
+                        "value": 2
+                      },
+                      {
+                        "label": 3,
+                        "value": 3
+                      },
+                      {
+                        "label": 4,
+                        "value": 4
+                      },
+                      {
+                        "label": 5,
+                        "value": 5
+                      },
+                      {
+                        "label": 6,
+                        "value": 6
+                      },
+                      {
+                        "label": 7,
+                        "value": 7
+                      },
+                      {
+                        "label": 8,
+                        "value": 8
+                      },
+                      {
+                        "label": 9,
+                        "value": 9
+                      },
+                      {
+                        "label": 10,
+                        "value": 10
+                      },
+                      {
+                        "label": 11,
+                        "value": 11
+                      },
+                      {
+                        "label": 12,
+                        "value": 12
+                      },
+                      {
+                        "label": 13,
+                        "value": 13
+                      },
+                      {
+                        "label": 14,
+                        "value": 14
+                      },
+                      {
+                        "label": 15,
+                        "value": 15
+                      },
+                      {
+                        "label": 16,
+                        "value": 16
+                      },
+                      {
+                        "label": 17,
+                        "value": 17
+                      },
+                      {
+                        "label": 18,
+                        "value": 18
+                      }
+                    ],
+                    "showQuestion": false,
+                    "value": 1
+                  },
+                  "path": "Objects/Dropdown",
                   "style": {
-                    "classes": "PAPO/Field/Dropdown",
                     "marginBottom": 10,
                     "marginTop": 10
                   },
-                  "value": 1
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.dropdown"
+                "type": "ia.display.view"
               }
             ],
             "meta": {
@@ -528,26 +538,8 @@
               "custom.item.answer": {
                 "binding": {
                   "config": {
-                    "path": "this.props.selected"
+                    "path": "this.props.params.answer"
                   },
-                  "transforms": [
-                    {
-                      "fallback": "none",
-                      "inputType": "scalar",
-                      "mappings": [
-                        {
-                          "input": true,
-                          "output": "Cumple"
-                        },
-                        {
-                          "input": false,
-                          "output": "No Cumple"
-                        }
-                      ],
-                      "outputType": "scalar",
-                      "type": "map"
-                    }
-                  ],
                   "type": "property"
                 }
               },
@@ -565,7 +557,7 @@
                   "type": "property"
                 }
               },
-              "props.style.fontSize": {
+              "props.params.fontSize": {
                 "binding": {
                   "config": {
                     "path": "view.custom.fontSize"
@@ -573,27 +565,29 @@
                   "type": "property"
                 }
               },
-              "props.text": {
+              "props.params.papoItemID": {
                 "binding": {
                   "config": {
                     "path": "this.custom.item.papoItemID"
                   },
-                  "transforms": [
-                    {
-                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT Description\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"Description\"]\n\telse:\n\t\treturn None",
-                      "type": "script"
-                    }
-                  ],
                   "type": "property"
                 }
               }
             },
             "props": {
-              "style": {
-                "classes": "PAPO/Field/Checkbox"
-              }
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
             },
-            "type": "ia.input.checkbox"
+            "type": "ia.display.view"
           },
           {
             "children": [
@@ -758,7 +752,7 @@
                   "props.enabled": {
                     "binding": {
                       "config": {
-                        "path": ".../Checkbox1.props.selected"
+                        "path": ".../Checkbox1.props.params.value"
                       },
                       "type": "property"
                     }
@@ -933,7 +927,7 @@
                   "props.enabled": {
                     "binding": {
                       "config": {
-                        "path": ".../Checkbox1.props.selected"
+                        "path": ".../Checkbox1.props.params.value"
                       },
                       "type": "property"
                     }
@@ -1414,7 +1408,7 @@
                   "custom.item.answer": {
                     "binding": {
                       "config": {
-                        "path": "this.props.value"
+                        "path": "this.props.params.answer"
                       },
                       "type": "property"
                     }
@@ -1432,599 +1426,614 @@
                       ],
                       "type": "property"
                     }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
                   }
                 },
                 "props": {
-                  "options": [
-                    {
-                      "label": "U1 3x2 AX",
-                      "value": 8
-                    },
-                    {
-                      "label": "U1 4x3 AX",
-                      "value": 10
-                    },
-                    {
-                      "label": "U1 4x4 AX",
-                      "value": 11
-                    },
-                    {
-                      "label": "U1 5x4 AX",
-                      "value": 12
-                    },
-                    {
-                      "label": "U1 6x5 AX",
-                      "value": 3
-                    },
-                    {
-                      "label": "NS40 5X4 GN AX",
-                      "value": 15
-                    },
-                    {
-                      "label": "NS40 5X4 GN BZ",
-                      "value": 16
-                    },
-                    {
-                      "label": "NS40 5X5 AX",
-                      "value": 17
-                    },
-                    {
-                      "label": "B19 5X4 GN AX",
-                      "value": 13
-                    },
-                    {
-                      "label": "B19 5X4 GN BZ",
-                      "value": 14
-                    },
-                    {
-                      "label": "B19 5X4 GN AX",
-                      "value": 13
-                    },
-                    {
-                      "label": "B19 5X4 GN BZ",
-                      "value": 14
-                    },
-                    {
-                      "label": "NS60 5X4 GN AX",
-                      "value": 21
-                    },
-                    {
-                      "label": "NS60 6X5 GN AX",
-                      "value": 22
-                    },
-                    {
-                      "label": "NS60 6X6 GN AX",
-                      "value": 123
-                    },
-                    {
-                      "label": "NS60 7X6 GN AX",
-                      "value": 23
-                    },
-                    {
-                      "label": "B24 5X4 GN AX",
-                      "value": 18
-                    },
-                    {
-                      "label": "B24 6X5 GN AX",
-                      "value": 19
-                    },
-                    {
-                      "label": "B24 6X6 GN AX",
-                      "value": 140
-                    },
-                    {
-                      "label": "B24 7X6 GN AX",
-                      "value": 20
-                    },
-                    {
-                      "label": "B24 7X6 GN AY",
-                      "value": 24
-                    },
-                    {
-                      "label": "36 4X3 LN AX",
-                      "value": 25
-                    },
-                    {
-                      "label": "36 5X4 LN AX",
-                      "value": 26
-                    },
-                    {
-                      "label": "36 5X5 LN AX",
-                      "value": 27
-                    },
-                    {
-                      "label": "36 5x5 LN AW",
-                      "value": 30
-                    },
-                    {
-                      "label": "LBN1 5X4 LN AX",
-                      "value": 28
-                    },
-                    {
-                      "label": "LBN1 5X5 LN AX",
-                      "value": 29
-                    },
-                    {
-                      "label": "LBN1 5X5 LN AW",
-                      "value": 30
-                    },
-                    {
-                      "label": "L1 5X4 ZN AX",
-                      "value": 31
-                    },
-                    {
-                      "label": "L1 5X5 ZN BX",
-                      "value": 32
-                    },
-                    {
-                      "label": "LN1 5X4 ZN AX",
-                      "value": 33
-                    },
-                    {
-                      "label": "58 5X5 LN AX",
-                      "value": 34
-                    },
-                    {
-                      "label": "58 7X6 LN BY",
-                      "value": 116
-                    },
-                    {
-                      "label": "58 7x7 AX",
-                      "value": 148
-                    },
-                    {
-                      "label": "58 7x7 BX",
-                      "value": 149
-                    },
-                    {
-                      "label": "42 4X4 LN AW",
-                      "value": 35
-                    },
-                    {
-                      "label": "42 5X4 LN AX",
-                      "value": 36
-                    },
-                    {
-                      "label": "42 5X5 LN AW",
-                      "value": 37
-                    },
-                    {
-                      "label": "42 6X5 LN AX",
-                      "value": 39
-                    },
-                    {
-                      "label": "42 6X6 LN AW",
-                      "value": 40
-                    },
-                    {
-                      "label": "42 6X6 LN AX",
-                      "value": 41
-                    },
-                    {
-                      "label": "42 7X6 LN AX",
-                      "value": 42
-                    },
-                    {
-                      "label": "42 7X6 LN BY",
-                      "value": 43
-                    },
-                    {
-                      "label": "LBN2 4x4 LN AW",
-                      "value": 44
-                    },
-                    {
-                      "label": "LBN2 5X4 LN AX",
-                      "value": 45
-                    },
-                    {
-                      "label": "LBN2 5X5 LN AW",
-                      "value": 46
-                    },
-                    {
-                      "label": "LBN2 5X5 LN AX",
-                      "value": 47
-                    },
-                    {
-                      "label": "LBN2 6X5 LN AX",
-                      "value": 48
-                    },
-                    {
-                      "label": "LBN2 6X6 LN AW",
-                      "value": 49
-                    },
-                    {
-                      "label": "LBN2 6X6 LN AX",
-                      "value": 50
-                    },
-                    {
-                      "label": "LBN2 7X6 LN AX",
-                      "value": 51
-                    },
-                    {
-                      "label": "LBN2 7X6 LN BY",
-                      "value": 52
-                    },
-                    {
-                      "label": "47 5X4 ZN AX",
-                      "value": 53
-                    },
-                    {
-                      "label": "47 5X5 ZN AX",
-                      "value": 54
-                    },
-                    {
-                      "label": "47 6X6 ZN AX",
-                      "value": 55
-                    },
-                    {
-                      "label": "47 7X6 ZN AX",
-                      "value": 56
-                    },
-                    {
-                      "label": "REN 47 7X6 MED",
-                      "value": 57
-                    },
-                    {
-                      "label": "REN 47 6X6 LN DZ",
-                      "value": 9
-                    },
-                    {
-                      "label": "48 6X5 LN AX",
-                      "value": 80
-                    },
-                    {
-                      "label": "48 7X6 LN AX",
-                      "value": 81
-                    },
-                    {
-                      "label": "48 8X7 LN AX",
-                      "value": 82
-                    },
-                    {
-                      "label": "LBN3 6X5 LN AX",
-                      "value": 83
-                    },
-                    {
-                      "label": "LBN3 6X5 LNAY",
-                      "value": 124
-                    },
-                    {
-                      "label": "LBN3 7X6 LN AX",
-                      "value": 68
-                    },
-                    {
-                      "label": "LBN3 8X7 LN AX",
-                      "value": 84
-                    },
-                    {
-                      "label": "LBN3 8X7 LN BY",
-                      "value": 85
-                    },
-                    {
-                      "label": "LBN3 8X8 LN BY",
-                      "value": 64
-                    },
-                    {
-                      "label": "LN3 10X9 Z Imp",
-                      "value": 119
-                    },
-                    {
-                      "label": "75 6X5 LN AX",
-                      "value": 86
-                    },
-                    {
-                      "label": "75 7X6 LN BY",
-                      "value": 117
-                    },
-                    {
-                      "label": "75DT 6X5 LN AX",
-                      "value": 87
-                    },
-                    {
-                      "label": "75DT 7X6 LN BY",
-                      "value": 117
-                    },
-                    {
-                      "label": "85/86 6X5 LN AX",
-                      "value": 88
-                    },
-                    {
-                      "label": "85/86 7X6 LN AX",
-                      "value": 89
-                    },
-                    {
-                      "label": "25/35 5X4 CN AX",
-                      "value": 90
-                    },
-                    {
-                      "label": "25/35 5X4 CN AZ",
-                      "value": 122
-                    },
-                    {
-                      "label": "25/35 5X5 CN AX",
-                      "value": 141
-                    },
-                    {
-                      "label": "25/35 6X5 CN AX",
-                      "value": 91
-                    },
-                    {
-                      "label": "78 8X7 MED AX",
-                      "value": 92
-                    },
-                    {
-                      "label": "78DT 8X7 MED AX",
-                      "value": 93
-                    },
-                    {
-                      "label": "34 5X4 ZN AX",
-                      "value": 4
-                    },
-                    {
-                      "label": "34 5X5 ZN AX",
-                      "value": 79
-                    },
-                    {
-                      "label": "34 6X5 ZN AX",
-                      "value": 126
-                    },
-                    {
-                      "label": "34 6X6 ZN AW",
-                      "value": 108
-                    },
-                    {
-                      "label": "34 6X6 ZN BX",
-                      "value": 66
-                    },
-                    {
-                      "label": "34 7X7 ZN AW",
-                      "value": 107
-                    },
-                    {
-                      "label": "34 7X7 ZN BX",
-                      "value": 94
-                    },
-                    {
-                      "label": "34 8X7 ZN AX",
-                      "value": 95
-                    },
-                    {
-                      "label": "34PMV 5X5 ZN AX",
-                      "value": 96
-                    },
-                    {
-                      "label": "34 6X5 ZN AX",
-                      "value": 126
-                    },
-                    {
-                      "label": "34PMV 6X6 ZN AW",
-                      "value": 108
-                    },
-                    {
-                      "label": "34PMV 6X6 ZN BX",
-                      "value": 66
-                    },
-                    {
-                      "label": "34PMV 7X7 ZN AW",
-                      "value": 107
-                    },
-                    {
-                      "label": "34PMV 7X7 ZN BX",
-                      "value": 94
-                    },
-                    {
-                      "label": "34PMV 8X7 ZN AX",
-                      "value": 95
-                    },
-                    {
-                      "label": "24 4X4 CN AX",
-                      "value": 74
-                    },
-                    {
-                      "label": "24 5X4CN AX",
-                      "value": 127
-                    },
-                    {
-                      "label": "24 5X5 CN AX",
-                      "value": 75
-                    },
-                    {
-                      "label": "24 6X5 CN AX",
-                      "value": 76
-                    },
-                    {
-                      "label": "24 6X6 CN AY",
-                      "value": 7
-                    },
-                    {
-                      "label": "24 7X6 CN AX",
-                      "value": 77
-                    },
-                    {
-                      "label": "24 7X7 CN AX",
-                      "value": 129
-                    },
-                    {
-                      "label": "24 7X7 CN AX GM",
-                      "value": 65
-                    },
-                    {
-                      "label": "59 7X6 CN AX",
-                      "value": 97
-                    },
-                    {
-                      "label": "27 6X5 CN AX",
-                      "value": 78
-                    },
-                    {
-                      "label": "27 6X6 CN AY",
-                      "value": 128
-                    },
-                    {
-                      "label": "27 7X6 CN AX",
-                      "value": 62
-                    },
-                    {
-                      "label": "27 8X7 CN AX",
-                      "value": 6
-                    },
-                    {
-                      "label": "27 8X8 CN AX",
-                      "value": 143
-                    },
-                    {
-                      "label": "27 9X8 CN AV",
-                      "value": 144
-                    },
-                    {
-                      "label": "65 8X7 LN AX",
-                      "value": 98
-                    },
-                    {
-                      "label": "65 9X8 LN AX",
-                      "value": 73
-                    },
-                    {
-                      "label": "65 9X8 LN BY",
-                      "value": 99
-                    },
-                    {
-                      "label": "LN2 IMPO 6X6",
-                      "value": 145
-                    },
-                    {
-                      "label": "LN4 PMV 11X10 Z Imp",
-                      "value": 118
-                    },
-                    {
-                      "label": "LN5 PMV 11X11",
-                      "value": 106
-                    },
-                    {
-                      "label": "31 7X6 CN AY",
-                      "value": 58
-                    },
-                    {
-                      "label": "31 7X7 CN AY",
-                      "value": 69
-                    },
-                    {
-                      "label": "31 8x7 CN AV",
-                      "value": 125
-                    },
-                    {
-                      "label": "31 8X8 CN AX",
-                      "value": 70
-                    },
-                    {
-                      "label": "31 9X8 CN AV",
-                      "value": 120
-                    },
-                    {
-                      "label": "31 9X9 CN AX",
-                      "value": 59
-                    },
-                    {
-                      "label": "31 10X9 CN AY GM",
-                      "value": 71
-                    },
-                    {
-                      "label": "31 10x9 CN AY",
-                      "value": 130
-                    },
-                    {
-                      "label": "31 10X10 CN AY",
-                      "value": 109
-                    },
-                    {
-                      "label": "31 11X10 CN AY/AV",
-                      "value": 131
-                    },
-                    {
-                      "label": "31BT 7X6 CN AY",
-                      "value": 134
-                    },
-                    {
-                      "label": "31BT 7X7 CN AY",
-                      "value": 135
-                    },
-                    {
-                      "label": "31BT 8X8 CN AX",
-                      "value": 136
-                    },
-                    {
-                      "label": "31BT 9X9 CN AX",
-                      "value": 137
-                    },
-                    {
-                      "label": "31BT 10X9 CN AY",
-                      "value": 138
-                    },
-                    {
-                      "label": "31BT 10X10 CN AY",
-                      "value": 139
-                    },
-                    {
-                      "label": "31BT 11X10 CN AY/AV",
-                      "value": 133
-                    },
-                    {
-                      "label": "4DLT 9X9 AX",
-                      "value": 100
-                    },
-                    {
-                      "label": "4DLT 10X10 AX",
-                      "value": 67
-                    },
-                    {
-                      "label": "4DLT 12X12 AX",
-                      "value": 101
-                    },
-                    {
-                      "label": "4D 10X9 AX",
-                      "value": 72
-                    },
-                    {
-                      "label": "4D 11X10 AX",
-                      "value": 60
-                    },
-                    {
-                      "label": "4D 12X11 BY",
-                      "value": 63
-                    },
-                    {
-                      "label": "4D 12X12 AX GM",
-                      "value": 115
-                    },
-                    {
-                      "label": "8D 12X11 AW",
-                      "value": 110
-                    },
-                    {
-                      "label": "8D 13X12 AW",
-                      "value": 111
-                    },
-                    {
-                      "label": "8D 14X13 AW",
-                      "value": 112
-                    },
-                    {
-                      "label": "8D 14X14 AW",
-                      "value": 105
-                    },
-                    {
-                      "label": "8D 15X14 AW",
-                      "value": 113
-                    }
-                  ],
+                  "params": {
+                    "answer": 8,
+                    "answerFrom": "value",
+                    "options": [
+                      {
+                        "label": "U1 3x2 AX",
+                        "value": 8
+                      },
+                      {
+                        "label": "U1 4x3 AX",
+                        "value": 10
+                      },
+                      {
+                        "label": "U1 4x4 AX",
+                        "value": 11
+                      },
+                      {
+                        "label": "U1 5x4 AX",
+                        "value": 12
+                      },
+                      {
+                        "label": "U1 6x5 AX",
+                        "value": 3
+                      },
+                      {
+                        "label": "NS40 5X4 GN AX",
+                        "value": 15
+                      },
+                      {
+                        "label": "NS40 5X4 GN BZ",
+                        "value": 16
+                      },
+                      {
+                        "label": "NS40 5X5 AX",
+                        "value": 17
+                      },
+                      {
+                        "label": "B19 5X4 GN AX",
+                        "value": 13
+                      },
+                      {
+                        "label": "B19 5X4 GN BZ",
+                        "value": 14
+                      },
+                      {
+                        "label": "B19 5X4 GN AX",
+                        "value": 13
+                      },
+                      {
+                        "label": "B19 5X4 GN BZ",
+                        "value": 14
+                      },
+                      {
+                        "label": "NS60 5X4 GN AX",
+                        "value": 21
+                      },
+                      {
+                        "label": "NS60 6X5 GN AX",
+                        "value": 22
+                      },
+                      {
+                        "label": "NS60 6X6 GN AX",
+                        "value": 123
+                      },
+                      {
+                        "label": "NS60 7X6 GN AX",
+                        "value": 23
+                      },
+                      {
+                        "label": "B24 5X4 GN AX",
+                        "value": 18
+                      },
+                      {
+                        "label": "B24 6X5 GN AX",
+                        "value": 19
+                      },
+                      {
+                        "label": "B24 6X6 GN AX",
+                        "value": 140
+                      },
+                      {
+                        "label": "B24 7X6 GN AX",
+                        "value": 20
+                      },
+                      {
+                        "label": "B24 7X6 GN AY",
+                        "value": 24
+                      },
+                      {
+                        "label": "36 4X3 LN AX",
+                        "value": 25
+                      },
+                      {
+                        "label": "36 5X4 LN AX",
+                        "value": 26
+                      },
+                      {
+                        "label": "36 5X5 LN AX",
+                        "value": 27
+                      },
+                      {
+                        "label": "36 5x5 LN AW",
+                        "value": 30
+                      },
+                      {
+                        "label": "LBN1 5X4 LN AX",
+                        "value": 28
+                      },
+                      {
+                        "label": "LBN1 5X5 LN AX",
+                        "value": 29
+                      },
+                      {
+                        "label": "LBN1 5X5 LN AW",
+                        "value": 30
+                      },
+                      {
+                        "label": "L1 5X4 ZN AX",
+                        "value": 31
+                      },
+                      {
+                        "label": "L1 5X5 ZN BX",
+                        "value": 32
+                      },
+                      {
+                        "label": "LN1 5X4 ZN AX",
+                        "value": 33
+                      },
+                      {
+                        "label": "58 5X5 LN AX",
+                        "value": 34
+                      },
+                      {
+                        "label": "58 7X6 LN BY",
+                        "value": 116
+                      },
+                      {
+                        "label": "58 7x7 AX",
+                        "value": 148
+                      },
+                      {
+                        "label": "58 7x7 BX",
+                        "value": 149
+                      },
+                      {
+                        "label": "42 4X4 LN AW",
+                        "value": 35
+                      },
+                      {
+                        "label": "42 5X4 LN AX",
+                        "value": 36
+                      },
+                      {
+                        "label": "42 5X5 LN AW",
+                        "value": 37
+                      },
+                      {
+                        "label": "42 6X5 LN AX",
+                        "value": 39
+                      },
+                      {
+                        "label": "42 6X6 LN AW",
+                        "value": 40
+                      },
+                      {
+                        "label": "42 6X6 LN AX",
+                        "value": 41
+                      },
+                      {
+                        "label": "42 7X6 LN AX",
+                        "value": 42
+                      },
+                      {
+                        "label": "42 7X6 LN BY",
+                        "value": 43
+                      },
+                      {
+                        "label": "LBN2 4x4 LN AW",
+                        "value": 44
+                      },
+                      {
+                        "label": "LBN2 5X4 LN AX",
+                        "value": 45
+                      },
+                      {
+                        "label": "LBN2 5X5 LN AW",
+                        "value": 46
+                      },
+                      {
+                        "label": "LBN2 5X5 LN AX",
+                        "value": 47
+                      },
+                      {
+                        "label": "LBN2 6X5 LN AX",
+                        "value": 48
+                      },
+                      {
+                        "label": "LBN2 6X6 LN AW",
+                        "value": 49
+                      },
+                      {
+                        "label": "LBN2 6X6 LN AX",
+                        "value": 50
+                      },
+                      {
+                        "label": "LBN2 7X6 LN AX",
+                        "value": 51
+                      },
+                      {
+                        "label": "LBN2 7X6 LN BY",
+                        "value": 52
+                      },
+                      {
+                        "label": "47 5X4 ZN AX",
+                        "value": 53
+                      },
+                      {
+                        "label": "47 5X5 ZN AX",
+                        "value": 54
+                      },
+                      {
+                        "label": "47 6X6 ZN AX",
+                        "value": 55
+                      },
+                      {
+                        "label": "47 7X6 ZN AX",
+                        "value": 56
+                      },
+                      {
+                        "label": "REN 47 7X6 MED",
+                        "value": 57
+                      },
+                      {
+                        "label": "REN 47 6X6 LN DZ",
+                        "value": 9
+                      },
+                      {
+                        "label": "48 6X5 LN AX",
+                        "value": 80
+                      },
+                      {
+                        "label": "48 7X6 LN AX",
+                        "value": 81
+                      },
+                      {
+                        "label": "48 8X7 LN AX",
+                        "value": 82
+                      },
+                      {
+                        "label": "LBN3 6X5 LN AX",
+                        "value": 83
+                      },
+                      {
+                        "label": "LBN3 6X5 LNAY",
+                        "value": 124
+                      },
+                      {
+                        "label": "LBN3 7X6 LN AX",
+                        "value": 68
+                      },
+                      {
+                        "label": "LBN3 8X7 LN AX",
+                        "value": 84
+                      },
+                      {
+                        "label": "LBN3 8X7 LN BY",
+                        "value": 85
+                      },
+                      {
+                        "label": "LBN3 8X8 LN BY",
+                        "value": 64
+                      },
+                      {
+                        "label": "LN3 10X9 Z Imp",
+                        "value": 119
+                      },
+                      {
+                        "label": "75 6X5 LN AX",
+                        "value": 86
+                      },
+                      {
+                        "label": "75 7X6 LN BY",
+                        "value": 117
+                      },
+                      {
+                        "label": "75DT 6X5 LN AX",
+                        "value": 87
+                      },
+                      {
+                        "label": "75DT 7X6 LN BY",
+                        "value": 117
+                      },
+                      {
+                        "label": "85/86 6X5 LN AX",
+                        "value": 88
+                      },
+                      {
+                        "label": "85/86 7X6 LN AX",
+                        "value": 89
+                      },
+                      {
+                        "label": "25/35 5X4 CN AX",
+                        "value": 90
+                      },
+                      {
+                        "label": "25/35 5X4 CN AZ",
+                        "value": 122
+                      },
+                      {
+                        "label": "25/35 5X5 CN AX",
+                        "value": 141
+                      },
+                      {
+                        "label": "25/35 6X5 CN AX",
+                        "value": 91
+                      },
+                      {
+                        "label": "78 8X7 MED AX",
+                        "value": 92
+                      },
+                      {
+                        "label": "78DT 8X7 MED AX",
+                        "value": 93
+                      },
+                      {
+                        "label": "34 5X4 ZN AX",
+                        "value": 4
+                      },
+                      {
+                        "label": "34 5X5 ZN AX",
+                        "value": 79
+                      },
+                      {
+                        "label": "34 6X5 ZN AX",
+                        "value": 126
+                      },
+                      {
+                        "label": "34 6X6 ZN AW",
+                        "value": 108
+                      },
+                      {
+                        "label": "34 6X6 ZN BX",
+                        "value": 66
+                      },
+                      {
+                        "label": "34 7X7 ZN AW",
+                        "value": 107
+                      },
+                      {
+                        "label": "34 7X7 ZN BX",
+                        "value": 94
+                      },
+                      {
+                        "label": "34 8X7 ZN AX",
+                        "value": 95
+                      },
+                      {
+                        "label": "34PMV 5X5 ZN AX",
+                        "value": 96
+                      },
+                      {
+                        "label": "34 6X5 ZN AX",
+                        "value": 126
+                      },
+                      {
+                        "label": "34PMV 6X6 ZN AW",
+                        "value": 108
+                      },
+                      {
+                        "label": "34PMV 6X6 ZN BX",
+                        "value": 66
+                      },
+                      {
+                        "label": "34PMV 7X7 ZN AW",
+                        "value": 107
+                      },
+                      {
+                        "label": "34PMV 7X7 ZN BX",
+                        "value": 94
+                      },
+                      {
+                        "label": "34PMV 8X7 ZN AX",
+                        "value": 95
+                      },
+                      {
+                        "label": "24 4X4 CN AX",
+                        "value": 74
+                      },
+                      {
+                        "label": "24 5X4CN AX",
+                        "value": 127
+                      },
+                      {
+                        "label": "24 5X5 CN AX",
+                        "value": 75
+                      },
+                      {
+                        "label": "24 6X5 CN AX",
+                        "value": 76
+                      },
+                      {
+                        "label": "24 6X6 CN AY",
+                        "value": 7
+                      },
+                      {
+                        "label": "24 7X6 CN AX",
+                        "value": 77
+                      },
+                      {
+                        "label": "24 7X7 CN AX",
+                        "value": 129
+                      },
+                      {
+                        "label": "24 7X7 CN AX GM",
+                        "value": 65
+                      },
+                      {
+                        "label": "59 7X6 CN AX",
+                        "value": 97
+                      },
+                      {
+                        "label": "27 6X5 CN AX",
+                        "value": 78
+                      },
+                      {
+                        "label": "27 6X6 CN AY",
+                        "value": 128
+                      },
+                      {
+                        "label": "27 7X6 CN AX",
+                        "value": 62
+                      },
+                      {
+                        "label": "27 8X7 CN AX",
+                        "value": 6
+                      },
+                      {
+                        "label": "27 8X8 CN AX",
+                        "value": 143
+                      },
+                      {
+                        "label": "27 9X8 CN AV",
+                        "value": 144
+                      },
+                      {
+                        "label": "65 8X7 LN AX",
+                        "value": 98
+                      },
+                      {
+                        "label": "65 9X8 LN AX",
+                        "value": 73
+                      },
+                      {
+                        "label": "65 9X8 LN BY",
+                        "value": 99
+                      },
+                      {
+                        "label": "LN2 IMPO 6X6",
+                        "value": 145
+                      },
+                      {
+                        "label": "LN4 PMV 11X10 Z Imp",
+                        "value": 118
+                      },
+                      {
+                        "label": "LN5 PMV 11X11",
+                        "value": 106
+                      },
+                      {
+                        "label": "31 7X6 CN AY",
+                        "value": 58
+                      },
+                      {
+                        "label": "31 7X7 CN AY",
+                        "value": 69
+                      },
+                      {
+                        "label": "31 8x7 CN AV",
+                        "value": 125
+                      },
+                      {
+                        "label": "31 8X8 CN AX",
+                        "value": 70
+                      },
+                      {
+                        "label": "31 9X8 CN AV",
+                        "value": 120
+                      },
+                      {
+                        "label": "31 9X9 CN AX",
+                        "value": 59
+                      },
+                      {
+                        "label": "31 10X9 CN AY GM",
+                        "value": 71
+                      },
+                      {
+                        "label": "31 10x9 CN AY",
+                        "value": 130
+                      },
+                      {
+                        "label": "31 10X10 CN AY",
+                        "value": 109
+                      },
+                      {
+                        "label": "31 11X10 CN AY/AV",
+                        "value": 131
+                      },
+                      {
+                        "label": "31BT 7X6 CN AY",
+                        "value": 134
+                      },
+                      {
+                        "label": "31BT 7X7 CN AY",
+                        "value": 135
+                      },
+                      {
+                        "label": "31BT 8X8 CN AX",
+                        "value": 136
+                      },
+                      {
+                        "label": "31BT 9X9 CN AX",
+                        "value": 137
+                      },
+                      {
+                        "label": "31BT 10X9 CN AY",
+                        "value": 138
+                      },
+                      {
+                        "label": "31BT 10X10 CN AY",
+                        "value": 139
+                      },
+                      {
+                        "label": "31BT 11X10 CN AY/AV",
+                        "value": 133
+                      },
+                      {
+                        "label": "4DLT 9X9 AX",
+                        "value": 100
+                      },
+                      {
+                        "label": "4DLT 10X10 AX",
+                        "value": 67
+                      },
+                      {
+                        "label": "4DLT 12X12 AX",
+                        "value": 101
+                      },
+                      {
+                        "label": "4D 10X9 AX",
+                        "value": 72
+                      },
+                      {
+                        "label": "4D 11X10 AX",
+                        "value": 60
+                      },
+                      {
+                        "label": "4D 12X11 BY",
+                        "value": 63
+                      },
+                      {
+                        "label": "4D 12X12 AX GM",
+                        "value": 115
+                      },
+                      {
+                        "label": "8D 12X11 AW",
+                        "value": 110
+                      },
+                      {
+                        "label": "8D 13X12 AW",
+                        "value": 111
+                      },
+                      {
+                        "label": "8D 14X13 AW",
+                        "value": 112
+                      },
+                      {
+                        "label": "8D 14X14 AW",
+                        "value": 105
+                      },
+                      {
+                        "label": "8D 15X14 AW",
+                        "value": 113
+                      }
+                    ],
+                    "showQuestion": false,
+                    "value": 8
+                  },
+                  "path": "Objects/Dropdown",
                   "style": {
-                    "classes": "PAPO/Field/Dropdown",
                     "marginBottom": 10,
                     "marginTop": 10
                   },
-                  "value": 8
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
                 },
-                "type": "ia.input.dropdown"
+                "type": "ia.display.view"
               }
             ],
             "meta": {
@@ -2103,7 +2112,7 @@
                   "props.text": {
                     "binding": {
                       "config": {
-                        "path": ".../FlexContainer_0/Dropdown.props.value"
+                        "path": ".../FlexContainer_0/Dropdown.props.params.value"
                       },
                       "type": "property"
                     }
@@ -2266,7 +2275,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "2": "{.../FlexContainer_11/Dropdown.props.value}",
                           "path": "{view.custom.path}"
                         },
@@ -2370,7 +2379,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "2": "{.../FlexContainer_11/Dropdown.props.value}",
                           "path": "{view.custom.path}"
                         },
@@ -2474,7 +2483,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "2": "{.../FlexContainer_11/Dropdown.props.value}",
                           "path": "{view.custom.path}"
                         },
@@ -3109,7 +3118,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "path": "{view.custom.path}"
                         },
                         "tagPath": "{path}/Mesa_{1}/Select_WaterLv"
@@ -3212,7 +3221,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "path": "{view.custom.path}"
                         },
                         "tagPath": "{path}/Mesa_{1}/AI_InWaterLv"
@@ -3315,7 +3324,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "path": "{view.custom.path}"
                         },
                         "tagPath": "{path}/Mesa_{1}/AI_OutWaterLv"
@@ -3418,7 +3427,7 @@
                         "fallbackDelay": 2.5,
                         "mode": "indirect",
                         "references": {
-                          "1": "{.../FlexContainer_6/Dropdown.props.value}",
+                          "1": "{.../FlexContainer_6/Dropdown.props.params.value}",
                           "path": "{view.custom.path}"
                         },
                         "tagPath": "{path}/Mesa_{1}/WaterTemp"
