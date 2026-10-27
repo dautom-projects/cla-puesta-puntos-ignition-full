@@ -18,10 +18,10 @@ En cada registro, `ui_check.js` llena todos los campos, abre cada sección (sin 
 
 | Área | PAPOs | Ciclos completos | PDF igual a lo guardado | Pendiente |
 |---|---|---|---|---|
-| Ensamble | 11 | 11 | 10 (EA11-1601 sin PDF: error 500 del reporte) | Reportes EA11-0901, EA11-1101, EA11-1501 y EA11-1601 (BACKLOG) |
-| F&A | 19 | 19 | 19 | Plantillas GR10-0501 y PT11-0104 (BACKLOG) |
-| Metalurgia | 10 | 10 | 10 | Reportes TR11-0101, TR11-0102 y SO02-4502 (BACKLOG) |
-| OREC | 26 | 26 | 26 | Reporte EC07-0101; PO07-0101 mezcla ciclos de dos estaciones (BACKLOG) |
+| Ensamble | 11 | 11 | 11 (EA11-1601 ya genera PDF) | Reportes EA11-0901, EA11-1101 y EA11-1501 (BACKLOG) |
+| F&A | 19 | 19 | 19 | Casilla única de Torres en GR10-0501 (BACKLOG) |
+| Metalurgia | 10 | 10 | 10 | — |
+| OREC | 26 | 26 | 26 | PO07-0101 mezcla ciclos de dos estaciones; EJ11-0101 clave repetida (BACKLOG) |
 | General | 3 | 3 | 3 | — |
 
 Todos los formularios guardan y firman.
@@ -36,21 +36,18 @@ Todos los formularios guardan y firman.
 | `ed49f9e` | Fila comprimida en "Seguridad" de TR11-0101_start |
 | `580b304`, `127f19e` | Regresión del estándar: el Guardar de MZ11-0101_4h enviaba `saveStartShift`, un handler legacy que se había quitado, y el registro de 4 horas no se guardaba. papo_qa v1.14.0 lo revisa |
 | `253829d` | Hallazgos de reportes, datos y originales en el BACKLOG |
+| `cf12c10` y siguiente | `report_bin.py` y los 7 reportes corregidos sin el Designer: EA11-1601 (ya genera PDF), GR10-0501, PT11-0104, TR11-0101, TR11-0102 (la grilla mensual ya muestra las marcas), SO02-4502 y EC07-0101 |
 
 Después de las dos regresiones se revisaron todas las vistas Form_* con las comprobaciones nuevas: no queda ninguna con el problema.
 
 ## Lo que no es del estándar (BACKLOG)
 
-- **Reportes (Designer):**
-  - GR10-0501: el Fin reemplaza el Inicio de su turno
-  - PT11-0104: clave sin punto en el ítem 6257
-  - TR11-0101: el rango deja fuera el 6350
-  - TR11-0102: grilla mensual vacía
-  - SO02-4502: tres casillas con claves de dos columnas
-  - EJ11-0101: clave repetida, sale "7.0 7.0"
-  - EC07-0101: referencia de la barcada cortada
-  - EA11-1601: error 500
-  - Varios reportes no tienen sección para el Fin
+- **Reportes:**
+  - Corregidos el 2026-10-27 con `report_bin.py`: GR10-0501, PT11-0104, TR11-0101, TR11-0102, SO02-4502, EC07-0101 y EA11-1601
+  - Abiertos:
+    - GR10-0501: la casilla única de Torres en y=342 muestra el 6603
+    - EJ11-0101: clave repetida, sale "7.0 7.0"
+    - Varios reportes no tienen sección para el Fin
 - **Datos:**
   - CG10-0101 asignado a un nodo `Workstation`: "View Not Found"; se probó en la línea 85
   - `RegisterCode` se numera por estación, pero los reportes filtran por nodo (PO07-0101)
