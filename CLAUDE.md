@@ -141,6 +141,7 @@ comparten el mismo timestamp exacto). Bug ya corregido en papo_core.sign.
 - `.claude/docs/CONTEXT_AUTOMATIZACION_JSON.md` — cómo inyectar wrappers en view.json
 - `.claude/docs/DATABASE_SCHEMA.dbml` — esquema de papo_db generado desde la base viva (notas de dominio, conteos y catálogos)
 - `.claude/docs/DEPLOY_INVENTORY.md` — registro de cambios aplicados para desplegar
+- `.claude/docs/DESPLIEGUE_ESTANDAR.md` — orden de despliegue a producción del estándar (Library → clases → objetos → tema → SQL → formularios) y cómo revertir
 - `.claude/docs/BACKLOG.md` — pendientes y horizonte del proyecto
 - `.claude/docs/ESTANDAR_DISENO.md` — estándar de diseño de formularios (clases `PAPO/`, papo-design, despliegue por fases)
 - `.claude/docs/OBJETOS_ESTANDAR.md` — contrato de los objetos `Objects/` (v2), condiciones y herramienta papo_objects
