@@ -38,7 +38,7 @@ Changelog:
 4. Las firmas (operario y supervisor) viven en `Page/Digitalizacion_Template` y quedan fuera de este procedimiento.
 5. `dbConnection` siempre de `view.custom` o `session.custom`; nunca `"papo_db"` escrito. `papo_core` se llama sin `project.`.
 6. Los valores de tag (labels con `custom.item` que muestran un tag) quedan nativos, con la clase `PAPO/Field/TagValue`: un objeto en una sección cerrada no se monta y no podría leer el tag.
-7. Un campo con lógica propia que el objeto no reproduce igual queda nativo (con su clase `PAPO/Field/*`). Ejemplos: un numérico que solo exige un mínimo, un campo que otro componente referencia, un dropdown que combina dos valores.
+7. Un campo con lógica propia que el objeto no reproduce igual queda nativo (con su clase `PAPO/Field/*`). Ejemplos: un dropdown cuya respuesta combina otro valor, un numérico con dos rangos válidos, un campo que un script lee o cambia. Un campo que el resto de la vista solo lee en bindings sí pasa a objeto, con el mismo nombre, y esos bindings leen `props.params.value` (papo_objects v2.12).
 8. Los `view.json` no se reescriben con `json.dump` (Ignition usa Gson y escapa `'` `=` `<` `>`): ediciones puntuales o las herramientas, que escriben Gson canónico.
 9. Los objetos `Objects/*` no se editan a mano: se generan con `build_objects.py`.
 10. Los errores que ya tiene el formulario original (ítems repetidos, grupos que no se guardan, plantillas de reporte rotas) se reproducen tal cual y se anotan en el BACKLOG; se corrigen aparte con `/bug`, nunca en el mismo cambio de estandarización.
@@ -230,8 +230,10 @@ Parámetros comunes: `question`, `papoItemID`, `showQuestion`, `questionBasis`, 
 
 ### Rango de los numéricos
 
-- [ ] El rango (`minValue`, `maxValue`) tiene que pintar de rojo **exactamente los mismos valores** que el script de color del original. Los originales lo escriben de varias formas (`rang_down`..`rang_up`, `start ± rang`, solo un mínimo); la herramienta ejecuta ese script con valores de prueba y deduce el rango
-- [ ] Si el rojo del original no es un rango cerrado (p. ej. "mayor a 12,75", solo un mínimo), el campo **queda nativo** con su lógica
+- [ ] El rango (`minValue`, `maxValue`) tiene que pintar de rojo **exactamente los mismos valores** que el script de color del original. Los originales lo escriben de varias formas: `rang_down`..`rang_up`, `start ± rang`, `start · (1 ± porc)`, `getRangeColor` con límites fijos, o el máximo `"9999…"` en texto. La herramienta ejecuta ese script como Jython 2 con valores de prueba y deduce el rango
+- [ ] Solo un mínimo (p. ej. "mayor a 12,75"): el máximo es `"9999999999999999999999999"`, como ya lo hacían los formularios (decisión del 2026-10-27)
+- [ ] Límites que dependen de otro campo (p. ej. el tamaño de batería): `minValue` y `maxValue` quedan enlazados a ese campo; la QA compara los límites en cada estado
+- [ ] Un script que lee un `custom` que el campo no tiene nunca pinta: el objeto queda sin rango. Si el rojo no es un rango cerrado (dos rangos válidos), el campo **queda nativo**
 - [ ] Dentro de rango el objeto muestra el texto negro y el borde gris; fuera de rango, texto y borde rojos
 
 ### Supervisor
@@ -387,7 +389,7 @@ Una vista no se commitea si no pasa las etapas 1–7.
 
 - `Cubiertas/Form_PL11-0101-CA_start`, `-CU_start`, `-S&A_start`: sin los wrappers de la v2 (su `answerRecopile` tiene lógica propia); se estandarizan a mano
 - `Metalurgia/Form_FU10-0202_start`: JSON no canónico; guardarlo en el Designer para normalizarlo y luego aplicar las herramientas
-- Los campos que quedan nativos (referenciados por otro componente, con lógica propia o con una propiedad que el objeto no tiene) se revisan uno por uno
+- Los campos que quedan nativos se revisan uno por uno (fase 5, 2026-10-27: de 111 quedan 3 campos nativos a propósito: el numérico de dos rangos de CI11-0101 y el `Dropdown_0` de FO10-0100 y FO10-0601; ver `DEPLOY_INVENTORY.md`)
 
 ---
 

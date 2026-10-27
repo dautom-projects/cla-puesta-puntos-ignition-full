@@ -43,6 +43,12 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `Ensamble/Form_EA11-1601_start` (desde 2026-08-31): `Checkbox_4`/`_5` y `_6`/`_7` de "Estado Termoselladora" tienen el mismo `papoItemID` (11190 y 11191): preguntas repetidas en pantalla y en el registro, y faltan 11192 y 11193
 - `F&A/Form_GR10-0501_start` (desde el checkpoint `1a0ba2b`, 2026-10-22): en `FlexContainerGroup13/S4` las etiquetas de 5997 y 5998 pasaron a numéricos con ID calculado (`basePapo + índice`) que da 5999 y 6000, repetidos; 5981 se repite 35 veces y 6192 dos (ya en julio)
 - `OREC/Form_PO11-0101-2_start`: 5168 se guarda dos veces (ya en septiembre)
+- `OREC/Form_PO11-0101-1_start` … `-4_start` (confirmado en la fase 5, 2026-10-27): el contenedor "Antes del arranque o durante el proceso" guarda 5168 con el texto marcado, su `Checkbox` guarda 5168 otra vez (Cumple / No Cumple) y `Checkbox_1` guarda 5169, que no existe en `papoitem`. `Metalurgia/Form_FU11-0101_start` usa esos mismos 5168 y 5169 para "Mantenimiento Predictivo / Correctivo" (su contenedor es 7906). El estándar lo conserva igual
+- `Ensamble/Form_EA11-1603_1h`: el script de color de 19 numéricos lee `rang_down` / `rang_up`, que el campo no tiene; el binding fallaba y nunca se pintaban de rojo. Convertidos sin rango (decisión del usuario, 2026-10-27): falta definir esos rangos
+- `POLY/Form_PL11-0101-CAJA_start`: el grupo "CAV2" guarda en 9177, que la base describe como "CAV1 (primera) // Verificacion altura troquelado con galga" (¿ID equivocado?). Se dejó el texto corto fijo
+- `F&A/Form_FO10-0100_input` y `FO10-0601_input`: la respuesta de `Dropdown_0` es `str(<Dropdown>) + " - " + str(<Dropdown_0>)`, y `Dropdown` tiene `custom.item_dev` (no se guarda). Nunca responde "-" ("None - None"). Queda nativo: un objeto tiene que responder su propio valor
+- `OREC/Form_CI11-0101_start` `NumericEntryField_6`: válido en 0 o entre 90 y 150 (dos rangos). Queda nativo (decisión del usuario, 2026-10-27)
+- `Ensamble/Form_EA11-0901_2h`: una etiqueta de "Parámetros de operación y control proceso" muestra "null" (igual en el original)
 - `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado) — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
 - `papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196: es el dato, se ve igual en el original
 - `OREC/Form_CU11-0101_start`: no existe `FlexContainerGroup7`; `papo_core.register.save` recorre los grupos 1..N y los 4 checkbox de `FlexContainerGroup8` nunca se guardan
@@ -77,6 +83,8 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `papo_core.ui.getShift(dateTime=None)` existe sin uso: reemplazar los cálculos con `getHour24` (ui.preInsight, sign.autoCloseOpenForms, report x2, custom.shift de Metalurgia FU10-0202_dia y TR11-0102_start, que además tiene el bug de turno)
 
 ## Verificaciones pendientes
+
+- Base de prueba: ningún ítem de EA11-0901 (papo 1) tiene el tipo 2 en `papoitem_registertype`, así que el Template nunca muestra el botón "2 hr". La `_2h` se probó puesta un momento en la ruta de `_1h` (2026-10-27); confirmar en producción que el botón existe
 
 - `papo_core.register._getLastRegisterCode` ordena por `ID DESC` en lugar de `RegisterCode DESC` (la regla del proyecto); en la práctica devuelve lo mismo porque ID es creciente
 
