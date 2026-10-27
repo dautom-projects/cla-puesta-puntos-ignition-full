@@ -93,9 +93,16 @@ def _addInventoryRow(row):
 
 
 def _allDone(out, views):
-	"""Every view of the run is applied or unchanged (no error, no rejected view)."""
-	states = re.findall(r"^- `?(.+?)`? · (aplicada|sin cambios|error|rechazada)", out, re.M)
-	return len(states) == len(views) and all(s in ("aplicada", "sin cambios") for _, s in states)
+	"""Every view of the run is applied or unchanged (no error, no rejected view).
+
+	papo_design prints a table (| sin cambios | 2 |) and papo_objects a summary line (Vistas: 2 sin cambios, 1 aplicada).
+	"""
+	states = r"(aplicada|aplicable|sin cambios|error|rechazada)"
+	counts = [(state, int(n)) for state, n in re.findall(r"^\| " + states + r" \| (\d+) \|$", out, re.M)]
+	summary = re.search(r"^Vistas: (.+)$", out, re.M)
+	if summary:
+		counts += [(state, int(n)) for n, state in re.findall(r"(\d+) " + states, summary.group(1))]
+	return bool(counts) and all(s in ("aplicada", "sin cambios") for s, _ in counts) and sum(n for _, n in counts) == len(views)
 
 
 def standardizeFamily(area, family, phase=3):
