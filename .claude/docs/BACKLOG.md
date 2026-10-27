@@ -84,6 +84,8 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 ## Verificaciones pendientes
 
+- Producción (export de F&A del 2026-10-27 10:32): los dropdowns nuevos de `AC10-0201_start` y `_mmto` tienen guardado "Hubo" y el de `AC10-1801_30min` 101; si el operario no elige, el registro guarda ese valor. En develop ya están limpios (`9f05d29`); se corrige en producción al desplegar estas vistas
+
 - Base de prueba: ningún ítem de EA11-0901 (papo 1) tiene el tipo 2 en `papoitem_registertype`, así que el Template nunca muestra el botón "2 hr". La `_2h` se probó puesta un momento en la ruta de `_1h` (2026-10-27); confirmar en producción que el botón existe
 
 - `papo_core.register._getLastRegisterCode` ordena por `ID DESC` en lugar de `RegisterCode DESC` (la regla del proyecto); en la práctica devuelve lo mismo porque ID es creciente
