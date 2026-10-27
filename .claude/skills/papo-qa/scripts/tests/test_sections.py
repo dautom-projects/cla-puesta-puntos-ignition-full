@@ -43,6 +43,14 @@ class SectionsTest(unittest.TestCase):
 		self.assertEqual(group["position"]["shrink"], 0)
 		self.assertEqual(group["custom"]["baseBasisPx"], 2615)
 
+	def test_labelWithoutHeight(self):
+		# EA11-4101_2h: "Referencia hora/hora" (basis -141.2%, rendered auto: 23 px) above 25 + 200 px rows
+		view, group = _view(225, [(25, 0), (200, 0)])
+		group["children"].insert(0, {"meta": {"name": "Label_3"}, "type": "ia.display.label", "position": {"basis": "-141.2%"},
+			"props": {"text": "Referencia hora/hora"}})
+		objects.fitSections(view, collections.Counter())
+		self.assertEqual(group["custom"]["baseBasisPx"], 248)
+
 	def test_alreadyFits(self):
 		view, group = _view(500, [(50, 0)] * 4)
 		stats = collections.Counter()

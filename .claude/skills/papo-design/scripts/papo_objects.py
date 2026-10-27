@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.13.0
+Version: 2.13.1
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -63,6 +63,8 @@ Changelog:
 		checkbox that answers its own Sí / No text
 	2026-10-27 | William M. | v2.13.0 - Bounds chosen by other fields (ranges.dynamicRange, EA11-2501_2h): minValue /
 		maxValue bound to the same struct; numeric inputBounds carried to the object (Objects/NumericField v2.6)
+	2026-10-27 | William M. | v2.13.1 - A label row without a px height counts the height of its text lines in the
+		section (the general test found sections cut by "Referencia hora/hora" labels of 23 px counted as 0)
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -862,6 +864,23 @@ def _conflict(references, removed, keepItem):
 	return False
 
 
+# Line height of a label without a fixed height: the forms use view.custom.fontSize (17 px -> 23 px rows)
+DEFAULT_FONT_PX = 17
+LINE_FACTOR = 1.35
+
+
+def _labelHeight(child):
+	"""Rendered height of a label row with an automatic height: its text lines at its font size."""
+	props = child.get("props") or {}
+	size = ((props.get("textStyle") or {}).get("fontSize") or (props.get("style") or {}).get("fontSize"))
+	try:
+		size = float(str(size).replace("px", "")) if size else DEFAULT_FONT_PX
+	except ValueError:
+		size = DEFAULT_FONT_PX
+	lines = max(1, str(props.get("text", "") or "").count("\n") + 1)
+	return -(-size * LINE_FACTOR * lines // 1)
+
+
 def _pxSum(group):
 	total = 0.0
 	for child in group.get("children", []):
@@ -880,6 +899,9 @@ def _pxSum(group):
 				total += float(basis[:-2])
 			except ValueError:
 				pass
+		elif child.get("type") == "ia.display.label" and (basis in ("", "auto") or basis.startswith("-")):
+			# No height, or an invalid negative basis the browser treats as auto
+			total += _labelHeight(child)
 	return total
 
 
