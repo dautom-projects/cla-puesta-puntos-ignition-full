@@ -1,6 +1,6 @@
 # QA de formularios PAPO
 
-Generado: 2026-10-27 09:10 · Baseline: `HEAD` · Vistas: 1
+Generado: 2026-10-27 09:11 · Baseline: `HEAD` · Vistas: 1
 
 Resultado: **PASA** · 1 vistas pasan, 0 fallan
 
@@ -10,7 +10,7 @@ Resultado: **PASA** · 1 vistas pasan, 0 fallan
 
 ## Por vista
 
-### `Page/Embedded/Cubiertas/Form_PL11-0101-CA_start` · PASA · 110 ítems, 2 respuestas comparadas
+### `Page/Embedded/General/Form_PL11-0101-CA_start` · PASA · 112 ítems, 2 respuestas comparadas
 - ✅ 1 Estructura
 - ✅ 2 Recolección
 - ✅ 3 Respuestas
