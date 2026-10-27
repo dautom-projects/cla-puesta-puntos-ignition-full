@@ -9,7 +9,7 @@
 - Paginas y docks: 8
 - Clases de estilo: 105
 - Session props: 5
-- Relaciones: 4807 (usa tag 720, llama 664, embebe/abre 542, maneja 334, monta 8, envia 344, usa sesion 279, usa estilo 1916)
+- Relaciones: 4812 (usa tag 720, llama 664, embebe/abre 547, maneja 334, monta 8, envia 344, usa sesion 279, usa estilo 1916)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
@@ -22,8 +22,8 @@ _Directo = quien lo usa. Transitivo = todo lo que termina afectado en cascada._
 - **Objects/Checkbox** (cla-project) — directo 164, transitivo 166
 - **Objects/TextField** (cla-project) — directo 133, transitivo 135
 - **Page/PopUps/Authenticator** (cla-project) — directo 3, transitivo 106
-- **Objects/Dropdown** (cla-project) — directo 93, transitivo 95
-- **Objects/NumericField** (cla-project) — directo 64, transitivo 66
+- **Objects/Dropdown** (cla-project) — directo 94, transitivo 96
+- **Objects/NumericField** (cla-project) — directo 68, transitivo 70
 - **Objects/OptionGroup** (cla-project) — directo 14, transitivo 16
 - **Node/MixingDashboard/Mixing Trend/Framework/Pen** (cla-project) — directo 7, transitivo 12
 - **Page/Embedded/Title_Header** (cla-project) — directo 5, transitivo 9
