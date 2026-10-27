@@ -23,6 +23,7 @@ Regla general: **lo que un recurso llama va antes que el recurso**. Si un paso f
 4. `2026-10-26_preguntas_Ensamble.sql` (72 `UPDATE`)
 5. `2026-10-26_preguntas_Metalurgia.sql` (4 `UPDATE`)
 6. `2026-10-26_preguntas_OREC.sql` (2 `UPDATE`)
+7. `2026-10-27_tildes_papoitem.sql` (tildes y símbolos mal codificados: 62 ítems y `registertype` 13; cada `UPDATE` solo cambia el texto si sigue roto, así que puede ir en cualquier momento)
 
 F&A y General/POLY/Cubiertas no tienen SQL. Un área puede desplegarse sin las demás, pero siempre con su SQL antes que sus formularios.
 

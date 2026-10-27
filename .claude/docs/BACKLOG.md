@@ -50,7 +50,7 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `OREC/Form_CI11-0101_start` `NumericEntryField_6`: válido en 0 o entre 90 y 150 (dos rangos). Queda nativo (decisión del usuario, 2026-10-27)
 - `Ensamble/Form_EA11-0901_2h`: una etiqueta de "Parámetros de operación y control proceso" muestra "null" (igual en el original)
 - `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado) — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
-- `papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196: es el dato, se ve igual en el original
+- ~~`papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196~~ corregido el 2026-10-27 en cla-db-papo (62 ítems y `registertype` 13; `.claude/docs/sql/2026-10-27_tildes_papoitem.sql`, falta producción). Las palabras escritas sin tilde ("presion", "operacion") no se tocaron
 - `OREC/Form_CU11-0101_start`: no existe `FlexContainerGroup7`; `papo_core.register.save` recorre los grupos 1..N y los 4 checkbox de `FlexContainerGroup8` nunca se guardan
 - ~~Supervisor guardado con `papoItemID` nulo en `Ensamble/Form_EA11-1601_start` y `Form_EA11-2601_start`~~ corregido el 2026-10-26 (11233 y 11355). Queda `OREC/Form_PO07-0101_start` (`FlexContainer15/TextField`, `papoItemID` nulo)
 - `F&A/Form_AC10-0201_start`: "Cubierta sin rayones." aparece dos veces en "Condiciones de operacion" y varias preguntas largas se cortan en su fila (también en el original)
