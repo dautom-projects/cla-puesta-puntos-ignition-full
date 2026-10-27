@@ -51,6 +51,26 @@ class SectionsTest(unittest.TestCase):
 		objects.fitSections(view, collections.Counter())
 		self.assertEqual(group["custom"]["baseBasisPx"], 248)
 
+	def test_basisWithoutBase(self):
+		# F&A/Form_AC10-1101_30min: no custom.baseBasisPx, toggleSection opens it with its 600px basis (rows need 632)
+		view, group = _view(None, [(48, 0)] * 9 + [(50, 0)] * 4, position={"basis": "600px", "display": False, "shrink": 0})
+		del group["custom"]["baseBasisPx"]
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertEqual(group["position"]["basis"], "632px")
+		self.assertNotIn("baseBasisPx", group["custom"])
+		self.assertEqual(stats["secciones ajustadas a sus filas"], 1)
+
+	def test_supervisorWithoutBase(self):
+		# FlexContainerSupervisor is not a section: its basis is not the height of an accordion
+		view, group = _view(None, [(300, 0)], position={"basis": "32px", "shrink": 0})
+		del group["custom"]["baseBasisPx"]
+		group["meta"]["name"] = "FlexContainerSupervisor"
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertEqual(group["position"]["basis"], "32px")
+		self.assertFalse(stats)
+
 	def test_alreadyFits(self):
 		view, group = _view(500, [(50, 0)] * 4)
 		stats = collections.Counter()

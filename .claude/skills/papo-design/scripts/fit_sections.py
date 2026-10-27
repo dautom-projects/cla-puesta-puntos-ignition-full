@@ -5,11 +5,13 @@ An open section keeps its height (FlexContainerGroupN with shrink 0) and custom.
 margins and the group padding: no row is squeezed and the end of the section is not cut. Nothing else changes; the
 answer collection is checked before writing. Simulates by default.
 
-Version: 1.0.1
+Version: 1.0.2
 
 Changelog:
 	2026-10-26 | William M. | v1.0.0 - Initial version (squeezed rows in AC10-0201, PO11-0101-2, GR10-0501...)
 	2026-10-27 | William M. | v1.0.1 - Uses papo_objects v2.13.1: label rows without a px height count their text lines
+	2026-10-27 | William M. | v1.0.2 - Uses papo_objects v2.13.2: section groups without custom.baseBasisPx fit their
+		position.basis
 
 Args (CLI):
 	--views (str...): Form folders relative to views/ (default: every Form_* view with the PAPO/Form class, pilots included)

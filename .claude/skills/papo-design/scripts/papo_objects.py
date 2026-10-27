@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.13.1
+Version: 2.13.2
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -65,6 +65,8 @@ Changelog:
 		maxValue bound to the same struct; numeric inputBounds carried to the object (Objects/NumericField v2.6)
 	2026-10-27 | William M. | v2.13.1 - A label row without a px height counts the height of its text lines in the
 		section (the general test found sections cut by "Referencia hora/hora" labels of 23 px counted as 0)
+	2026-10-27 | William M. | v2.13.2 - fitSections also fits section groups without custom.baseBasisPx: their px
+		position.basis is the expanded height toggleSection takes (general test of F&A: AC10-1101, CA02-2102, AC10 _end)
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -940,14 +942,18 @@ def fitSections(view, stats):
 	papo_core.ui.toggleSection opens a group with the fixed height custom.baseBasisPx. A group that can shrink is
 	squeezed to the visible height of the form, and a height below its rows compresses them.
 	"""
-	for name, group in _sectionHeights(view).items():
+	for name, group in list(_sectionHeights(view).items()) + list(_basisHeights(view).items()):
 		position = group.setdefault("position", {})
 		if position.get("shrink", 1) != 0:
 			position["shrink"] = 0
 			stats["secciones que ya no se encogen"] += 1
 		needed = int(-(-_rowsHeight(group) // 1))
-		if needed > group["custom"]["baseBasisPx"]:
-			group["custom"]["baseBasisPx"] = needed
+		if isinstance((group.get("custom") or {}).get("baseBasisPx"), (int, float)):
+			if needed > group["custom"]["baseBasisPx"]:
+				group["custom"]["baseBasisPx"] = needed
+				stats["secciones ajustadas a sus filas"] += 1
+		elif needed > _px(position["basis"]):
+			position["basis"] = "{}px".format(needed)
 			stats["secciones ajustadas a sus filas"] += 1
 
 
@@ -955,6 +961,22 @@ def _sectionHeights(view):
 	"""Groups whose expanded height is fixed (custom.baseBasisPx, used by papo_core.ui.toggleSection)."""
 	return {g["meta"]["name"]: g for g in view["root"].get("children", []) if GROUP.match(g.get("meta", {}).get("name", ""))
 		and isinstance((g.get("custom") or {}).get("baseBasisPx"), (int, float)) and "custom.baseBasisPx" not in g.get("propConfig", {})}
+
+
+def _basisHeights(view):
+	"""Section groups without custom.baseBasisPx: toggleSection takes their px position.basis as the expanded height
+	the first time they open."""
+	return {g["meta"]["name"]: g for g in view["root"].get("children", [])
+		if re.match(r"^FlexContainerGroup\d+$", g.get("meta", {}).get("name", ""))
+		and not isinstance((g.get("custom") or {}).get("baseBasisPx"), (int, float))
+		and not {"custom.baseBasisPx", "position.basis"} & set(g.get("propConfig", {}))
+		and _px((g.get("position") or {}).get("basis")) > 0}
+
+
+def _px(basis):
+	"""Pixels of a "<n>px" basis; 0 for any other basis."""
+	match = re.match(r"^(\d+(?:\.\d+)?)px$", str(basis or ""))
+	return float(match.group(1)) if match else 0
 
 
 # Binding a fixed papoItemID came from (id(node) -> binding), so the description bindings that read the same
