@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.13.0
+Version: 1.14.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -51,6 +51,8 @@ Changelog:
 		the ones the original script chooses for every state of those fields; inputBounds carried to the object
 	2026-10-27 | William M. | v1.13.0 - Stage 6: a script that reads or writes a native prop (props.value...) of a
 		field that is now an object fails (general test: RE11-0101_end, GR10-0501_start, PT11-0104_start)
+	2026-10-27 | William M. | v1.14.0 - Stage 4: an alert action (btnActionPrimary / Secondary) that no handler of the
+		view receives fails (general test: MZ11-0101_4h did not save after its legacy handler was removed)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -733,7 +735,16 @@ def stageFlow(cur, base, rel):
 		legacy = [m for owner, m in _handlers(cur) if not (owner == "root" and m == "saveDataRoot")]
 		if legacy:
 			problems.append("handlers legacy: {}".format(", ".join(sorted(set(legacy)))))
+	# An alert whose action button sends a message no handler of the view receives (MZ11-0101_4h: its Guardar sent
+	# saveStartShift after the legacy handler was removed, and the register was never saved)
+	handled = {m for _, m in _handlers(cur)}
+	for action in sorted(set(RE_ALERT_ACTION.findall(json.dumps(cur)))):
+		if action not in handled:
+			problems.append("una alerta envía {} y ningún handler de la vista lo recibe".format(action))
 	return problems
+
+
+RE_ALERT_ACTION = re.compile(r"""btnAction(?:Primary|Secondary)\s*(?:=|\\u003d)\s*\\["'](\w+)\\["']""")
 
 
 def _classes(view):

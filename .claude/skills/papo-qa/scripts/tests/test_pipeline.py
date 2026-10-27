@@ -195,6 +195,15 @@ class PipelineTest(unittest.TestCase):
 		v["root"]["events"]["onStartup"]["config"]["script"] = "\tx = self.getChild(\"{}\").props.params.value".format(name)
 		self.assertNotIn("6", self.run_case(v))
 
+	def test_flow_alert_without_handler(self):
+		# MZ11-0101_4h: Guardar opened an alert that sent saveStartShift and nothing received it
+		v = copy.deepcopy(self.clean)
+		v["root"].setdefault("events", {})["onStartup"] = {"config": {"script": "\talerts.showAlert(state=\"warning\", "
+			"btnTextPrimary=\"Si\", btnActionPrimary=\"saveStartShift\")"}, "scope": "G", "type": "script"}
+		self.assertIn("4", self.run_case(v))
+		v["root"]["events"]["onStartup"]["config"]["script"] = "\talerts.showAlert(btnActionPrimary=\"saveDataRoot\")"
+		self.assertNotIn("4", self.run_case(v))
+
 	def test_contract_answer_not_bound(self):
 		v = copy.deepcopy(self.clean)
 		_embeds(v)[0]["propConfig"]["custom.item.answer"]["binding"]["config"]["path"] = "this.props.params.value"
