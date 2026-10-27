@@ -79,6 +79,28 @@ class Phase5Test(unittest.TestCase):
 		self.assertEqual(params["answer"], "Sí")
 		self.assertEqual(qa.stageAnswers(after, {"view": before}), ([], 2))
 
+	def test_rangeByOtherFields(self):
+		# EA11-2501_2h: the bounds depend on the battery size checkboxes; inputBounds 0-100 is carried
+		before, after, stats = _convert("Ensamble/Form_EA11-2501_2h")
+		field = _node(after, "FlexContainerGroup5/FlexContainer_20/FlexContainer_5/NumericEntryField")
+		self.assertEqual(field["props"]["path"], "Objects/NumericField")
+		self.assertEqual(field["props"]["params"]["inputBounds"], {"maximum": 100, "minimum": 0})
+		struct = field["propConfig"]["props.params.maxValue"]["binding"]["config"]["struct"]
+		self.assertEqual(sorted(struct), ["isLarge", "isMedium"])
+		self.assertEqual(stats["numéricos con rango según otro campo"], 16)
+		self.assertFalse(view_refs.broken(after) - view_refs.broken(before))
+		problems, checked = qa.stageAnswers(after, {"view": before})
+		self.assertEqual(problems, [])
+		self.assertEqual(qa.stageFieldProps(after, {"view": before}), [])
+
+	def test_qaCatchesWrongDynamicBound(self):
+		before, after, _ = _convert("Ensamble/Form_EA11-2501_2h")
+		field = _node(after, "FlexContainerGroup5/FlexContainer_0/FlexContainer_5/NumericEntryField")
+		binding = field["propConfig"]["props.params.maxValue"]["binding"]
+		binding["transforms"][0]["code"] = binding["transforms"][0]["code"].replace("maxValue = 3", "maxValue = 4")
+		problems, _ = qa.stageAnswers(after, {"view": before})
+		self.assertTrue(any("rango" in p for p in problems))
+
 
 if __name__ == "__main__":
 	unittest.main()

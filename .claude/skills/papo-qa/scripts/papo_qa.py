@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.11.0
+Version: 1.12.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -47,6 +47,8 @@ Changelog:
 	2026-10-27 | William M. | v1.11.0 - Stage 3 recognizes an option group answered by a chain of if() on
 		custom.checkboxAnswers (empty answer: the last text of the chain) and a checkbox whose answer is its own text
 		mapped from the state (Sí / No)
+	2026-10-27 | William M. | v1.12.0 - Stage 3: bounds chosen by other fields (minValue / maxValue bound) must be
+		the ones the original script chooses for every state of those fields; inputBounds carried to the object
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -397,12 +399,34 @@ def stageCollection(cur, base):
 	return problems
 
 
+def _dynamicProblems(native, node, itemID):
+	"""Bounds bound to other fields: for every state of those fields, the same bounds the original script passes."""
+	dynamic = ranges.dynamicRange(native)
+	if dynamic is None:
+		return ["{}: el objeto tiene el rango enlazado y el original no elige su rango por otros campos".format(itemID)]
+	original = native["propConfig"]["props.style.color"]["binding"]["transforms"][0]["code"]
+	bound = {}
+	for param in ("minValue", "maxValue"):
+		binding = (node.get("propConfig", {}).get("props.params." + param) or {}).get("binding") or {}
+		if binding.get("type") != "expr-struct" or (binding.get("config") or {}).get("struct") != dynamic["struct"]:
+			return ["{}: {} no lee los mismos campos que el original".format(itemID, param)]
+		bound[param] = binding["transforms"][0]["code"]
+	for inputs in ranges._combinations(dynamic["struct"]):
+		expected = ranges.boundsOf(original, inputs)
+		got = tuple(ranges._run(bound[p], {}, dict(inputs)) for p in ("minValue", "maxValue"))
+		if tuple(expected or ()) != got:
+			return ["{}: con {} el original usa el rango {} y el objeto {}".format(itemID, inputs, expected, got)]
+	return []
+
+
 def _rangeProblems(old, node, itemID):
 	"""A converted numeric turns red (out of range) for the same values as the original color script."""
 	native = old.get("node") or {}
 	if native.get("type") != "ia.input.numeric-entry-field" or node["props"].get("path") != "Objects/NumericField":
 		return []
 	params = node["props"].get("params", {})
+	if any(k in node.get("propConfig", {}) for k in ("props.params.minValue", "props.params.maxValue")):
+		return _dynamicProblems(native, node, itemID)
 	low, high = params.get("minValue"), params.get("maxValue")
 	if not ranges.colorScripts(native):
 		return [] if low is None and high is None else ["{}: el original no se pinta por rango y el objeto tiene rango {}–{}".format(itemID, low, high)]
@@ -649,8 +673,13 @@ def stageFieldProps(cur, base):
 				problems.append("{}: cambiaron las opciones".format(where))
 			if bool((field.get("props") or {}).get("showClearIcon")) != bool(params.get("showClearIcon")):
 				problems.append("{}: cambió showClearIcon".format(where))
+		if ctype == "ia.input.numeric-entry-field":
+			bounds = (field.get("props") or {}).get("inputBounds")
+			expected = {"maximum": bounds.get("maximum"), "minimum": bounds.get("minimum")} if isinstance(bounds, dict) else None
+			if expected != params.get("inputBounds"):
+				problems.append("{}: inputBounds era {} y el objeto recibe {}".format(where, bounds, params.get("inputBounds")))
 		# Anything else the original field had
-		known = STANDARD_PROPS | CARRIED_PROPS | {OWN_VALUE.get(ctype, "value")}
+		known = STANDARD_PROPS | CARRIED_PROPS | {OWN_VALUE.get(ctype, "value"), "inputBounds"}
 		extra = [k for k in (field.get("props") or {}) if k not in known]
 		extra += [k for k, v in field.get("propConfig", {}).items() if k.startswith("props.") and k[6:].split(".")[0] not in known]
 		extra += [k for k, v in field.get("propConfig", {}).items() if v.get("onChange") and not k.startswith("custom.item")]

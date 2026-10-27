@@ -13,18 +13,22 @@ The scripts run as Jython 2 does: a number is always less than a text, so rang_u
 minimum gets the same upper bound (NO_UPPER). A script that reads a custom property the field does not have fails
 in Ignition and never paints the field: it has no range.
 
-Version: 1.1.0
+Version: 1.2.0
 
 Changelog:
 	2026-10-26 | William M. | v1.0.0 - Initial version
 	2026-10-27 | William M. | v1.1.0 - Jython 2 comparisons (number < text), bounds computed by the script
 		(minimo / maximo and the like), only a lower bound (upper bound NO_UPPER), getRangeColor with fixed bounds
 		on custom.item.answer, and scripts that fail on a missing custom property (never red, no range)
+	2026-10-27 | William M. | v1.2.0 - dynamicRange: bounds that depend on other fields (EA11-2501_2h: the battery
+		size checkboxes) become bindings of minValue / maxValue with the same struct
 
 Returns:
 	rangeOf(component) -> None (no color logic or never red), (minValue, maxValue) or UNSUPPORTED
 	isRed(component, value) -> True / False / None (no color logic or the script cannot run here)
 	objectRed(minValue, maxValue, value) -> True / False, as getRangeColor does
+	dynamicRange(component) -> {"struct", "waitOnAll", "minCode", "maxCode"} or None
+	boundsOf(code, inputs) -> (minValue, maxValue) the original script passes to getRangeColor for those inputs
 """
 
 import itertools
@@ -254,3 +258,72 @@ def rangeOf(component):
 		if all(red is objectRed(low, high, v) for red, v in zip(reds, values)):
 			return low, high
 	return UNSUPPORTED
+
+
+# ==================== BOUNDS THAT DEPEND ON OTHER FIELDS ====================
+
+RE_DYNAMIC_CALL = re.compile(r"^(\s*)return papo_core\.items\.getRangeColor\(value\[['\"]answer['\"]\],\s*minValue,\s*maxValue,\s*['\"](text|border)['\"]\)\s*$", re.M)
+
+
+class _Capture(Exception):
+	pass
+
+
+def boundsOf(code, inputs):
+	"""(minValue, maxValue) the script passes to getRangeColor when the struct has these inputs."""
+	class _Items(object):
+		@staticmethod
+		def getRangeColor(value, minValue, maxValue, colorType="border"):
+			raise _Capture(minValue, maxValue)
+
+	class _Core(object):
+		items = _Items()
+	scope = {"__builtins__": __builtins__, "papo_core": _Core()}
+	exec(compile(_source(code), "<bounds>", "exec"), scope)
+	try:
+		scope["_t"](None, dict(inputs, answer=0))
+	except _Capture as e:
+		return e.args
+	return None
+
+
+def dynamicRange(component):
+	"""Bounds chosen by other fields: props.style.color / borderColor are expr-struct bindings
+	{answer: {this.custom.item.answer}, <other inputs>} whose script ends in
+	getRangeColor(value['answer'], minValue, maxValue, ...). Returns the struct without the answer and the scripts
+	that compute minValue and maxValue from it, or None.
+	"""
+	propConfig = component.get("propConfig", {})
+	found = []
+	for prop in ("props.style.color", "props.style.borderColor"):
+		binding = (propConfig.get(prop) or {}).get("binding") or {}
+		config = binding.get("config") or {}
+		transforms = binding.get("transforms") or []
+		struct = config.get("struct") or {}
+		if binding.get("type") != "expr-struct" or struct.get("answer") != "{this.custom.item.answer}" or len(transforms) != 1:
+			return None
+		code = transforms[0].get("code") or ""
+		match = RE_DYNAMIC_CALL.search(code)
+		if transforms[0].get("type") != "script" or not match or code.count("value['answer']") + code.count('value["answer"]') != 1:
+			return None
+		found.append((struct, config.get("waitOnAll"), code, match))
+	if not _answerIsValue(component) or found[0][0] != found[1][0]:
+		return None
+	struct, waitOnAll, code, match = found[0]
+	others = {k: v for k, v in struct.items() if k != "answer"}
+	if not others:
+		return None
+	indent = match.group(1)
+	minCode = code[:match.start()] + indent + "return minValue" + code[match.end():]
+	maxCode = code[:match.start()] + indent + "return maxValue" + code[match.end():]
+	# Both color scripts must choose the same bounds (text and border only differ in the color type)
+	for inputs in _combinations(others):
+		if boundsOf(found[0][2], inputs) != boundsOf(found[1][2], inputs):
+			return None
+	return {"struct": others, "waitOnAll": waitOnAll, "minCode": minCode, "maxCode": maxCode}
+
+
+def _combinations(struct):
+	"""Every True / False combination of the struct inputs (checkbox states)."""
+	keys = sorted(struct)
+	return [dict(zip(keys, values)) for values in itertools.product((True, False), repeat=len(keys))]

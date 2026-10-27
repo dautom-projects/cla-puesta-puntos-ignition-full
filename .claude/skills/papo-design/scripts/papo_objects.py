@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.12.0
+Version: 2.13.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -61,6 +61,8 @@ Changelog:
 		reads in bindings (X.props.value, .selected, .text) becomes an object with the same name and those bindings
 		read X.props.params.value; option groups answered by a chain of if() (empty answer from the chain); a
 		checkbox that answers its own Sí / No text
+	2026-10-27 | William M. | v2.13.0 - Bounds chosen by other fields (ranges.dynamicRange, EA11-2501_2h): minValue /
+		maxValue bound to the same struct; numeric inputBounds carried to the object (Objects/NumericField v2.6)
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -117,7 +119,7 @@ DESCRIPTION_QUERY = "SELECT Description FROM papoitem WHERE ID = ?"
 # Field props each object takes as a param (static value or binding)
 FIELD_PARAMS = {
 	"ia.input.checkbox": {"selected": "value", "enabled": "enabled"},
-	"ia.input.numeric-entry-field": {"value": "value", "placeholder": "placeholder", "enabled": "enabled"},
+	"ia.input.numeric-entry-field": {"value": "value", "placeholder": "placeholder", "enabled": "enabled", "inputBounds": "inputBounds"},
 	"ia.input.text-field": {"text": "value", "placeholder": "placeholder", "enabled": "enabled"},
 	"ia.input.dropdown": {"value": "value", "options": "options", "placeholder": "placeholder", "enabled": "enabled",
 		"showClearIcon": "showClearIcon"},
@@ -254,9 +256,21 @@ def objectParams(component, rule, stats, moved=False):
 			params["emptyAnswer"] = rule["empty"]
 		limits = _rangeOf(component) if ctype == "ia.input.numeric-entry-field" else None
 		if limits == ranges.UNSUPPORTED:
-			# Its red is not a closed range (e.g. only a lower bound): the field keeps its own color logic
-			stats["numéricos nativos (color fuera de rango propio)"] += 1
-			return None
+			dynamic = ranges.dynamicRange(component)
+			if dynamic is None:
+				# Its red is not a closed range (e.g. two valid ranges): the field keeps its own color logic
+				stats["numéricos nativos (color fuera de rango propio)"] += 1
+				return None
+			for param, code in (("minValue", dynamic["minCode"]), ("maxValue", dynamic["maxCode"])):
+				config = {"struct": dynamic["struct"]}
+				if dynamic["waitOnAll"] is not None:
+					config["waitOnAll"] = dynamic["waitOnAll"]
+				binding = {"config": config, "transforms": [{"code": code, "type": "script"}], "type": "expr-struct"}
+				if not _portable(binding, moved):
+					return None
+				bindings["props.params." + param] = {"binding": binding}
+			stats["numéricos con rango según otro campo"] += 1
+			limits = None
 		if limits:
 			params.update(minValue=limits[0], maxValue=limits[1])
 			stats["numéricos con rango"] += 1
@@ -372,6 +386,12 @@ def carryProps(component, moved):
 		params["enabled"] = False
 	if props.get("showClearIcon"):
 		params["showClearIcon"] = True
+	bounds = props.get("inputBounds")
+	if bounds is not None:
+		# Only the limits are a param (the invalid style stays the component's)
+		if not isinstance(bounds, dict) or set(bounds) - {"minimum", "maximum"}:
+			return None
+		params["inputBounds"] = {"maximum": bounds.get("maximum"), "minimum": bounds.get("minimum")}
 	placeholder = props.get("placeholder")
 	if ctype == "ia.input.dropdown":
 		text = placeholder.get("text") if isinstance(placeholder, dict) else None
