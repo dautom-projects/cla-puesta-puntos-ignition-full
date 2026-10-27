@@ -185,6 +185,16 @@ class PipelineTest(unittest.TestCase):
 		_embeds(v)[0]["props"]["params"]["foo"] = 1
 		self.assertIn("6", self.run_case(v))
 
+	def test_contract_script_native_prop(self):
+		# RE11-0101_end: a sum transform read NumericEntryField_0.props.value of fields that became objects
+		v = copy.deepcopy(self.clean)
+		name = _embeds(v)[0]["meta"]["name"]
+		v["root"].setdefault("events", {})["onStartup"] = {"config": {"script": "\tx = self.getChild(\"{}\").props.value".format(name)},
+			"scope": "G", "type": "script"}
+		self.assertIn("6", self.run_case(v))
+		v["root"]["events"]["onStartup"]["config"]["script"] = "\tx = self.getChild(\"{}\").props.params.value".format(name)
+		self.assertNotIn("6", self.run_case(v))
+
 	def test_contract_answer_not_bound(self):
 		v = copy.deepcopy(self.clean)
 		_embeds(v)[0]["propConfig"]["custom.item.answer"]["binding"]["config"]["path"] = "this.props.params.value"

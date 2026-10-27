@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.12.0
+Version: 1.13.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -49,6 +49,8 @@ Changelog:
 		mapped from the state (Sí / No)
 	2026-10-27 | William M. | v1.12.0 - Stage 3: bounds chosen by other fields (minValue / maxValue bound) must be
 		the ones the original script chooses for every state of those fields; inputBounds carried to the object
+	2026-10-27 | William M. | v1.13.0 - Stage 6: a script that reads or writes a native prop (props.value...) of a
+		field that is now an object fails (general test: RE11-0101_end, GR10-0501_start, PT11-0104_start)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -842,7 +844,45 @@ def stageContract(cur):
 		for c in node.get("children", []):
 			walk(c)
 	walk(cur["root"])
+	problems += _scriptNativeProps(cur)
 	return sorted(set(problems))
+
+
+RE_SCRIPT_PROP = re.compile(r"""(?:getChild|getSibling)\(\s*["'](\w+)["']\s*\)\s*\.props\.(\w+)""")
+
+
+def _scriptNativeProps(view):
+	"""Scripts that read or write a native prop (props.value, .selected, .text...) of a field that is now an object:
+	its value lives in props.params (RE11-0101_end summed None, GR10-0501_start lost its initial times)."""
+	kinds = collections.defaultdict(set)
+
+	def walk(node):
+		props = node.get("props") or {}
+		isObject = node.get("type") == "ia.display.view" and str(props.get("path", "")).startswith("Objects/")
+		kinds[node.get("meta", {}).get("name")].add("object" if isObject else "native")
+		for c in node.get("children", []):
+			walk(c)
+	walk(view["root"])
+	codes = []
+
+	def scan(value):
+		if isinstance(value, dict):
+			for k, v in value.items():
+				if k in ("code", "script") and isinstance(v, str):
+					codes.append(v)
+				else:
+					scan(v)
+		elif isinstance(value, list):
+			for v in value:
+				scan(v)
+	scan(view)
+	out = []
+	for code in codes:
+		for m in RE_SCRIPT_PROP.finditer(code):
+			# A name shared with a native component cannot be told apart by name: left to the review
+			if m.group(2) != "params" and kinds.get(m.group(1)) == {"object"}:
+				out.append("script usa {}.props.{} y {} es un objeto (props.params.value)".format(m.group(1), m.group(2), m.group(1)))
+	return out
 
 
 def stageGraph(baseline):
