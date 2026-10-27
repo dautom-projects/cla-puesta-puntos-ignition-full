@@ -17,7 +17,7 @@ cannot take stays native.
 Also: dead legacy save handlers are removed (--legacy) and the root gets PAPO/Form (--form-class).
 A component is not replaced when something else in the view references it. Dry run by default.
 
-Version: 2.11.0
+Version: 2.12.0
 
 Changelog:
 	2026-10-24 | William M. | v1.0.0 - Initial version (EA11-0901_1h pilot)
@@ -56,6 +56,11 @@ Changelog:
 		own scripts use custom.answers otherwise keeps it
 	2026-10-26 | William M. | v2.11.0 - The legacy cleanup also removes the custom.answers collector of inner
 		containers (rows of FU10-0202_dia): it read the field value and kept the field native as "referenced"
+	2026-10-27 | William M. | v2.12.0 - Phase 5: ranges.py v1.1 (bounds computed by the script, "9999..." upper
+		bound, only a minimum, getRangeColor with fixed bounds, never-red scripts); a field the rest of the view only
+		reads in bindings (X.props.value, .selected, .text) becomes an object with the same name and those bindings
+		read X.props.params.value; option groups answered by a chain of if() (empty answer from the chain); a
+		checkbox that answers its own Sí / No text
 
 Args (CLI):
 	--views (str...) / --all-forms: views to convert
@@ -151,7 +156,11 @@ def answerRule(component):
 		return None
 	if ctype == "ia.container.flex":
 		options = qa._optionTexts(component) if "checkboxAnswers" in component.get("custom", {}) else None
-		return {"kind": "options", "options": options} if options else None
+		return {"kind": "options", "options": options, "empty": qa.optionEmpty(component)} if options else None
+	state = qa.checkboxTextAnswer(component)
+	if state:
+		# The answer is the checkbox text, mapped from its state (Sí / No): same values as trueValue / falseValue
+		return {"kind": "checkbox", "true": state[0], "false": state[1]}
 	binding = propConfig.get("custom.item.answer", {}).get("binding")
 	if ctype not in VALUE_PROP or not binding or binding.get("type") != "property" or binding["config"].get("path") != VALUE_PROP[ctype]:
 		return None
@@ -211,8 +220,9 @@ def objectParams(component, rule, stats, moved=False):
 	elif kind == "options":
 		answers = component["custom"].get("checkboxAnswers") or []
 		chosen = [o for o, on in zip(rule["options"], answers) if on]
-		params.update(options=rule["options"], emptyAnswer="-", value=chosen[0] if chosen else None,
-			answer=chosen[0] if chosen else "-")
+		empty = rule.get("empty", "-")
+		params.update(options=rule["options"], emptyAnswer=empty, value=chosen[0] if chosen else None,
+			answer=chosen[0] if chosen else empty)
 		return params, bindings
 	elif kind == "time":
 		# The native field opens with the current time (not the value stored in the design): startNow
@@ -754,6 +764,73 @@ def dropLegacy(view, stats):
 
 # ==================== VIEW ====================
 
+# Value prop of a field that other components read; the object exposes it as props.params.value (inout)
+VALUE_READ = {
+	"ia.input.checkbox": "props.selected",
+	"ia.input.numeric-entry-field": "props.value",
+	"ia.input.text-field": "props.text",
+	"ia.input.dropdown": "props.value",
+	"ia.input.date-time-input": "props.value",
+}
+OBJECT_VALUE = "props.params.value"
+
+
+def _valueReadsOnly(references, path, ctype):
+	"""True when everything outside the field that references it only reads its value in a binding."""
+	found = False
+	for owner, target, rest in references:
+		if owner[:len(path)] == path or target[:len(path)] != path:
+			continue
+		if target == path and (rest.startswith("custom.item") or rest.split(".")[0] in ("meta", "position")):
+			continue
+		# Script references come as "script": those keep the field native
+		if target != path or rest != VALUE_READ.get(ctype):
+			return False
+		found = True
+	return found
+
+
+def redirectValueReads(view, targets, stats):
+	"""Bindings that read a converted field's value (X.props.value...) read the object's X.props.params.value."""
+	wanted = {tuple(path): rest for path, rest in targets}
+
+	def fix(owner, ref):
+		r = view_refs.resolve(owner, ref)
+		if not r or wanted.get(tuple(r[0])) != r[1] or not ref.strip().endswith(r[1]):
+			return None
+		stats["referencias al valor redirigidas al objeto"] += 1
+		return ref.strip()[:-len(r[1])] + OBJECT_VALUE
+
+	def braces(owner, text):
+		def sub(match):
+			new = fix(owner, match.group(1))
+			return "{" + new + "}" if new else match.group(0)
+		return view_refs.RE_BRACES.sub(sub, text)
+
+	def strings(owner, value):
+		if isinstance(value, str):
+			return braces(owner, value)
+		if isinstance(value, dict):
+			return {k: strings(owner, v) for k, v in value.items()}
+		if isinstance(value, list):
+			return [strings(owner, v) for v in value]
+		return value
+
+	for owner, node in view_refs.index(view).items():
+		for key, cfg in (node.get("propConfig") or {}).items():
+			binding = cfg.get("binding") or {}
+			config = binding.get("config") or {}
+			if binding.get("type") == "property" and config.get("path"):
+				new = fix(owner, config["path"])
+				if new:
+					config["path"] = new
+			for k in [k for k in config if k != "path"]:
+				config[k] = strings(owner, config[k])
+			for transform in binding.get("transforms", []):
+				if transform.get("expression"):
+					transform["expression"] = braces(owner, transform["expression"])
+
+
 def _conflict(references, removed, keepItem):
 	"""True when something outside the removed subtree references it (custom.item/meta/position allowed on keepItem)."""
 	for owner, target, rest in references:
@@ -891,19 +968,27 @@ def standardize(view, options, stats):
 		for name in dropLegacy(view, stats):
 			stats["handlers no estándar que quedan: " + name] += 1
 	references = view_refs.refs(view)
+	redirects = []
 
 	def convertField(node, path, parent, grand):
 		rule = answerRule(node)
 		if rule is None:
 			stats["nativos (lógica propia)"] += 1
 			return node
+		readOnly = False
 		if _conflict(references, path, True):
-			stats["nativos (referenciados)"] += 1
-			return node
+			readOnly = _valueReadsOnly(references, path, node.get("type"))
+			if not readOnly:
+				stats["nativos (referenciados)"] += 1
+				return node
 		embed = fieldEmbed(node, parent, grand, rule, stats, options.get("questionTexts"))
 		if embed is None:
 			stats["nativos (propiedades sin parámetro)"] += 1
 			return node
+		if readOnly:
+			# Same name and place: the bindings that read its value are pointed at the object after the walk
+			redirects.append((path, VALUE_READ[node["type"]]))
+			stats["campos leídos por otros convertidos"] += 1
 		return embed
 
 	def walk(node, path, parent, grand):
@@ -936,6 +1021,8 @@ def standardize(view, options, stats):
 			node["children"] = [row for c in node["children"] for row in (c if isinstance(c, list) else [c])]
 
 	walk(view["root"], ("root",), None, None)
+	if redirects:
+		redirectValueReads(view, redirects, stats)
 	# Rows taller than before: the expanded section grows by the same amount (otherwise its end is cut)
 	for name, group in _sectionHeights(view).items():
 		grown = _pxSum(group) - heights.get(name, 0)

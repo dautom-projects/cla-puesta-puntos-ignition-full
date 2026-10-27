@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.10.0
+Version: 1.11.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -44,6 +44,9 @@ Changelog:
 	2026-10-26 | William M. | v1.9.3 - Stage 5: hidden rows (position.display false) take no height in a section
 	2026-10-26 | William M. | v1.10.0 - FIXED_TEXTS: items whose question stays written in the form
 		(docs/sql/preguntas_texto_fijo.json)
+	2026-10-27 | William M. | v1.11.0 - Stage 3 recognizes an option group answered by a chain of if() on
+		custom.checkboxAnswers (empty answer: the last text of the chain) and a checkbox whose answer is its own text
+		mapped from the state (Sí / No)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -163,8 +166,45 @@ def _code(transform):
 	return " ".join((transform.get("code") or "").split())
 
 
+RE_OPTION_IF = re.compile(r'^\s*if\(\s*\{this\.custom\.checkboxAnswers\}\[(\d+)\]\s*,\s*"([^"]*)"\s*,(.*)\)\s*$', re.S)
+
+
+def _optionChain(node):
+	"""(texts, empty) of an answer written as if({this.custom.checkboxAnswers}[0], "A", if(..., "")), or None.
+
+	Each checkboxAnswers[i] must read ./<checkbox>.props.selected and each text be that checkbox text, so the
+	answer is the text of the first checked option (one at most: their scripts uncheck the others).
+	"""
+	binding = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
+	transforms = binding.get("transforms") or []
+	if binding.get("type") != "expr" or any(t.get("type") != "script" or _code(t) != "return value" for t in transforms):
+		return None
+	rest, texts = binding.get("config", {}).get("expression") or "", []
+	while True:
+		match = RE_OPTION_IF.match(rest)
+		if not match:
+			break
+		if int(match.group(1)) != len(texts):
+			return None
+		texts.append(match.group(2))
+		rest = match.group(3)
+	empty = re.match(r'^\s*"([^"]*)"\s*$', rest)
+	if not texts or not empty:
+		return None
+	children = {c.get("meta", {}).get("name"): c for c in node.get("children", [])}
+	for i, text in enumerate(texts):
+		path = ((node.get("propConfig", {}).get("custom.checkboxAnswers[{}]".format(i)) or {}).get("binding") or {}).get("config", {}).get("path", "")
+		match = re.match(r"^\./([^./]+)\.props\.selected$", path)
+		if not match or (children.get(match.group(1), {}).get("props") or {}).get("text") != text:
+			return None
+	return texts, empty.group(1)
+
+
 def _optionTexts(node):
 	"""Texts of the checkboxes an option group answers with, in the order of its script."""
+	chain = _optionChain(node)
+	if chain:
+		return chain[0]
 	binding = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
 	code = (binding.get("transforms") or [{}])[0].get("code") or ""
 	if binding.get("type") != "property" or "answerReturn[value.index(True)] if any(value) else \"-\"" not in code:
@@ -173,6 +213,28 @@ def _optionTexts(node):
 	names = re.findall(r'getChild\("([^"]+)"\)', code)
 	texts = [(children.get(n, {}).get("props") or {}).get("text") for n in names]
 	return texts if names and None not in texts else None
+
+
+def optionEmpty(node):
+	"""Answer of an option group with nothing chosen: "-" (script) or the last text of its if() chain."""
+	chain = _optionChain(node)
+	return chain[1] if chain else "-"
+
+
+def checkboxTextAnswer(node):
+	"""(trueText, falseText) when a checkbox answers its own text and the text maps the state, else None."""
+	pc = node.get("propConfig", {})
+	answer = (pc.get("custom.item.answer") or {}).get("binding") or {}
+	text = (pc.get("props.text") or {}).get("binding") or {}
+	if node.get("type") != "ia.input.checkbox" or answer.get("type") != "property" or answer.get("config") != {"path": "this.props.text"} or answer.get("transforms"):
+		return None
+	transforms = text.get("transforms") or []
+	if text.get("type") != "property" or text.get("config") != {"path": "this.props.selected"} or len(transforms) != 1 or transforms[0].get("type") != "map":
+		return None
+	table = {m.get("input"): m.get("output") for m in transforms[0].get("mappings", [])}
+	if set(table) != {True, False} or not all(isinstance(v, str) for v in table.values()):
+		return None
+	return table[True], table[False]
 
 
 def _formatTime(value):
@@ -200,7 +262,8 @@ def nativeAnswer(source):
 			return None, "grupo de opción no reconocido"
 		answers = node["custom"].get("checkboxAnswers") or []
 		chosen = [o for o, on in zip(options, answers) if on]
-		return (lambda v: v if v else "-"), (chosen[0] if chosen else None)
+		empty = optionEmpty(node)
+		return (lambda v: v if v else empty), (chosen[0] if chosen else None)
 	if ctype == "ia.input.date-time-input":
 		b = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
 		if b.get("config", {}).get("path") == "this.props.value" and any('SimpleDateFormat("h:mm:ss a"' in (t.get("code") or "") for t in b.get("transforms", [])):
@@ -210,6 +273,9 @@ def nativeAnswer(source):
 	if ctype not in VALUE_PROP:
 		return None, "tipo {}".format(ctype)
 	prop, componentDefault = VALUE_PROP[ctype]
+	state = checkboxTextAnswer(node)
+	if state:
+		return (lambda v: state[0] if v else state[1]), (node.get("props") or {}).get("selected", False)
 	binding = node.get("propConfig", {}).get("custom.item.answer", {}).get("binding") or {}
 	if binding.get("type") != "property" or binding.get("config", {}).get("path") != "this.props." + prop:
 		return None, "respuesta con binding propio"
