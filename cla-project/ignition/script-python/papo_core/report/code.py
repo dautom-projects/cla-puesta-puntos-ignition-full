@@ -16,9 +16,12 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.5.0
+Version: 2.6.0
 
 Changelog:
+	2026-10-27 | William M. | v2.6.0 - build(): copies (the same slot with another normalize),
+		normalize ar / mark, typeName also gives _typeID, header (date and shift of the
+		first record of a type)
 	2026-10-27 | William M. | v2.5.0 - build() slots by time (shift, weekday, weekSlot) and
 		monthGrid() for TR11-0102
 	2026-10-27 | William M. | v2.4.0 - build(): several reprocessed groups per section,
@@ -63,6 +66,8 @@ NORMALIZE_MODES = {
 	"check": {"cumple": u"✔", "no cumple": u"✘"},
 	"yn": {"cumple": "Si", "no cumple": "No"},
 	"ok": {"cumple": "OK", "no cumple": "N OK"},
+	"ar": {"cumple": "A", "no cumple": "R"},
+	"mark": {"cumple": u"✘", "no cumple": ""},
 }
 
 # Bueno/Malo/Regular -> symbol/text for reprocessedMode="quality"
@@ -614,7 +619,10 @@ def _buildSection(ds, data, section, typeNames=None):
 
 	if slot == "single":
 		_fillDataFromDataset(ds, data, name)
-		data[name] = _normalizeDict(data[name], mode)
+		raw = data[name]
+		data[name] = _normalizeDict(raw, mode)
+		for copy in section.get("copies") or []:
+			data[copy["name"]] = _normalizeDict(raw, copy.get("normalize", mode))
 		for g in groups:
 			data[g["name"]] = _normalizeDict(_classifyReprocessed(ds, g["ids"], g["mode"]), g["normalize"])
 		return
@@ -638,7 +646,13 @@ def _buildSection(ds, data, section, typeNames=None):
 			marks = _classifyReprocessed(oneByN, g["ids"], g["mode"])
 			data['{0}{1}'.format(g["name"], k + 1)] = _normalizeDict(marks, g["normalize"])
 		if section.get("typeName") and typeNames is not None:
-			data[slotName + "_type"] = typeNames.get(ds.getValueAt(k, "RegisterTypeID"), u"Desconocido")
+			typeID = ds.getValueAt(k, "RegisterTypeID")
+			data[slotName + "_type"] = typeNames.get(typeID, u"Desconocido")
+			data[slotName + "_typeID"] = typeID
+		for copy in section.get("copies") or []:
+			raw = {}
+			_fillDataFromDataset(oneByN, raw, "x")
+			data["{0}{1}".format(copy["name"], k + 1)] = _normalizeDict(raw["x"], copy.get("normalize", mode))
 
 
 def _buildTimeSlots(ds, data, section, slot, mode, groups):
@@ -706,6 +720,21 @@ def _buildTimeSlots(ds, data, section, slot, mode, groups):
 				data[markName] = marks
 
 
+def _header(data, typeID, papoID, nodeID, registerCode, db, station=None):
+	"""data["date"] and data["shift"] from the Timestamp of the cycle's first record of typeID."""
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
+	ds = system.db.runPrepQuery("SELECT Timestamp FROM registerhistory WHERE {0} AND RegisterTypeID = ? ORDER BY ID ASC".format(cycleSql),
+		params + [typeID], db)
+	if ds.getRowCount() > 0:
+		date = ds.getValueAt(0, 0)
+		shift = papo_core.ui.getShift(date)
+		data["date"] = date
+		data["shift"] = str(shift) if shift is not None else None
+	else:
+		data["date"] = None
+		data["shift"] = None
+
+
 def _historyList(papoID, nodeID, registerCode, db, station=None):
 	"""Records of the cycle for the history table (same columns as the report query RegisterHistory)."""
 	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station, "rh.")
@@ -727,7 +756,7 @@ def _historyList(papoID, nodeID, registerCode, db, station=None):
 # ==================== PUBLIC FUNCTIONS ====================
 
 def build(data, sections, history="RegisterHistoryStation", signatures="role", signaturePrefix=('firmaAdministrator', 'firmaOperator'),
-		signatureRoles=("Supervisor_PAPO",)):
+		signatureRoles=("Supervisor_PAPO",), header=None):
 	"""
 	Fill the data of a report from its list of sections.
 
@@ -763,6 +792,10 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 				name, mode ("check", "quality", "yn" -> siItemID/noItemID, "ok" -> the
 				item key with OK / NO OK, "number" -> number{value}papoItemID) and normalize
 			typeName (bool, optional): also name{N}_type = registertype.Description of the record
+				and name{N}_typeID = its RegisterTypeID
+			copies (list, optional): the same slots again under another name with another
+				normalize, each a dict with name and normalize (e.g. "ar" -> A / R, "mark" ->
+				check-x on Cumple, blank on No Cumple)
 		history (str): key of the history list the template table reads, or None
 		signatures (str): "role" (default, as the report scripts: Supervisor_PAPO ->
 			adminKey1, 2..., Operator -> operatorKey), "roleLast" (one adminKey and one
@@ -770,6 +803,8 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			Finalizado -> operatorKey1..., plus a last-seen alias without the number)
 		signaturePrefix (tuple): (adminKey, operatorKey) base names for signatures
 		signatureRoles (tuple): roles of a supervisor signature for "roleLast"
+		header (int, optional): RegisterTypeID whose first record gives data["date"] (its
+			Timestamp) and data["shift"] (its plant shift)
 
 	Returns:
 		None: Populates data in place
@@ -808,6 +843,8 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			_extractSignaturesByRole(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
 		if history:
 			data[history] = _historyList(papoID, nodeID, registerCode, db, station)
+		if header is not None:
+			_header(data, header, papoID, nodeID, registerCode, db, station)
 
 	except Exception as e:
 		logger.error("Error building report data: " + str(e))

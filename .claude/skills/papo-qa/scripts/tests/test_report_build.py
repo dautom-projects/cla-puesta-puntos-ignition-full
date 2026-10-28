@@ -356,6 +356,17 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertIn("papoItemID6201", data["shift10"])
 		self.assertIn("papoItemID6202", data["shift2"])
 
+	def test_copiesTypeIdAndHeader(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "register", "typeName": True, "copies": [{"name": "registerRepro", "normalize": "ar"}]},
+			{"types": [7], "name": "startShift", "slot": "single", "copies": [{"name": "startShiftmodes", "normalize": "mark"}]}], history=None, header=7)
+		self.assertEqual(data["registerRepro1"]["papoItemID6100"], "A")
+		self.assertEqual(data["registerRepro2"]["papoItemID6100"], "R")
+		self.assertEqual(data["register1_typeID"], 7)
+		self.assertEqual(data["startShiftmodes"]["papoItemID6100"], u"\u2718")
+		self.assertEqual(data["shift"], "3")
+		self.assertEqual(data["date"].dt.hour, 19)
+
 	def test_comment(self):
 		data = self._pilot(self._data(station=7))
 		self.assertEqual(data["comment"], "| T: 3 - QA. | T: 3 - 4h")
