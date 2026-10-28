@@ -49,7 +49,7 @@ Después de las dos regresiones se revisaron todas las vistas Form_* con las com
     - EJ11-0101: clave repetida, sale "7.0 7.0"
     - Varios reportes no tienen sección para el Fin
 - **Datos:**
-  - CG10-0101 asignado a un nodo `Workstation`: "View Not Found"; se probó en la línea 85
+  - ~~CG10-0101 asignado a un nodo `Workstation`: "View Not Found"; se probó en la línea 85~~ corregido en la base de prueba: el nodo 1001 pasa a CELL con su `Topic` completo; ciclo y PDF probados desde la estación (falta en producción)
   - `RegisterCode` se numera por estación, pero los reportes filtran por nodo (PO07-0101)
 - **Originales:**
   - EJ11-0101_1h no guarda nada
