@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.5
+Version: 2.8.6
 
 Changelog:
+	2026-10-28 | William M. | v2.8.6 - _normalizeDict leaves the text "None" blank (str(None) of a tag
+		without value) and an item saved twice takes its first value that has an answer
 	2026-10-28 | William M. | v2.8.5 - _detectShiftFromTimestamp uses papo_core.ui.getShift (no getHour24 left)
 	2026-10-28 | William M. | v2.8.4 - _normalizeDict keeps unicode values (the quality marks of CU11-0101
 		printed as UTF-8 bytes)
@@ -107,11 +109,14 @@ def _normalizeDict(sourceDict, mode):
 	result = {}
 	for k, v in sourceDict.items():
 		if isinstance(v, (list, tuple)):
-			val = v[0] if v else None
+			# First saved value: an item saved twice keeps the one that has an answer (PO07-0101)
+			given = [x for x in v if x is not None and x != u"None"]
+			val = given[0] if given else None
 		else:
 			val = v
 
-		if val is None:
+		# "None" is str(None) of a tag without value (PA11-0301, EJ07-0101): blank like None
+		if val is None or val == u"None":
 			result[k] = ""
 			continue
 

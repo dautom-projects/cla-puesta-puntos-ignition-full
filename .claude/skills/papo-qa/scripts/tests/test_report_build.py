@@ -304,6 +304,14 @@ class ReportBuildTest(unittest.TestCase):
 		self.report.build(data, [{"types": [7], "name": "s", "reprocessed": [{"ids": [6115], "name": "r"}]}], history=None)
 		self.assertEqual(data["r1"], {"cumplepapoItemID6115": u"\u2714"})
 
+	def test_noneTextAndRepeatedItem(self):
+		self.conn.execute("INSERT INTO registerhistory VALUES (9, 18, 30, 7, 4, 7, 'En proceso', 'x', '2026-10-28 09:00:00', ?)",
+			(_answer([(8108, None), (8108, "4.5"), (6101, "None")]),))
+		data = {"papoID": 18, "nodeID": 30, "registerCode": 4, "db": "papo_db"}
+		self.report.build(data, [{"types": [7], "name": "s", "normalize": "raw"}], history=None)
+		self.assertEqual(data["s1"]["papoItemID8108"], "4.5")
+		self.assertEqual(data["s1"]["papoItemID6101"], "")
+
 	def test_singleSlotMergesRecords(self):
 		data = self._data(station=7)
 		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "startShift", "slot": "single"}], history=None)
