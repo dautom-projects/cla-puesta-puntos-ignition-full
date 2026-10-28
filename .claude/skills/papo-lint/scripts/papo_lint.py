@@ -7,12 +7,14 @@ last RegisterCode ordered by Timestamp, project.papo_core prefix, legacy
 view.custom keys and missing papo_core wrappers in Form_* views). Writes a
 Markdown report with a summary per pattern and the detail per view.
 
-Version: 1.2.0
+Version: 1.3.0
 
 Changelog:
 	2026-10-22 | William M. | v1.0.0 - Initial version
 	2026-10-24 | William M. | v1.1.0 - Pattern formFieldDesign (fields without PAPO/Field/* class or Objects/*)
 	2026-10-25 | William M. | v1.2.0 - Patterns formNativeField, formLegacyHandler, formRootClass
+	2026-10-28 | William M. | v1.3.0 - formLegacyHandler accepts the root refreshPreviewTable handler (re-reads the cycle
+		after papo_core writes; FO10-0100_input), as papo_qa stage 4
 
 Args (CLI):
 	--project (str): Ignition project folder. Default: <repo>/cla-project
@@ -61,7 +63,7 @@ PATTERNS = collections.OrderedDict([
 	("formAnswerRecopile", "Form_*: answerRecopile sin papo_core.register"),
 	("formFieldDesign", "Form_*: campos sin clase de diseño PAPO/Field/*"),
 	("formNativeField", "Form_*: campo nativo que puede ser objeto estándar (papo_objects)"),
-	("formLegacyHandler", "Form_*: message handler fuera del estándar (solo root/saveDataRoot)"),
+	("formLegacyHandler", "Form_*: message handler fuera del estándar (solo root/saveDataRoot y root/refreshPreviewTable)"),
 	("formRootClass", "Form_*: raíz sin la clase PAPO/Form"),
 ])
 
@@ -244,7 +246,7 @@ def lintView(view, viewPath):
 
 		root = view.get("root") or {}
 		for owner, messageType in _handlers(root, True):
-			if not (owner == "root" and messageType == "saveDataRoot"):
+			if not (owner == "root" and messageType in ("saveDataRoot", "refreshPreviewTable")):
 				findings.append(("formLegacyHandler", "{} en {}".format(messageType, owner)))
 		classes = str(((root.get("props") or {}).get("style") or {}).get("classes", "")).split()
 		if "PAPO/Form" not in classes:

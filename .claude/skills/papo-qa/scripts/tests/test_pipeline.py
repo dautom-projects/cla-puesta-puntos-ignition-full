@@ -204,6 +204,18 @@ class PipelineTest(unittest.TestCase):
 		v["root"]["events"]["onStartup"]["config"]["script"] = "\talerts.showAlert(btnActionPrimary=\"saveDataRoot\")"
 		self.assertNotIn("4", self.run_case(v))
 
+	def test_flow_refresh_handler(self):
+		# FO10-0100_input: the root re-reads its table of entries when papo_core sends refreshPreviewTable
+		v = copy.deepcopy(self.clean)
+		handler = {"messageType": "refreshPreviewTable", "pageScope": True, "script": "\tpass", "sessionScope": True, "viewScope": False}
+		v["root"]["scripts"]["messageHandlers"].append(handler)
+		self.assertNotIn("4", self.run_case(v))
+		v["root"]["scripts"]["messageHandlers"][-1] = dict(handler, messageType="saveStartShift")
+		self.assertIn("4", self.run_case(v))
+		v["root"]["scripts"]["messageHandlers"].pop()
+		v["root"]["children"][0]["scripts"] = {"messageHandlers": [handler]}
+		self.assertIn("4", self.run_case(v))
+
 	def test_contract_answer_not_bound(self):
 		v = copy.deepcopy(self.clean)
 		_embeds(v)[0]["propConfig"]["custom.item.answer"]["binding"]["config"]["path"] = "this.props.params.value"

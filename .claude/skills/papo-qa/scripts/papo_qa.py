@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.14.0
+Version: 1.15.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -53,6 +53,8 @@ Changelog:
 		field that is now an object fails (general test: RE11-0101_end, GR10-0501_start, PT11-0104_start)
 	2026-10-27 | William M. | v1.14.0 - Stage 4: an alert action (btnActionPrimary / Secondary) that no handler of the
 		view receives fails (general test: MZ11-0101_4h did not save after its legacy handler was removed)
+	2026-10-28 | William M. | v1.15.0 - Stage 4: the root may also handle refreshPreviewTable (sent by papo_core after a
+		save or a signature) to re-read what the form shows from the cycle; FO10-0100_input table of entries
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -694,6 +696,10 @@ def stageFieldProps(cur, base):
 	return problems
 
 
+# Root handlers of a standard form: the save, and the refresh papo_core sends after writing (re-reads the cycle)
+STANDARD_ROOT_HANDLERS = ("saveDataRoot", "refreshPreviewTable")
+
+
 def _isStandard(view):
 	return "PAPO/Form" in str(((view["root"].get("props") or {}).get("style") or {}).get("classes", "")).split()
 
@@ -732,7 +738,7 @@ def stageFlow(cur, base, rel):
 		if pattern == "hardcodedDb" and (pattern, where) not in before:
 			problems.append('"papo_db" nuevo en {}'.format(where))
 	if _isStandard(cur):
-		legacy = [m for owner, m in _handlers(cur) if not (owner == "root" and m == "saveDataRoot")]
+		legacy = [m for owner, m in _handlers(cur) if not (owner == "root" and m in STANDARD_ROOT_HANDLERS)]
 		if legacy:
 			problems.append("handlers legacy: {}".format(", ".join(sorted(set(legacy)))))
 	# An alert whose action button sends a message no handler of the view receives (MZ11-0101_4h: its Guardar sent
