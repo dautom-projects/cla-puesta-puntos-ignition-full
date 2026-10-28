@@ -229,6 +229,33 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertEqual(data["reprocesed1"], {"nocumplepapoItemID6115": "N OK"})
 		self.assertEqual(data["reprocesed2"], {"cumplepapoItemID6115": "OK"})
 
+	def test_reprocessedGroupsAndModes(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "startShift", "slot": "single", "reprocessed": [
+			{"ids": [6115], "name": "reprocessed"},
+			{"ids": [6115], "name": "yn", "mode": "yn"},
+			{"ids": [6100], "name": "ok", "mode": "ok"},
+			{"ids": [6101], "name": "number", "mode": "number"}]}], history=None)
+		self.assertEqual(data["reprocessed"], {"nocumplepapoItemID6115": u"\u2718", "cumplepapoItemID6115": u"\u2714"})
+		self.assertEqual(data["yn"], {"noItemID6115": u"\u2718", "siItemID6115": u"\u2714"})
+		self.assertEqual(data["ok"], {"papoItemID6100": "NO OK"})
+		self.assertEqual(data["number"], {"number12.34papoItemID": u"\u2718"})
+
+	def test_typeNamePerSlot(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 4, 5, 6, 7], "name": "register", "typeName": True}], history=None)
+		self.assertEqual([data["register{}_type".format(i)] for i in (1, 2, 3)], ["Inicio de turno", "Cuatro horas", "Inicio de turno"])
+
+	def test_signaturesLastOne(self):
+		data = self._data(station=7)
+		self.report.build(data, [], history=None, signatures="roleLast")
+		self.assertEqual(data["firmaAdministrator"], "Soporte D.")
+		self.assertEqual(data["firmaOperator"], "Soporte D.")
+		self.assertNotIn("firmaAdministrator1", data)
+		data = self._data(station=7)
+		self.report.build(data, [], history=None, signatures="roleLast", signatureRoles=("INTEGRADOR",))
+		self.assertNotIn("firmaAdministrator", data)
+
 	def test_singleSlotMergesRecords(self):
 		data = self._data(station=7)
 		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "startShift", "slot": "single"}], history=None)

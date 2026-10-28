@@ -16,9 +16,12 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.3.1
+Version: 2.4.0
 
 Changelog:
+	2026-10-27 | William M. | v2.4.0 - build(): several reprocessed groups per section,
+		marks yn / ok / number, register type name per slot and the last-signature
+		mode (roleLast), so every report script fits in a build() call
 	2026-10-27 | William M. | v2.3.1 - Record shift from papo_core.ui.getShift
 		(America/Bogota, not the gateway timezone) and hora_registro (HH:mm:ss of
 		the record) in every section; OREC reports used their own shift numbering
@@ -222,7 +225,7 @@ def _fillDataFromDataset(ds, data, keyName, includeInsights=True, sep=u' *---* '
 
 
 def _classifyReprocessed(ds, allowedIds, mode):
-	"""Classify specific papoItemIDs into cumple/no-cumple (or quality) buckets."""
+	"""Classify specific papoItemIDs into marks: check (cumple/nocumple), quality (bueno/malo/regular), yn, ok or number."""
 	result = {}
 	if ds is None:
 		return result
@@ -250,6 +253,22 @@ def _classifyReprocessed(ds, allowedIds, mode):
 			if mode == "quality":
 				if valLower in QUALITY_MODES:
 					result["{0}papoItemID{1}".format(valLower, papoItemID)] = QUALITY_MODES[valLower]
+			elif mode == "yn":
+				# siItemID{ID} / noItemID{ID} (AC10-1003)
+				if valLower == "cumple" or valLower == "si":
+					result["siItemID{0}".format(papoItemID)] = 'Cumple'
+				elif valLower == "no cumple" or valLower == "no":
+					result["noItemID{0}".format(papoItemID)] = 'No Cumple'
+			elif mode == "ok":
+				# The item key itself with OK / NO OK (EC07-0101)
+				if valLower == "cumple":
+					result["papoItemID{0}".format(papoItemID)] = 'OK'
+				elif valLower == "no cumple":
+					result["papoItemID{0}".format(papoItemID)] = 'NO OK'
+			elif mode == "number":
+				# One mark per numeric answer: number{value}papoItemID, without the ID as the template uses it (TE11-0401)
+				if val is not None:
+					result["number{0}papoItemID".format(val)] = 'No Cumple'
 			else:
 				if valLower == "cumple" or valLower == "si":
 					result["cumplepapoItemID{0}".format(papoItemID)] = 'Cumple'
@@ -264,7 +283,7 @@ def _queryByTypes(typeIDs, papoID, nodeID, registerCode, db, station=None):
 	placeholders = ",".join(["?"] * len(typeIDs))
 	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
 	sql = '''
-		SELECT DataAnswer
+		SELECT DataAnswer, RegisterTypeID
 		FROM registerhistory
 		WHERE {0} AND RegisterTypeID IN ({1})
 		ORDER BY ID ASC
@@ -410,6 +429,45 @@ def _extractSignaturesByRole(data, papoID, nodeID, registerCode, db, prefixAdmin
 			data[prefixOperator] = obj.get("name", "") + " " + obj.get("lastname", "")
 
 
+def _extractSignaturesLast(data, papoID, nodeID, registerCode, db, prefixAdmin, prefixOperator, roles, station=None):
+	"""One signature per kind, the last one seen: any of roles -> prefixAdmin, Operator -> prefixOperator."""
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
+	sql = '''
+		SELECT DataAnswer
+		FROM registerhistory
+		WHERE {0} AND RegisterTypeID = 10
+		ORDER BY ID ASC
+	'''.format(cycleSql)
+	ds = system.db.runPrepQuery(sql, params, db)
+
+	for k in range(ds.getRowCount()):
+		raw = ds.getValueAt(k, "DataAnswer")
+		if not raw:
+			continue
+		try:
+			obj = system.util.jsonDecode(raw)
+		except:
+			continue
+
+		signerRoles = obj.get("role")
+		if signerRoles is None:
+			continue
+		fullName = (obj.get("name", "") + " " + obj.get("lastname", "")).strip()
+		if [r for r in roles if r in signerRoles]:
+			data[prefixAdmin] = fullName
+		if "Operator" in signerRoles:
+			data[prefixOperator] = fullName
+
+
+def _registerTypeNames(db):
+	"""RegisterTypeID -> registertype.Description."""
+	names = {}
+	ds = system.db.runPrepQuery("SELECT ID, Description FROM registertype", [], db)
+	for i in range(ds.getRowCount()):
+		names[ds.getValueAt(i, 0)] = ds.getValueAt(i, 1)
+	return names
+
+
 def _detectShiftFromTimestamp(dt):
 	"""Determine shift number from a java.util.Date timestamp."""
 	if dt is None:
@@ -479,21 +537,27 @@ def _processAutoSectionsMultiShift(ds, data, typeName, normalizeMode):
 			data[slotName] = _normalizeDict(data[slotName], normalizeMode)
 
 
-def _buildSection(ds, data, section):
+def _reprocessedGroups(section, mode):
+	"""Reprocessed groups of a section: the list "reprocessed" plus the one-group shorthand reprocessedIds."""
+	groups = list(section.get("reprocessed") or [])
+	if section.get("reprocessedIds"):
+		groups.insert(0, {"ids": section["reprocessedIds"], "name": section.get("reprocessedName", "reprocesed" + section["name"]),
+			"mode": section.get("reprocessedMode", "check"), "normalize": section.get("reprocessedNormalize", mode)})
+	return [dict(g, mode=g.get("mode", "check"), normalize=g.get("normalize", mode)) for g in groups]
+
+
+def _buildSection(ds, data, section, typeNames=None):
 	"""One build() section: a key per record (name1, name2...) or one merged key, plus its reprocessed marks."""
 	name = section["name"]
 	slot = section.get("slot", "record")
 	mode = section.get("normalize", "check")
-	reprocessedIds = section.get("reprocessedIds")
-	reprocessedMode = section.get("reprocessedMode", "check")
-	reprocessedName = section.get("reprocessedName", "reprocesed" + name)
-	reprocessedNormalize = section.get("reprocessedNormalize", mode)
+	groups = _reprocessedGroups(section, mode)
 
 	if slot == "single":
 		_fillDataFromDataset(ds, data, name)
 		data[name] = _normalizeDict(data[name], mode)
-		if reprocessedIds:
-			data[reprocessedName] = _normalizeDict(_classifyReprocessed(ds, reprocessedIds, reprocessedMode), reprocessedNormalize)
+		for g in groups:
+			data[g["name"]] = _normalizeDict(_classifyReprocessed(ds, g["ids"], g["mode"]), g["normalize"])
 		return
 
 	rowCount = ds.getRowCount()
@@ -507,9 +571,11 @@ def _buildSection(ds, data, section):
 		slotName = '{0}{1}'.format(name, k + 1)
 		_fillDataFromDataset(oneByN, data, slotName)
 		data[slotName] = _normalizeDict(data[slotName], mode)
-		if reprocessedIds:
-			marks = _classifyReprocessed(oneByN, reprocessedIds, reprocessedMode)
-			data['{0}{1}'.format(reprocessedName, k + 1)] = _normalizeDict(marks, reprocessedNormalize)
+		for g in groups:
+			marks = _classifyReprocessed(oneByN, g["ids"], g["mode"])
+			data['{0}{1}'.format(g["name"], k + 1)] = _normalizeDict(marks, g["normalize"])
+		if section.get("typeName") and typeNames is not None:
+			data[slotName + "_type"] = typeNames.get(ds.getValueAt(k, "RegisterTypeID"), u"Desconocido")
 
 
 def _historyList(papoID, nodeID, registerCode, db, station=None):
@@ -532,7 +598,8 @@ def _historyList(papoID, nodeID, registerCode, db, station=None):
 
 # ==================== PUBLIC FUNCTIONS ====================
 
-def build(data, sections, history="RegisterHistoryStation", signatures="role", signaturePrefix=('firmaAdministrator', 'firmaOperator')):
+def build(data, sections, history="RegisterHistoryStation", signatures="role", signaturePrefix=('firmaAdministrator', 'firmaOperator'),
+		signatureRoles=("Supervisor_PAPO",)):
 	"""
 	Fill the data of a report from its list of sections.
 
@@ -560,18 +627,26 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 				the section (defaults to "reprocesed" + name)
 			reprocessedNormalize (str, optional): mapping of the marks (defaults to
 				the section normalize; e.g. "ok" -> OK / N OK)
+			reprocessed (list, optional): more groups of marks, each a dict with ids,
+				name, mode ("check", "quality", "yn" -> siItemID/noItemID, "ok" -> the
+				item key with OK / NO OK, "number" -> number{value}papoItemID) and normalize
+			typeName (bool, optional): also name{N}_type = registertype.Description of the record
 		history (str): key of the history list the template table reads, or None
 		signatures (str): "role" (default, as the report scripts: Supervisor_PAPO ->
-			adminKey1, 2..., Operator -> operatorKey) or "status" (Revisado -> adminKey1...,
+			adminKey1, 2..., Operator -> operatorKey), "roleLast" (one adminKey and one
+			operatorKey, the last of each) or "status" (Revisado -> adminKey1...,
 			Finalizado -> operatorKey1..., plus a last-seen alias without the number)
 		signaturePrefix (tuple): (adminKey, operatorKey) base names for signatures
+		signatureRoles (tuple): roles of a supervisor signature for "roleLast"
 
 	Returns:
 		None: Populates data in place
 
 	Changelog:
 		2026-10-27 | William M. | v1.0.0 - Initial version (pilot AC10-0202, AC10-0301,
-			AC10-1101, CA02-2102); reprocessedNormalize for FO10-0601 / FO10-1701
+			AC10-1101, CA02-2102); reprocessedNormalize for FO10-0601 / FO10-1701;
+			reprocessed groups and modes yn / ok / number, typeName and signatures
+			"roleLast" for the rest of the reports
 	"""
 	papoID = data.get('papoID')
 	nodeID = data.get('nodeID')
@@ -587,13 +662,16 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 	logger = system.util.getLogger(ref)
 
 	try:
+		typeNames = _registerTypeNames(db) if [s for s in sections if s.get("typeName")] else None
 		for section in sections:
 			ds = _queryByTypes(section["types"], papoID, nodeID, registerCode, db, station)
-			_buildSection(ds, data, section)
+			_buildSection(ds, data, section, typeNames)
 
 		data["comment"] = _extractComments(papoID, nodeID, registerCode, db, station)
 		if signatures == "status":
 			_extractSignatures(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
+		elif signatures == "roleLast":
+			_extractSignaturesLast(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], signatureRoles, station)
 		else:
 			_extractSignaturesByRole(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
 		if history:
