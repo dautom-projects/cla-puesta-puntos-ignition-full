@@ -2,15 +2,28 @@
 papo_core.report
 
 Report data extraction for PAPO PDF reports.
-Two modes: config-driven (extractReportData) with explicit sections
-list, and auto-configured (extractReportDataAuto) which discovers
+build() is the one call of a report script: the report lists its
+sections and the engine reads the cycle, fills the keys of the
+template, the comment, the signatures and the history list. The
+older entry points stay: config-driven (extractReportData) and
+auto-configured (extractReportDataAuto), which discovers
 RegisterTypeIDs from papoitem_registertype, derives section names
 from registertype.Description, and handles multi-shift forms with
 turno prefix grouping.
 
-Version: 2.2.0
+Every query reads only the cycle of the report station when the viewer
+passes workstationNodeID (Gestion): two stations of the same node number
+their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
+RegisterCode). Without it the cycle is read by node, as before.
+
+Version: 2.3.0
 
 Changelog:
+	2026-10-27 | William M. | v2.3.0 - build(): sections with one slot
+		per record (or one merged key), reprocessed classification with its
+		mark, comment, signatures and the history list, so a report script
+		is only its list of sections. Station filter (workstationNodeID) in
+		every query
 	2026-10-22 | William M. | v2.2.0 - extractShiftChecklist: per-shift
 		OK / X / N/A columns for checklists filled once per shift (FU10-0202)
 	2026-08-12 | William M. | v2.1.1 - Fix _extractSignatures classifying
@@ -53,6 +66,12 @@ QUALITY_MODES = {
 
 
 # ==================== INTERNAL HELPERS ====================
+
+def _cycleFilter(papoID, nodeID, registerCode, station=None, alias=""):
+	"""SQL condition and parameters of one cycle; the station only applies when it is given."""
+	sql = "{0}PapoID = ? AND {0}NodeID = ? AND {0}RegisterCode = ? AND (? IS NULL OR {0}WorkstationNodeID = ?)".format(alias)
+	return sql, [papoID, nodeID, registerCode, station, station]
+
 
 def _normalizeDict(sourceDict, mode):
 	"""Normalize answer values to symbols/text per mode, or leave as-is for 'raw'."""
@@ -236,17 +255,17 @@ def _classifyReprocessed(ds, allowedIds, mode):
 	return result
 
 
-def _queryByTypes(typeIDs, papoID, nodeID, registerCode, db):
+def _queryByTypes(typeIDs, papoID, nodeID, registerCode, db, station=None):
 	"""Query registerhistory filtered by one or more RegisterTypeID (IN clause)."""
 	placeholders = ",".join(["?"] * len(typeIDs))
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
 	sql = '''
 		SELECT DataAnswer
 		FROM registerhistory
-		WHERE PapoID = ? AND NodeID = ? AND RegisterCode = ? AND RegisterTypeID IN ({0})
+		WHERE {0} AND RegisterTypeID IN ({1})
 		ORDER BY ID ASC
-	'''.format(placeholders)
-	params = [papoID, nodeID, registerCode] + list(typeIDs)
-	return system.db.runPrepQuery(sql, params, db)
+	'''.format(cycleSql, placeholders)
+	return system.db.runPrepQuery(sql, params + list(typeIDs), db)
 
 
 def _processSection(ds, data, section):
@@ -284,15 +303,16 @@ def _processSection(ds, data, section):
 			data['{0}{1}'.format(reprocessedName, k + 1)] = _classifyReprocessed(oneByN, reprocessedIds, reprocessedMode)
 
 
-def _extractComments(papoID, nodeID, registerCode, db):
+def _extractComments(papoID, nodeID, registerCode, db, station=None):
 	"""Collect unique insights text from every row in this cycle."""
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
 	sql = '''
 		SELECT DataAnswer
 		FROM registerhistory
-		WHERE PapoID = ? AND NodeID = ? AND RegisterCode = ?
+		WHERE {0}
 		ORDER BY ID ASC
-	'''
-	ds = system.db.runPrepQuery(sql, [papoID, nodeID, registerCode], db)
+	'''.format(cycleSql)
+	ds = system.db.runPrepQuery(sql, params, db)
 
 	insightsList = []
 	for row in range(ds.getRowCount()):
@@ -318,16 +338,17 @@ def _extractComments(papoID, nodeID, registerCode, db):
 	return ". ".join(uniqueInsights)
 
 
-def _extractSignatures(data, papoID, nodeID, registerCode, db, prefixAdmin, prefixOperator):
+def _extractSignatures(data, papoID, nodeID, registerCode, db, prefixAdmin, prefixOperator, station=None):
 	"""Numbered signatures (prefix1, prefix2, ...) plus a last-seen convenience alias."""
 	# Query includes Status to distinguish operator (Finalizado) from supervisor (Revisado)
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
 	sql = '''
 		SELECT DataAnswer, Status
 		FROM registerhistory
-		WHERE PapoID = ? AND NodeID = ? AND RegisterCode = ? AND RegisterTypeID = 10
+		WHERE {0} AND RegisterTypeID = 10
 		ORDER BY ID ASC
-	'''
-	ds = system.db.runPrepQuery(sql, [papoID, nodeID, registerCode], db)
+	'''.format(cycleSql)
+	ds = system.db.runPrepQuery(sql, params, db)
 
 	adminIdx = 0
 	operatorIdx = 0
@@ -353,6 +374,38 @@ def _extractSignatures(data, papoID, nodeID, registerCode, db, prefixAdmin, pref
 			data[prefixAdmin] = fullName
 
 
+def _extractSignaturesByRole(data, papoID, nodeID, registerCode, db, prefixAdmin, prefixOperator, station=None):
+	"""Signatures by the signer's roles, as the report scripts do: Supervisor_PAPO -> prefixAdmin1, 2... and
+	Operator -> prefixOperator (a user with both roles fills both)."""
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
+	sql = '''
+		SELECT DataAnswer
+		FROM registerhistory
+		WHERE {0} AND RegisterTypeID = 10
+		ORDER BY ID ASC
+	'''.format(cycleSql)
+	ds = system.db.runPrepQuery(sql, params, db)
+
+	adminIdx = 0
+	for k in range(ds.getRowCount()):
+		raw = ds.getValueAt(k, "DataAnswer")
+		if not raw:
+			continue
+		try:
+			obj = system.util.jsonDecode(raw)
+		except:
+			continue
+
+		roles = obj.get("role")
+		if roles is None:
+			continue
+		if "Supervisor_PAPO" in roles:
+			adminIdx += 1
+			data["{0}{1}".format(prefixAdmin, adminIdx)] = (obj.get("name", "") + " " + obj.get("lastname", "")).strip()
+		if "Operator" in roles:
+			data[prefixOperator] = obj.get("name", "") + " " + obj.get("lastname", "")
+
+
 def _detectShiftFromTimestamp(dt):
 	"""Determine shift number from a java.util.Date timestamp."""
 	if dt is None:
@@ -369,17 +422,17 @@ def _detectShiftFromTimestamp(dt):
 		return "0"
 
 
-def _queryForAuto(typeIDs, papoID, nodeID, registerCode, db):
+def _queryForAuto(typeIDs, papoID, nodeID, registerCode, db, station=None):
 	"""Query registerhistory including Timestamp for shift detection."""
 	placeholders = ",".join(["?"] * len(typeIDs))
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
 	sql = '''
 		SELECT DataAnswer, Timestamp
 		FROM registerhistory
-		WHERE PapoID = ? AND NodeID = ? AND RegisterCode = ? AND RegisterTypeID IN ({0})
+		WHERE {0} AND RegisterTypeID IN ({1})
 		ORDER BY ID ASC
-	'''.format(placeholders)
-	params = [papoID, nodeID, registerCode] + list(typeIDs)
-	return system.db.runPrepQuery(sql, params, db)
+	'''.format(cycleSql, placeholders)
+	return system.db.runPrepQuery(sql, params + list(typeIDs), db)
 
 
 def _processAutoSections(ds, data, typeName, normalizeMode):
@@ -422,14 +475,134 @@ def _processAutoSectionsMultiShift(ds, data, typeName, normalizeMode):
 			data[slotName] = _normalizeDict(data[slotName], normalizeMode)
 
 
+def _buildSection(ds, data, section):
+	"""One build() section: a key per record (name1, name2...) or one merged key, plus its reprocessed marks."""
+	name = section["name"]
+	slot = section.get("slot", "record")
+	mode = section.get("normalize", "check")
+	reprocessedIds = section.get("reprocessedIds")
+	reprocessedMode = section.get("reprocessedMode", "check")
+	reprocessedName = section.get("reprocessedName", "reprocesed" + name)
+
+	if slot == "single":
+		_fillDataFromDataset(ds, data, name)
+		data[name] = _normalizeDict(data[name], mode)
+		if reprocessedIds:
+			data[reprocessedName] = _normalizeDict(_classifyReprocessed(ds, reprocessedIds, reprocessedMode), mode)
+		return
+
+	rowCount = ds.getRowCount()
+	colCount = ds.getColumnCount()
+	headers = [ds.getColumnName(i) for i in range(colCount)]
+
+	# Only the slots of the saved records exist, as in the report scripts it replaces
+	for k in range(rowCount):
+		values = [ds.getValueAt(k, i) for i in range(colCount)]
+		oneByN = system.dataset.toDataSet(headers, [values])
+		slotName = '{0}{1}'.format(name, k + 1)
+		_fillDataFromDataset(oneByN, data, slotName)
+		data[slotName] = _normalizeDict(data[slotName], mode)
+		if reprocessedIds:
+			marks = _classifyReprocessed(oneByN, reprocessedIds, reprocessedMode)
+			data['{0}{1}'.format(reprocessedName, k + 1)] = _normalizeDict(marks, mode)
+
+
+def _historyList(papoID, nodeID, registerCode, db, station=None):
+	"""Records of the cycle for the history table (same columns as the report query RegisterHistory)."""
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station, "rh.")
+	sql = '''
+		SELECT
+			rh.Timestamp AS Fecha,
+			rh.[User] AS "Global ID",
+			rh.Status AS "Estado",
+			rt.Description AS "Tipo Registro",
+			rh.RegisterTypeID
+		FROM registerhistory rh
+		INNER JOIN registertype rt ON rh.RegisterTypeID = rt.ID
+		WHERE {0}
+		ORDER BY rh.Timestamp ASC
+	'''.format(cycleSql)
+	return system.dataset.toDataSet(system.db.runPrepQuery(sql, params, db))
+
+
 # ==================== PUBLIC FUNCTIONS ====================
+
+def build(data, sections, history="RegisterHistoryStation", signatures="role", signaturePrefix=('firmaAdministrator', 'firmaOperator')):
+	"""
+	Fill the data of a report from its list of sections.
+
+	The one call of a report script: each section names the register types
+	it reads and the key the template uses; the engine adds the comment, the
+	signatures and the history list. Logic that only one form has stays as a
+	few lines after this call in its report.
+
+	Version: 1.0.0
+
+	Args:
+		data (dict): Report data dict with papoID, nodeID, registerCode, db and,
+			when the viewer passes it, workstationNodeID (only that station's cycle)
+		sections (list): Each item is a dict:
+			types (list[int]): RegisterTypeID(s) read together, ordered by ID
+			name (str): base key in data
+			slot (str): "record" (default) = one key per record, name1..nameN;
+				"single" = all the records merged in data[name]
+			normalize (str): "check" (default, Cumple/No Cumple -> check/x
+				symbols), "yn" (-> Si/No), "ok" (-> OK/N OK), "raw" (no mapping)
+			reprocessedIds (list[int], optional): papoItemIDs also marked in
+				cumplepapoItemID{ID} / nocumplepapoItemID{ID} (or bueno/malo/regular)
+			reprocessedMode (str, optional): "check" (default) or "quality"
+			reprocessedName (str, optional): base key of the marks, numbered like
+				the section (defaults to "reprocesed" + name)
+		history (str): key of the history list the template table reads, or None
+		signatures (str): "role" (default, as the report scripts: Supervisor_PAPO ->
+			adminKey1, 2..., Operator -> operatorKey) or "status" (Revisado -> adminKey1...,
+			Finalizado -> operatorKey1..., plus a last-seen alias without the number)
+		signaturePrefix (tuple): (adminKey, operatorKey) base names for signatures
+
+	Returns:
+		None: Populates data in place
+
+	Changelog:
+		2026-10-27 | William M. | v1.0.0 - Initial version (pilot AC10-0202, AC10-0301,
+			AC10-1101, CA02-2102)
+	"""
+	papoID = data.get('papoID')
+	nodeID = data.get('nodeID')
+	registerCode = data.get('registerCode')
+	db = data.get('db', 'papo_db') or 'papo_db'
+	station = data.get('workstationNodeID')
+
+	try:
+		refResult = system.db.runPrepQuery("SELECT Reference FROM papo WHERE ID = ?", [papoID], db)
+		ref = refResult.getValueAt(0, 0) if refResult.getRowCount() > 0 else "papo_core.report"
+	except:
+		ref = "papo_core.report"
+	logger = system.util.getLogger(ref)
+
+	try:
+		for section in sections:
+			ds = _queryByTypes(section["types"], papoID, nodeID, registerCode, db, station)
+			_buildSection(ds, data, section)
+
+		data["comment"] = _extractComments(papoID, nodeID, registerCode, db, station)
+		if signatures == "status":
+			_extractSignatures(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
+		else:
+			_extractSignaturesByRole(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
+		if history:
+			data[history] = _historyList(papoID, nodeID, registerCode, db, station)
+
+	except Exception as e:
+		logger.error("Error building report data: " + str(e))
+
 
 def extractReportData(data, sections, signaturePrefix=('firmaAdministrator', 'firmaOperator')):
 	"""
 	Extract and flatten registerhistory data into the report data dict.
 
 	Args:
-		data (dict): Report data dict with papoID, nodeID, registerCode, db
+		data (dict): Report data dict with papoID, nodeID, registerCode, db and
+			optional workstationNodeID (only that station's cycle)
 		sections (list): Each item is a dict:
 			types (list[int]): RegisterTypeID(s) grouped in one IN(...) query
 			name (str): base key written into data (e.g. "inicio", "item")
@@ -457,6 +630,7 @@ def extractReportData(data, sections, signaturePrefix=('firmaAdministrator', 'fi
 	nodeID = data.get('nodeID')
 	registerCode = data.get('registerCode')
 	db = data.get('db', 'papo_db') or 'papo_db'
+	station = data.get('workstationNodeID')
 
 	try:
 		refResult = system.db.runPrepQuery("SELECT Reference FROM papo WHERE ID = ?", [papoID], db)
@@ -467,11 +641,11 @@ def extractReportData(data, sections, signaturePrefix=('firmaAdministrator', 'fi
 
 	try:
 		for section in sections:
-			ds = _queryByTypes(section["types"], papoID, nodeID, registerCode, db)
+			ds = _queryByTypes(section["types"], papoID, nodeID, registerCode, db, station)
 			_processSection(ds, data, section)
 
-		data["comment"] = _extractComments(papoID, nodeID, registerCode, db)
-		_extractSignatures(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1])
+		data["comment"] = _extractComments(papoID, nodeID, registerCode, db, station)
+		_extractSignatures(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
 
 	except Exception as e:
 		logger.error("Error extracting report data: " + str(e))
@@ -493,6 +667,7 @@ def extractReportDataAuto(data):
 			nodeID (int): Node ID
 			registerCode (int): Register code for this form session
 			db (str): Database connection name
+			workstationNodeID (int, optional): Only that station's cycle
 			multiShift (bool): Enable turno grouping (default False)
 			normalizeMode (str): "check" (default), "yn", "ok", "raw"
 
@@ -509,6 +684,7 @@ def extractReportDataAuto(data):
 	multiShift = data.get('multiShift', False)
 	normalizeMode = data.get('normalizeMode', 'check')
 	sigPrefix = data.get('signaturePrefix', ('firmaAdministrator', 'firmaOperator'))
+	station = data.get('workstationNodeID')
 
 	# Resolve MasterPapoID
 	try:
@@ -545,7 +721,7 @@ def extractReportDataAuto(data):
 			rawName = typesDs.getValueAt(i, "Description")
 			typeName = rawName.replace(" ", "").replace(",", "")
 
-			ds = _queryForAuto([typeID], papoID, nodeID, registerCode, db)
+			ds = _queryForAuto([typeID], papoID, nodeID, registerCode, db, station)
 			if ds.getRowCount() == 0:
 				continue
 
@@ -555,11 +731,11 @@ def extractReportDataAuto(data):
 				_processAutoSectionsMultiShift(ds, data, typeName, normalizeMode)
 
 		# Extract comments
-		data["comment"] = _extractComments(papoID, nodeID, registerCode, db)
+		data["comment"] = _extractComments(papoID, nodeID, registerCode, db, station)
 
 		# Extract signatures
 		_extractSignatures(
-			data, papoID, nodeID, registerCode, db, sigPrefix[0], sigPrefix[1])
+			data, papoID, nodeID, registerCode, db, sigPrefix[0], sigPrefix[1], station)
 
 	except Exception as e:
 		logger.error("Error in extractReportDataAuto: " + str(e))
@@ -577,7 +753,8 @@ def extractShiftChecklist(data, typeIDs, prefix="t", marks=None):
 	Version: 1.0.0
 
 	Args:
-		data (dict): Report data dict with papoID, nodeID, registerCode, db
+		data (dict): Report data dict with papoID, nodeID, registerCode, db and
+			optional workstationNodeID (only that station's cycle)
 		typeIDs (list[int]): RegisterTypeID(s) of the checklist records
 		prefix (str): Base key per shift, data["{prefix}{shift}"] (default "t")
 		marks (dict, optional): Lowercase answer -> (column, mark). Default:
@@ -610,7 +787,7 @@ def extractShiftChecklist(data, typeIDs, prefix="t", marks=None):
 		for shift in (1, 2, 3):
 			data["{0}{1}".format(prefix, shift)] = {"user": "", "date": None}
 
-		ds = _queryForAuto(typeIDs, papoID, nodeID, registerCode, db)
+		ds = _queryForAuto(typeIDs, papoID, nodeID, registerCode, db, data.get('workstationNodeID'))
 		for i in range(ds.getRowCount()):
 			raw = ds.getValueAt(i, "DataAnswer")
 			if not raw:
