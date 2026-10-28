@@ -29,13 +29,13 @@
 
 ## Objetos estándar (`Objects/`)
 
-- Aplicar formulario por formulario (un commit por formulario, `git revert` para deshacer); ver `OBJETOS_ESTANDAR.md`
-- Agregar a papo-lint el patrón "campos fuera de objetos estándar" para medir la adopción
-- Diseño estándar (`ESTANDAR_DISENO.md`, herramienta papo-design): revisar el piloto `Form_EA11-0901_1h_PruebaPiloto` en el Designer; si pasa, desplegar por fases (familia EA11-0901 + `Metalurgia/Fundamental Views/Checkbox`, luego por área). Simulado: 238 de 239 formularios aplicables con la recolección idéntica; `FU10-0202_start` a mano
+- ~~Aplicar formulario por formulario (un commit por formulario, `git revert` para deshacer); ver `OBJETOS_ESTANDAR.md`~~ hecho: 239 formularios con objetos estándar (fases 2–5 del plan, hasta 2026-10-27)
+- ~~Agregar a papo-lint el patrón "campos fuera de objetos estándar" para medir la adopción~~ hecho: papo-lint marca "campo nativo que puede ser objeto estándar"
+- ~~Diseño estándar (`ESTANDAR_DISENO.md`, herramienta papo-design): revisar el piloto `Form_EA11-0901_1h_PruebaPiloto` en el Designer; si pasa, desplegar por fases (familia EA11-0901 + `Metalurgia/Fundamental Views/Checkbox`, luego por área). Simulado: 238 de 239 formularios aplicables con la recolección idéntica; `FU10-0202_start` a mano~~ hecho: piloto aprobado y desplegado por área (fases 1–3)
 - Siguiente nivel del diseño: clases para preguntas, subtítulos y encabezados (confirmar antes que una clase en la label equivale a `textStyle`), tokens `--papo-*` en el tema, plantilla para formularios nuevos
-- Tema `cla-light`/`cla-dark` roto (`:root` sin cerrar: ~75 reglas que el Designer descarta; selectores de input que no coinciden; `boder-color`; dropdowns a 150 px fijos). Parche propuesto en `.claude/docs/theme/`, sin instalar: probar en PAPOS (reinicio de Perspective) y decidir. Ver "Evaluación" en `ESTANDAR_DISENO.md`. Piloto instalado en PAPOS el 2026-10-24 (bloque con alcance `PAPO/Form`, solo el piloto): revisar Designer contra Chrome y decidir si se aplica el parche global
+- ~~Tema `cla-light`/`cla-dark` roto (`:root` sin cerrar: ~75 reglas que el Designer descarta; selectores de input que no coinciden; `boder-color`; dropdowns a 150 px fijos). Parche propuesto en `.claude/docs/theme/`, sin instalar: probar en PAPOS (reinicio de Perspective) y decidir. Ver "Evaluación" en `ESTANDAR_DISENO.md`. Piloto instalado en PAPOS el 2026-10-24 (bloque con alcance `PAPO/Form`, solo el piloto): revisar Designer contra Chrome y decidir si se aplica el parche global~~ hecho el 2026-10-26: parche global instalado en PAPOS, sin el bloque piloto (fase 4, `DESPLIEGUE_ESTANDAR.md`)
 
-- Objetos v2 en el piloto (2026-10-24): verificar en sesión que los valores se conservan al cerrar/reabrir la sección, guardar un registro y comparar con el original, medir la carga. Si pasa: `papo_objects.py` simula 238 formularios convertibles (4,555 campos)
+- ~~Objetos v2 en el piloto (2026-10-24): verificar en sesión que los valores se conservan al cerrar/reabrir la sección, guardar un registro y comparar con el original, medir la carga. Si pasa: `papo_objects.py` simula 238 formularios convertibles (4,555 campos)~~ hecho: piloto verificado (etapas 8 y 9) y 4,555 campos convertidos
 
 ## Errores de los formularios originales (encontrados con los pilotos, 2026-10-25)
 
@@ -52,7 +52,7 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 - `Ensamble/Form_EA11-0901_2h`: una etiqueta de "Parámetros de operación y control proceso" muestra "null" (igual en el original)
 - `OREC/Form_CU11-0101_start`: la sección "Verificacion programa de curado y secado" se abre más baja que su contenido (final cortado) — **corregido por el estándar** (papo_objects v2.9, `fitSections`: la sección conserva su alto y alcanza para sus filas)
 - ~~`papoitem.Description` con tildes mal codificadas en la base ("MÃ¡quina" por "Máquina"), p. ej. 11185–11196~~ corregido el 2026-10-27 en cla-db-papo (62 ítems y `registertype` 13; `.claude/docs/sql/2026-10-27_tildes_papoitem.sql`, falta producción). Las palabras escritas sin tilde ("presion", "operacion") no se tocaron
-- `OREC/Form_CU11-0101_start`: no existe `FlexContainerGroup7`; `papo_core.register.save` recorre los grupos 1..N y los 4 checkbox de `FlexContainerGroup8` nunca se guardan
+- ~~`OREC/Form_CU11-0101_start`: no existe `FlexContainerGroup7`; `papo_core.register.save` recorre los grupos 1..N y los 4 checkbox de `FlexContainerGroup8` nunca se guardan~~ corregido el 2026-10-28 en `papo_core.register` v1.1.0 (recorre los grupos que existen); falta verlo en el navegador
 - ~~Supervisor guardado con `papoItemID` nulo en `Ensamble/Form_EA11-1601_start` y `Form_EA11-2601_start`~~ corregido el 2026-10-26 (11233 y 11355). Queda `OREC/Form_PO07-0101_start` (`FlexContainer15/TextField`, `papoItemID` nulo)
 - `F&A/Form_AC10-0201_start`: "Cubierta sin rayones." aparece dos veces en "Condiciones de operacion" y varias preguntas largas se cortan en su fila (también en el original)
 - ~~`custom.insights` de los formularios (original y estándar): `preInsight` usa `initialPapoDateTime` y solo se recalcula cuando cambia el texto de Observaciones; si el operario no escribe nada se guarda el turno y la hora del diseño ("T: 3, H: 14:35" en un registro de las 07:55; en el PDF de PO11-0101 sale "T: 3, H: 14:13")~~ corregido el 2026-10-28 en `papo_core.ui.initForm` v1.1.0 (`ui` v1.3.0): rehace los insights con la hora de apertura; falta verlo en el navegador
@@ -108,7 +108,7 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
 ## Mejoras opcionales (fuera de la estandarización básica)
 
 - Preguntas en una consulta por vista: hoy hay ~3,520 bindings que consultan `papoitem` uno por pregunta en 153 vistas. `papo_core.items.getQuestions(value)` y `getQuestionText(value)` ya existen (sin uso); se probaron y revirtieron en el piloto EC07-0101 barcada por no ser parte del estándar
-- `papo_core.ui.getShift(dateTime=None)` existe sin uso: reemplazar los cálculos con `getHour24` (ui.preInsight, sign.autoCloseOpenForms, report x2, custom.shift de Metalurgia FU10-0202_dia y TR11-0102_start, que además tiene el bug de turno)
+- ~~`papo_core.ui.getShift(dateTime=None)` existe sin uso: reemplazar los cálculos con `getHour24` (ui.preInsight, sign.autoCloseOpenForms, report x2, custom.shift de Metalurgia FU10-0202_dia y TR11-0102_start, que además tiene el bug de turno)~~ hecho el 2026-10-28: ya no queda `getHour24` en papo_core ni en los Form_* (FU10-0202_dia y TR11-0102_start con el bug de turno corregido). Los filtros de fecha de Gestión y Overview lo siguen usando para redondear la hora, en la misma zona que `setTime`: no calculan turno
 
 ## Verificaciones pendientes
 
@@ -116,7 +116,7 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
 
 - Base de prueba: ningún ítem de EA11-0901 (papo 1) tiene el tipo 2 en `papoitem_registertype`, así que el Template nunca muestra el botón "2 hr". La `_2h` se probó puesta un momento en la ruta de `_1h` (2026-10-27); confirmar en producción que el botón existe
 
-- `papo_core.register._getLastRegisterCode` ordena por `ID DESC` en lugar de `RegisterCode DESC` (la regla del proyecto); en la práctica devuelve lo mismo porque ID es creciente
+- ~~`papo_core.register._getLastRegisterCode` ordena por `ID DESC` en lugar de `RegisterCode DESC` (la regla del proyecto); en la práctica devuelve lo mismo porque ID es creciente~~ corregido el 2026-10-28 (`register` v1.1.0)
 
 - Scheduled Script de gateway que llama a `papo_core.sign.autoCloseOpenForms("papo_db")`: conexión hardcodeada
 

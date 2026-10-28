@@ -35,6 +35,22 @@ Un commit por familia (`refactor: estándar en <familia>`), así que una familia
 - Las copias `F&A/Form_* D` y `F&A/Form__end` quedan como están (decisión del usuario)
 - `Metalurgia/Fundamental Views/Checkbox` ya no la usa ningún formulario (BACKLOG)
 
+## Después del estándar: reportes con `build()`, estación y correcciones (2026-10-27 / 28)
+
+Va después de los pasos 1–6 (o junto con ellos, respetando el orden). Filas de cada recurso en `DEPLOY_INVENTORY.md` con fecha 2026-10-27 y 2026-10-28.
+
+| # | Qué | Dónde | Por qué va en ese lugar | Verificar |
+|:-:|---|---|---|---|
+| 7 | Project Library `papo_core`: `report` v2.8.6, `register` v1.1.0, `ui` v1.3.0, `sign` v1.2.1 | `cla-project/ignition/script-python/papo_core/` | Los 65 reportes llaman `papo_core.report.build()` / `monthGrid` / `extractShiftChecklist`; `register` y `ui` arreglan el guardado (grupos con número salteado) y la hora de las observaciones de todos los formularios | 74 tests (`tests/test_report_build.py`); sin errores de script al abrir un formulario y un PDF |
+| 8 | Los 65 reportes | `cla-project/com.inductiveautomation.reporting/reports/` (`data.bin`) | Necesitan el paso 7. Sin estación (Gestión vieja) leen el ciclo por nodo, como antes | El PDF de un ciclo por área desde Gestión; informe `.claude/docs/qa/reportes-build-informe.md` |
+| 9 | `Page/Gestion` y `Page/Gestion Gerencia` | `views/Page/` | Pasan `workstationNodeID` al visor (PDF solo de la estación) y la ruta del reporte sin error; los reportes viejos ignoran el parámetro, así que el orden 8 / 9 no rompe nada | Cambiar de fila sin error en el log; el historial del PDF solo con la estación |
+| 10 | `Page/Digitalizacion_Template` | `views/Page/` | La vista previa y el último tipo de registro por estación | Una estación no ve el ciclo de otra con el mismo código |
+| 11 | Correcciones de formularios | `views/Page/Embedded/`: `Metalurgia/Form_FU10-0202_dia`, `Form_TR11-0102_start`, `Ensamble/Form_EA11-1601_start`, `F&A/Form_GR10-0501_start` (IDs y niveles), `F&A/Form_FO10-0601_input` | Después de su familia del paso 6 y del paso 7 (`getShift`) | Abrir y guardar un registro de cada uno |
+| 12 | Editor de nodos `Page/PopUps/CreateOrEditNode-Clarios` | `views/Page/PopUps/` | Independiente (MES Core) | Crear un nodo CELL de prueba con el Topic vacío |
+| 13 | SQL del nodo de la segunda estación de CG10-0101 | `.claude/docs/sql/2026-10-27_nodo_CG10-0101_cell.sql` | Solo si en producción el nodo tiene el mismo ID (1001), `Type = 'Workstation'` y `Topic = 'PC'`: el archivo es idempotente y no toca otro nodo. Confirmar antes con un `SELECT` | El Template abre CG10-0101 en esa estación y Gestión encuentra su reporte |
+
+Los reportes no se pueden abrir en develop sin ciclos de prueba; los 8 sin ciclos tienen el mismo script que uno probado (informe de la prueba).
+
 ## Tema global
 
 Desde el 2026-10-26 el tema no tiene el bloque `PILOTO PAPO` con alcance `.psc-PAPO\/Form`: el parche (`.claude/docs/theme/*.fix.patch`) se aplicó a todo el tema, así que la corrección llega a todas las vistas y el Designer dibuja igual que los navegadores.
