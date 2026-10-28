@@ -1,6 +1,6 @@
 # Procedimiento de Estandarización de Formularios PAPO — v3
 
-**Versión:** 3.1.0 · **Fecha:** 2026-10-27 · **Autor:** William M.
+**Versión:** 3.2.0 · **Fecha:** 2026-10-28 · **Autor:** William M.
 
 **Arquitectura:** la lógica vive en el Project Library package `papo_core` (igual que en la v2) y, desde la v3, el diseño y el comportamiento de cada campo viven en los **objetos estándar** `Objects/*` y en las **clases de estilo** `PAPO/`. El formulario solo tiene estructura, wrappers de una línea y parámetros.
 
@@ -12,6 +12,7 @@ Changelog:
 | 2 | 2026-07-20 | Toda la lógica en `papo_core`; la vista solo tiene wrappers |
 | 3 | 2026-10-26 | Campos como objetos `Objects/*`, diseño por clases `PAPO/`, preguntas desde `papoItemID`, `papoItemID` fijo, botón Guardar con `papo_core.ui.confirmSave()`, herramientas y pipeline de QA |
 | 3.1 | 2026-10-27 | Fase 5: rangos con solo mínimo, calculados en el script o según otro campo; campos que otros leen en bindings pasan a objeto con el mismo nombre; `inputBounds` en `Objects/NumericField` |
+| 3.2 | 2026-10-28 | Reglas 11 y 12: `custom.item_dev` para dejar un componente sin recolectar (etiquetas del PLC ocultas) y un `papoItemID` de otro PAPO no es error |
 
 ---
 
