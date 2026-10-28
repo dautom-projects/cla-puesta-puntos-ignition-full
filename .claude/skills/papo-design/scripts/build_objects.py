@@ -5,7 +5,7 @@ Edit this file and run it to change every object at once; forms only pass parame
 Contract (all objects): question, papoItemID, fontSize (input) · value (inout) · answer (output).
 Inputs also take enabled. List layout: showQuestion, questionBasis. See .claude/docs/OBJETOS_ESTANDAR.md.
 
-Version: 2.5.0
+Version: 2.7.0
 
 Changelog:
 	2026-10-24 | William M. | v2.0.0 - value inout, answer output, options/answerFrom (Dropdown)
@@ -19,6 +19,9 @@ Changelog:
 		controlled (the first option could stay checked in the browser and ignore the first click)
 	2026-10-26 | William M. | v2.5.0 - DateTime startNow: without a value it starts with the time the form opens,
 		like the native date-time input (also when the form pushes the empty value after the object started)
+	2026-10-27 | William M. | v2.6.0 - NumericField inputBounds (minimum / maximum the field accepts)
+	2026-10-28 | William M. | v2.7.0 - DateTime displayFormat: what the field shows (moment.js tokens); the default
+		keeps the native "MMM D, YYYY h:mm A" (date pickers pass e.g. "DD/MM/YYYY")
 
 Args (CLI):
 	--check: Only report which objects would change
@@ -71,6 +74,8 @@ ANSWER_DATETIME = (
 QUESTION_TEXT = "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)"
 QUESTION = "{view.custom.question}"
 # DateTime with startNow: the native date-time input of the forms shows the time the form opens
+# What the date-time input shows (moment.js tokens): by default the format the native input shows without one
+DATETIME_DISPLAY = "MMM D, YYYY h:mm A"
 START_NOW = {"system": {"onStartup": {"config": {"script": "\t# A time field starts with the time the form opens, like the native date-time input\n"
 	"\tif self.params.startNow and self.params.value is None:\n\t\tself.params.value = system.date.now()"}, "scope": "G", "type": "script"}}}
 # The form can push its empty value after the object started: the field keeps a time, as the native one does
@@ -168,12 +173,15 @@ def definitions():
 				"props.style.fontSize": FONT}, {"checkedIcon": DISABLED_ICON, "style": {"classes": "PAPO/Field/Checkbox"},
 				"uncheckedIcon": DISABLED_ICON})]),
 		"NumericField": view(dict(COMMON, minValue=None, maxValue=None, emptyAnswer=None, value=None, answer=None,
-				**dict(INPUT_TEXT, **LIST)),
-			dict(COMMON_DIR, minValue="input", maxValue="input", emptyAnswer="input", value="inout", **dict(INPUT_TEXT_DIR, **LIST_DIR)),
+				inputBounds={"maximum": None, "minimum": None}, **dict(INPUT_TEXT, **LIST)),
+			dict(COMMON_DIR, minValue="input", maxValue="input", emptyAnswer="input", value="inout", inputBounds="input",
+				**dict(INPUT_TEXT_DIR, **LIST_DIR)),
 			struct(("emptyAnswer", "value"), ANSWER_VALUE),
 			[questionLabel(), field("ia.input.numeric-entry-field", {"props.value": prop("view.params.value", True),
 				"props.placeholder": expr(PLACEHOLDER), "props.style.color": rangeColor("text"),
-				"props.style.borderColor": rangeColor("border"), "props.style.fontSize": FONT},
+				"props.style.borderColor": rangeColor("border"), "props.style.fontSize": FONT,
+				"props.inputBounds.maximum": prop("view.params.inputBounds.maximum"),
+				"props.inputBounds.minimum": prop("view.params.inputBounds.minimum")},
 				{"align": "left", "format": "none", "spinner": {"enabled": False}, "style": {"classes": "PAPO/Field/Input"}})]),
 		"TextField": view(dict(COMMON, emptyAnswer=None, value="", answer="", **dict(INPUT_TEXT, **LIST)),
 			dict(COMMON_DIR, emptyAnswer="input", value="inout", **dict(INPUT_TEXT_DIR, **LIST_DIR)),
@@ -201,11 +209,13 @@ def definitions():
 				"style": {"classes": "PAPO/Field/Checkbox"}, "textPosition": "right"},
 				position={"basis": "auto", "grow": 1, "shrink": 0})]),
 		# Date or time picker; answer = the value formatted with format (default: time as text)
-		"DateTime": view(dict(COMMON, pickerType="time", format="h:mm:ss a", startNow=False, value=None, answer=None, **LIST),
-			dict(COMMON_DIR, pickerType="input", format="input", startNow="input", value="inout", **LIST_DIR),
+		"DateTime": view(dict(COMMON, pickerType="time", format="h:mm:ss a", displayFormat=DATETIME_DISPLAY, startNow=False,
+				value=None, answer=None, **LIST),
+			dict(COMMON_DIR, pickerType="input", format="input", displayFormat="input", startNow="input", value="inout", **LIST_DIR),
 			struct(("format", "value"), ANSWER_DATETIME),
 			[questionLabel(), field("ia.input.date-time-input", {"props.value": prop("view.params.value", True),
-				"props.pickerType": prop("view.params.pickerType"), "props.style.fontSize": FONT},
+				"props.pickerType": prop("view.params.pickerType"), "props.format": prop("view.params.displayFormat"),
+				"props.style.fontSize": FONT},
 				{"style": {"classes": "PAPO/Field/Input"}})], events=START_NOW, onChange={"value": KEEP_TIME}),
 		# Read-only tag value; answer = the value read from tagPath
 		"Label": view(dict(COMMON_LABEL, tagPath="", answer=None, **LIST), dict(COMMON_LABEL_DIR, tagPath="input", **LIST_DIR),
