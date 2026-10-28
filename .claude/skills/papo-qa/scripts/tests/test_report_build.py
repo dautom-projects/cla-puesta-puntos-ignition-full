@@ -58,6 +58,40 @@ class SimpleDateFormat(object):
 		return date.dt.astimezone(self.zone).strftime(self.fmt)
 
 
+class Calendar(object):
+	"""java.util.Calendar stand-in (ISO weeks, Sunday = 1 for DAY_OF_WEEK)."""
+	MONDAY, YEAR, WEEK_OF_YEAR, DAY_OF_WEEK, HOUR_OF_DAY, DATE = 2, 1, 3, 7, 11, 5
+
+	def __init__(self, zone):
+		self.zone, self.dt = zone, None
+
+	@classmethod
+	def getInstance(cls, zone=None):
+		return cls(zone or BOGOTA)
+
+	def setFirstDayOfWeek(self, day):
+		pass
+
+	def setMinimalDaysInFirstWeek(self, days):
+		pass
+
+	def setTime(self, date):
+		self.dt = date.dt.astimezone(self.zone)
+
+	def add(self, field, amount):
+		self.dt += datetime.timedelta(days=amount)
+
+	def get(self, field):
+		if field == self.YEAR:
+			return self.dt.isocalendar()[0]
+		if field == self.WEEK_OF_YEAR:
+			return self.dt.isocalendar()[1]
+		if field == self.DAY_OF_WEEK:
+			return self.dt.isoweekday() % 7 + 1
+		if field == self.HOUR_OF_DAY:
+			return self.dt.hour
+
+
 def _plantShift(date):
 	"""papo_core.ui.getShift stand-in: T1 22-06, T2 06-14, T3 14-22 in America/Bogota."""
 	hour = date.dt.astimezone(BOGOTA).hour
@@ -71,6 +105,7 @@ def _javaModules():
 	util.Date = JDate
 	util.Locale = types.SimpleNamespace(US="US")
 	util.TimeZone = types.SimpleNamespace(getTimeZone=lambda name: BOGOTA)
+	util.Calendar = Calendar
 	text.SimpleDateFormat = SimpleDateFormat
 	java.util, java.text = util, text
 	# Jython imports a Java class like a module (import java.util.Date)
@@ -122,7 +157,14 @@ class FakeSystem(object):
 		self.queries.append((sql, list(params)))
 		cur = self.conn.execute(sql, list(params))
 		headers = [c[0] for c in cur.description]
-		return Dataset(headers, cur.fetchall())
+		rows = [list(r) for r in cur.fetchall()]
+		# The Timestamp column comes back as a date, as from SQL Server
+		for i, h in enumerate(headers):
+			if h in ("Timestamp", "Fecha"):
+				for r in rows:
+					if isinstance(r[i], str):
+						r[i] = JDate(datetime.datetime.strptime(r[i][:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=BOGOTA))
+		return Dataset(headers, rows)
 
 	def _toDataSet(self, headers, rows=None):
 		if rows is None:
@@ -285,6 +327,34 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertEqual(data["shift1"]["shift"], "2")
 		self.assertEqual(data["shift1"]["hora_registro"], "09:15:00")
 		self.assertEqual(data["shift1"]["papoItemID6100"], "")
+
+	def _times(self, stamps):
+		"""Records of type 7 on cycle 3 at the given local times (YYYY-MM-DD HH:MM)."""
+		for i, stamp in enumerate(stamps):
+			when = datetime.datetime.strptime(stamp, "%Y-%m-%d %H:%M").strftime("%a %b %d %H:%M:%S COT %Y")
+			self.conn.execute("INSERT INTO registerhistory VALUES (?, 18, 30, 7, 3, 7, 'En proceso', 'x', ?, ?)",
+				(100 + i, stamp + ":00", _answer([(6100, "Cumple" if i % 2 == 0 else "No Cumple"), (6200 + i, "QA")], when=when)))
+		return {"papoID": 18, "nodeID": 30, "registerCode": 3, "db": "papo_db"}
+
+	def test_shiftColumnsMergeTheSameShift(self):
+		data = self._times(["2026-10-27 07:00", "2026-10-27 15:00", "2026-10-27 08:00"])
+		self.report.build(data, [{"types": [7], "name": "register", "slot": "shift"}, {"types": [7], "name": "fourhour", "slot": "shift", "merge": False}], history=None)
+		self.assertEqual(data["register1"]["shift"], "2")
+		self.assertEqual(set(k for k in data["register1"] if k.startswith("papoItemID62")), {"papoItemID6200", "papoItemID6202"})
+		self.assertEqual(data["register2"]["shift"], "3")
+		self.assertEqual(data["register3"], "")
+		self.assertNotIn("papoItemID6200", data["fourhour1"])
+
+	def test_weekdayAndWeekSlot(self):
+		# Tuesday 07:00 (T2), Wednesday 23:00 (T1 of Thursday), next week Monday (other week)
+		data = self._times(["2026-10-27 07:00", "2026-10-28 23:00", "2026-11-02 07:00"])
+		self.report.build(data, [{"types": [7], "name": "daily", "slot": "weekday"}, {"types": [7], "name": "shift", "slot": "weekSlot"}], history=None)
+		self.assertIn("papoItemID6200", data["daily2"])
+		self.assertIn("papoItemID6201", data["daily3"])
+		self.assertEqual(data["daily1"], {u"user": [], u"date": [], u"shift": [], u"insights": u""})
+		self.assertIn("papoItemID6200", data["shift5"])
+		self.assertIn("papoItemID6201", data["shift10"])
+		self.assertIn("papoItemID6202", data["shift2"])
 
 	def test_comment(self):
 		data = self._pilot(self._data(station=7))

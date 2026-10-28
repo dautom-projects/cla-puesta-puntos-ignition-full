@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.4.0
+Version: 2.5.0
 
 Changelog:
+	2026-10-27 | William M. | v2.5.0 - build() slots by time (shift, weekday, weekSlot) and
+		monthGrid() for TR11-0102
 	2026-10-27 | William M. | v2.4.0 - build(): several reprocessed groups per section,
 		marks yn / ok / number, register type name per slot and the last-signature
 		mode (roleLast), so every report script fits in a build() call
@@ -283,7 +285,7 @@ def _queryByTypes(typeIDs, papoID, nodeID, registerCode, db, station=None):
 	placeholders = ",".join(["?"] * len(typeIDs))
 	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
 	sql = '''
-		SELECT DataAnswer, RegisterTypeID
+		SELECT DataAnswer, RegisterTypeID, Timestamp
 		FROM registerhistory
 		WHERE {0} AND RegisterTypeID IN ({1})
 		ORDER BY ID ASC
@@ -537,6 +539,63 @@ def _processAutoSectionsMultiShift(ds, data, typeName, normalizeMode):
 			data[slotName] = _normalizeDict(data[slotName], normalizeMode)
 
 
+EMPTY_SLOT = {u'user': [], u'date': [], u'shift': [], u'insights': u''}
+
+
+def _oneRow(ds, k):
+	"""Row k of a dataset as a one-row dataset."""
+	headers = [ds.getColumnName(i) for i in range(ds.getColumnCount())]
+	return system.dataset.toDataSet(headers, [[ds.getValueAt(k, i) for i in range(ds.getColumnCount())]])
+
+
+def _recordDate(raw):
+	"""Date of a record from its DataAnswer JSON (the timestamp of the insights item), or None."""
+	holder = {}
+	_fillDataFromDataset(system.dataset.toDataSet(["DataAnswer"], [[raw]]), holder, "x", False)
+	dates = (holder.get("x") or {}).get("date") or [None]
+	return dates[0]
+
+
+def _calendar(date):
+	"""java.util.Calendar on a date in plant local time, weeks from Monday (ISO)."""
+	from java.util import Calendar, TimeZone
+	cal = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"))
+	cal.setFirstDayOfWeek(Calendar.MONDAY)
+	cal.setMinimalDaysInFirstWeek(4)
+	cal.setTime(date)
+	return cal
+
+
+def _isoWeek(date):
+	"""(year, ISO week) of a date in plant local time."""
+	from java.util import Calendar
+	cal = _calendar(date)
+	return (cal.get(Calendar.YEAR), cal.get(Calendar.WEEK_OF_YEAR))
+
+
+def _weekday(date):
+	"""1 = Monday ... 7 = Sunday, in plant local time."""
+	from java.util import Calendar
+	return ((_calendar(date).get(Calendar.DAY_OF_WEEK) + 5) % 7) + 1
+
+
+def _weekSlot(date):
+	"""Slot 1..21 of the weekly grid (Monday T1, T2, T3 ... Sunday T3); T1 from 22:00 belongs to the next day."""
+	from java.util import Calendar
+	cal = _calendar(date)
+	hour = cal.get(Calendar.HOUR_OF_DAY)
+	if hour >= 22 or hour < 6:
+		turnoIndex = 0
+		if hour >= 22:
+			cal.add(Calendar.DATE, 1)
+	elif hour < 14:
+		turnoIndex = 1
+	else:
+		turnoIndex = 2
+	dayIndex = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7
+	return dayIndex * 3 + turnoIndex + 1
+
+
 def _reprocessedGroups(section, mode):
 	"""Reprocessed groups of a section: the list "reprocessed" plus the one-group shorthand reprocessedIds."""
 	groups = list(section.get("reprocessed") or [])
@@ -560,6 +619,10 @@ def _buildSection(ds, data, section, typeNames=None):
 			data[g["name"]] = _normalizeDict(_classifyReprocessed(ds, g["ids"], g["mode"]), g["normalize"])
 		return
 
+	if slot in ("shift", "weekday", "weekSlot"):
+		_buildTimeSlots(ds, data, section, slot, mode, groups)
+		return
+
 	rowCount = ds.getRowCount()
 	colCount = ds.getColumnCount()
 	headers = [ds.getColumnName(i) for i in range(colCount)]
@@ -576,6 +639,71 @@ def _buildSection(ds, data, section, typeNames=None):
 			data['{0}{1}'.format(g["name"], k + 1)] = _normalizeDict(marks, g["normalize"])
 		if section.get("typeName") and typeNames is not None:
 			data[slotName + "_type"] = typeNames.get(ds.getValueAt(k, "RegisterTypeID"), u"Desconocido")
+
+
+def _buildTimeSlots(ds, data, section, slot, mode, groups):
+	"""Slots by time: "shift" (one column per plant shift in order of appearance, records of the same shift merged
+	unless merge is False, the first columns empty), "weekday" (name1 Monday .. name7 Sunday, first record of each day
+	in the week of the first dated record) and "weekSlot" (name1 .. name21, Monday T1 .. Sunday T3, from the record
+	Timestamp)."""
+	name = section["name"]
+	slots = []
+	if slot == "shift":
+		for i in range(1, section.get("columns", 3) + 1):
+			data["{0}{1}".format(name, i)] = ""
+			for g in groups:
+				data["{0}{1}".format(g["name"], i)] = ""
+		columns, count = {}, 0
+		for k in range(ds.getRowCount()):
+			row = _oneRow(ds, k)
+			holder = {}
+			_fillDataFromDataset(row, holder, "x")
+			shift = ((holder.get("x") or {}).get("shift") or [None])[0]
+			if shift in columns:
+				number = columns[shift]
+			else:
+				count += 1
+				number = count
+				if shift:
+					columns[shift] = number
+			slots.append((number, row))
+	elif slot == "weekday":
+		target, byDay = None, {}
+		for k in range(ds.getRowCount()):
+			date = _recordDate(ds.getValueAt(k, "DataAnswer"))
+			if date is None:
+				continue
+			if target is None:
+				target = _isoWeek(date)
+			if _isoWeek(date) == target and _weekday(date) not in byDay:
+				byDay[_weekday(date)] = _oneRow(ds, k)
+		for day in range(1, 8):
+			if day in byDay:
+				slots.append((day, byDay[day]))
+			else:
+				data["{0}{1}".format(name, day)] = dict(EMPTY_SLOT)
+	else:
+		for k in range(ds.getRowCount()):
+			stamp = ds.getValueAt(k, "Timestamp")
+			slots.append((_weekSlot(stamp) if stamp is not None else k + 1, _oneRow(ds, k)))
+
+	merge = slot == "shift" and section.get("merge", True)
+	for number, row in slots:
+		slotName = "{0}{1}".format(name, number)
+		holder = {}
+		_fillDataFromDataset(row, holder, "x")
+		values = _normalizeDict(holder["x"], mode)
+		if merge and isinstance(data.get(slotName), dict):
+			data[slotName].update(values)
+		else:
+			data[slotName] = values
+		for g in groups:
+			marks = _normalizeDict(_classifyReprocessed(row, g["ids"], g["mode"]), g["normalize"])
+			markName = "{0}{1}".format(g["name"], number)
+			if merge and isinstance(data.get(markName), dict):
+				data[markName].update(marks)
+			else:
+				data[markName] = marks
 
 
 def _historyList(papoID, nodeID, registerCode, db, station=None):
@@ -617,7 +745,11 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			types (list[int]): RegisterTypeID(s) read together, ordered by ID
 			name (str): base key in data
 			slot (str): "record" (default) = one key per record, name1..nameN;
-				"single" = all the records merged in data[name]
+				"single" = all the records merged in data[name]; "shift" = one column
+				per plant shift in order of appearance (records of the same shift merged
+				unless merge is False; columns: empty columns first, default 3);
+				"weekday" = name1 Monday .. name7 Sunday; "weekSlot" = name1 .. name21
+				(Monday T1 .. Sunday T3, from the record Timestamp)
 			normalize (str): "check" (default, Cumple/No Cumple -> check/x
 				symbols), "yn" (-> Si/No), "ok" (-> OK/N OK), "raw" (no mapping)
 			reprocessedIds (list[int], optional): papoItemIDs also marked in
@@ -679,6 +811,79 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 
 	except Exception as e:
 		logger.error("Error building report data: " + str(e))
+
+
+def monthGrid(data, typeIDs, prefix="turno", refTypeID=8):
+	"""
+	Monthly grid of marks: data["turno{shift}"]["dia{day}"]["papoItemID{ID}"] = check / x for every record of
+	the given types in the month of the cycle (the month of its first record of refTypeID, or this month), read
+	by node and, when the viewer passes it, by station. Used after build() by TR11-0102.
+
+	Version: 1.0.0
+
+	Args:
+		data (dict): Report data dict with papoID, nodeID, registerCode, db, optional workstationNodeID
+		typeIDs (list[int]): RegisterTypeID(s) of the grid records
+		prefix (str): base key per shift (default "turno")
+		refTypeID (int): register type whose first record gives the month (default 8, Fin)
+
+	Returns:
+		None: Populates data["turno1"]..["turno3"] with dia1..dia31 in place
+
+	Changelog:
+		2026-10-27 | William M. | v1.0.0 - Initial version (from the TR11-0102 report script)
+	"""
+	papoID = data.get('papoID')
+	nodeID = data.get('nodeID')
+	registerCode = data.get('registerCode')
+	db = data.get('db', 'papo_db') or 'papo_db'
+	station = data.get('workstationNodeID')
+	logger = system.util.getLogger("papo_core.report.monthGrid")
+	try:
+		cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
+		ref = system.db.runPrepQuery("SELECT TOP 1 Timestamp FROM registerhistory WHERE {0} AND RegisterTypeID = ? ORDER BY Timestamp ASC".format(cycleSql),
+			params + [refTypeID], db)
+		refDate = ref.getValueAt(0, "Timestamp") if ref.getRowCount() > 0 else system.date.now()
+		monthStart = system.date.getDate(system.date.getYear(refDate), system.date.getMonth(refDate), 1)
+		monthEnd = system.date.addMonths(monthStart, 1)
+		placeholders = ",".join(["?"] * len(typeIDs))
+		sql = '''
+			SELECT DataAnswer, Timestamp
+			FROM registerhistory
+			WHERE PapoID = ? AND NodeID = ? AND (? IS NULL OR WorkstationNodeID = ?) AND Timestamp >= ? AND Timestamp < ?
+				AND RegisterTypeID IN ({0})
+			ORDER BY ID ASC
+		'''.format(placeholders)
+		ds = system.db.runPrepQuery(sql, [papoID, nodeID, station, station, monthStart, monthEnd] + list(typeIDs), db)
+
+		for shift in (1, 2, 3):
+			data["{0}{1}".format(prefix, shift)] = dict(("dia{0}".format(day), {}) for day in range(1, 32))
+		for i in range(ds.getRowCount()):
+			raw = ds.getValueAt(i, "DataAnswer")
+			stamp = ds.getValueAt(i, "Timestamp")
+			if not raw or stamp is None:
+				continue
+			try:
+				obj = system.util.jsonDecode(raw)
+			except:
+				continue
+			if not (isinstance(obj, dict) and "items" in obj):
+				continue
+			shift = papo_core.ui.getShift(stamp)
+			day = "dia{0}".format(system.date.getDayOfMonth(stamp))
+			for item in obj["items"]:
+				if "papoItemID" not in item:
+					continue
+				answer = item.get("answer")
+				if answer in ("Cumple", "Si"):
+					mark = NORMALIZE_MODES["check"]["cumple"]
+				elif answer in ("No Cumple", "No"):
+					mark = NORMALIZE_MODES["check"]["no cumple"]
+				else:
+					continue
+				data["{0}{1}".format(prefix, shift)][day]["papoItemID{0}".format(item["papoItemID"])] = mark
+	except Exception as e:
+		logger.error("Error building the month grid: " + str(e))
 
 
 def extractReportData(data, sections, signaturePrefix=('firmaAdministrator', 'firmaOperator')):
