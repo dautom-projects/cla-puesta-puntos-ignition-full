@@ -6,9 +6,11 @@ scripts, queries, the base64 XML of the page template...) is one record: a 4-byt
 UTF-8 bytes, with the length after the marker (0: 2 bytes, as Java writeUTF; 1: 4 bytes, for long texts like the
 template). Changing a text rewrites only that record and its length; every other byte is kept.
 
-Version: 1.0.0
+Version: 1.0.1
 
 Changelog:
+	2026-10-27 | William M. | v1.0.1 - A record must be followed by another record: a script under 256 bytes
+		that starts with a line break was read past its end
 	2026-10-27 | William M. | v1.0.0 - Initial version (report fixes found by the general test)
 
 Usage (CLI):
@@ -50,12 +52,18 @@ class ReportBin(object):
 			else:
 				continue
 			start, end = s + head, s + head + size
-			if start <= pos and end >= pos and end <= len(self.raw) and self._isText(start, end) and start == self._textStart(pos, start):
+			if start <= pos and end >= pos and end <= len(self.raw) and self._isText(start, end) and start == self._textStart(pos, start) \
+					and self._nextIsRecord(end):
 				return s, start, end, marker == 1
 		raise ValueError("no se encontró el registro del texto en {}".format(pos))
 
 	def _textStart(self, pos, start):
 		return start
+
+	def _nextIsRecord(self, end):
+		"""A text record is followed by the next record's 4-byte id (small, so it starts with 0x00 0x00) or the
+		end of the stream. Rejects a false header read from a short text's own length bytes plus its first char."""
+		return end == len(self.raw) or self.raw[end:end + 2] == b"\x00\x00"
 
 	def _isText(self, start, end):
 		try:

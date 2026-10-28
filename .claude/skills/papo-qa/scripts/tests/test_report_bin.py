@@ -54,6 +54,16 @@ class ReportBinTest(unittest.TestCase):
 		self.assertEqual(after.template(), before.template())
 		self.assertEqual(len(after.raw) - len(before.raw), len(after.script().encode("utf-8")) - len(before.script().encode("utf-8")))
 
+	def test_shortScriptStartingWithLineBreak(self):
+		# Under 256 bytes the length is 0x00 0xNN: with a leading line break it looked like another header
+		path = _copy("Clarios/Andina/Metalurgia/PA11-0401")
+		doc = rb.ReportBin(path)
+		short = "\n\t# short\n\tpapo_core.report.build(data, [])"
+		doc.replaceScript(doc.script(), short)
+		doc.save()
+		self.assertEqual(rb.ReportBin(path).script(), short)
+		self.assertTrue(rb.roundTrip(path)[0])
+
 	def test_textMustAppearOnce(self):
 		doc = rb.ReportBin(_copy("Clarios/Andina/F&A/PT11-0104"))
 		with self.assertRaises(ValueError):
