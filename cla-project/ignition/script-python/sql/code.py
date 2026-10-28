@@ -72,11 +72,13 @@ def papoByNode(nodeId=None, db='papo_db'):
             FROM nodepapo np
             INNER JOIN papo p ON p.ID = np.PapoID
             INNER JOIN node n ON n.ID = np.NodeID
-            WHERE n.ID = ?
+            -- The node and its children: a LINE also lists the forms of its cells
+            WHERE n.ID = ? OR n.ParentNodeID = ?
+            GROUP BY p.ID, p.Reference
             ORDER BY p.ID DESC
         '''
         
-        result = system.db.runPrepQuery(query, [nodeId], database=db)
+        result = system.db.runPrepQuery(query, [nodeId, nodeId], database=db)
         return result
 
     except Exception as e:
@@ -280,7 +282,10 @@ def papoAll(db='papo_db'):
 
 def papoByArea(areaId, db='papo_db'):
 	"""
-	Get all papos (forms) associated with lines under a specific area.
+	Get all papos (forms) associated with lines under a specific area, or with the cells of those lines.
+	
+	Changelog:
+		2026-10-28 | William M. | Cells of the lines too (F&A listed 9 of its 20 forms, OREC 13 of 29)
 	
 	Args:
 		areaId (int): The area node ID.
@@ -299,13 +304,15 @@ def papoByArea(areaId, db='papo_db'):
 			papo p
 		INNER JOIN nodepapo np ON p.ID = np.PapoID
 		INNER JOIN node n ON n.ID = np.NodeID
+		LEFT JOIN node pn ON pn.ID = n.ParentNodeID
+		-- Lines of the area and their cells
 		WHERE
-			n.ParentNodeID = ?
+			n.ParentNodeID = ? OR pn.ParentNodeID = ?
 		ORDER BY p.Reference ASC
 	'''
 	
 	try:
-		result = system.db.runPrepQuery(query, [areaId], database=db)
+		result = system.db.runPrepQuery(query, [areaId, areaId], database=db)
 		return result
 	except Exception as e:
 		logger.error("Error in papoByArea(areaId=%s): %s" % (str(areaId), str(e)))
