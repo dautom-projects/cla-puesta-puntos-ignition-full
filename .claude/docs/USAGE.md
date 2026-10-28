@@ -187,7 +187,7 @@ Autentica al supervisor desde el popup (credenciales, rol e IP) y ejecuta la fir
 
 ### `sign.autoCloseOpenForms(dbConnection)`
 
-Cierra automáticamente los formularios que quedaron "En proceso" tras el cambio de turno (Finalizado + Sin Iniciar); pensado para un Gateway Timer/Scheduled Script.
+Cierra automáticamente los ciclos que siguen abiertos ("En proceso" o "Revisado") 10 minutos después del cambio de turno, si empezaron antes del turno en curso (Finalizado + Sin Iniciar, a nombre del operario del último formulario; comentario con el turno del ciclo). Excluye Granja de ácidos y Metalurgia por el nodo del formulario, con sus líneas y celdas.
 
 **Llamado desde:** ninguna vista.
 

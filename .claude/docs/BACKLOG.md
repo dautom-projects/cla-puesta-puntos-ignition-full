@@ -123,5 +123,6 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
 - ~~`papo_core.register._getLastRegisterCode` ordena por `ID DESC` en lugar de `RegisterCode DESC` (la regla del proyecto); en la práctica devuelve lo mismo porque ID es creciente~~ corregido el 2026-10-28 (`register` v1.1.0)
 
 - Scheduled Script de gateway que llama a `papo_core.sign.autoCloseOpenForms("papo_db")`: conexión hardcodeada
+- `papo_core.sign.autoCloseOpenForms` v1.3.0 no cierra un ciclo sin formularios: en la base de prueba, FO10-0100 estación 44 tiene un "Revisado" (código 7) insertado después de cerrar el ciclo 6. Si en producción aparecen casos así, decidir si se cierran (no hay formulario abierto que cerrar).
 
 - `Page/Gestion`, `custom.signature` (`now(60000)`): cada minuto y en cada sesión abierta consulta todo el historial e inserta una firma tipo 10 "Revisado" con usuario `NA` en los ciclos "En proceso" de más de 180 min (origen de las firmas "NA NA"). Escribe en la base desde un binding de vista, duplica a `autoCloseOpenForms`, puede insertar dos veces si hay dos sesiones abiertas y su llave de ciclo no incluye `WorkstationNodeID`. Decidir si se elimina y se deja solo el cierre automático del gateway

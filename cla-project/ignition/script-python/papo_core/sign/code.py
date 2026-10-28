@@ -5,9 +5,14 @@ Supervisor signature logic for PAPO forms.
 Handles direct signing, authentication popup flow, and
 IP validation by role.
 
-Version: 1.2.1
+Version: 1.3.0
 
 Changelog:
+	2026-10-28 | William M. | v1.3.0 - autoCloseOpenForms: excludes by the form's NodeID (Granja de acidos and
+		Metalurgia with their lines and cells; it compared WorkstationNodeID), also closes cycles whose last row
+		is the supervisor "Revisado", closes only cycles started before the current shift (a form opened in the
+		10-minute grace is not closed), the comment carries the shift of the closed cycle and the closure is
+		signed by the operator who saved the last form of the cycle (not the supervisor row)
 	2026-10-28 | William M. | v1.2.1 - autoCloseOpenForms takes the shift and time in plant local time
 		(papo_core.ui.getShift and java.util.Calendar) instead of system.date.getHour24
 	2026-07-30 | William M. | v1.2.0 - Added signSupervisorFromSelection for
@@ -24,9 +29,8 @@ Changelog:
 ALLOWED_ROLES = {"INTEGRADOR", "Administrator", "Supervisor_PAPO"}
 IP_EXEMPT_ROLES = {"INTEGRADOR", "Administrator"}
 
-# Nodes excluded from shift-end auto-close (forms that intentionally span shifts)
-AUTO_CLOSE_EXCLUDED_NODE_ID = 29  # Granja de acidos
-AUTO_CLOSE_EXCLUDED_PARENT_NODE_ID = 4  # Metalurgia area - covers all its lines
+# Nodes excluded from shift-end auto-close (forms that intentionally span shifts), with their lines and cells
+AUTO_CLOSE_EXCLUDED_ROOTS = (29, 4)  # Granja de acidos (line), Metalurgia (area)
 
 
 # ==================== INTERNAL HELPERS ====================
@@ -50,6 +54,28 @@ def _validateWorkstationIp(session, allowedIp):
 	"""Return True if the client IP matches the allowed workstation IP."""
 	clientIp = _getClientIp(session)
 	return clientIp == str(allowedIp).strip()
+
+
+def _shiftStart(date):
+	"""Start of the plant shift that contains date (T1 22:00, T2 06:00, T3 14:00), in America/Bogota."""
+	from java.util import Calendar, TimeZone
+	cal = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"))
+	cal.setTime(date)
+	hour = cal.get(Calendar.HOUR_OF_DAY)
+	if hour >= 22:
+		startHour = 22
+	elif hour < 6:
+		startHour = 22
+		cal.add(Calendar.DAY_OF_MONTH, -1)
+	elif hour < 14:
+		startHour = 6
+	else:
+		startHour = 14
+	cal.set(Calendar.HOUR_OF_DAY, startHour)
+	cal.set(Calendar.MINUTE, 0)
+	cal.set(Calendar.SECOND, 0)
+	cal.set(Calendar.MILLISECOND, 0)
+	return cal.getTime()
 
 
 def _insertSignature(dbConnection, dataAnswerStr, papoId, userName, workstationNodeId, nodeId, workstationId, registerCode):
@@ -489,17 +515,18 @@ def authenticateAndSign(popup):
 
 def autoCloseOpenForms(dbConnection):
 	"""
-	Auto-close PAPO forms left "En proceso" past the shift boundary.
+	Auto-close PAPO forms left open past the shift boundary.
 
-	Meant to run from a Gateway Timer/Scheduled Script shortly after each
-	shift change (06:10, 14:10, 22:10). Finds the latest registerhistory
-	row per PapoID/WorkstationNodeID pair still in "En proceso", then
-	inserts the same closing pair signOperator() would (type 10 Finalizado
-	+ type 12 Sin Iniciar, RegisterCode + 1), attributing the closure to
-	the operator recorded on that last save and tagging the signature
-	comment with turno/hora plus "Cierre automatico". Forms under Granja
-	de acidos or any Metalurgia line are skipped since they intentionally
-	span multiple shifts.
+	Runs from a Gateway Scheduled Script at fixed times, 10 minutes after each shift change (06:10, 14:10,
+	22:10): the operators get those 10 minutes to sign their forms; whatever is still open was left behind.
+	Finds the latest registerhistory row per PapoID/WorkstationNodeID; when it is "En proceso" (a saved
+	form) or "Revisado" (the supervisor signed, the operator did not) and the cycle started before the
+	current shift, inserts the same closing pair signOperator() would (type 10 Finalizado + type 12 Sin
+	Iniciar, RegisterCode + 1), attributing the closure to the operator who saved the last form of the cycle
+	and tagging the comment with the shift of the closed cycle, the closing time and "Cierre automatico".
+	A cycle started in the current shift (a form opened during the grace minutes) is left open.
+	Forms whose node is Granja de acidos or Metalurgia (and their lines and cells) are skipped since
+	they intentionally span multiple shifts.
 
 	Args:
 		dbConnection (str): Database connection name.
@@ -510,33 +537,46 @@ def autoCloseOpenForms(dbConnection):
 	try:
 		logger = system.util.getLogger("papo_core.sign.autoCloseOpenForms")
 		now = system.date.now()
+		shiftStart = _shiftStart(now)
 
-		# Build turno/hora prefix for the closing comment
 		from java.util import Calendar, TimeZone
 		cal = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"))
 		cal.setTime(now)
-		shift = papo_core.ui.getShift(now)
-
 		timeStr = "{:02d}:{:02d}".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
-		comment = "T: {}, H: {} - Cierre automatico".format(shift, timeStr)
 
-		# Get node IDs excluded from auto-close (Granja de acidos + Metalurgia lines)
-		excludedQuery = "SELECT ID FROM node WHERE ID = ? OR ParentNodeID = ?"
-		excludedResult = system.db.runPrepQuery(
-			excludedQuery,
-			[AUTO_CLOSE_EXCLUDED_NODE_ID, AUTO_CLOSE_EXCLUDED_PARENT_NODE_ID],
-			dbConnection
-		)
+		# Nodes excluded from auto-close: the roots, their children and grandchildren (AREA > LINE > CELL)
+		roots = list(AUTO_CLOSE_EXCLUDED_ROOTS)
+		marks = ", ".join("?" for _ in roots)
+		excludedQuery = """
+			SELECT n.ID
+			FROM node n
+			LEFT JOIN node p ON p.ID = n.ParentNodeID
+			WHERE n.ID IN ({0}) OR n.ParentNodeID IN ({0}) OR p.ParentNodeID IN ({0})
+		""".format(marks)
+		excludedResult = system.db.runPrepQuery(excludedQuery, roots * 3, dbConnection)
 		excludedNodeIds = set(
 			int(excludedResult.getValueAt(i, 0)) for i in range(excludedResult.getRowCount())
 		)
 
-		# Get the latest register per PapoID/WorkstationNodeID still "En proceso"
+		# Latest register per PapoID/WorkstationNodeID that leaves the cycle open, with the time the cycle started
 		# Tiebreak by Timestamp then ID: historical RegisterCode duplicates exist
 		# for some stations (pre-dating the signOperator RegisterCode fix), so
 		# RegisterCode alone is not always unique per PapoID/WorkstationNodeID
 		openQuery = """
-			SELECT PapoID, WorkstationNodeID, NodeID, WorkstationID, RegisterCode, [User]
+			SELECT latest.PapoID, latest.WorkstationNodeID, latest.NodeID, latest.WorkstationID,
+				latest.RegisterCode, latest.[User],
+				(
+					SELECT MIN(r.[Timestamp]) FROM registerhistory r
+					WHERE r.PapoID = latest.PapoID AND r.WorkstationNodeID = latest.WorkstationNodeID
+						AND r.RegisterCode = latest.RegisterCode AND r.RegisterTypeID NOT IN (10, 12)
+				) AS CycleStart,
+				(
+					SELECT u.[User] FROM registerhistory u WHERE u.ID = (
+						SELECT MAX(r.ID) FROM registerhistory r
+						WHERE r.PapoID = latest.PapoID AND r.WorkstationNodeID = latest.WorkstationNodeID
+							AND r.RegisterCode = latest.RegisterCode AND r.RegisterTypeID NOT IN (10, 12)
+					)
+				) AS CycleUser
 			FROM (
 				SELECT
 					PapoID, WorkstationNodeID, NodeID, WorkstationID, RegisterCode, [User], Status,
@@ -546,9 +586,9 @@ def autoCloseOpenForms(dbConnection):
 					) AS rn
 				FROM registerhistory
 			) latest
-			WHERE rn = 1 AND Status = ?
+			WHERE latest.rn = 1 AND latest.Status IN (?, ?)
 		"""
-		openResult = system.db.runPrepQuery(openQuery, ["En proceso"], dbConnection)
+		openResult = system.db.runPrepQuery(openQuery, ["En proceso", "Revisado"], dbConnection)
 
 		insertSql = """
 			INSERT INTO registerhistory (
@@ -565,11 +605,17 @@ def autoCloseOpenForms(dbConnection):
 			nodeID = openResult.getValueAt(i, "NodeID")
 			workstationID = openResult.getValueAt(i, "WorkstationID")
 			regCode = int(openResult.getValueAt(i, "RegisterCode"))
-			lastUser = openResult.getValueAt(i, "User")
+			# The operator who saved the last form of the cycle (the last row may be the supervisor's signature)
+			lastUser = openResult.getValueAt(i, "CycleUser") or openResult.getValueAt(i, "User")
+			cycleStart = openResult.getValueAt(i, "CycleStart")
 
-			if workstationNodeID is None or int(workstationNodeID) in excludedNodeIds:
+			if workstationNodeID is None or nodeID is None or int(nodeID) in excludedNodeIds:
+				continue
+			# Only cycles started before this shift: a form opened in the grace minutes belongs to the new shift
+			if cycleStart is None or not system.date.isBefore(cycleStart, shiftStart):
 				continue
 
+			comment = "T: {}, H: {} - Cierre automatico".format(papo_core.ui.getShift(cycleStart), timeStr)
 			regPayload = {
 				"user": lastUser,
 				"role": "SYSTEM",
