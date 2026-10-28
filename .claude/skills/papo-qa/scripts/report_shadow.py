@@ -6,9 +6,10 @@ after it runs _old and build(sections) on every cycle of that PAPO and logs the 
 PAPO.report.shadow). "results" reads that log from the gateway container; "off" puts the original data.bin back
 (byte for byte). Never commit a report with the shadow on.
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
+	2026-10-27 | William M. | v1.1.0 - --sections also takes a dict of build() arguments (signatures...)
 	2026-10-27 | William M. | v1.0.0 - Initial version (pilot AC10-0202, AC10-0301, AC10-1101, CA02-2102)
 
 Usage (CLI, from projects/):
@@ -58,7 +59,7 @@ SHADOW = u'''
 	def _shadowCompare(data):
 		sLogger = system.util.getLogger("PAPO.report.shadow")
 		db = data.get('db', 'papo_db') or 'papo_db'
-		sections = %(sections)s
+		options = %(options)s
 		cycles = system.db.runPrepQuery("SELECT DISTINCT NodeID, RegisterCode FROM registerhistory WHERE PapoID = ? AND RegisterTypeID <> 12 ORDER BY NodeID, RegisterCode", [data.get('papoID')], db)
 		diffs = []
 		total = 0
@@ -72,7 +73,7 @@ SHADOW = u'''
 			except Exception as e:
 				diffs.append(tag + u" old error: " + unicode(e))
 				continue
-			papo_core.report.build(b, sections)
+			papo_core.report.build(b, **options)
 			total += 1
 			for k in sorted(set(a.keys()) | set(b.keys())):
 				if k in base or k == 'RegisterHistoryStation':
@@ -120,26 +121,37 @@ def sectionsOf(old):
 	return out
 
 
+def _path(ref):
+	"""data.bin of a report: Area/REF under Clarios/Andina, or Site/Area/REF under Clarios, or a folder under reports."""
+	for base in (ROOT, os.path.dirname(ROOT), os.path.dirname(os.path.dirname(ROOT))):
+		path = os.path.join(base, ref, "data.bin")
+		if os.path.exists(path):
+			return path
+	raise ValueError("no existe el reporte " + ref)
+
+
 def on(ref, sections=None):
-	path = os.path.join(ROOT, ref, "data.bin")
+	"""sections: the build() sections, or a dict of build() arguments with "sections" (signatures, history...)."""
+	path = _path(ref)
 	backup = os.path.join(BACKUP, ref, "data.bin")
 	os.makedirs(os.path.dirname(backup), exist_ok=True)
 	if not os.path.exists(backup):
 		shutil.copy2(path, backup)
 	doc = rb.ReportBin(backup)
 	old = doc.script()
-	sections = sections or sectionsOf(old)
+	options = sections if isinstance(sections, dict) else {"sections": sections or sectionsOf(old)}
+	options = dict((str(k), v) for k, v in options.items())
 	body = u"\n".join((u"\t" + l) if l.strip() else l for l in old.split(u"\n"))
-	new = u"\n\tdef _old(data):\n" + body + u"\n\t_old(data)\n" + SHADOW % {"sections": repr(sections), "ref": ref.split("/")[-1]}
+	new = u"\n\tdef _old(data):\n" + body + u"\n\t_old(data)\n" + SHADOW % {"options": repr(options), "ref": ref.split("/")[-1]}
 	doc.path = path
 	doc.replaceScript(old, new)
 	doc.save()
-	print("{} · sombra activa · {}".format(ref, json.dumps(sections)))
+	print("{} · sombra activa · {}".format(ref, json.dumps(options)[:200]))
 
 
 def off(ref):
 	backup = os.path.join(BACKUP, ref, "data.bin")
-	shutil.copy2(backup, os.path.join(ROOT, ref, "data.bin"))
+	shutil.copy2(backup, _path(ref))
 	os.remove(backup)
 	print("{} · restaurado".format(ref))
 
