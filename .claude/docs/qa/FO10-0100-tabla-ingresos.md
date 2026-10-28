@@ -28,3 +28,10 @@ Resultado: **PASA** · 1 vistas pasan, 0 fallan
 - Referencia sale "0" en la tabla porque los ingresos de prueba dejaron "Seleccionar" (es lo que se guarda)
 
 Registros de prueba: IDs 8226 y el siguiente (PapoID 56, estación 13, ciclo 3), quedan "En proceso".
+
+## Columnas del PDF (2026-10-28, pedido del usuario)
+
+La tabla pasa a las 17 columnas de la página 1 del reporte, en su orden: Mesa de formación, Combinada, Circuitos, Referencia, Programa a ingresar, Programa cargado, Cantidad de baterías, Hora de inicio, Hora final estimada, Hora final real, Circuito con errores (fallas), Ingreso parcial, Nivel de agua programado de la mesa, Nivel de agua de la mesa medido, Temperatura agua de la mesa (menor a 45°C), Temperatura de la batería al inicio y Observaciones.
+
+- [x] QA 1–7 y papo-lint sin hallazgos
+- [x] Navegador a 1920x1080 con 4 ingresos del ciclo: Combinada e Ingreso parcial con ✔ / ✘ como el PDF, títulos en varias líneas, ningún encabezado ni celda cortada (revisado en el DOM)

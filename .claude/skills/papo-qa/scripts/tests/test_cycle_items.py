@@ -83,8 +83,9 @@ class CycleItemsTest(unittest.TestCase):
 		self.conn.close()
 		self.assertEqual(self.system.errors, [])
 
-	def save(self, when, rtype, code, answers, station=13, user="oper", status="En proceso"):
-		data = {"items": [{"papoItemID": k, "answer": v, "registerTypeID": rtype} for k, v in answers.items()]}
+	def save(self, when, rtype, code, answers, station=13, user="oper", status="En proceso", insights=" | T: 3"):
+		data = {"items": [{"papoItemID": k, "answer": v, "registerTypeID": rtype} for k, v in answers.items()]
+			+ [{"insights": insights, "registerTypeID": rtype, "user": user, "timestamp": when}]}
 		self.conn.execute("INSERT INTO registerhistory ([Timestamp], DataAnswer, Status, PapoID, RegisterTypeID, [User], "
 			"WorkstationNodeID, RegisterCode) VALUES (?, ?, ?, 56, ?, ?, ?, ?)", (when, json.dumps(data), status, rtype, user, station, code))
 
@@ -95,8 +96,9 @@ class CycleItemsTest(unittest.TestCase):
 		self.save("2026-10-28 13:50:00", 10, 2, {}, status="Finalizado")
 		self.save("2026-10-28 13:50:00", 12, 3, {}, status="Sin Iniciar")
 		self.save("2026-10-28 14:05:00", 7, 3, {6601: "Cumple"})
-		self.save("2026-10-28 14:30:00", 16, 3, {6623: 18, 6626: 113, 6629: "10", 6630: "14:31:00", 6640: "10"})
-		self.save("2026-10-28 15:10:00", 16, 3, {6623: 7, 6626: 120, 6629: "5,5", 6640: "15,5"}, user="oper2")
+		self.save("2026-10-28 14:30:00", 16, 3, {6623: 18, 6624: "No Cumple", 6626: 113, 6629: "10", 6630: "14:31:00", 6640: "10"},
+			insights="Mesa lenta | T: 3, H: 14:28 - oper")
+		self.save("2026-10-28 15:10:00", 16, 3, {6623: 7.0, 6624: "Cumple", 6626: 120, 6629: "5,5", 6640: "15,5"}, user="oper2")
 		self.save("2026-10-28 15:20:00", 16, 3, {6623: 18, 6629: "8"}, station=44)  # another station
 
 	def test_totalAddsEveryEntryOfTheCycle(self):
@@ -121,11 +123,13 @@ class CycleItemsTest(unittest.TestCase):
 
 	def test_tableListsTheEntriesOfTheCycle(self):
 		self.cycle()
-		rows = self.items["getCycleRegisters"](form(), {"hora": "time", "mesa": 6623, "referencia": 6626,
-			"cantidad": 6629, "inicio": 6630, "operario": "user"})
+		rows = self.items["getCycleRegisters"](form(), {"hora": "time", "mesa": 6623, "combinada": 6624, "referencia": 6626,
+			"cantidad": 6629, "inicio": 6630, "operario": "user", "observaciones": "insights"}, ["combinada"])
 		self.assertEqual(rows, [
-			{"hora": "14:30", "mesa": "18", "referencia": "113", "cantidad": "10", "inicio": "14:31:00", "operario": "oper"},
-			{"hora": "15:10", "mesa": "7", "referencia": "120", "cantidad": "5,5", "inicio": "", "operario": "oper2"},
+			{"hora": "14:30", "mesa": "18", "combinada": u"\u2718", "referencia": "113", "cantidad": "10", "inicio": "14:31:00",
+				"operario": "oper", "observaciones": "Mesa lenta | T: 3, H: 14:28 - oper"},
+			{"hora": "15:10", "mesa": "7", "combinada": u"\u2714", "referencia": "120", "cantidad": "5,5", "inicio": "",
+				"operario": "oper2", "observaciones": "| T: 3"},
 		])
 
 	def test_emptyStation(self):

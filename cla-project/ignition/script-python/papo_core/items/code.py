@@ -173,7 +173,7 @@ def _toNumber(value):
 
 
 def _cycleRegisters(component):
-	"""Registers of the form's type saved in the open cycle of this station, oldest first: (Timestamp, User, {papoItemID: answer})."""
+	"""Registers of the form's type saved in the open cycle of this station, oldest first: (Timestamp, User, {papoItemID: answer}, insights)."""
 	params = component.view.params
 	query = """
 		SELECT [Timestamp], [User], DataAnswer
@@ -193,10 +193,13 @@ def _cycleRegisters(component):
 	for row in range(ds.getRowCount()):
 		data = system.util.jsonDecode(ds.getValueAt(row, "DataAnswer") or "{}") or {}
 		answers = {}
+		insights = u""
 		for item in data.get("items", []):
 			if "papoItemID" in item and item.get("answer") not in (None, ""):
 				answers.setdefault(item["papoItemID"], item["answer"])
-		registers.append((ds.getValueAt(row, "Timestamp"), ds.getValueAt(row, "User"), answers))
+			elif isinstance(item.get("insights"), basestring):
+				insights = item["insights"].strip()
+		registers.append((ds.getValueAt(row, "Timestamp"), ds.getValueAt(row, "User"), answers, insights))
 	return registers
 
 
@@ -233,7 +236,7 @@ def getCycleSum(component, sumItemID, keyItemID, keyValue, current):
 		if keyItemID is not None and keyValue in (None, ""):
 			return ""
 		total = _toNumber(current)
-		for stamp, user, answers in _cycleRegisters(component):
+		for stamp, user, answers, insights in _cycleRegisters(component):
 			if keyItemID is not None and unicode(answers.get(keyItemID, "")) != unicode(keyValue):
 				continue
 			number = _toNumber(answers.get(sumItemID))
@@ -249,21 +252,26 @@ def getCycleSum(component, sumItemID, keyItemID, keyValue, current):
 		return ""
 
 
-def getCycleRegisters(component, columns):
+def getCycleRegisters(component, columns, checks=()):
 	"""
 	Registers of the same type saved in the open cycle of this station, one row per register, for a table.
 
 	Same registers getCycleSum adds up (same WorkstationNodeID, PapoID, RegisterTypeID and last RegisterCode),
-	oldest first. Each row maps the table fields to the saved answers.
+	oldest first. Each row maps the table fields to the saved answers, as the report shows them: whole numbers
+	without decimals and the Cumple / No Cumple of the checks fields as check / x marks.
 
-	Version: 1.0.0
+	Version: 1.1.0
 
 	Changelog:
+		2026-10-28 | William M. | v1.1.0 - "insights" source (Observaciones) and checks marks: the columns of the
+			FO10-0100 report
 		2026-10-28 | William M. | v1.0.0 - Initial version (FO10-0100: battery entries of the form)
 
 	Args:
 		component (Component): Any component of the form (self in a binding transform)
-		columns (dict): {field: papoItemID}; "time" gives the time of the register (HH:mm) and "user" its operator
+		columns (dict): {field: papoItemID}; "time" gives the time of the register (HH:mm), "user" its operator
+			and "insights" its observations
+		checks (list): Fields whose answer Cumple / No Cumple shows as a check / x mark
 
 	Returns:
 		list[dict]: One {field: text} per register; [] when there are none or on error
@@ -272,17 +280,24 @@ def getCycleRegisters(component, columns):
 	logger = system.util.getLogger(ref)
 
 	try:
+		marks = {u"cumple": u"\u2714", u"no cumple": u"\u2718"}
 		rows = []
-		for stamp, user, answers in _cycleRegisters(component):
+		for stamp, user, answers, insights in _cycleRegisters(component):
 			row = {}
 			for field, source in columns.items():
 				if source == "time":
 					row[field] = system.date.format(stamp, "HH:mm") if stamp is not None else ""
 				elif source == "user":
 					row[field] = user or ""
+				elif source == "insights":
+					row[field] = insights
 				else:
 					value = answers.get(source)
+					if isinstance(value, float) and value == int(value):
+						value = int(value)
 					row[field] = "" if value is None else unicode(value)
+					if field in checks:
+						row[field] = marks.get(row[field].strip().lower(), row[field])
 			rows.append(row)
 		return rows
 
