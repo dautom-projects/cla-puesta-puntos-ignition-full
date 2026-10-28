@@ -386,6 +386,12 @@ class ReportBuildTest(unittest.TestCase):
 			"keys": {"No Cumple": "noItemID", "Cumple": "siItemID"}}]}], history=None)
 		self.assertEqual(data["Reprocesed1"], {"noItemID6115": u"\u2718"})
 		self.assertEqual(data["Reprocesed2"], {"siItemID6115": u"\u2718"})
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "register", "normalize": "okText", "reprocessed": [{"ids": [6115], "name": "r", "mode": "values",
+			"keys": {"Cumple": ["buenopapoItemID", "Si"], "No Cumple": ["malopapoItemID", "No"]}}]}], history=None)
+		self.assertEqual(data["register1"]["papoItemID6100"], u"Ok")
+		self.assertEqual(data["r1"], {"malopapoItemID6115": "No"})
+		self.assertEqual(data["r2"], {"buenopapoItemID6115": "Si"})
 
 	def test_comment(self):
 		data = self._pilot(self._data(station=7))

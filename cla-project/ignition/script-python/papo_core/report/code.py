@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.1
+Version: 2.8.2
 
 Changelog:
+	2026-10-28 | William M. | v2.8.2 - normalize okText (PT11-0104) and values marks with their own
+		text (AC10-1801 bueno = Si / malo = No)
 	2026-10-27 | William M. | v2.8.1 - Slot shiftNumber (TR11-0102 Fin by its shift); monthGrid takes the
 		month of the last Fin, as the report script did
 	2026-10-27 | William M. | v2.8.0 - Reprocessed mode values (one key per answer text:
@@ -74,6 +76,7 @@ NORMALIZE_MODES = {
 	"ok": {"cumple": "OK", "no cumple": "N OK"},
 	"ar": {"cumple": "A", "no cumple": "R"},
 	"mark": {"cumple": u"✘", "no cumple": ""},
+	"okText": {"cumple": u"Ok", "no cumple": u"No Ok"},
 }
 
 # Bueno/Malo/Regular -> symbol/text for reprocessedMode="quality"
@@ -280,9 +283,11 @@ def _classifyReprocessed(ds, allowedIds, mode, keys=None):
 					result["papoItemID{0}".format(papoItemID)] = 'NO OK'
 			elif mode == "values":
 				# One key per answer text: keys = {"Exportación": "expoItemID", ...} -> expoItemID{ID} (AC10-1003, PO11-0101)
-				for answer, prefix in (keys or {}).items():
+				# keys: {answer text: key prefix} (mark No Cumple) or {answer text: [key prefix, text]}
+				for answer, target in (keys or {}).items():
 					if unicode(val).strip() == answer:
-						result["{0}{1}".format(prefix, papoItemID)] = 'No Cumple'
+						prefix, text = (target[0], target[1]) if isinstance(target, (list, tuple)) else (target, 'No Cumple')
+						result["{0}{1}".format(prefix, papoItemID)] = text
 			elif mode == "x":
 				# Both keys always, X or blank, for every item of the list (PT11-0104)
 				result["cumplepapoItemID{0}".format(papoItemID)] = 'X' if valLower == "cumple" else u''
@@ -868,7 +873,8 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			reprocessed (list, optional): more groups of marks, each a dict with ids,
 				name, mode ("check", "quality", "yn" -> siItemID/noItemID, "ok" -> the
 				item key with OK / NO OK, "number" -> number{value}papoItemID, "x" -> both keys
-				with X or blank, "values" -> keys {answer text: key prefix}) and normalize
+				with X or blank, "values" -> keys {answer text: key prefix or [prefix, text]})
+				and normalize ("okText" -> Ok / No Ok besides the section modes)
 			typeName (bool, optional): also name{N}_type = registertype.Description of the record
 				and name{N}_typeID = its RegisterTypeID
 			start (int, optional): number of the first record slot (default 1)
