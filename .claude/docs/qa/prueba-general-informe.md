@@ -21,7 +21,7 @@ En cada registro, `ui_check.js` llena todos los campos, abre cada sección (sin 
 | Ensamble | 11 | 11 | 11 (EA11-1601 ya genera PDF) | Reportes EA11-0901, EA11-1101 y EA11-1501 (BACKLOG) |
 | F&A | 19 | 19 | 19 | — |
 | Metalurgia | 10 | 10 | 10 | — |
-| OREC | 26 | 26 | 26 | PO07-0101 mezcla ciclos de dos estaciones; EJ11-0101 clave repetida (BACKLOG) |
+| OREC | 26 | 26 | 26 | PO07-0101 mezcla ciclos de dos estaciones (BACKLOG) |
 | General | 3 | 3 | 3 | — |
 
 Todos los formularios guardan y firman.
@@ -43,10 +43,8 @@ Después de las dos regresiones se revisaron todas las vistas Form_* con las com
 ## Lo que no es del estándar (BACKLOG)
 
 - **Reportes:**
-  - Corregidos el 2026-10-27 con `report_bin.py`: GR10-0501, PT11-0104, TR11-0101, TR11-0102, SO02-4502, EC07-0101 y EA11-1601. En GR10-0501, Scrubber y Torres no tienen nivel de tanque: la casilla de Torres queda vacía y el formulario ya no tiene esas filas
-  - Abiertos:
-    - EJ11-0101: clave repetida, sale "7.0 7.0"
-    - Varios reportes no tienen sección para el Fin
+  - Corregidos el 2026-10-27 con `report_bin.py`: GR10-0501, PT11-0104, TR11-0101, TR11-0102, SO02-4502, EC07-0101, EA11-1601 y EJ11-0101 (clave repetida en "Velocidad de las aspas"). En GR10-0501, Scrubber y Torres no tienen nivel de tanque: la casilla de Torres queda vacía y el formulario ya no tiene esas filas
+  - Abierto: varios reportes no tienen sección para el Fin
 - **Datos:**
   - ~~CG10-0101 asignado a un nodo `Workstation`: "View Not Found"; se probó en la línea 85~~ corregido en la base de prueba: el nodo 1001 pasa a CELL con su `Topic` completo; ciclo y PDF probados desde la estación (falta en producción)
   - `RegisterCode` se numera por estación, pero los reportes filtran por nodo (PO07-0101)
