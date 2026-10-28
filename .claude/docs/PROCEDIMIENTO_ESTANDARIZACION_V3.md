@@ -43,6 +43,8 @@ Changelog:
 8. Los `view.json` no se reescriben con `json.dump` (Ignition usa Gson y escapa `'` `=` `<` `>`): ediciones puntuales o las herramientas, que escriben Gson canónico.
 9. Los objetos `Objects/*` no se editan a mano: se generan con `build_objects.py`.
 10. Los errores que ya tiene el formulario original (ítems repetidos, grupos que no se guardan, plantillas de reporte rotas) se reproducen tal cual y se anotan en el BACKLOG; se corrigen aparte con `/bug`, nunca en el mismo cambio de estandarización.
+11. `custom.item_dev` deja un componente en la vista sin que se recolecte, para poder revertir un cambio: por ejemplo, la etiqueta de tag que se oculta porque el PLC no tiene el valor y la reemplaza un campo escrito con el mismo `papoItemID`. No se borra ni se trata como error; sus bindings que leen `custom.item` fallan por eso. Para volver al PLC: `item_dev` → `item` en la etiqueta y `item` → `item_dev` en el campo escrito. En develop los valores de tag salen nulos o con error porque no hay PLC (usuario, 2026-10-28)
+12. Un `papoItemID` de otro PAPO no es error: cada formulario guarda en su propio registro y el reporte lee por `papoItemID`. Sí lo son el mismo ítem dos veces en un formulario y un ID que no existe en `papoitem` (usuario, 2026-10-28)
 
 ---
 
