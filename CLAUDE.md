@@ -78,7 +78,7 @@ Módulos (`papo_core/<modulo>/code.py`, funciones públicas):
 - `register` — recopile, save
 - `ui` — toggleSection, initForm, preInsight, confirmSave, getSecurityImage
 - `sign` — supervisorOpt, signOperator, requestSupervisorAuth, signSupervisor, signSupervisorFromSelection, authenticateAndSign, autoCloseOpenForms
-- `report` — build (la llamada de los reportes migrados), extractReportData, extractReportDataAuto, extractShiftChecklist
+- `report` — build (la llamada de todos los reportes), monthGrid, extractShiftChecklist; extractReportData y extractReportDataAuto quedan sin uso
 - `overview` — getPapoListFiltered, getCardPath
 - `items` — getRangeColor
 
