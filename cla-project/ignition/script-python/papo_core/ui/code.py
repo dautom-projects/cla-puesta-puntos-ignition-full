@@ -4,9 +4,11 @@ papo_core.ui
 Visual behavior logic for PAPO forms.
 Handles accordion toggle, form initialization, and title labels.
 
-Version: 1.2.1
+Version: 1.3.0
 
 Changelog:
+	2026-10-28 | William M. | v1.3.0 - initForm rebuilds custom.insights with the opening time (a record
+		without comments saved the shift and time of the design)
 	2026-10-28 | William M. | v1.2.1 - preInsight takes the shift and time in plant local time
 		(java.util.Calendar America/Bogota) instead of system.date.getHour24
 	2026-10-22 | William M. | v1.2.0 - Added getShift (java.util.Calendar, America/Bogota)
@@ -82,15 +84,31 @@ def initForm(root):
 	"""
 	Initialize a PAPO form on startup.
 
-	Sets initialPapoDateTime to current time for shift/time display.
+	Sets initialPapoDateTime to current time for shift/time display and rebuilds
+	custom.insights with it: its binding (Observaciones TextField + preInsight) ran
+	before with the timestamp saved in the design and only runs again when the
+	operator writes, so a record without comments kept the shift and time of the design.
+
+	Version: 1.1.0
+
+	Changelog:
+		2026-10-28 | William M. | v1.1.0 - Rebuilds custom.insights with the opening time
 
 	Args:
-		root (Component): The root component
+		root (View): The form view (self of the view onStartup)
 
 	Returns:
 		None
 	"""
 	root.custom.initialPapoDateTime = system.date.now()
+
+	try:
+		textField = root.getChild("root").getChild("TextField")
+		text = textField.props.text if textField is not None else None
+		root.custom.insights = preInsight(root, text or u"")
+	except Exception as e:
+		ref = str(getattr(root.custom, "referencePapo", "papo_core.ui"))
+		system.util.getLogger(ref).error("initForm insights: {}".format(str(e)))
 
 
 def preInsight(root, value):
