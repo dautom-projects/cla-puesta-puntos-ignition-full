@@ -89,7 +89,7 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
 - ~~`OREC/EC07-0101`: la referencia de la barcada (ítem 7931) se corta en la casilla de 26 px ("ZN NEGATI" de "ZN NEGATIVA COM 85X")~~ corregido el 2026-10-27 (`shrink` en las 16 casillas; se lee en dos líneas)
 - ~~Valores de tag sin dato (PA11-0301 pH, EJ07-0101 Temp_Horno, EJ11-0102 Temp_Horno / Cantidad_Placas): el script hace `str(None)` y el PDF imprime "None". En develop no hay tags; en producción pasa si el tag está en mala calidad~~ el PDF ya no imprime "None" (`papo_core.report` v2.8.6, 2026-10-28)
 - El registro de Fin no tiene sección en varios reportes (CG10-0101, FO10-1701-1, PT11-0104, TE11-2601, TE11-0601, FU10-0202, FU11-0101, PA11-0301/0401, RE10-0102, SO02-1006/4502, TR11-0102, CI11-0101, CU11-0101, EC11-0101, EJ07/EJ11, MZ07/MZ11, PO11-0101-N, RJ11-0101-N); confirmar si es lo esperado
-- Textos en vertical (usuario y firma por turno en SO02-1006 / SO02-4502): la herramienta de la prueba no los lee; revisarlos a ojo en el PDF
+- ~~Textos en vertical (usuario y firma por turno en SO02-1006 / SO02-4502): la herramienta de la prueba no los lee; revisarlos a ojo en el PDF~~ revisados el 2026-10-28 (PDF dibujado con pdf.js a 3x): se leen completos en su celda. La firma del operario cae en la columna de su día y turno; la del supervisor llena desde Lunes T1 en el orden de las firmas (`firmaAdministrator1..N`), igual que el script viejo (PDF base de SO02-4502 OREC). Decidir si la firma del supervisor debe ir en la columna de su turno
 
 ## Datos y configuración (prueba general, 2026-10-27)
 
