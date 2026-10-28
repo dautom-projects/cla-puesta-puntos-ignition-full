@@ -2281,6 +2281,12 @@
                             },
                             "tagPath": "{path}/FWFT_CirStatus_{1}_/Time_Start/Time_Start_{2}_"
                           },
+                          "transforms": [
+                            {
+                              "code": "\treturn papo_core.items.formatTagTime(value)",
+                              "type": "script"
+                            }
+                          ],
                           "type": "tag"
                         }
                       },
@@ -2334,6 +2340,12 @@
                             },
                             "tagPath": "{path}/FWFT_CirStatus_{1}_/Time_End/Time_End_{2}_"
                           },
+                          "transforms": [
+                            {
+                              "code": "\treturn papo_core.items.formatTagTime(value)",
+                              "type": "script"
+                            }
+                          ],
                           "type": "tag"
                         }
                       },
@@ -2387,7 +2399,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\treturn str(value)",
+                              "code": "\treturn papo_core.items.formatTagTime(value)",
                               "type": "script"
                             }
                           ],
@@ -2988,7 +3000,7 @@
                   },
                   {
                     "custom": {
-                      "item": {
+                      "item_dev": {
                         "papoItemID": 6640,
                         "registerTypeID": 16
                       }
@@ -2997,10 +3009,11 @@
                       "name": "Label_6"
                     },
                     "position": {
-                      "basis": "42px"
+                      "basis": "42px",
+                      "display": false
                     },
                     "propConfig": {
-                      "custom.item.answer": {
+                      "custom.item_dev.answer": {
                         "binding": {
                           "config": {
                             "path": "this.props.text"
@@ -3020,6 +3033,62 @@
                             "tagPath": "{path}/Mesa_{1}/BatteryNum"
                           },
                           "type": "tag"
+                        }
+                      },
+                      "props.textStyle.fontSize": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.fontSize"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "style": {
+                        "classes": "PAPO/Field/TagValue"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "custom": {
+                      "item": {
+                        "papoItemID": 6640,
+                        "registerTypeID": 16
+                      }
+                    },
+                    "meta": {
+                      "name": "Label_Calculado"
+                    },
+                    "position": {
+                      "basis": "42px"
+                    },
+                    "propConfig": {
+                      "custom.item.answer": {
+                        "binding": {
+                          "config": {
+                            "path": "this.props.text"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "struct": {
+                              "cantidad": "{/root/FlexContainerGroup1/S4/FlexContainer_0/TextField_4.props.params.value}",
+                              "mesa": "{/root/FlexContainerGroup1/FlexContainer_6/Dropdown.props.params.answer}"
+                            },
+                            "waitOnAll": true
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t# Batteries entered to this table in the shift: saved registers plus the one being filled\n\treturn papo_core.items.getCycleSum(self, 6629, 6623, value[\"mesa\"], value[\"cantidad\"])",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "expr-struct"
                         }
                       },
                       "props.textStyle.fontSize": {
