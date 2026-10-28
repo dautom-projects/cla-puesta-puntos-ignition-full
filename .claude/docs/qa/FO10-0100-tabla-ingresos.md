@@ -39,3 +39,9 @@ La tabla pasa a las 17 columnas de la página 1 del reporte, en su orden: Mesa d
 ## Sin Observaciones (2026-10-28, pedido del usuario)
 
 - [x] La tabla queda con 16 columnas (sale Observaciones); QA 1–7 y papo-lint sin hallazgos; navegador a 1920x1080 sin celdas cortadas
+
+## Alto según los registros (2026-10-28, pedido del usuario)
+
+- [x] Alto = encabezado 84 px + 32 px por ingreso; sin ingresos 80 px (ícono y mensaje visibles)
+- [x] Encabezado de 84 px: el título de 4 líneas ("Temperatura agua de la mesa (menor a 45°C)") se ve completo (antes 66 px y se cortaba)
+- [x] Estación 44 sin ingresos y luego estación 13 en la misma sesión: la tabla pasa de vacía a 4 ingresos (214 px, sin scroll). Antes mostraba los de la estación anterior porque el formulario embebido no se recrea al cambiar de estación

@@ -158,14 +158,33 @@
           "name": "Table_Ingresos"
         },
         "position": {
-          "basis": "200px",
+          "basis": "80px",
           "shrink": 0
         },
         "propConfig": {
+          "position.basis": {
+            "binding": {
+              "config": {
+                "path": "this.props.data"
+              },
+              "transforms": [
+                {
+                  "code": "\t# As tall as the entries of the cycle: the header and one row per entry; only the message without entries\n\trows \u003d len(value) if value is not None else 0\n\tif rows \u003d\u003d 0:\n\t\treturn \"80px\"\n\treturn \"{}px\".format(84 + 32 * rows + 2)",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          },
           "props.data": {
             "binding": {
               "config": {
-                "path": "view.custom.initialPapoDateTime"
+                "struct": {
+                  "apertura": "{view.custom.initialPapoDateTime}",
+                  "estacion": "{view.params.workstationnodeID}",
+                  "papo": "{view.params.papoID}"
+                },
+                "waitOnAll": false
               },
               "transforms": [
                 {
@@ -173,7 +192,7 @@
                   "type": "script"
                 }
               ],
-              "type": "property"
+              "type": "expr-struct"
             }
           }
         },
@@ -1699,7 +1718,8 @@
           "headerStyle": {
             "borderRightColor": "#D5D5D5",
             "borderRightStyle": "none",
-            "borderRightWidth": 1
+            "borderRightWidth": 1,
+            "height": 84
           },
           "pager": {
             "activeOption": 100,
@@ -4646,7 +4666,9 @@
                         "binding": {
                           "config": {
                             "struct": {
-                              "cantidad": "{/root/FlexContainerGroup1/S4/FlexContainer_0/TextField_4.props.params.value}"
+                              "cantidad": "{/root/FlexContainerGroup1/S4/FlexContainer_0/TextField_4.props.params.value}",
+                              "estacion": "{view.params.workstationnodeID}",
+                              "papo": "{view.params.papoID}"
                             },
                             "waitOnAll": true
                           },
