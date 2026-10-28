@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.3
+Version: 2.8.4
 
 Changelog:
+	2026-10-28 | William M. | v2.8.4 - _normalizeDict keeps unicode values (the quality marks of CU11-0101
+		printed as UTF-8 bytes)
 	2026-10-28 | William M. | v2.8.3 - Reprocessed marks read Sí (with accent) as si (MZ07-0101)
 	2026-10-28 | William M. | v2.8.2 - normalize okText (PT11-0104) and values marks with their own
 		text (AC10-1801 bueno = Si / malo = No)
@@ -120,7 +122,8 @@ def _normalizeDict(sourceDict, mode):
 			result[k] = val
 			continue
 
-		valStr = str(val).strip()
+		# unicode, not str: a mark like the quality cross would turn into UTF-8 bytes
+		valStr = unicode(val).strip()
 		valLower = valStr.lower()
 
 		if mode != "raw" and valLower in valueMap:
