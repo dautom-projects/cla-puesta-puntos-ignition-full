@@ -26,4 +26,21 @@ No es por ser de otro PAPO: la plantilla del reporte no tiene la clave, así que
 - `Ensamble/Form_EA11-1501_2h`: 11035 y 11036 no salen
 - `Metalurgia/Form_TR11-0102_start`: el supervisor guarda 10949, que el PDF no tiene; la firma se lee del registro tipo 10, así que no se pierde
 
+Encontrados en la verificación de F&A y OREC (2026-10-28, ciclo completo y PDF casilla por casilla, `verificacion-fa-orec.md`). Todas las plantillas son las originales (el estándar solo cambió los scripts de los reportes):
+
+- Supervisor sin casilla (la firma sale del registro tipo 10): 10969 FO10-1701-1, 10971 AC10-1801, 10972 AC10-0501, 10976 CA02-2102, 10977 AC10-0301, 10950 SO02-4502 (OREC)
+- `F&A/Form_AC10-0201_*`: 5801 (ruidos extraños), 5804 (correa de la volcadora) y 6753 (multímetro)
+- `F&A/Form_AC10-1003_*`: 5568 (tipo de estiba) y 6724–6730 (elementos de protección: botas, gafas, guantes, tapabocas, tapón)
+- `F&A/Form_AC10-1801_*`: 5949 (cantidad de rechazos alto voltaje), 5950 (definición), 6830 (rayada) y 6832 (humedad)
+- `F&A/Form_FO10-0601_*`: 6471 (baterías reportadas por aislamiento corto); el ítem 0 ya está arriba
+- `F&A/Form_FO10-1701_*`: 6159 (borne picado)
+- `F&A/Form_FO10-1701-1_*`: 6289 (turno) y 6296 (operario)
+- `F&A/Form_GR10-0501_start`: 6052, 6056, 6060, 6064 y 6068 (los "Relevantes" de tanque 7, suavizador, lavadora, scrubber y planta F.A)
+- `OREC/Form_CI11-0101_start`: 4851 (cinta pegante, tijeras, separador de cartón, estibas)
+- `OREC/Form_EC07-0101_barcada`: 7930 (hora inicio); `_end`: 7955 (lote de papel batch date)
+- `OREC/Form_MZ07-0101_30min`: 5231–5236 (densidad y penetración LCS / LC / LCI)
+- `OREC/Form_SO02-4502_start`: los 16 textos "Hallazgo …" (4496–4526, pares); el PDF solo marca el ítem revisado
+- `OREC/Form_RJ07-0101_end`: 7985 (producción buenas) y 7988 (kilos desperdicio)
+- `OREC/Form_PO11-0101-N_start`: 5168 sí sale (marcas Antes / Durante); 5169 no existe en `papoitem` (arriba)
+
 Cómo repetirlo: recorrer los `custom.item` de cada vista y buscar `papoItemID<ID>` en la plantilla de su reporte (`report_bin.py show <data.bin> --template`); los IDs, contra `SELECT ID FROM papoitem`.
