@@ -53,6 +53,6 @@ Los 8 sin ciclos en develop (7 copias de PL11-0101 y la base) tienen el mismo sc
 
 ## Pendiente
 
-- `Digitalizacion_Template`: la tabla de vista previa y `lastRegisterType` todavía leen por nodo
+- ~~`Digitalizacion_Template`: la tabla de vista previa y `lastRegisterType` todavía leen por nodo~~ hecho el 2026-10-28 (también por estación)
 - La consulta `RegisterHistory` queda sin uso en los reportes migrados (la tabla lee `RegisterHistoryStation`)
 - El script viejo de EC07-0101 y EC11-0101 fallaba en algunos ciclos; con `build()` ya generan
