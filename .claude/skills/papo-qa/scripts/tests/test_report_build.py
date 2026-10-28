@@ -380,6 +380,13 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertIn("papoItemID6110", data["fourhour2"])
 		self.assertNotIn("fourhour3", data)
 
+	def test_reprocessedValues(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "register", "reprocessed": [{"ids": [6115], "name": "Reprocesed", "mode": "values",
+			"keys": {"No Cumple": "noItemID", "Cumple": "siItemID"}}]}], history=None)
+		self.assertEqual(data["Reprocesed1"], {"noItemID6115": u"\u2718"})
+		self.assertEqual(data["Reprocesed2"], {"siItemID6115": u"\u2718"})
+
 	def test_comment(self):
 		data = self._pilot(self._data(station=7))
 		self.assertEqual(data["comment"], "| T: 3 - QA. | T: 3 - 4h")

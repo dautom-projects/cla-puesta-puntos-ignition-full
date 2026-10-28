@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.7.0
+Version: 2.8.0
 
 Changelog:
+	2026-10-27 | William M. | v2.8.0 - Reprocessed mode values (one key per answer text:
+		Exportación / Nacional in AC10-1003, Antes / Durante in PO11-0101)
 	2026-10-27 | William M. | v2.7.0 - build(): nestedMarks and reprocessed mode x (PT11-0104),
 		start and itemType / first (MZ11-0101)
 	2026-10-27 | William M. | v2.6.0 - build(): copies (the same slot with another normalize),
@@ -233,7 +235,7 @@ def _fillDataFromDataset(ds, data, keyName, includeInsights=True, sep=u' *---* '
 			pass
 
 
-def _classifyReprocessed(ds, allowedIds, mode):
+def _classifyReprocessed(ds, allowedIds, mode, keys=None):
 	"""Classify specific papoItemIDs into marks: check (cumple/nocumple), quality (bueno/malo/regular), yn, ok or number."""
 	result = {}
 	if ds is None:
@@ -274,6 +276,11 @@ def _classifyReprocessed(ds, allowedIds, mode):
 					result["papoItemID{0}".format(papoItemID)] = 'OK'
 				elif valLower == "no cumple":
 					result["papoItemID{0}".format(papoItemID)] = 'NO OK'
+			elif mode == "values":
+				# One key per answer text: keys = {"Exportación": "expoItemID", ...} -> expoItemID{ID} (AC10-1003, PO11-0101)
+				for answer, prefix in (keys or {}).items():
+					if unicode(val).strip() == answer:
+						result["{0}{1}".format(prefix, papoItemID)] = 'No Cumple'
 			elif mode == "x":
 				# Both keys always, X or blank, for every item of the list (PT11-0104)
 				result["cumplepapoItemID{0}".format(papoItemID)] = 'X' if valLower == "cumple" else u''
@@ -677,7 +684,7 @@ def _buildSection(ds, data, section, typeNames=None):
 		for copy in section.get("copies") or []:
 			data[copy["name"]] = _normalizeDict(raw, copy.get("normalize", mode))
 		for g in groups:
-			data[g["name"]] = _normalizeDict(_classifyReprocessed(ds, g["ids"], g["mode"]), g["normalize"])
+			data[g["name"]] = _normalizeDict(_classifyReprocessed(ds, g["ids"], g["mode"], g.get("keys")), g["normalize"])
 		return
 
 	if slot in ("shift", "weekday", "weekSlot"):
@@ -698,7 +705,7 @@ def _buildSection(ds, data, section, typeNames=None):
 		if section.get("nestedMarks"):
 			data[slotName].update(_nestedMarks(oneByN, section["nestedMarks"], section.get("nestedQuality", False)))
 		for g in groups:
-			marks = _classifyReprocessed(oneByN, g["ids"], g["mode"])
+			marks = _classifyReprocessed(oneByN, g["ids"], g["mode"], g.get("keys"))
 			data['{0}{1}'.format(g["name"], k + section.get("start", 1))] = _normalizeDict(marks, g["normalize"])
 		if section.get("typeName") and typeNames is not None:
 			typeID = ds.getValueAt(k, "RegisterTypeID")
@@ -767,7 +774,7 @@ def _buildTimeSlots(ds, data, section, slot, mode, groups):
 		else:
 			data[slotName] = values
 		for g in groups:
-			marks = _normalizeDict(_classifyReprocessed(row, g["ids"], g["mode"]), g["normalize"])
+			marks = _normalizeDict(_classifyReprocessed(row, g["ids"], g["mode"], g.get("keys")), g["normalize"])
 			markName = "{0}{1}".format(g["name"], number)
 			if merge and isinstance(data.get(markName), dict):
 				data[markName].update(marks)
@@ -846,7 +853,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			reprocessed (list, optional): more groups of marks, each a dict with ids,
 				name, mode ("check", "quality", "yn" -> siItemID/noItemID, "ok" -> the
 				item key with OK / NO OK, "number" -> number{value}papoItemID, "x" -> both keys
-				with X or blank) and normalize
+				with X or blank, "values" -> keys {answer text: key prefix}) and normalize
 			typeName (bool, optional): also name{N}_type = registertype.Description of the record
 				and name{N}_typeID = its RegisterTypeID
 			start (int, optional): number of the first record slot (default 1)
