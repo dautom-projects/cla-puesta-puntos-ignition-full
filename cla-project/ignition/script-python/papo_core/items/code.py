@@ -160,3 +160,102 @@ def getQuestionText(value):
 	except Exception as e:
 		logger.error("Error reading question text for papoItemID {}: {}".format(value.get("papoItemID"), str(e)))
 		return ""
+
+
+def _toNumber(value):
+	"""Number typed in a text field (comma or dot as decimal separator); None when it is not a number."""
+	if value is None:
+		return None
+	try:
+		return float(unicode(value).strip().replace(",", "."))
+	except ValueError:
+		return None
+
+
+def getCycleSum(component, sumItemID, keyItemID, keyValue, current):
+	"""
+	Sum of one item over the registers of the open cycle of this station, plus the value being entered.
+
+	Reads the registers of the same type already saved in the cycle (same WorkstationNodeID, PapoID and
+	last RegisterCode, the one register.save uses) whose keyItemID answer equals keyValue, and adds the
+	sumItemID answers that are numbers. The form being filled is not saved yet, so current is added.
+
+	Version: 1.0.0
+
+	Changelog:
+		2026-10-28 | William M. | v1.0.0 - Initial version (FO10-0100: total batteries per table in the shift)
+
+	Args:
+		component (Component): Any component of the form (self in a binding transform)
+		sumItemID (int): papoItemID to add up (e.g. battery quantity)
+		keyItemID (int): papoItemID that groups the registers (e.g. table number)
+		keyValue (str): Answer of keyItemID in the form being filled
+		current (str): Value of sumItemID in the form being filled
+
+	Returns:
+		str: The total as text (no decimals when whole); "" when there is nothing to add or on error
+	"""
+	ref = str(getattr(component.view.custom, "referencePapo", "") or "papo_core.items")
+	logger = system.util.getLogger(ref)
+
+	try:
+		if keyValue in (None, ""):
+			return ""
+		dbConnection = component.view.custom.dbConnection
+		params = component.view.params
+		query = """
+			SELECT DataAnswer
+			FROM registerhistory
+			WHERE WorkstationNodeID = ? AND PapoID = ? AND RegisterTypeID = ?
+				AND RegisterCode = (
+					SELECT TOP 1 RegisterCode FROM registerhistory
+					WHERE WorkstationNodeID = ? AND PapoID = ?
+					ORDER BY RegisterCode DESC, ID DESC
+				)
+		"""
+		args = [params.workstationnodeID, params.papoID, component.view.custom.registerTypeID,
+			params.workstationnodeID, params.papoID]
+		ds = system.db.runPrepQuery(query, args, dbConnection)
+
+		total = _toNumber(current)
+		for row in range(ds.getRowCount()):
+			data = system.util.jsonDecode(ds.getValueAt(row, "DataAnswer") or "{}") or {}
+			answers = {}
+			for item in data.get("items", []):
+				if "papoItemID" in item and item.get("answer") not in (None, ""):
+					answers.setdefault(item["papoItemID"], item["answer"])
+			if unicode(answers.get(keyItemID, "")) != unicode(keyValue):
+				continue
+			number = _toNumber(answers.get(sumItemID))
+			if number is not None:
+				total = (total or 0) + number
+
+		if total is None:
+			return ""
+		return unicode(int(total)) if total == int(total) else unicode(total)
+
+	except Exception as e:
+		logger.error("getCycleSum {} by {}: {}".format(sumItemID, keyItemID, str(e)))
+		return ""
+
+
+def formatTagTime(value):
+	"""
+	Time read from the PLC as text: HH:mm:ss when the tag is a date, the text as it comes otherwise.
+
+	Version: 1.0.0
+
+	Changelog:
+		2026-10-28 | William M. | v1.0.0 - Initial version (FO10-0100: Hora final real saved "None" without a value)
+
+	Args:
+		value: Tag value (date, text or None)
+
+	Returns:
+		str: The time as text; "" without a value
+	"""
+	if value is None:
+		return ""
+	if hasattr(value, "getTime"):
+		return system.date.format(value, "HH:mm:ss")
+	return value if isinstance(value, basestring) else unicode(value)
