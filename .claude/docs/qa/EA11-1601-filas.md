@@ -43,4 +43,4 @@ Resultado: **FALLA** · 0 vistas pasan, 2 fallan
 - Recolección: 23 → 22 ítems; los 10 ítems 11185–11194 una vez cada uno; el resto en el mismo orden y contenedor
 - El reporte `EA11-1601` imprime por `papoItemID` (`@startShift.papoItemID11185@` … `11194@`): con esto se llena la fila de las boquillas, que antes salía vacía
 - Mismo cambio en `Form_EA11-1601_start_PruebaPiloto`
-- Pendiente: verlo a 1920x1080 y guardar un ciclo (sin sesión del navegador en esta corrida)
+- A 1920x1080 (2026-10-28, estación 75, ciclo 3): "Estado Termoselladora" con 8 filas en 400 px, sin preguntas repetidas ni filas cortadas; el Inicio (registro 8024) guarda 22 ítems con 11185–11194 una vez cada uno; ciclo cerrado (1 hr, firmas, Fin)
