@@ -172,23 +172,54 @@ def _toNumber(value):
 		return None
 
 
+def _cycleRegisters(component):
+	"""Registers of the form's type saved in the open cycle of this station, oldest first: (Timestamp, User, {papoItemID: answer})."""
+	params = component.view.params
+	query = """
+		SELECT [Timestamp], [User], DataAnswer
+		FROM registerhistory
+		WHERE WorkstationNodeID = ? AND PapoID = ? AND RegisterTypeID = ?
+			AND RegisterCode = (
+				SELECT TOP 1 RegisterCode FROM registerhistory
+				WHERE WorkstationNodeID = ? AND PapoID = ?
+				ORDER BY RegisterCode DESC, ID DESC
+			)
+		ORDER BY ID ASC
+	"""
+	args = [params.workstationnodeID, params.papoID, component.view.custom.registerTypeID,
+		params.workstationnodeID, params.papoID]
+	ds = system.db.runPrepQuery(query, args, component.view.custom.dbConnection)
+	registers = []
+	for row in range(ds.getRowCount()):
+		data = system.util.jsonDecode(ds.getValueAt(row, "DataAnswer") or "{}") or {}
+		answers = {}
+		for item in data.get("items", []):
+			if "papoItemID" in item and item.get("answer") not in (None, ""):
+				answers.setdefault(item["papoItemID"], item["answer"])
+		registers.append((ds.getValueAt(row, "Timestamp"), ds.getValueAt(row, "User"), answers))
+	return registers
+
+
 def getCycleSum(component, sumItemID, keyItemID, keyValue, current):
 	"""
 	Sum of one item over the registers of the open cycle of this station, plus the value being entered.
 
 	Reads the registers of the same type already saved in the cycle (same WorkstationNodeID, PapoID and
-	last RegisterCode, the one register.save uses) whose keyItemID answer equals keyValue, and adds the
-	sumItemID answers that are numbers. The form being filled is not saved yet, so current is added.
+	last RegisterCode, the one register.save uses) and adds the sumItemID answers that are numbers; with
+	keyItemID, only the registers whose keyItemID answer equals keyValue. The form being filled is not
+	saved yet, so current is added.
 
-	Version: 1.0.0
+	Version: 1.1.0
 
 	Changelog:
+		2026-10-28 | William M. | v1.1.0 - keyItemID None adds every register of the cycle (FO10-0100: total
+			batteries entered in the form)
 		2026-10-28 | William M. | v1.0.0 - Initial version (FO10-0100: total batteries per table in the shift)
 
 	Args:
 		component (Component): Any component of the form (self in a binding transform)
 		sumItemID (int): papoItemID to add up (e.g. battery quantity)
-		keyItemID (int): papoItemID that groups the registers (e.g. table number)
+		keyItemID (int): papoItemID that groups the registers (e.g. table number); None for all of them
 		keyValue (str): Answer of keyItemID in the form being filled
 		current (str): Value of sumItemID in the form being filled
 
@@ -199,32 +230,11 @@ def getCycleSum(component, sumItemID, keyItemID, keyValue, current):
 	logger = system.util.getLogger(ref)
 
 	try:
-		if keyValue in (None, ""):
+		if keyItemID is not None and keyValue in (None, ""):
 			return ""
-		dbConnection = component.view.custom.dbConnection
-		params = component.view.params
-		query = """
-			SELECT DataAnswer
-			FROM registerhistory
-			WHERE WorkstationNodeID = ? AND PapoID = ? AND RegisterTypeID = ?
-				AND RegisterCode = (
-					SELECT TOP 1 RegisterCode FROM registerhistory
-					WHERE WorkstationNodeID = ? AND PapoID = ?
-					ORDER BY RegisterCode DESC, ID DESC
-				)
-		"""
-		args = [params.workstationnodeID, params.papoID, component.view.custom.registerTypeID,
-			params.workstationnodeID, params.papoID]
-		ds = system.db.runPrepQuery(query, args, dbConnection)
-
 		total = _toNumber(current)
-		for row in range(ds.getRowCount()):
-			data = system.util.jsonDecode(ds.getValueAt(row, "DataAnswer") or "{}") or {}
-			answers = {}
-			for item in data.get("items", []):
-				if "papoItemID" in item and item.get("answer") not in (None, ""):
-					answers.setdefault(item["papoItemID"], item["answer"])
-			if unicode(answers.get(keyItemID, "")) != unicode(keyValue):
+		for stamp, user, answers in _cycleRegisters(component):
+			if keyItemID is not None and unicode(answers.get(keyItemID, "")) != unicode(keyValue):
 				continue
 			number = _toNumber(answers.get(sumItemID))
 			if number is not None:
@@ -237,6 +247,48 @@ def getCycleSum(component, sumItemID, keyItemID, keyValue, current):
 	except Exception as e:
 		logger.error("getCycleSum {} by {}: {}".format(sumItemID, keyItemID, str(e)))
 		return ""
+
+
+def getCycleRegisters(component, columns):
+	"""
+	Registers of the same type saved in the open cycle of this station, one row per register, for a table.
+
+	Same registers getCycleSum adds up (same WorkstationNodeID, PapoID, RegisterTypeID and last RegisterCode),
+	oldest first. Each row maps the table fields to the saved answers.
+
+	Version: 1.0.0
+
+	Changelog:
+		2026-10-28 | William M. | v1.0.0 - Initial version (FO10-0100: battery entries of the form)
+
+	Args:
+		component (Component): Any component of the form (self in a binding transform)
+		columns (dict): {field: papoItemID}; "time" gives the time of the register (HH:mm) and "user" its operator
+
+	Returns:
+		list[dict]: One {field: text} per register; [] when there are none or on error
+	"""
+	ref = str(getattr(component.view.custom, "referencePapo", "") or "papo_core.items")
+	logger = system.util.getLogger(ref)
+
+	try:
+		rows = []
+		for stamp, user, answers in _cycleRegisters(component):
+			row = {}
+			for field, source in columns.items():
+				if source == "time":
+					row[field] = system.date.format(stamp, "HH:mm") if stamp is not None else ""
+				elif source == "user":
+					row[field] = user or ""
+				else:
+					value = answers.get(source)
+					row[field] = "" if value is None else unicode(value)
+			rows.append(row)
+		return rows
+
+	except Exception as e:
+		logger.error("getCycleRegisters: {}".format(str(e)))
+		return []
 
 
 def formatTagTime(value):
