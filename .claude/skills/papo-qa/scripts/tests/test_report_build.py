@@ -36,16 +36,32 @@ class JDate(object):
 		return "JDate({})".format(self.dt)
 
 
+BOGOTA = datetime.timezone(datetime.timedelta(hours=-5))
+
+
 class SimpleDateFormat(object):
-	FORMATS = {"EEE MMM dd HH:mm:ss Z yyyy": "%a %b %d %H:%M:%S %z %Y"}
+	FORMATS = {"EEE MMM dd HH:mm:ss Z yyyy": "%a %b %d %H:%M:%S %z %Y", "HH:mm:ss": "%H:%M:%S"}
 
 	def __init__(self, fmt, locale=None):
 		self.fmt = self.FORMATS.get(fmt)
+		self.zone = None
+
+	def setTimeZone(self, zone):
+		self.zone = zone
 
 	def parse(self, text):
-		if self.fmt is None:
+		if self.fmt is None or "%z" not in self.fmt:
 			raise ValueError(text)
 		return JDate(datetime.datetime.strptime(text, self.fmt))
+
+	def format(self, date):
+		return date.dt.astimezone(self.zone).strftime(self.fmt)
+
+
+def _plantShift(date):
+	"""papo_core.ui.getShift stand-in: T1 22-06, T2 06-14, T3 14-22 in America/Bogota."""
+	hour = date.dt.astimezone(BOGOTA).hour
+	return 1 if hour >= 22 or hour < 6 else (2 if hour < 14 else 3)
 
 
 def _javaModules():
@@ -54,6 +70,7 @@ def _javaModules():
 	text = types.ModuleType("java.text")
 	util.Date = JDate
 	util.Locale = types.SimpleNamespace(US="US")
+	util.TimeZone = types.SimpleNamespace(getTimeZone=lambda name: BOGOTA)
 	text.SimpleDateFormat = SimpleDateFormat
 	java.util, java.text = util, text
 	# Jython imports a Java class like a module (import java.util.Date)
@@ -130,7 +147,7 @@ def _loadReport(conn):
 	builtins.basestring, builtins.long, builtins.unicode = str, int, str
 	module = types.ModuleType("papo_core.report")
 	module.system = FakeSystem(conn)
-	module.papo_core = types.SimpleNamespace()
+	module.papo_core = types.SimpleNamespace(ui=types.SimpleNamespace(getShift=_plantShift))
 	with io.open(REPORT, encoding="utf-8") as f:
 		exec(compile(f.read(), REPORT, "exec"), module.__dict__)
 	return module, saved
@@ -192,6 +209,7 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertEqual(data["register1"]["papoItemID6101"], "12.3")
 		self.assertEqual(data["register1"]["user"], "Soporte D.")
 		self.assertEqual(data["register1"]["shift"], "3")
+		self.assertEqual(data["register1"]["hora_registro"], "19:43:47")
 		self.assertEqual(data["register2"]["papoItemID6100"], u"✘")
 		self.assertNotIn("register3", data)
 		self.assertEqual(data["fourhour1"]["papoItemID6110"], u"✘")
@@ -230,6 +248,16 @@ class ReportBuildTest(unittest.TestCase):
 		data = self._pilot(self._data())
 		self.assertEqual([data["register{}".format(i)]["user"] for i in (1, 2, 3)], ["Soporte D.", "Otro U.", "Estacion B"])
 		self.assertEqual(data["RegisterHistoryStation"].getRowCount(), 7)
+
+	def test_plantShiftNotTheOrecNumbering(self):
+		# 09:15 is T2 for the plant (06-14); the OREC report scripts called it 3
+		self.conn.execute("INSERT INTO registerhistory VALUES (8, 18, 30, 7, 2, 7, 'En proceso', 'x', '2026-10-28 09:15:00', ?)",
+			(_answer([(6100, None)], when="Wed Oct 28 09:15:00 COT 2026"),))
+		data = {"papoID": 18, "nodeID": 30, "registerCode": 2, "db": "papo_db"}
+		self.report.build(data, [{"types": [7], "name": "shift"}], history=None)
+		self.assertEqual(data["shift1"]["shift"], "2")
+		self.assertEqual(data["shift1"]["hora_registro"], "09:15:00")
+		self.assertEqual(data["shift1"]["papoItemID6100"], "")
 
 	def test_comment(self):
 		data = self._pilot(self._data(station=7))

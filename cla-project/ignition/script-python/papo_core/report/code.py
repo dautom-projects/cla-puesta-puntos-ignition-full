@@ -16,9 +16,12 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.3.0
+Version: 2.3.1
 
 Changelog:
+	2026-10-27 | William M. | v2.3.1 - Record shift from papo_core.ui.getShift
+		(America/Bogota, not the gateway timezone) and hora_registro (HH:mm:ss of
+		the record) in every section; OREC reports used their own shift numbering
 	2026-10-27 | William M. | v2.3.0 - build(): sections with one slot
 		per record (or one merged key), reprocessed classification with its
 		mark, comment, signatures and the history list, so a report script
@@ -191,19 +194,20 @@ def _fillDataFromDataset(ds, data, keyName, includeInsights=True, sep=u' *---* '
 			agg["user"].append(ctxUser)
 			agg["date"].append(ctxDt)
 
+			# Plant shift (T1 22-06, T2 06-14, T3 14-22) and time of the record, in plant local time
 			shiftVal = None
-			try:
-				if ctxDt is not None:
-					hour = system.date.getHour24(ctxDt)
-					if hour >= 22 or hour < 6:
-						shiftVal = "1"
-					elif hour >= 6 and hour < 14:
-						shiftVal = "2"
-					else:
-						shiftVal = "3"
-			except:
-				shiftVal = None
+			timeVal = u''
+			if ctxDt is not None:
+				try:
+					shift = papo_core.ui.getShift(ctxDt)
+					shiftVal = str(shift) if shift is not None else None
+					timeFormat = java.text.SimpleDateFormat("HH:mm:ss")
+					timeFormat.setTimeZone(java.util.TimeZone.getTimeZone("America/Bogota"))
+					timeVal = timeFormat.format(ctxDt)
+				except:
+					shiftVal = None
 			agg["shift"].append(shiftVal)
+			agg["hora_registro"].append(timeVal)
 
 		result = dict(agg)
 		if includeInsights:

@@ -89,7 +89,7 @@ Vistas: 235 Form_* (detalle por vista en `MIGRATION_STATUS.md`).
 
 impact.json: 0 vista(s) lo usan.
 
-Todas las consultas leen solo el ciclo de la estación del reporte cuando el visor pasa `workstationNodeID` (Gestión); sin él leen el ciclo por nodo, como antes (v2.3.0).
+Todas las consultas leen solo el ciclo de la estación del reporte cuando el visor pasa `workstationNodeID` (Gestión); sin él leen el ciclo por nodo, como antes (v2.3.0). Cada registro de una sección trae `user`, `date`, `shift` (turno de la planta con `papo_core.ui.getShift`: T1 22–06, T2 06–14, T3 14–22) y `hora_registro` (HH:mm:ss) (v2.3.1).
 
 ### `report.build(data, sections, history="RegisterHistoryStation", signatures="role", signaturePrefix=('firmaAdministrator', 'firmaOperator'))`
 
@@ -99,7 +99,7 @@ La única llamada del script de un reporte: la lista de secciones dice qué tipo
 - `signatures="role"`: como los scripts de reportes (Supervisor_PAPO → `firmaAdministrator1`, `2`…; Operator → `firmaOperator`). `"status"`: Revisado / Finalizado, como `extractReportData`
 - `history`: clave de la lista del historial filtrada por estación; la tabla de la plantilla usa `list-key`, `grouping key` y los títulos de fila con esa clave (la consulta `RegisterHistory` del reporte no tiene estación)
 
-**Llamado desde:** reportes `Clarios/Andina/F&A/AC10-0202`, `AC10-0301`, `AC10-1101`, `CA02-2102` (piloto del 2026-10-27), `AC10-0801`, `TE11-2601`, `FO10-0100`, `FO10-0601` y `FO10-1701` (segunda familia, comparado en sombra con `.claude/skills/papo-qa/scripts/report_shadow.py`); su tabla "Historial de registros" (última página) lee `RegisterHistoryStation`, así que también se filtra por estación.
+**Llamado desde:** reportes `Clarios/Andina/F&A/AC10-0202`, `AC10-0301`, `AC10-1101`, `CA02-2102` (piloto del 2026-10-27), `AC10-0801`, `TE11-2601`, `FO10-0100`, `FO10-0601` y `FO10-1701` (segunda familia), `OREC/EJ11-0102`, `EC11-0101`, `RJ11-0101`, `EJ11-0101`, `EJ07-0101`, `PO07-0101` y `Metalurgia/SO02-1006` (familia OREC; comparado en sombra con `.claude/skills/papo-qa/scripts/report_shadow.py`); su tabla "Historial de registros" (última página) lee `RegisterHistoryStation`, así que también se filtra por estación.
 
 ### `report.extractReportData(data, sections, signaturePrefix=('firmaAdministrator', 'firmaOperator'))`
 
