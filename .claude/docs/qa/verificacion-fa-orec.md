@@ -9,18 +9,20 @@ Herramientas en el scratchpad de la sesión (`verify/`: `run.js`, `check.py`, `p
 
 ## Resultado
 
-44 PAPOs con el ciclo completo: **0 diferencias** en los registros y **0 diferencias** en los PDF.
+47 PAPOs (los 19 de F&A y los 28 de OREC) con el ciclo completo: **0 diferencias** en los registros y **0 diferencias** en los PDF.
 
 | Área | PAPOs | Registros | PDF |
 |---|---|---|---|
-| F&A | AC10-0201, AC10-0202-HD, AC10-0202-SLI, AC10-0301, AC10-0501, AC10-0801, AC10-1003, AC10-1101, AC10-1801, CA02-2102, CG10-0101, FO10-0100, FO10-0601, FO10-1701, FO10-1701-1, GR10-0501 (16) | iguales a la vista | sin diferencias |
+| F&A | AC10-0201, AC10-0202-HD, AC10-0202-SLI, AC10-0301, AC10-0501, AC10-0801, AC10-1003, AC10-1101, AC10-1801, CA02-2102, CG10-0101, FO10-0100, FO10-0601, FO10-1701, FO10-1701-1, GR10-0501, PT11-0104, TE11-0601, TE11-2601 (19) | iguales a la vista | sin diferencias |
 | OREC | CI11-0101, CU11-0101, EC07-0101, EC11-0101, EJ07-0101, EJ11-0101, EJ11-0102, MZ07-0101, MZ11-0101, PO07-0101, PO11-0101-1…4, RJ11-0101-1…12, SO02-4502, RJ07-0101 (28) | iguales a la vista | sin diferencias |
 
 AC10-0202-SLI, FO10-0100 y GR10-0501 se corrieron antes de sus correcciones del mismo día (checkbox de llenado, tabla de ingresos y total, rotación con fecha e inventario final); esos cambios se probaron aparte en el navegador (ver sus informes en esta carpeta).
 
-## Pendiente
+## AC10-1801, registro de 30 min
 
-- F&A: PT11-0104, TE11-0601 y TE11-2601 sin correr; AC10-1801 conviene repetirlo (su 30 min quedó con 22 campos vacíos por una prueba en dos pestañas a la vez)
+En las dos corridas (2026-10-28 09:57 y 16:46) el registro de 30 min se guardó sin llenar: textos vacíos y checkbox en "No Cumple" (solo la Referencia elegida); los de SKU y Mantenimiento, con los mismos 49 ítems, salieron llenos. No es el formulario: llenado a mano a 1920x1080 guarda lo escrito ("PRUEBA1" en Lote batería, "Cumple" en Apariencia del poliblado; registro 8430) y elegir la Referencia no borra los demás campos. Es el llenado automático de la prueba en esa vista (hay dos botones "30 min" en la página). En septiembre, con el formulario original, los operarios sí guardaban esos campos.
+
+Detalles de la prueba que no son errores: en TE11-2601 dos checkbox de "Verificación de línea auxiliar" no tienen texto porque es una grilla (la pregunta está en la etiqueta de la izquierda, como en el original); en TE11-0601 la copia A / R del reporte muestra "A" en las casillas Cumple.
 
 ## Hallazgos
 
