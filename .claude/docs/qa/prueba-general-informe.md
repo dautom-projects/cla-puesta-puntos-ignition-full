@@ -19,7 +19,7 @@ En cada registro, `ui_check.js` llena todos los campos, abre cada sección (sin 
 | Área | PAPOs | Ciclos completos | PDF igual a lo guardado | Pendiente |
 |---|---|---|---|---|
 | Ensamble | 11 | 11 | 11 (EA11-1601 ya genera PDF) | Reportes EA11-0901, EA11-1101 y EA11-1501 (BACKLOG) |
-| F&A | 19 | 19 | 19 | Casilla única de Torres en GR10-0501 (BACKLOG) |
+| F&A | 19 | 19 | 19 | — |
 | Metalurgia | 10 | 10 | 10 | — |
 | OREC | 26 | 26 | 26 | PO07-0101 mezcla ciclos de dos estaciones; EJ11-0101 clave repetida (BACKLOG) |
 | General | 3 | 3 | 3 | — |
@@ -43,9 +43,8 @@ Después de las dos regresiones se revisaron todas las vistas Form_* con las com
 ## Lo que no es del estándar (BACKLOG)
 
 - **Reportes:**
-  - Corregidos el 2026-10-27 con `report_bin.py`: GR10-0501, PT11-0104, TR11-0101, TR11-0102, SO02-4502, EC07-0101 y EA11-1601
+  - Corregidos el 2026-10-27 con `report_bin.py`: GR10-0501, PT11-0104, TR11-0101, TR11-0102, SO02-4502, EC07-0101 y EA11-1601. En GR10-0501, Scrubber y Torres no tienen nivel de tanque: la casilla de Torres queda vacía y el formulario ya no tiene esas filas
   - Abiertos:
-    - GR10-0501: la casilla única de Torres en y=342 muestra el 6603
     - EJ11-0101: clave repetida, sale "7.0 7.0"
     - Varios reportes no tienen sección para el Fin
 - **Datos:**
