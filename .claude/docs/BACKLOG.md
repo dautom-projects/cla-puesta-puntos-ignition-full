@@ -98,7 +98,7 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
   - Gestión y Gestión Gerencia: pasar `workstationNodeID` del registro elegido al visor
   - `Digitalizacion_Template`: la tabla de vista previa y `lastRegisterType` por estación
   - Los otros 61 reportes a `build()` por familia (convertidor + `report_shadow.py`); unos 10 con lógica propia (GR10-0501 por turno, TR11-0101/0102, SO02-4502, MZ07, MZ11, PT11-0104…) necesitan opciones nuevas del motor
-- Tabla "Historial de registros" (última página de los PDF): se queda con su consulta `RegisterHistory` sin cambios (usuario, 2026-10-27); los reportes migrados llaman `build(..., history=None)`. Esa consulta filtra por nodo, así que cuando Gestión pase la estación, en un ciclo cruzado el historial seguirá listando los registros de las dos estaciones
+- Tabla "Historial de registros" (última página de los PDF) de los reportes migrados: lee la lista `RegisterHistoryStation` que arma `build()` (la misma consulta más el filtro por estación; usuario, 2026-10-27). La consulta `RegisterHistory` sigue en el reporte sin uso
 - `Page/Gestion` (`custom.path`): "'...script' object has no attribute 'split'" en el log al cambiar de fila (el path llega como objeto y `unwrap` solo maneja dict); el PDF sale igual
 
 ## Preguntas desde papoitem (fases 2 y 3)
