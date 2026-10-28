@@ -203,6 +203,14 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertEqual(data["reprocesed2"], {"cumplepapoItemID6115": u"✔"})
 		self.assertEqual(data["endShiftReprocesed1"], {"cumplepapoItemID6117": u"✔", "nocumplepapoItemID6120": u"✘"})
 
+	def test_reprocessedNormalizeApart(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "register", "normalize": "yn", "reprocessedIds": [6115],
+			"reprocessedName": "reprocesed", "reprocessedNormalize": "ok"}], history=None)
+		self.assertEqual(data["register1"]["papoItemID6100"], "Si")
+		self.assertEqual(data["reprocesed1"], {"nocumplepapoItemID6115": "N OK"})
+		self.assertEqual(data["reprocesed2"], {"cumplepapoItemID6115": "OK"})
+
 	def test_singleSlotMergesRecords(self):
 		data = self._data(station=7)
 		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "startShift", "slot": "single"}], history=None)

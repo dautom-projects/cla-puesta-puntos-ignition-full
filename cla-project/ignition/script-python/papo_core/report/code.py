@@ -483,12 +483,13 @@ def _buildSection(ds, data, section):
 	reprocessedIds = section.get("reprocessedIds")
 	reprocessedMode = section.get("reprocessedMode", "check")
 	reprocessedName = section.get("reprocessedName", "reprocesed" + name)
+	reprocessedNormalize = section.get("reprocessedNormalize", mode)
 
 	if slot == "single":
 		_fillDataFromDataset(ds, data, name)
 		data[name] = _normalizeDict(data[name], mode)
 		if reprocessedIds:
-			data[reprocessedName] = _normalizeDict(_classifyReprocessed(ds, reprocessedIds, reprocessedMode), mode)
+			data[reprocessedName] = _normalizeDict(_classifyReprocessed(ds, reprocessedIds, reprocessedMode), reprocessedNormalize)
 		return
 
 	rowCount = ds.getRowCount()
@@ -504,7 +505,7 @@ def _buildSection(ds, data, section):
 		data[slotName] = _normalizeDict(data[slotName], mode)
 		if reprocessedIds:
 			marks = _classifyReprocessed(oneByN, reprocessedIds, reprocessedMode)
-			data['{0}{1}'.format(reprocessedName, k + 1)] = _normalizeDict(marks, mode)
+			data['{0}{1}'.format(reprocessedName, k + 1)] = _normalizeDict(marks, reprocessedNormalize)
 
 
 def _historyList(papoID, nodeID, registerCode, db, station=None):
@@ -553,6 +554,8 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			reprocessedMode (str, optional): "check" (default) or "quality"
 			reprocessedName (str, optional): base key of the marks, numbered like
 				the section (defaults to "reprocesed" + name)
+			reprocessedNormalize (str, optional): mapping of the marks (defaults to
+				the section normalize; e.g. "ok" -> OK / N OK)
 		history (str): key of the history list the template table reads, or None
 		signatures (str): "role" (default, as the report scripts: Supervisor_PAPO ->
 			adminKey1, 2..., Operator -> operatorKey) or "status" (Revisado -> adminKey1...,
@@ -564,7 +567,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 
 	Changelog:
 		2026-10-27 | William M. | v1.0.0 - Initial version (pilot AC10-0202, AC10-0301,
-			AC10-1101, CA02-2102)
+			AC10-1101, CA02-2102); reprocessedNormalize for FO10-0601 / FO10-1701
 	"""
 	papoID = data.get('papoID')
 	nodeID = data.get('nodeID')
