@@ -94,7 +94,12 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
 
 - ~~`nodepapo` 2136 asigna CG10-0101 al nodo 1001 "PC" (tipo `Workstation`): el Template solo saca el área de nodos LINE o CELL y abre `Page/Embedded/None/...` ("View Not Found"). Sus registros anteriores están en las líneas 84 y 85; la prueba se hizo en la 85~~ corregido el 2026-10-27 en cla-db-papo (`.claude/docs/sql/2026-10-27_nodo_CG10-0101_cell.sql`): el nodo 1001 pasa a CELL y su `Topic` a la ruta completa (era 'PC' y Gestión no encontraba el reporte). Ciclo y PDF probados desde la estación. Falta aplicarlo en producción
 - El editor de nodos (`Page/PopUps/CreateOrEditNode-Clarios`) no ofrece el tipo CELL y el `Topic` se escribe a mano; Gestión arma la ruta del reporte con sus 3 primeros segmentos, así que un Topic incompleto deja la estación sin PDF
-- `papo_core.register._getLastRegisterCode` numera los ciclos por (`WorkstationNodeID`, `PapoID`), pero los reportes y Gestión filtran por (`PapoID`, `NodeID`, `RegisterCode`): si un PAPO se llena en el mismo nodo desde dos estaciones, los ciclos se cruzan. Pasa en PO07-0101 (estaciones 22 y 27 con el código 1) y su PDF mezcla registros de junio. Decidir si el código se toma por nodo
+- `papo_core.register._getLastRegisterCode` numera los ciclos por (`WorkstationNodeID`, `PapoID`), pero los reportes y Gestión filtran por (`PapoID`, `NodeID`, `RegisterCode`): si un PAPO se llena en el mismo nodo desde dos estaciones, los ciclos se cruzan. Pasa en PO07-0101 (estaciones 22 y 27 con el código 1) y su PDF mezcla registros de junio; en la base de prueba, 36 ciclos de 12 PAPOs. Decidido (usuario, 2026-10-27): un formulario por estación. Hecho: `papo_core.report` v2.3.0 filtra por `workstationNodeID` y el piloto F&A (AC10-0202, AC10-0301, AC10-1101, CA02-2102) usa `build()`. Falta:
+  - Gestión y Gestión Gerencia: pasar `workstationNodeID` del registro elegido al visor
+  - `Digitalizacion_Template`: la tabla de vista previa y `lastRegisterType` por estación
+  - Los otros 61 reportes a `build()` por familia (convertidor + `report_shadow.py`); unos 10 con lógica propia (GR10-0501 por turno, TR11-0101/0102, SO02-4502, MZ07, MZ11, PT11-0104…) necesitan opciones nuevas del motor
+- Reportes migrados a `build()`: la consulta `RegisterHistory` sigue en el reporte sin uso (la tabla lee `RegisterHistoryStation`); quitarla desde el Designer cuando se abra el reporte
+- `Page/Gestion` (`custom.path`): "'...script' object has no attribute 'split'" en el log al cambiar de fila (el path llega como objeto y `unwrap` solo maneja dict); el PDF sale igual
 
 ## Preguntas desde papoitem (fases 2 y 3)
 
