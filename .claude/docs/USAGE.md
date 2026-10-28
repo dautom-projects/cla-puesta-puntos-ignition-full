@@ -75,7 +75,7 @@ Vistas: 235 Form_* (detalle por vista en `MIGRATION_STATUS.md`).
 
 ### `register.save(root)`
 
-Recolecta las respuestas de todos los FlexContainerGroup y guarda un único registro en registerhistory (formularios start y end).
+Recolecta las respuestas de los `FlexContainerGroupN` que existen, en orden de número (un número salteado ya no corta los siguientes; `register` v1.1.0), y guarda un único registro en registerhistory (formularios start y end). El último RegisterCode se lee con `ORDER BY RegisterCode DESC`.
 
 **Llamado desde:** 235 vista(s).
 
@@ -211,7 +211,7 @@ Vistas: 235 Form_* (detalle por vista en `MIGRATION_STATUS.md`).
 
 ### `ui.initForm(root)`
 
-Inicializa el formulario al arrancar (initialPapoDateTime para mostrar turno/hora).
+Inicializa el formulario al arrancar: `initialPapoDateTime` = ahora y rehace `custom.insights` con esa hora (el binding ya había corrido con la hora del diseño; `ui` v1.3.0).
 
 **Llamado desde:** 235 vista(s).
 
@@ -223,7 +223,7 @@ Vistas: 235 Form_* (detalle por vista en `MIGRATION_STATUS.md`).
 
 ### `ui.preInsight(root, value)`
 
-Antepone turno y hora al comentario: " | T: {shift}, H: {HH:MM} - {value}".
+Antepone turno y hora de `initialPapoDateTime` al comentario: " | T: {shift}, H: {HH:MM} - {value}" (turno con `getShift`, hora America/Bogota; `ui` v1.2.1).
 
 **Llamado desde:** 235 vista(s).
 
