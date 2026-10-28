@@ -5,9 +5,12 @@ Data collection and saving logic for PAPO forms.
 Handles answer recopilation, saving to registerhistory,
 and operator signature flow.
 
-Version: 1.0.1
+Version: 1.1.0
 
 Changelog:
+	2026-10-28 | William M. | v1.1.0 - save() walks the FlexContainerGroupN that exist, in order
+		(a missing number left the next groups unsaved: CU11-0101_start, group 8);
+		last RegisterCode ordered by RegisterCode DESC (project rule)
 	2026-07-22 | William M. | v1.0.1 - Fix save() silently skipping flat forms
 		(no FlexContainerGroup) since allItems is always empty for them
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
@@ -89,21 +92,22 @@ def _getLastRegisterCode(workstationNodeID, papoID, dbConnection):
 		SELECT TOP 1 RegisterCode
 		FROM registerhistory
 		WHERE WorkstationNodeID = ? AND PapoID = ?
-		ORDER BY ID DESC
+		ORDER BY RegisterCode DESC, ID DESC
 	"""
 	rs = system.db.runPrepQuery(query, [workstationNodeID, papoID], dbConnection)
 	lastCode = rs.getValueAt(0, 0) if rs.getRowCount() > 0 else 0
 	return int(lastCode) if lastCode is not None else 0
 
 
-def _countFlexGroups(root):
-	"""Count FlexContainerGroup children of root dynamically."""
-	count = 0
+def _flexGroupNumbers(root):
+	"""Numbers of the FlexContainerGroupN children of root, ascending (a form may skip a number)."""
+	import re
+	numbers = []
 	for child in root.getChildren():
-		name = child.meta.name
-		if name.startswith("FlexContainerGroup") and name != "FlexContainerSupervisor":
-			count += 1
-	return count
+		match = re.match(r"^FlexContainerGroup(\d+)$", child.meta.name)
+		if match:
+			numbers.append(int(match.group(1)))
+	return sorted(numbers)
 
 
 # ==================== PUBLIC FUNCTIONS ====================
@@ -165,12 +169,13 @@ def save(root):
 		status = "En proceso"
 		now = system.date.now()
 
-		flexGroupCount = _countFlexGroups(root)
+		groupNumbers = _flexGroupNumbers(root)
+		flexGroupCount = len(groupNumbers)
 		regCode = _getLastRegisterCode(workstationNodeID, papoID, dbConnection)
 
 		# Collect all items from all groups
 		allItems = []
-		for groupIndex in range(1, flexGroupCount + 1):
+		for groupIndex in groupNumbers:
 			flexGroup = root.getChild("FlexContainerGroup{}".format(groupIndex))
 			answersObj = recopile(flexGroup, root)
 

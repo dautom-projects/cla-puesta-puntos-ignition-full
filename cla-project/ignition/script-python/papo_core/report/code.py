@@ -16,9 +16,10 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.4
+Version: 2.8.5
 
 Changelog:
+	2026-10-28 | William M. | v2.8.5 - _detectShiftFromTimestamp uses papo_core.ui.getShift (no getHour24 left)
 	2026-10-28 | William M. | v2.8.4 - _normalizeDict keeps unicode values (the quality marks of CU11-0101
 		printed as UTF-8 bytes)
 	2026-10-28 | William M. | v2.8.3 - Reprocessed marks read Sí (with accent) as si (MZ07-0101)
@@ -505,16 +506,8 @@ def _detectShiftFromTimestamp(dt):
 	"""Determine shift number from a java.util.Date timestamp."""
 	if dt is None:
 		return "0"
-	try:
-		hour = system.date.getHour24(dt)
-		if hour >= 22 or hour < 6:
-			return "1"
-		elif hour >= 6 and hour < 14:
-			return "2"
-		else:
-			return "3"
-	except:
-		return "0"
+	shift = papo_core.ui.getShift(dt)
+	return str(shift) if shift is not None else "0"
 
 
 def _queryForAuto(typeIDs, papoID, nodeID, registerCode, db, station=None):

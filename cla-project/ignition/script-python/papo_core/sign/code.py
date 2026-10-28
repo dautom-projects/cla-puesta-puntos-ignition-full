@@ -5,9 +5,11 @@ Supervisor signature logic for PAPO forms.
 Handles direct signing, authentication popup flow, and
 IP validation by role.
 
-Version: 1.2.0
+Version: 1.2.1
 
 Changelog:
+	2026-10-28 | William M. | v1.2.1 - autoCloseOpenForms takes the shift and time in plant local time
+		(papo_core.ui.getShift and java.util.Calendar) instead of system.date.getHour24
 	2026-07-30 | William M. | v1.2.0 - Added signSupervisorFromSelection for
 		management/audit tables (e.g. Gestion) that sign a selected
 		registerhistory row instead of the PAPO's own form view
@@ -510,17 +512,12 @@ def autoCloseOpenForms(dbConnection):
 		now = system.date.now()
 
 		# Build turno/hora prefix for the closing comment
-		hour = system.date.getHour24(now)
-		minute = system.date.getMinute(now)
+		from java.util import Calendar, TimeZone
+		cal = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"))
+		cal.setTime(now)
+		shift = papo_core.ui.getShift(now)
 
-		if hour >= 22 or hour < 6:
-			shift = 1
-		elif hour >= 6 and hour < 14:
-			shift = 2
-		else:
-			shift = 3
-
-		timeStr = "{:02d}:{:02d}".format(hour, minute)
+		timeStr = "{:02d}:{:02d}".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
 		comment = "T: {}, H: {} - Cierre automatico".format(shift, timeStr)
 
 		# Get node IDs excluded from auto-close (Granja de acidos + Metalurgia lines)

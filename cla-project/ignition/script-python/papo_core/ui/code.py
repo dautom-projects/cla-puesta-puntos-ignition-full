@@ -4,9 +4,11 @@ papo_core.ui
 Visual behavior logic for PAPO forms.
 Handles accordion toggle, form initialization, and title labels.
 
-Version: 1.2.0
+Version: 1.2.1
 
 Changelog:
+	2026-10-28 | William M. | v1.2.1 - preInsight takes the shift and time in plant local time
+		(java.util.Calendar America/Bogota) instead of system.date.getHour24
 	2026-10-22 | William M. | v1.2.0 - Added getShift (java.util.Calendar, America/Bogota)
 	2026-07-21 | William M. | v1.1.0 - Added confirmSave for save button onClick standardization
 	2026-07-06 | William | v1.0.0 - Initial Project Library version
@@ -109,17 +111,12 @@ def preInsight(root, value):
 	if dateTime is None:
 		return ""
 
-	hour = system.date.getHour24(dateTime)
-	minute = system.date.getMinute(dateTime)
+	from java.util import Calendar, TimeZone
+	cal = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"))
+	cal.setTime(dateTime)
+	shift = getShift(dateTime)
 
-	if hour >= 22 or hour < 6:
-		shift = 1
-	elif hour >= 6 and hour < 14:
-		shift = 2
-	else:
-		shift = 3
-
-	timeStr = "{:02d}:{:02d}".format(hour, minute)
+	timeStr = "{:02d}:{:02d}".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
 	return " | T: {}, H: {} - ".format(shift, timeStr) + value
 
 
