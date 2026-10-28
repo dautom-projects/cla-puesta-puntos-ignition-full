@@ -149,7 +149,7 @@ class FakeSystem(object):
 				pass
 
 		self.db = types.SimpleNamespace(runPrepQuery=self._query)
-		self.util = types.SimpleNamespace(jsonDecode=json.loads, getLogger=Logger)
+		self.util = types.SimpleNamespace(jsonDecode=json.loads, jsonEncode=json.dumps, getLogger=Logger)
 		self.dataset = types.SimpleNamespace(toDataSet=self._toDataSet)
 		self.date = types.SimpleNamespace(getHour24=lambda d: d.dt.hour, fromMillis=lambda ms: JDate(datetime.datetime.fromtimestamp(ms / 1000.0)))
 
@@ -366,6 +366,19 @@ class ReportBuildTest(unittest.TestCase):
 		self.assertEqual(data["startShiftmodes"]["papoItemID6100"], u"\u2718")
 		self.assertEqual(data["shift"], "3")
 		self.assertEqual(data["date"].dt.hour, 19)
+
+	def test_nestedMarksXAndItemsOfType(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [3, 5, 6, 7], "name": "register", "nestedMarks": "X", "reprocessed": [{"ids": [6115], "name": "reprocesed", "mode": "x", "normalize": "raw"}]},
+			{"types": [7], "name": "fourhour1", "slot": "single", "itemType": 7, "first": True},
+			{"types": [4], "name": "fourhour", "start": 2}], history=None)
+		self.assertEqual(data["register1"]["cumple"]["papoItemID6100"], "X")
+		self.assertEqual(data["register1"]["nocumple"]["papoItemID6100"], u"")
+		self.assertEqual(data["reprocesed2"], {"cumplepapoItemID6115": "X", "nocumplepapoItemID6115": u""})
+		self.assertEqual(data["fourhour1"]["papoItemID6100"], u"\u2714")
+		self.assertNotIn("papoItemID6110", data["fourhour1"])
+		self.assertIn("papoItemID6110", data["fourhour2"])
+		self.assertNotIn("fourhour3", data)
 
 	def test_comment(self):
 		data = self._pilot(self._data(station=7))

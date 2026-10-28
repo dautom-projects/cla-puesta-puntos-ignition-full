@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.6.0
+Version: 2.7.0
 
 Changelog:
+	2026-10-27 | William M. | v2.7.0 - build(): nestedMarks and reprocessed mode x (PT11-0104),
+		start and itemType / first (MZ11-0101)
 	2026-10-27 | William M. | v2.6.0 - build(): copies (the same slot with another normalize),
 		normalize ar / mark, typeName also gives _typeID, header (date and shift of the
 		first record of a type)
@@ -272,6 +274,10 @@ def _classifyReprocessed(ds, allowedIds, mode):
 					result["papoItemID{0}".format(papoItemID)] = 'OK'
 				elif valLower == "no cumple":
 					result["papoItemID{0}".format(papoItemID)] = 'NO OK'
+			elif mode == "x":
+				# Both keys always, X or blank, for every item of the list (PT11-0104)
+				result["cumplepapoItemID{0}".format(papoItemID)] = 'X' if valLower == "cumple" else u''
+				result["nocumplepapoItemID{0}".format(papoItemID)] = 'X' if valLower == "no cumple" else u''
 			elif mode == "number":
 				# One mark per numeric answer: number{value}papoItemID, without the ID as the template uses it (TE11-0401)
 				if val is not None:
@@ -601,6 +607,49 @@ def _weekSlot(date):
 	return dayIndex * 3 + turnoIndex + 1
 
 
+def _nestedMarks(ds, mark, quality=False):
+	"""{"cumple": {papoItemID: mark or ''}, "nocumple": {...}} for every item of the rows (PT11-0104), plus bueno /
+	malo / regular when quality."""
+	names = ("cumple", "nocumple", "bueno", "malo", "regular") if quality else ("cumple", "nocumple")
+	answers = {"cumple": "cumple", "nocumple": "no cumple", "bueno": "bueno", "malo": "malo", "regular": "regular"}
+	out = dict((n, {}) for n in names)
+	for i in range(0 if ds is None else ds.getRowCount()):
+		raw = ds.getValueAt(i, "DataAnswer")
+		try:
+			obj = system.util.jsonDecode(raw) if raw else None
+		except:
+			obj = None
+		if not (isinstance(obj, dict) and "items" in obj):
+			continue
+		for item in obj["items"]:
+			if item.get("papoItemID") is None:
+				continue
+			value = unicode(item.get("answer") or u"").strip().lower()
+			for n in names:
+				out[n]["papoItemID{0}".format(item["papoItemID"])] = mark if value == answers[n] else u''
+	return out
+
+
+def _itemsOfType(ds, itemType):
+	"""Rows whose JSON keeps only the items of registerTypeID itemType (plus the insights item); rows without any
+	are left out (MZ11-0101 saves its first 4-hour check inside the Inicio record)."""
+	rows = []
+	for i in range(ds.getRowCount()):
+		raw = ds.getValueAt(i, "DataAnswer")
+		try:
+			obj = system.util.jsonDecode(raw) if raw else None
+		except:
+			obj = None
+		if not (isinstance(obj, dict) and "items" in obj):
+			continue
+		kept = [it for it in obj["items"] if "papoItemID" in it and it.get("registerTypeID") == itemType]
+		if not kept:
+			continue
+		kept += [it for it in obj["items"] if "insights" in it]
+		rows.append([system.util.jsonEncode({"items": kept})])
+	return system.dataset.toDataSet(["DataAnswer"], rows)
+
+
 def _reprocessedGroups(section, mode):
 	"""Reprocessed groups of a section: the list "reprocessed" plus the one-group shorthand reprocessedIds."""
 	groups = list(section.get("reprocessed") or [])
@@ -616,6 +665,10 @@ def _buildSection(ds, data, section, typeNames=None):
 	slot = section.get("slot", "record")
 	mode = section.get("normalize", "check")
 	groups = _reprocessedGroups(section, mode)
+	if section.get("itemType") is not None:
+		ds = _itemsOfType(ds, section["itemType"])
+		if section.get("first") and ds.getRowCount() > 1:
+			ds = _oneRow(ds, 0)
 
 	if slot == "single":
 		_fillDataFromDataset(ds, data, name)
@@ -639,12 +692,14 @@ def _buildSection(ds, data, section, typeNames=None):
 	for k in range(rowCount):
 		values = [ds.getValueAt(k, i) for i in range(colCount)]
 		oneByN = system.dataset.toDataSet(headers, [values])
-		slotName = '{0}{1}'.format(name, k + 1)
+		slotName = '{0}{1}'.format(name, k + section.get("start", 1))
 		_fillDataFromDataset(oneByN, data, slotName)
 		data[slotName] = _normalizeDict(data[slotName], mode)
+		if section.get("nestedMarks"):
+			data[slotName].update(_nestedMarks(oneByN, section["nestedMarks"], section.get("nestedQuality", False)))
 		for g in groups:
 			marks = _classifyReprocessed(oneByN, g["ids"], g["mode"])
-			data['{0}{1}'.format(g["name"], k + 1)] = _normalizeDict(marks, g["normalize"])
+			data['{0}{1}'.format(g["name"], k + section.get("start", 1))] = _normalizeDict(marks, g["normalize"])
 		if section.get("typeName") and typeNames is not None:
 			typeID = ds.getValueAt(k, "RegisterTypeID")
 			data[slotName + "_type"] = typeNames.get(typeID, u"Desconocido")
@@ -652,7 +707,7 @@ def _buildSection(ds, data, section, typeNames=None):
 		for copy in section.get("copies") or []:
 			raw = {}
 			_fillDataFromDataset(oneByN, raw, "x")
-			data["{0}{1}".format(copy["name"], k + 1)] = _normalizeDict(raw["x"], copy.get("normalize", mode))
+			data["{0}{1}".format(copy["name"], k + section.get("start", 1))] = _normalizeDict(raw["x"], copy.get("normalize", mode))
 
 
 def _buildTimeSlots(ds, data, section, slot, mode, groups):
@@ -790,9 +845,15 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 				the section normalize; e.g. "ok" -> OK / N OK)
 			reprocessed (list, optional): more groups of marks, each a dict with ids,
 				name, mode ("check", "quality", "yn" -> siItemID/noItemID, "ok" -> the
-				item key with OK / NO OK, "number" -> number{value}papoItemID) and normalize
+				item key with OK / NO OK, "number" -> number{value}papoItemID, "x" -> both keys
+				with X or blank) and normalize
 			typeName (bool, optional): also name{N}_type = registertype.Description of the record
 				and name{N}_typeID = its RegisterTypeID
+			start (int, optional): number of the first record slot (default 1)
+			itemType (int, optional): keep only the items of that registerTypeID inside each
+				record, and first (bool) keeps only the first record that has them
+			nestedMarks (str, optional): each slot also gets cumple / nocumple dicts with this
+				mark or blank for every item (nestedQuality adds bueno / malo / regular)
 			copies (list, optional): the same slots again under another name with another
 				normalize, each a dict with name and normalize (e.g. "ar" -> A / R, "mark" ->
 				check-x on Cumple, blank on No Cumple)
