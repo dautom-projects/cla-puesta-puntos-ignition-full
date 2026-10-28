@@ -5,9 +5,12 @@ Data collection and saving logic for PAPO forms.
 Handles answer recopilation, saving to registerhistory,
 and operator signature flow.
 
-Version: 1.1.0
+Version: 1.1.1
 
 Changelog:
+	2026-10-28 | William M. | v1.1.1 - save() walks groups 1..N again: the FlexContainerGroup8 of
+		CU11-0101_start is a hidden copy of group 1 (same items, no Section8) and saving it stored
+		5275-5278 twice; the only form with a missing number keeps its old record
 	2026-10-28 | William M. | v1.1.0 - save() walks the FlexContainerGroupN that exist, in order
 		(a missing number left the next groups unsaved: CU11-0101_start, group 8);
 		last RegisterCode ordered by RegisterCode DESC (project rule)
@@ -99,15 +102,14 @@ def _getLastRegisterCode(workstationNodeID, papoID, dbConnection):
 	return int(lastCode) if lastCode is not None else 0
 
 
-def _flexGroupNumbers(root):
-	"""Numbers of the FlexContainerGroupN children of root, ascending (a form may skip a number)."""
-	import re
-	numbers = []
+def _countFlexGroups(root):
+	"""Count FlexContainerGroup children of root dynamically."""
+	count = 0
 	for child in root.getChildren():
-		match = re.match(r"^FlexContainerGroup(\d+)$", child.meta.name)
-		if match:
-			numbers.append(int(match.group(1)))
-	return sorted(numbers)
+		name = child.meta.name
+		if name.startswith("FlexContainerGroup") and name != "FlexContainerSupervisor":
+			count += 1
+	return count
 
 
 # ==================== PUBLIC FUNCTIONS ====================
@@ -169,13 +171,12 @@ def save(root):
 		status = "En proceso"
 		now = system.date.now()
 
-		groupNumbers = _flexGroupNumbers(root)
-		flexGroupCount = len(groupNumbers)
+		flexGroupCount = _countFlexGroups(root)
 		regCode = _getLastRegisterCode(workstationNodeID, papoID, dbConnection)
 
 		# Collect all items from all groups
 		allItems = []
-		for groupIndex in groupNumbers:
+		for groupIndex in range(1, flexGroupCount + 1):
 			flexGroup = root.getChild("FlexContainerGroup{}".format(groupIndex))
 			answersObj = recopile(flexGroup, root)
 

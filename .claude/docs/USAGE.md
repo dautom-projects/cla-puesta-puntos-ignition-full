@@ -75,7 +75,7 @@ Vistas: 235 Form_* (detalle por vista en `MIGRATION_STATUS.md`).
 
 ### `register.save(root)`
 
-Recolecta las respuestas de los `FlexContainerGroupN` que existen, en orden de número (un número salteado ya no corta los siguientes; `register` v1.1.0), y guarda un único registro en registerhistory (formularios start y end). El último RegisterCode se lee con `ORDER BY RegisterCode DESC`.
+Recolecta las respuestas de `FlexContainerGroup1` a `FlexContainerGroupN` (N = cantidad de grupos; en CU11-0101_start el 8 es una copia oculta del 1 y no se guarda) y guarda un único registro en registerhistory (formularios start y end). El último RegisterCode se lee con `ORDER BY RegisterCode DESC`.
 
 **Llamado desde:** 235 vista(s).
 
