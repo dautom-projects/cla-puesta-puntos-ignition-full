@@ -16,9 +16,10 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.2
+Version: 2.8.3
 
 Changelog:
+	2026-10-28 | William M. | v2.8.3 - Reprocessed marks read Sí (with accent) as si (MZ07-0101)
 	2026-10-28 | William M. | v2.8.2 - normalize okText (PT11-0104) and values marks with their own
 		text (AC10-1801 bueno = Si / malo = No)
 	2026-10-27 | William M. | v2.8.1 - Slot shiftNumber (TR11-0102 Fin by its shift); monthGrid takes the
@@ -264,7 +265,9 @@ def _classifyReprocessed(ds, allowedIds, mode, keys=None):
 				continue
 			val = item.get("answer")
 			papoItemID = item["papoItemID"]
-			valLower = str(val).strip().lower() if val is not None else ""
+			valLower = unicode(val).strip().lower() if val is not None else u""
+			if valLower == u"s\xed":
+				valLower = u"si"
 
 			if mode == "quality":
 				if valLower in QUALITY_MODES:
