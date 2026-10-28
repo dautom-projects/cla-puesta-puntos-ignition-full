@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.0
+Version: 2.8.1
 
 Changelog:
+	2026-10-27 | William M. | v2.8.1 - Slot shiftNumber (TR11-0102 Fin by its shift); monthGrid takes the
+		month of the last Fin, as the report script did
 	2026-10-27 | William M. | v2.8.0 - Reprocessed mode values (one key per answer text:
 		Exportación / Nacional in AC10-1003, Antes / Durante in PO11-0101)
 	2026-10-27 | William M. | v2.7.0 - build(): nestedMarks and reprocessed mode x (PT11-0104),
@@ -687,7 +689,7 @@ def _buildSection(ds, data, section, typeNames=None):
 			data[g["name"]] = _normalizeDict(_classifyReprocessed(ds, g["ids"], g["mode"], g.get("keys")), g["normalize"])
 		return
 
-	if slot in ("shift", "weekday", "weekSlot"):
+	if slot in ("shift", "shiftNumber", "weekday", "weekSlot"):
 		_buildTimeSlots(ds, data, section, slot, mode, groups)
 		return
 
@@ -743,6 +745,18 @@ def _buildTimeSlots(ds, data, section, slot, mode, groups):
 				if shift:
 					columns[shift] = number
 			slots.append((number, row))
+	elif slot == "shiftNumber":
+		# name1..name3 = the record of plant shift 1..3, empty when there is none (TR11-0102)
+		for i in (1, 2, 3):
+			data["{0}{1}".format(name, i)] = dict(EMPTY_SLOT)
+			for g in groups:
+				data["{0}{1}".format(g["name"], i)] = {}
+		for k in range(ds.getRowCount()):
+			row = _oneRow(ds, k)
+			holder = {}
+			_fillDataFromDataset(row, holder, "x")
+			shift = ((holder.get("x") or {}).get("shift") or [None])[0]
+			slots.append((int(shift) if shift else k + 1, row))
 	elif slot == "weekday":
 		target, byDay = None, {}
 		for k in range(ds.getRowCount()):
@@ -839,6 +853,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 				"single" = all the records merged in data[name]; "shift" = one column
 				per plant shift in order of appearance (records of the same shift merged
 				unless merge is False; columns: empty columns first, default 3);
+				"shiftNumber" = name1..name3 by the plant shift of the record;
 				"weekday" = name1 Monday .. name7 Sunday; "weekSlot" = name1 .. name21
 				(Monday T1 .. Sunday T3, from the record Timestamp)
 			normalize (str): "check" (default, Cumple/No Cumple -> check/x
@@ -921,7 +936,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 def monthGrid(data, typeIDs, prefix="turno", refTypeID=8):
 	"""
 	Monthly grid of marks: data["turno{shift}"]["dia{day}"]["papoItemID{ID}"] = check / x for every record of
-	the given types in the month of the cycle (the month of its first record of refTypeID, or this month), read
+	the given types in the month of the cycle (the month of its last record of refTypeID, or this month), read
 	by node and, when the viewer passes it, by station. Used after build() by TR11-0102.
 
 	Version: 1.0.0
@@ -930,7 +945,7 @@ def monthGrid(data, typeIDs, prefix="turno", refTypeID=8):
 		data (dict): Report data dict with papoID, nodeID, registerCode, db, optional workstationNodeID
 		typeIDs (list[int]): RegisterTypeID(s) of the grid records
 		prefix (str): base key per shift (default "turno")
-		refTypeID (int): register type whose first record gives the month (default 8, Fin)
+		refTypeID (int): register type whose last record gives the month (default 8, Fin)
 
 	Returns:
 		None: Populates data["turno1"]..["turno3"] with dia1..dia31 in place
@@ -946,7 +961,7 @@ def monthGrid(data, typeIDs, prefix="turno", refTypeID=8):
 	logger = system.util.getLogger("papo_core.report.monthGrid")
 	try:
 		cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
-		ref = system.db.runPrepQuery("SELECT TOP 1 Timestamp FROM registerhistory WHERE {0} AND RegisterTypeID = ? ORDER BY Timestamp ASC".format(cycleSql),
+		ref = system.db.runPrepQuery("SELECT TOP 1 Timestamp FROM registerhistory WHERE {0} AND RegisterTypeID = ? ORDER BY Timestamp DESC".format(cycleSql),
 			params + [refTypeID], db)
 		refDate = ref.getValueAt(0, "Timestamp") if ref.getRowCount() > 0 else system.date.now()
 		monthStart = system.date.getDate(system.date.getYear(refDate), system.date.getMonth(refDate), 1)
