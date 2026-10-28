@@ -99,7 +99,7 @@ La única llamada del script de un reporte: la lista de secciones dice qué tipo
 - `signatures="role"`: como los scripts de reportes (Supervisor_PAPO → `firmaAdministrator1`, `2`…; Operator → `firmaOperator`). `"status"`: Revisado / Finalizado, como `extractReportData`
 - `history`: clave de la lista del historial filtrada por estación; la tabla de la plantilla usa `list-key`, `grouping key` y los títulos de fila con esa clave (la consulta `RegisterHistory` del reporte no tiene estación)
 
-**Llamado desde:** reportes `Clarios/Andina/F&A/AC10-0202`, `AC10-0301`, `AC10-1101` y `CA02-2102` (piloto del 2026-10-27, comparado en sombra con `.claude/skills/papo-qa/scripts/report_shadow.py`).
+**Llamado desde:** reportes `Clarios/Andina/F&A/AC10-0202`, `AC10-0301`, `AC10-1101` y `CA02-2102` (piloto del 2026-10-27, comparado en sombra con `.claude/skills/papo-qa/scripts/report_shadow.py`), con `history=None`: su tabla "Historial de registros" sigue con la consulta `RegisterHistory` del reporte.
 
 ### `report.extractReportData(data, sections, signaturePrefix=('firmaAdministrator', 'firmaOperator'))`
 
