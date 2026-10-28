@@ -98,7 +98,7 @@ El formulario guarda bien en todos estos casos (comparado celda por celda contra
   - ~~`Digitalizacion_Template`: la tabla de vista previa y `lastRegisterType` por estación~~ hecho el 2026-10-28
   - ~~Los otros 49 reportes a `build()`~~ hecho el 2026-10-28: los 65 reportes con script usan `build()` (informe en `.claude/docs/qa/reportes-build-informe.md`)
 - Tabla "Historial de registros" (última página de los PDF) de los reportes migrados: lee la lista `RegisterHistoryStation` que arma `build()` (la misma consulta más el filtro por estación; usuario, 2026-10-27). La consulta `RegisterHistory` sigue en el reporte sin uso
-- `Page/Gestion` (`custom.path`): "'...script' object has no attribute 'split'" en el log al cambiar de fila (el path llega como objeto y `unwrap` solo maneja dict); el PDF sale igual
+- ~~`Page/Gestion` (`custom.path`): "'...script' object has no attribute 'split'" en el log al cambiar de fila (el path llega como objeto y `unwrap` solo maneja dict); el PDF sale igual~~ corregido el 2026-10-28 (Gestión y Gerencia)
 
 ## Preguntas desde papoitem (fases 2 y 3)
 
