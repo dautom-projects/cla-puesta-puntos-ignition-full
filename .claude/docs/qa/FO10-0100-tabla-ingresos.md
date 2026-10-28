@@ -35,3 +35,7 @@ La tabla pasa a las 17 columnas de la página 1 del reporte, en su orden: Mesa d
 
 - [x] QA 1–7 y papo-lint sin hallazgos
 - [x] Navegador a 1920x1080 con 4 ingresos del ciclo: Combinada e Ingreso parcial con ✔ / ✘ como el PDF, títulos en varias líneas, ningún encabezado ni celda cortada (revisado en el DOM)
+
+## Sin Observaciones (2026-10-28, pedido del usuario)
+
+- [x] La tabla queda con 16 columnas (sale Observaciones); QA 1–7 y papo-lint sin hallazgos; navegador a 1920x1080 sin celdas cortadas
