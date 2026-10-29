@@ -27,6 +27,19 @@ Revisadas también las casillas de quien guardó y firmó (2026-10-28, a pedido 
 - **Operario** (`firmaOperator`): vacía en AC10-0301, AC10-0501, AC10-1003, CA02-2102, FO10-0601, TE11-2601 y EC07-0101 (FO10-0100 imprime `<N/A>`). No es el reporte: el reporte pone cada firma según el rol guardado con ella (`Operator` → operario, `Supervisor_PAPO` → supervisor) y el usuario de prueba de develop (admin, "Soporte D.") tiene Administrator y Supervisor_PAPO, no Operator, así que su firma de operario cae en la casilla del supervisor
 - Comprobado con ciclos firmados por operarios reales de la base de prueba, abiertos desde Gestión: AC10-0501 del 25/06 (parredhe, modo `roleLast`) imprime "Hernan Arredondo" y CA02-2102 del 25/06 (bsalinm2, modo `role`) imprime "Mauricio Salinas", el nombre y apellido guardados en su firma. Los 7 reportes usan uno de esos dos modos; CG10-0101 (modo `status`) ya la llena en develop
 
+## Las otras áreas con el comparador nuevo (2026-10-28)
+
+Los PDF de la prueba general (Ensamble, Metalurgia, General / POLY / Cubiertas, capturados el 2026-10-28 00:10–00:20 para comparar los reportes con `build()`) se volvieron a revisar con las marcas y las casillas de usuario y firma, que el comparador de esa prueba no miraba:
+
+- **Marcas:** 0 diferencias en las 456 revisadas (EA11-1101, FU11-0101, PA11-0301, RE10-0102, RE11-0101, TR11-0101). PA11-0301 imprime ✘ en las Cumple de su copia `startShiftmodes`: es el modo "mark" (equis en Cumple, blanco en No Cumple), como está definido
+- **Quien guardó y supervisor:** con nombre en todos; la firma del operario vacía por el mismo motivo del rol en develop
+- **Valores:** EA11-1101 y EA11-1601 tuvieron registros nuevos en su ciclo después de capturar el PDF (no se comparan); RE11-0101 4404 es el ítem guardado dos veces que ya está en el BACKLOG
+- **EA11-0901:** guardaba el supervisor con `papoItemID` nulo; corregido (10938, `EA11-0901-supervisor.md`)
+
+## Cierre automático en el gateway (2026-10-28)
+
+La corrida de las 14:10 fue con `papo_core.sign` v1.3.0 y cerró los 8 ciclos que estaban abiertos y habían empezado antes de las 14:00 (los 7 en "Revisado" de junio y julio, y FO10-0100 de la estación 13), con el turno del ciclo en el comentario y la firma a nombre del operario del último formulario. Dejó abierto FO10-0100 de la estación 44 (ciclo sin formularios). A esa hora no había ciclos abiertos de Granja ni de Metalurgia: las exclusiones quedan probadas solo con los tests. A las 22:10 no corrió (la prueba gratuita del gateway estaba vencida).
+
 ## AC10-1801, registro de 30 min
 
 En las dos corridas (2026-10-28 09:57 y 16:46) el registro de 30 min se guardó sin llenar: textos vacíos y checkbox en "No Cumple" (solo la Referencia elegida); los de SKU y Mantenimiento, con los mismos 49 ítems, salieron llenos. No es el formulario: llenado a mano a 1920x1080 guarda lo escrito ("PRUEBA1" en Lote batería, "Cumple" en Apariencia del poliblado; registro 8430) y elegir la Referencia no borra los demás campos. Es el llenado automático de la prueba en esa vista (hay dos botones "30 min" en la página). En septiembre, con el formulario original, los operarios sí guardaban esos campos.
