@@ -5,9 +5,11 @@ Supervisor signature logic for PAPO forms.
 Handles direct signing, authentication popup flow, and
 IP validation by role.
 
-Version: 1.4.0
+Version: 1.4.1
 
 Changelog:
+	2026-10-29 | William M. | v1.4.1 - signSupervisor saves every role of the signer as a list (str() of the session's
+		Java array saved "<ArrayWrapper>: [...]" as text)
 	2026-10-29 | William M. | v1.4.0 - _insertSignature saves the gateway time (system.date.now) instead of the
 		SQL Server CURRENT_TIMESTAMP, like the rest of the cycle (the develop server runs in UTC, 5 h ahead)
 	2026-10-28 | William M. | v1.3.0 - autoCloseOpenForms: excludes by the form's NodeID (Granja de acidos and
@@ -331,13 +333,14 @@ def signSupervisor(root):
 		name = root.view.custom.sign.name
 		lastname = root.view.custom.sign.lastname
 
-		role = str(roleList[0]) if isinstance(roleList, list) and roleList else (str(roleList) if roleList else '')
+		# Every role of the signer as a list, like Gestion and the popup (the session gives a Java array)
+		roles = [roleList] if hasattr(roleList, "strip") else [str(r) for r in (roleList or [])]
 		nameStr = str(name) if name is not None else ''
 		lastnameStr = str(lastname) if lastname is not None else ''
 
 		dataAnswer = {
 			"user": userName,
-			"role": role,
+			"role": roles,
 			"name": nameStr,
 			"lastname": lastnameStr
 		}
