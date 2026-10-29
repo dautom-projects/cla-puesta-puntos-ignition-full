@@ -5,9 +5,11 @@ Supervisor signature logic for PAPO forms.
 Handles direct signing, authentication popup flow, and
 IP validation by role.
 
-Version: 1.3.0
+Version: 1.4.0
 
 Changelog:
+	2026-10-29 | William M. | v1.4.0 - _insertSignature saves the gateway time (system.date.now) instead of the
+		SQL Server CURRENT_TIMESTAMP, like the rest of the cycle (the develop server runs in UTC, 5 h ahead)
 	2026-10-28 | William M. | v1.3.0 - autoCloseOpenForms: excludes by the form's NodeID (Granja de acidos and
 		Metalurgia with their lines and cells; it compared WorkstationNodeID), also closes cycles whose last row
 		is the supervisor "Revisado", closes only cycles started before the current shift (a form opened in the
@@ -79,15 +81,15 @@ def _shiftStart(date):
 
 
 def _insertSignature(dbConnection, dataAnswerStr, papoId, userName, workstationNodeId, nodeId, workstationId, registerCode):
-	"""Insert a supervisor signature record (type 10, Revisado)."""
+	"""Insert a supervisor signature record (type 10, Revisado) with the gateway time."""
 	sql = """
-		INSERT INTO registerhistory 
-		(Timestamp, DataAnswer, Status, PapoID, RegisterTypeID, [User], 
+		INSERT INTO registerhistory
+		(Timestamp, DataAnswer, Status, PapoID, RegisterTypeID, [User],
 		 WorkstationNodeID, NodeID, WorkstationID, RegisterCode)
-		VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	"""
 	args = [
-		dataAnswerStr, "Revisado", papoId, 10, userName,
+		system.date.now(), dataAnswerStr, "Revisado", papoId, 10, userName,
 		workstationNodeId, nodeId, workstationId, registerCode
 	]
 	system.db.runPrepUpdate(sql, args, dbConnection)
