@@ -27,6 +27,13 @@ Revisadas también las casillas de quien guardó y firmó (2026-10-28, a pedido 
 - **Operario** (`firmaOperator`): vacía en AC10-0301, AC10-0501, AC10-1003, CA02-2102, FO10-0601, TE11-2601 y EC07-0101 (FO10-0100 imprime `<N/A>`). No es el reporte: el reporte pone cada firma según el rol guardado con ella (`Operator` → operario, `Supervisor_PAPO` → supervisor) y el usuario de prueba de develop (admin, "Soporte D.") tiene Administrator y Supervisor_PAPO, no Operator, así que su firma de operario cae en la casilla del supervisor
 - Comprobado con ciclos firmados por operarios reales de la base de prueba, abiertos desde Gestión: AC10-0501 del 25/06 (parredhe, modo `roleLast`) imprime "Hernan Arredondo" y CA02-2102 del 25/06 (bsalinm2, modo `role`) imprime "Mauricio Salinas", el nombre y apellido guardados en su firma. Los 7 reportes usan uno de esos dos modos; CG10-0101 (modo `status`) ya la llena en develop
 
+## Firmas con usuarios de prueba con rol (2026-10-28)
+
+En la fuente `default` del gateway (la del inicio de sesión) se crearon `qa.operario` ("QA Operario"; Operator, OREC) y `qa.supervisor` ("QA Supervisor"; Supervisor_PAPO); contraseñas en `~/.config/papo-sql/papo_test_users.env`, fuera del repo.
+
+- **Operario:** con la sesión de `qa.operario` se guardó un registro y se firmó en EA11-0901 (estación 1) y AC10-0501 (estación 38). La firma queda con `role: ["Operator","OREC"]` y el PDF imprime "QA Operario" en la casilla del operario en los dos, también en AC10-0501, uno de los 7 que salían vacíos con admin (registros 8431–8434 y el ciclo de AC10-0501 del 28/10 23:07)
+- **Supervisor desde el popup:** la contraseña pasa (`system.security.validateUser`, fuente de la sesión), pero los roles se leen de `session.custom.userSource` = "ClariosAD" y `qa.supervisor` no existe ahí: "El usuario qa.supervisor no cuenta con los permisos para firmar". En producción los supervisores están en ClariosAD; en develop, para probar el popup y la validación de IP hay que agregar el usuario a ClariosAD con Supervisor_PAPO (no se hizo: cambio de seguridad del gateway que queda para el usuario)
+
 ## Las otras áreas con el comparador nuevo (2026-10-28)
 
 Los PDF de la prueba general (Ensamble, Metalurgia, General / POLY / Cubiertas, capturados el 2026-10-28 00:10–00:20 para comparar los reportes con `build()`) se volvieron a revisar con las marcas y las casillas de usuario y firma, que el comparador de esa prueba no miraba:
