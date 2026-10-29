@@ -18,6 +18,15 @@ Herramientas en el scratchpad de la sesión (`verify/`: `run.js`, `check.py`, `p
 
 AC10-0202-SLI, FO10-0100 y GR10-0501 se corrieron antes de sus correcciones del mismo día (checkbox de llenado, tabla de ingresos y total, rotación con fecha e inventario final); esos cambios se probaron aparte en el navegador (ver sus informes en esta carpeta).
 
+## Operario y supervisor en el PDF
+
+Revisadas también las casillas de quien guardó y firmó (2026-10-28, a pedido del usuario):
+
+- **Quien guardó cada registro** (`register1.user`, `shift1.user`, `endShift1.user`…): sale el nombre ("Soporte D.") en los 47; las que quedan vacías son de registros que el ciclo no tuvo (p. ej. `register2`…`register9` de FO10-1701-1)
+- **Supervisor** (`firmaAdministratorN`): sale el nombre en todos
+- **Operario** (`firmaOperator`): vacía en AC10-0301, AC10-0501, AC10-1003, CA02-2102, FO10-0601, TE11-2601 y EC07-0101 (FO10-0100 imprime `<N/A>`). No es el reporte: el reporte pone cada firma según el rol guardado con ella (`Operator` → operario, `Supervisor_PAPO` → supervisor) y el usuario de prueba de develop (admin, "Soporte D.") tiene Administrator y Supervisor_PAPO, no Operator, así que su firma de operario cae en la casilla del supervisor
+- Comprobado con ciclos firmados por operarios reales de la base de prueba, abiertos desde Gestión: AC10-0501 del 25/06 (parredhe, modo `roleLast`) imprime "Hernan Arredondo" y CA02-2102 del 25/06 (bsalinm2, modo `role`) imprime "Mauricio Salinas", el nombre y apellido guardados en su firma. Los 7 reportes usan uno de esos dos modos; CG10-0101 (modo `status`) ya la llena en develop
+
 ## AC10-1801, registro de 30 min
 
 En las dos corridas (2026-10-28 09:57 y 16:46) el registro de 30 min se guardó sin llenar: textos vacíos y checkbox en "No Cumple" (solo la Referencia elegida); los de SKU y Mantenimiento, con los mismos 49 ítems, salieron llenos. No es el formulario: llenado a mano a 1920x1080 guarda lo escrito ("PRUEBA1" en Lote batería, "Cumple" en Apariencia del poliblado; registro 8430) y elegir la Referencia no borra los demás campos. Es el llenado automático de la prueba en esa vista (hay dos botones "30 min" en la página). En septiembre, con el formulario original, los operarios sí guardaban esos campos.
