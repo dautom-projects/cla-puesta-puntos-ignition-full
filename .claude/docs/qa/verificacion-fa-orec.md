@@ -32,7 +32,12 @@ Revisadas también las casillas de quien guardó y firmó (2026-10-28, a pedido 
 En la fuente `default` del gateway (la del inicio de sesión) se crearon `qa.operario` ("QA Operario"; Operator, OREC) y `qa.supervisor` ("QA Supervisor"; Supervisor_PAPO); contraseñas en `~/.config/papo-sql/papo_test_users.env`, fuera del repo.
 
 - **Operario:** con la sesión de `qa.operario` se guardó un registro y se firmó en EA11-0901 (estación 1) y AC10-0501 (estación 38). La firma queda con `role: ["Operator","OREC"]` y el PDF imprime "QA Operario" en la casilla del operario en los dos, también en AC10-0501, uno de los 7 que salían vacíos con admin (registros 8431–8434 y el ciclo de AC10-0501 del 28/10 23:07)
-- **Supervisor desde el popup:** la contraseña pasa (`system.security.validateUser`, fuente de la sesión), pero los roles se leen de `session.custom.userSource` = "ClariosAD" y `qa.supervisor` no existe ahí: "El usuario qa.supervisor no cuenta con los permisos para firmar". En producción los supervisores están en ClariosAD; en develop, para probar el popup y la validación de IP hay que agregar el usuario a ClariosAD con Supervisor_PAPO (no se hizo: cambio de seguridad del gateway que queda para el usuario)
+- **Supervisor desde el popup:** la contraseña pasa (`system.security.validateUser`, fuente de la sesión), pero los roles se leen de `session.custom.userSource` = "ClariosAD" y `qa.supervisor` no existe ahí: "El usuario qa.supervisor no cuenta con los permisos para firmar". ClariosAD solo existe en producción
+- **Popup completo con la fuente apuntada a `default` (temporal, revertido):** con `userSource` = "default" en las session props (sesión nueva) y la sesión de `qa.operario`, en AC10-0501 (estación 38, workstation 31):
+  - rol Supervisor_PAPO aceptado y **validación de IP correcta**: "Estación no válida" desde este navegador (192.168.65.1 contra 10.69.195.88 de la estación)
+  - con la IP de la estación puesta un momento en 192.168.65.1: "Firma Exitosa"; el Revisado queda con `role: ["Supervisor_PAPO"]`, "QA Supervisor" (registro 8439; hora del servidor SQL en UTC, como ya está en el BACKLOG)
+  - firma del operario y PDF desde Gestión: operario "QA Operario" y supervisor "QA Supervisor"
+  - restaurados: `userSource` = "ClariosAD" (git limpio) e IP 10.69.195.88
 
 ## Las otras áreas con el comparador nuevo (2026-10-28)
 

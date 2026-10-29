@@ -51,6 +51,15 @@ Va después de los pasos 1–6 (o junto con ellos, respetando el orden). Filas d
 
 Los reportes no se pueden abrir en develop sin ciclos de prueba; los 8 sin ciclos tienen el mismo script que uno probado (informe de la prueba).
 
+## Prueba de firmas en producción (después del despliegue)
+
+En develop las firmas se probaron con usuarios de prueba de la fuente `default` (ClariosAD solo existe en producción; `verificacion-fa-orec.md`). En producción, con un operario y un supervisor reales de ClariosAD:
+
+1. El operario guarda un registro y el supervisor firma desde el popup **en el PC de la estación**: "Firma Exitosa"
+2. El mismo supervisor intenta firmar **desde otro PC**: "Estación no válida"
+3. El operario firma; en el PDF desde Gestión salen su nombre en la casilla del operario y el del supervisor en la suya
+4. Revisar en `registerhistory` que la hora del "Revisado" sea la de Bogotá (en develop el servidor SQL está en UTC)
+
 ## Tema global
 
 Desde el 2026-10-26 el tema no tiene el bloque `PILOTO PAPO` con alcance `.psc-PAPO\/Form`: el parche (`.claude/docs/theme/*.fix.patch`) se aplicó a todo el tema, así que la corrección llega a todas las vistas y el Designer dibuja igual que los navegadores.
