@@ -88,7 +88,7 @@ Con `qa.operario`, admin y sin sesión, a 1920x1080. Las IP de las estaciones se
 
 - Doble clic en "Si" del aviso de guardar (AC10-0501 est. 38): **dos registros iguales** (8462 y 8463, 33 ms entre uno y otro)
 - Doble clic en "Si" de Firma Operario: **dos "Finalizado" del ciclo 5 y dos "Sin Iniciar" del 6** (8464–8467)
-- El botón principal de `Alerts/alert` envía el mensaje en `onClick` antes de cerrar el popup y nada impide un segundo envío. Dos sesiones guardando o firmando en la misma estación caen en la misma carrera (no hay bloqueo ni llave única); no se probó aparte
+- El botón principal de `Alerts/alert` envía el mensaje en `onClick` antes de cerrar el popup y nada impide un segundo envío. Dos sesiones guardando o firmando a la vez en la misma estación no aplica: cada estación tiene un solo PC. Corregido el mismo día (`Alerts/alert` envía la acción una sola vez; 8479–8481)
 - **Firma del operario en el ciclo equivocado** (CU11-0101 est. 21): tras la firma de Gestión del ciclo 10 (hora UTC, 14:20), el operario firmó el 10 (8468–8469), guardó un Inicio del 11 (8470) y firmó otra vez: el "Finalizado" quedó con el código 10 (8471) y el ciclo 11 sigue abierto. `signOperator` de `Page/Digitalizacion_Template` toma el último código por `Timestamp DESC` (papo-lint ya lo marcaba) y gana el "Revisado" adelantado. En producción pasa si el servidor SQL no está en la hora de Bogotá
 
 ## AC10-1801, registro de 30 min
