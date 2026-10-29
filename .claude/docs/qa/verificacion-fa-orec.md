@@ -91,6 +91,35 @@ Con `qa.operario`, admin y sin sesión, a 1920x1080. Las IP de las estaciones se
 - El botón principal de `Alerts/alert` envía el mensaje en `onClick` antes de cerrar el popup y nada impide un segundo envío. Dos sesiones guardando o firmando a la vez en la misma estación no aplica: cada estación tiene un solo PC. Corregido el mismo día (`Alerts/alert` envía la acción una sola vez; 8479–8481)
 - **Firma del operario en el ciclo equivocado** (CU11-0101 est. 21): tras la firma de Gestión del ciclo 10 (hora UTC, 14:20), el operario firmó el 10 (8468–8469), guardó un Inicio del 11 (8470) y firmó otra vez: el "Finalizado" quedó con el código 10 (8471) y el ciclo 11 sigue abierto. `signOperator` de `Page/Digitalizacion_Template` toma el último código por `Timestamp DESC` (papo-lint ya lo marcaba) y gana el "Revisado" adelantado. En producción pasa si el servidor SQL no está en la hora de Bogotá
 
+## PDF: casos borde (2026-10-29)
+
+Ciclos armados en AC10-0501 est. 38 (códigos 8–12, registros 8482–8515) copiando registros reales (Inicio 8476, una Media hora, la firma de `qa.operario` y la del supervisor del Template) con otra hora y otros textos; PDF desde Gestión. Además, los ciclos del cierre automático simulado (AC10-0801, EJ11-0102, AC10-1801).
+
+| Caso | Resultado |
+|---|---|
+| Cierre automático (ciclo 10) | OPERARIO vacío: la firma del cierre guarda `role: "SYSTEM"` y el reporte llena la casilla solo con `Operator`. El comentario "Cierre automatico" no sale (el reporte solo junta los `insights`) y el historial lo muestra como "Firma / Finalizado" de QA Operario: el PDF no dice que el ciclo se cerró solo |
+| Firma del supervisor desde el Template (ciclo 10) | Sale "QA Supervisor", pero el rol se guarda como texto `"<ArrayWrapper>: [u'Supervisor_PAPO']"` (8477) y el reporte lo encuentra porque busca el rol dentro del texto. Gestión y el popup guardan una lista |
+| 16 registros para 12 casillas (ciclo 11) | Salen los 12 primeros (06:50–08:40); los de 08:50 a 09:20 no aparecen en la grilla, solo en Observaciones y en el historial, sin aviso. La casilla 11 tampoco muestra el campo 5621: la plantilla no lo tiene |
+| Textos largos y caracteres especiales (ciclo 12) | El PDF se genera (sin error 500). ñ, tildes, & < > " ' salen bien. Un texto largo en una casilla se corta ("Lote ÁÉÍÓÚ" de 300 caracteres; "MEDIANOCHE" sale "MEDIANOCH"). Observaciones con 700 caracteres se encoge a ~1,6 pt, ilegible; con ~350 (ciclo 11) se lee en 3 líneas |
+| Límites de turno (ciclos 8 y 9) | Correctos: ciclo de 23:50 → FECHA 28/10 y TURNO 1 aunque siga después de medianoche; Inicio 05:58 → TURNO 1 y la Media hora de 06:02 con "T: 2" |
+
+**Más registros que casillas en datos reales** (base de prueba, registros anteriores a 8482):
+
+| Reporte | Sección | Casillas | Máximo en un ciclo | Ciclos que no caben |
+|---|---|---|---|---|
+| AC10-0201 | register (Inicio, 30 min, SKU, Mmto) | 12 | 16 | 23 de 61 |
+| AC10-1101 | register | 12 | 21 | 4 de 23 |
+| AC10-1801 | register | 12 | 15 | 4 de 19 |
+| CA02-2102 | register | 12 | 16 | 2 de 11 |
+| MZ07-0101 | register | 15 | 20 | 1 de 6 |
+| EA11-1501 | 2 hr | 4 | 6 | 1 de 3 |
+
+Secciones de una casilla (Inicio, Fin, 4 hr) con varios registros en el ciclo (de 2 a 5, guardados otra vez): EA11-0901, AC10-0801, AC10-1101, CA02-2102, CG10-0101, PT11-0104, CI11-0101, EC07-0101, EC11-0101, EJ11-0101, MZ07-0101, PO11-0101 y RJ11-0101; el PDF muestra uno solo.
+
+En datos reales las observaciones de un ciclo juntas llegan a 316 caracteres (1 de 487 ciclos pasa de 300): se leen.
+
+Otro detalle de plantilla: AC10-1801 tiene la etiqueta OPERARIO sin campo, así que nunca muestra el operario.
+
 ## AC10-1801, registro de 30 min
 
 En las dos corridas (2026-10-28 09:57 y 16:46) el registro de 30 min se guardó sin llenar: textos vacíos y checkbox en "No Cumple" (solo la Referencia elegida); los de SKU y Mantenimiento, con los mismos 49 ítems, salieron llenos. No es el formulario: llenado a mano a 1920x1080 guarda lo escrito ("PRUEBA1" en Lote batería, "Cumple" en Apariencia del poliblado; registro 8430) y elegir la Referencia no borra los demás campos. Es el llenado automático de la prueba en esa vista (hay dos botones "30 min" en la página). En septiembre, con el formulario original, los operarios sí guardaban esos campos.
