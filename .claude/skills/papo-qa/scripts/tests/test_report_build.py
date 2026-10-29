@@ -40,7 +40,8 @@ BOGOTA = datetime.timezone(datetime.timedelta(hours=-5))
 
 
 class SimpleDateFormat(object):
-	FORMATS = {"EEE MMM dd HH:mm:ss Z yyyy": "%a %b %d %H:%M:%S %z %Y", "HH:mm:ss": "%H:%M:%S"}
+	FORMATS = {"EEE MMM dd HH:mm:ss Z yyyy": "%a %b %d %H:%M:%S %z %Y", "HH:mm:ss": "%H:%M:%S", "dd/MM/yyyy": "%d/%m/%Y",
+		"HH:mm": "%H:%M"}
 
 	def __init__(self, fmt, locale=None):
 		self.fmt = self.FORMATS.get(fmt)
@@ -436,10 +437,50 @@ class ReportBuildTest(unittest.TestCase):
 			["Inicio de turno", "Cuatro horas", "Inicio de turno", "Fin de turno", "Firma", "Firma"])
 		self.assertEqual(history.getValueAt(5, "Estado"), "Revisado")
 
+	def _autoClosedCycle(self):
+		"""Cycle 2 of station 7: opened by the idle record of the last closure, one form, closed by autoCloseOpenForms."""
+		closure = json.dumps({"role": "SYSTEM", "name": "Cierre", "lastname": "Automatico", "user": "Otro U.",
+			"comment": "T: 1, H: 06:10 - Cierre automatico"})
+		self.conn.executescript("INSERT INTO registertype VALUES (12, 'Idle');")
+		for rid, typeID, status, user, ts, answer in [
+				(20, 12, "Sin Iniciar", "Soporte D.", "2026-10-28 22:01:00", "{}"),
+				(21, 7, "En proceso", "QA Operario", "2026-10-28 22:30:00", _answer([(6100, "Cumple")], user="QA Operario")),
+				(22, 7, "En proceso", "Otro U.", "2026-10-29 01:00:00", _answer([(6100, "Cumple")], user="Otro U.")),
+				(23, 10, "Finalizado", "Otro U.", "2026-10-29 06:10:00", closure)]:
+			self.conn.execute("INSERT INTO registerhistory VALUES (?, 18, 30, 7, 2, ?, ?, ?, ?, ?)", (rid, typeID, status, user, ts, answer))
+		data = self._data(station=7)
+		data["registerCode"] = 2
+		return data
+
+	def test_autoCloseNoticeAndHistory(self):
+		data = self._autoClosedCycle()
+		self.report.build(data, [{"types": [7], "name": "register"}])
+		self.assertEqual(self.report.system.errors, [])
+		# Who started the cycle: the first form, not the idle record nor the closure
+		self.assertEqual(data["autoClose"], u"Cierre automático el 29/10/2026 a las 06:10, sin firma del operario. Inició: QA Operario")
+		self.assertEqual(data["register1"]["user"], "QA Operario")
+		self.assertNotIn("firmaOperator", data)
+		history = data["RegisterHistoryStation"]
+		self.assertEqual([history.getValueAt(i, "Estado") for i in range(history.getRowCount())],
+			["Sin Iniciar", "En proceso", "En proceso", u"Cierre automático"])
+		self.assertEqual(history.getValueAt(3, "Global ID"), "Otro U.")
+
+	def test_autoCloseLeavesTheStatusSignatureBlank(self):
+		data = self._autoClosedCycle()
+		self.report.build(data, [], signatures="status")
+		self.assertNotIn("firmaOperator1", data)
+		self.assertNotIn("firmaOperator", data)
+
+	def test_noAutoCloseNotice(self):
+		data = self._pilot(self._data(station=7))
+		self.assertEqual(data["autoClose"], u"")
+		history = data["RegisterHistoryStation"]
+		self.assertEqual(history.getValueAt(4, "Estado"), "Finalizado")
+
 	def test_everyQueryFiltersTheStation(self):
 		self._pilot(self._data(station=7))
 		cycleQueries = [q for q in self.report.system.queries if "registerhistory" in q[0]]
-		self.assertEqual(len(cycleQueries), 6)
+		self.assertEqual(len(cycleQueries), 7)
 		for sql, params in cycleQueries:
 			self.assertIn("WorkstationNodeID = ?", sql)
 			self.assertEqual(params[3:5], [7, 7])

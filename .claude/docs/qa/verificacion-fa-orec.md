@@ -103,6 +103,18 @@ Ciclos armados en AC10-0501 est. 38 (códigos 8–12, registros 8482–8515) cop
 | Textos largos y caracteres especiales (ciclo 12) | El PDF se genera (sin error 500). ñ, tildes, & < > " ' salen bien. Un texto largo en una casilla se corta ("Lote ÁÉÍÓÚ" de 300 caracteres; "MEDIANOCHE" sale "MEDIANOCH"). Observaciones con 700 caracteres se encoge a ~1,6 pt, ilegible; con ~350 (ciclo 11) se lee en 3 líneas |
 | Límites de turno (ciclos 8 y 9) | Correctos: ciclo de 23:50 → FECHA 28/10 y TURNO 1 aunque siga después de medianoche; Inicio 05:58 → TURNO 1 y la Media hora de 06:02 con "T: 2" |
 
+**Cierre automático en el PDF, corregido (2026-10-29).** Decisión del usuario: el aviso sale en la última página y dice que el cierre fue automático; la firma del operario queda vacía, pero el operario sí sale, para saber quién inició el ciclo. `papo_core.report` v2.9.0 llena `data["autoClose"]` y las 65 plantillas lo imprimen. PDF desde Gestión a 1920x1080:
+
+| Ciclo | Resultado |
+|---|---|
+| AC10-0501 est. 38, ciclo 13 (cerrado a las 14:10 por el job real, horizontal, firmas `roleLast`) | Aviso en rojo sobre el historial: "Cierre automático el 29/10/2026 a las 14:10, sin firma del operario. Inició: Soporte D."; la fila del cierre dice "Cierre automático". Página 1: OPERARIO vacío, SUPERVISOR "Soporte D." |
+| CU11-0101 est. 21, ciclo 12 (vertical, firmas `role`) | Mismo aviso con "Inició: QA Operario"; la página 1 sigue mostrando OPERARIO "QA Operario" (`startShift.user`) y SUPERVISOR "QA Supervisor" |
+| EA11-0901 est. 1, ciclo 12 (firmas `status`) | Aviso y fila "Cierre automático"; "Firma operador de turno" ya no imprime "Cierre Automatico"; OPERARIO "Soporte D." en la cabecera |
+| PL11-0101-CA est. 23, ciclo 1 (Pacífico, sin historial; firma de cierre temporal 8522, borrada después) | Aviso bajo "Vo. Bo. LIDER DE LINEA", sin tocar nada |
+| AC10-0501 est. 38 (11:17) y PL11-0101-CA sin cierre automático | Sin aviso; la tabla del historial baja 16 pt, nada más cambia |
+
+Sin abrir con datos: `Cubiertas/PL11-0101` (no tiene ciclos en la base de prueba), donde la caja de Observaciones pasa de 65 a 49 pt para dejar el aviso debajo.
+
 **Más registros que casillas en datos reales** (base de prueba, registros anteriores a 8482):
 
 | Reporte | Sección | Casillas | Máximo en un ciclo | Ciclos que no caben |

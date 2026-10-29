@@ -16,9 +16,13 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.8.6
+Version: 2.9.0
 
 Changelog:
+	2026-10-29 | William M. | v2.9.0 - Cycle closed by autoCloseOpenForms (signature with role SYSTEM):
+		data["autoClose"] gives the notice of the last page (closing date and time, no operator signature
+		and who started the cycle), the history reads "Cierre automático" in Estado and the "status"
+		signatures leave the operator blank, like the role modes
 	2026-10-28 | William M. | v2.8.6 - _normalizeDict leaves the text "None" blank (str(None) of a tag
 		without value) and an item saved twice takes its first value that has an answer
 	2026-10-28 | William M. | v2.8.5 - _detectShiftFromTimestamp uses papo_core.ui.getShift (no getHour24 left)
@@ -75,6 +79,10 @@ Changelog:
 
 SUPERVISOR_ROLES = {"Supervisor_PAPO", "Administrator", "INTEGRADOR"}
 
+# Automatic closure (papo_core.sign.autoCloseOpenForms): Estado in the history and the notice of the last page
+AUTO_CLOSE_STATUS = u"Cierre automático"
+AUTO_CLOSE_NOTICE = u"Cierre automático el {0} a las {1}, sin firma del operario. Inició: {2}"
+
 # Cumple/No Cumple -> symbol/text per normalize mode
 NORMALIZE_MODES = {
 	"check": {"cumple": u"✔", "no cumple": u"✘"},
@@ -99,6 +107,16 @@ def _cycleFilter(papoID, nodeID, registerCode, station=None, alias=""):
 	"""SQL condition and parameters of one cycle; the station only applies when it is given."""
 	sql = "{0}PapoID = ? AND {0}NodeID = ? AND {0}RegisterCode = ? AND (? IS NULL OR {0}WorkstationNodeID = ?)".format(alias)
 	return sql, [papoID, nodeID, registerCode, station, station]
+
+
+def _isAutoClose(raw):
+	"""True when a signature DataAnswer is the closure of autoCloseOpenForms (role SYSTEM)."""
+	if not raw:
+		return False
+	try:
+		return system.util.jsonDecode(raw).get("role") == "SYSTEM"
+	except:
+		return False
 
 
 def _normalizeDict(sourceDict, mode):
@@ -423,6 +441,9 @@ def _extractSignatures(data, papoID, nodeID, registerCode, db, prefixAdmin, pref
 		except:
 			continue
 
+		# The automatic closure is not an operator signature
+		if obj.get("role") == "SYSTEM":
+			continue
 		status = ds.getValueAt(k, "Status")
 		fullName = (obj.get("name", "") + " " + obj.get("lastname", "")).strip()
 
@@ -821,7 +842,8 @@ def _header(data, typeID, papoID, nodeID, registerCode, db, station=None):
 
 
 def _historyList(papoID, nodeID, registerCode, db, station=None):
-	"""Records of the cycle for the history table (same columns as the report query RegisterHistory)."""
+	"""Records of the cycle for the history table (same columns as the report query RegisterHistory); the
+	automatic closure reads AUTO_CLOSE_STATUS in Estado."""
 	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station, "rh.")
 	sql = '''
 		SELECT
@@ -829,13 +851,56 @@ def _historyList(papoID, nodeID, registerCode, db, station=None):
 			rh.[User] AS "Global ID",
 			rh.Status AS "Estado",
 			rt.Description AS "Tipo Registro",
-			rh.RegisterTypeID
+			rh.RegisterTypeID,
+			CASE WHEN rh.RegisterTypeID = 10 THEN rh.DataAnswer END AS Signature
 		FROM registerhistory rh
 		INNER JOIN registertype rt ON rh.RegisterTypeID = rt.ID
 		WHERE {0}
 		ORDER BY rh.Timestamp ASC
 	'''.format(cycleSql)
-	return system.dataset.toDataSet(system.db.runPrepQuery(sql, params, db))
+	ds = system.db.runPrepQuery(sql, params, db)
+	headers = ["Fecha", "Global ID", "Estado", "Tipo Registro", "RegisterTypeID"]
+	rows = []
+	for k in range(ds.getRowCount()):
+		row = [ds.getValueAt(k, h) for h in headers]
+		if _isAutoClose(ds.getValueAt(k, "Signature")):
+			row[2] = AUTO_CLOSE_STATUS
+		rows.append(row)
+	return system.dataset.toDataSet(headers, rows)
+
+
+def _autoCloseNotice(papoID, nodeID, registerCode, db, station=None):
+	"""Notice of the last page when autoCloseOpenForms closed the cycle: date and time of the closure and the
+	user of the first form (who started the cycle); empty text otherwise."""
+	from java.text import SimpleDateFormat
+	from java.util import TimeZone
+
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
+	ds = system.db.runPrepQuery('''
+		SELECT Timestamp, [User], RegisterTypeID, DataAnswer
+		FROM registerhistory
+		WHERE {0}
+		ORDER BY ID ASC
+	'''.format(cycleSql), params, db)
+
+	closedAt = None
+	starter = None
+	for k in range(ds.getRowCount()):
+		typeID = ds.getValueAt(k, "RegisterTypeID")
+		if typeID == 10:
+			if closedAt is None and _isAutoClose(ds.getValueAt(k, "DataAnswer")):
+				closedAt, closer = ds.getValueAt(k, "Timestamp"), ds.getValueAt(k, "User")
+		# Signatures (10) and the idle record that opens the cycle (12) are not forms
+		elif typeID != 12 and starter is None:
+			starter = ds.getValueAt(k, "User")
+	if closedAt is None:
+		return u""
+
+	zone = TimeZone.getTimeZone("America/Bogota")
+	dateFormat, timeFormat = SimpleDateFormat("dd/MM/yyyy"), SimpleDateFormat("HH:mm")
+	dateFormat.setTimeZone(zone)
+	timeFormat.setTimeZone(zone)
+	return AUTO_CLOSE_NOTICE.format(dateFormat.format(closedAt), timeFormat.format(closedAt), starter or closer or u"")
 
 
 # ==================== PUBLIC FUNCTIONS ====================
@@ -850,7 +915,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 	signatures and the history list. Logic that only one form has stays as a
 	few lines after this call in its report.
 
-	Version: 1.0.0
+	Version: 1.1.0
 
 	Args:
 		data (dict): Report data dict with papoID, nodeID, registerCode, db and,
@@ -899,10 +964,14 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 		header (int, optional): RegisterTypeID whose first record gives data["date"] (its
 			Timestamp) and data["shift"] (its plant shift)
 
+	Always fills data["autoClose"]: the notice of the last page when autoCloseOpenForms closed the
+	cycle, empty text otherwise.
+
 	Returns:
 		None: Populates data in place
 
 	Changelog:
+		2026-10-29 | William M. | v1.1.0 - data["autoClose"] and "Cierre automático" in the history
 		2026-10-27 | William M. | v1.0.0 - Initial version (pilot AC10-0202, AC10-0301,
 			AC10-1101, CA02-2102); reprocessedNormalize for FO10-0601 / FO10-1701;
 			reprocessed groups and modes yn / ok / number, typeName and signatures
@@ -920,6 +989,8 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 	except:
 		ref = "papo_core.report"
 	logger = system.util.getLogger(ref)
+	# The template prints the key as it is when it is missing
+	data["autoClose"] = u""
 
 	try:
 		typeNames = _registerTypeNames(db) if [s for s in sections if s.get("typeName")] else None
@@ -936,6 +1007,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			_extractSignaturesByRole(data, papoID, nodeID, registerCode, db, signaturePrefix[0], signaturePrefix[1], station)
 		if history:
 			data[history] = _historyList(papoID, nodeID, registerCode, db, station)
+		data["autoClose"] = _autoCloseNotice(papoID, nodeID, registerCode, db, station)
 		if header is not None:
 			_header(data, header, papoID, nodeID, registerCode, db, station)
 
