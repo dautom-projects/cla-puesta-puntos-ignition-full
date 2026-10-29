@@ -58,7 +58,7 @@ En develop las firmas se probaron con usuarios de prueba de la fuente `default` 
 1. El operario guarda un registro y el supervisor firma desde el popup **en el PC de la estación**: "Firma Exitosa"
 2. El mismo supervisor intenta firmar **desde otro PC**: "Estación no válida"
 3. El operario firma; en el PDF desde Gestión salen su nombre en la casilla del operario y el del supervisor en la suya
-4. Revisar en `registerhistory` que la hora del "Revisado" sea la de Bogotá (en develop el servidor SQL está en UTC)
+4. Revisar en `registerhistory` que la hora del "Revisado" sea la de Bogotá (en develop el servidor SQL está en UTC). Si no lo es, la firma del operario del ciclo siguiente cae en el anterior (BACKLOG, "Firmas, permisos y guardados"): corregir antes de usar el estándar
 
 ## Tema global
 

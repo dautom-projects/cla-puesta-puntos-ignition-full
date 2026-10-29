@@ -52,6 +52,45 @@ Los PDF de la prueba general (Ensamble, Metalurgia, General / POLY / Cubiertas, 
 
 La corrida de las 14:10 fue con `papo_core.sign` v1.3.0 y cerró los 8 ciclos que estaban abiertos y habían empezado antes de las 14:00 (los 7 en "Revisado" de junio y julio, y FO10-0100 de la estación 13), con el turno del ciclo en el comentario y la firma a nombre del operario del último formulario. Dejó abierto FO10-0100 de la estación 44 (ciclo sin formularios). A esa hora no había ciclos abiertos de Granja ni de Metalurgia: las exclusiones quedan probadas solo con los tests. A las 22:10 no corrió (la prueba gratuita del gateway estaba vencida).
 
+### Simulación del cierre (2026-10-29)
+
+Para no esperar a las 14:10 se insertaron ciclos de prueba con la hora atrasada (comentario "Simulacion QA cierre automatico") y se corrió `papo_core.sign.autoCloseOpenForms("papo_db")` a las 09:14 desde una página temporal del gateway (ya borrada; el turno en curso es el 2, que empieza a las 06:00). Resultado "Cerrados: 3":
+
+| Ciclo de prueba | Esperado | Resultado |
+|---|---|---|
+| AC10-0801 est. 39, Inicio 05:30 | cerrar | cerrado, "T: 1", a nombre de QA Operario (8458–8459) |
+| EJ11-0102 est. 17, Inicio 05:00 y Revisado 05:40 | cerrar a nombre del operario | cerrado, "T: 1", QA Operario y no el supervisor (8454–8455) |
+| CU11-0101 est. 21, Inicio 06:30 | no tocar (turno en curso) | abierto |
+| PT11-0104 est. 11 (Granja de ácidos) | no tocar | abierto |
+| FU10-0202 est. 68 (Metalurgia) | no tocar | abierto |
+| FO10-0100 est. 44 (ciclo sin formularios) | no tocar | abierto |
+
+También cerró AC10-1801 de la estación 14 ("T: 3"), un ciclo real que quedó abierto el 28/10. Con Gestión abierta en dos sesiones, su firma automática NA insertó dos "Revisado" por ciclo en los ciclos atrasados (8448–8453, también en Granja y Metalurgia); ya estaba en el BACKLOG.
+
+## Firmas, permisos y guardados (2026-10-29)
+
+Con `qa.operario`, admin y sin sesión, a 1920x1080. Las IP de las estaciones se cambiaron un momento a la de este navegador (192.168.65.1) y se restauraron.
+
+**Firmar desde Gestión**
+
+- Sin fila elegida: "Selección no válida" (el script no tiene `return` después del aviso)
+- Admin desde un PC que no es la estación: "No se encuentra en la estación…". Gestión no exime a Administrator de la IP, el popup sí; tampoco acepta INTEGRADOR (solo Administrator y Supervisor_PAPO)
+- Con la IP de la estación: "Formulario firmado" (8460). **Se puede firmar otra vez el mismo ciclo** (8461): el "Revisado" lleva la hora UTC del servidor SQL, 5 h adelante, y Gestión filtra hasta la hora actual, así que la fila sigue en "En proceso"
+- `qa.operario`: "Usuario no cuenta con los permisos suficientes para firmar"
+- Sin sesión: Gestión muestra los datos y Firmar no hace nada visible ni inserta nada
+
+**Overview del operario**
+
+- Con una IP que no es de ninguna estación: sin tarjetas y el menú solo con "Formularios Puesta Punto"
+- Con la IP de la estación 16: solo la tarjeta de CU11-0101 de esa estación. La etiqueta dice "Workstation no registrada, IP: 16" justo cuando la encontró (el transform está invertido) y la tarjeta marcó "Idle (05h 01m)" para un registro de hace un minuto (el tag `Papos_Info` no está en el repo; probablemente calcula con la hora UTC del servidor SQL)
+
+**Doble clic y firmas seguidas**
+
+- Doble clic en "Si" del aviso de guardar (AC10-0501 est. 38): **dos registros iguales** (8462 y 8463, 33 ms entre uno y otro)
+- Doble clic en "Si" de Firma Operario: **dos "Finalizado" del ciclo 5 y dos "Sin Iniciar" del 6** (8464–8467)
+- El botón principal de `Alerts/alert` envía el mensaje en `onClick` antes de cerrar el popup y nada impide un segundo envío. Dos sesiones guardando o firmando en la misma estación caen en la misma carrera (no hay bloqueo ni llave única); no se probó aparte
+- **Firma del operario en el ciclo equivocado** (CU11-0101 est. 21): tras la firma de Gestión del ciclo 10 (hora UTC, 14:20), el operario firmó el 10 (8468–8469), guardó un Inicio del 11 (8470) y firmó otra vez: el "Finalizado" quedó con el código 10 (8471) y el ciclo 11 sigue abierto. `signOperator` de `Page/Digitalizacion_Template` toma el último código por `Timestamp DESC` (papo-lint ya lo marcaba) y gana el "Revisado" adelantado. En producción pasa si el servidor SQL no está en la hora de Bogotá
+
 ## AC10-1801, registro de 30 min
 
 En las dos corridas (2026-10-28 09:57 y 16:46) el registro de 30 min se guardó sin llenar: textos vacíos y checkbox en "No Cumple" (solo la Referencia elegida); los de SKU y Mantenimiento, con los mismos 49 ítems, salieron llenos. No es el formulario: llenado a mano a 1920x1080 guarda lo escrito ("PRUEBA1" en Lote batería, "Cumple" en Apariencia del poliblado; registro 8430) y elegir la Referencia no borra los demás campos. Es el llenado automático de la prueba en esa vista (hay dos botones "30 min" en la página). En septiembre, con el formulario original, los operarios sí guardaban esos campos.
