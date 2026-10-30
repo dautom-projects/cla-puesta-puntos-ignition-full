@@ -115,7 +115,7 @@ Ciclos armados en AC10-0501 est. 38 (códigos 8–12, registros 8482–8515) cop
 
 Sin abrir con datos: `Cubiertas/PL11-0101` (no tiene ciclos en la base de prueba), donde la caja de Observaciones pasa de 65 a 49 pt para dejar el aviso debajo.
 
-**Más registros que casillas en datos reales** (base de prueba, registros anteriores a 8482):
+**Más registros que casillas en la base de prueba** (registros anteriores a 8482). No aplica en la planta: un ciclo real nunca pasa de las casillas de su plantilla (el usuario, 2026-10-30).
 
 | Reporte | Sección | Casillas | Máximo en un ciclo | Ciclos que no caben |
 |---|---|---|---|---|
