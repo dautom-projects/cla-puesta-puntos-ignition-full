@@ -130,7 +130,18 @@ Secciones de una casilla (Inicio, Fin, 4 hr) con varios registros en el ciclo (d
 
 En datos reales las observaciones de un ciclo juntas llegan a 316 caracteres (1 de 487 ciclos pasa de 300): se leen.
 
-Otro detalle de plantilla: AC10-1801 tiene la etiqueta OPERARIO sin campo, así que nunca muestra el operario.
+**Claves de plantilla, corregido (2026-10-30).** La casilla 11 de AC10-0501 existía con la clave mal escrita (`@register11papoItemID5621@`). Una búsqueda de claves mal formadas en las 65 plantillas (uniendo los tramos de texto de cada casilla) encontró 4, todas corregidas:
+
+| Reporte | Antes | Ahora | PDF desde Gestión |
+|---|---|---|---|
+| AC10-0501 | `@register11papoItemID5621@` | `@register11.papoItemID5621@` | Est. 38, ciclo 11: la casilla 11 muestra "R11" |
+| MZ07-0101 | `@register15papoItemID5228@` | `@register15.papoItemID5228@` | Est. 18, ciclo 6: la casilla 15 muestra "4.3" |
+| TR11-0101 | `@daily6..papoItemID4430@` | `@daily6.papoItemID4430@` | Est. 70, ciclo 2, con una copia temporal del Diario fechada el sábado 31/10 (la casilla de día toma la semana del primer registro): "Sabado: SABADO-QA" |
+| TR11-0102 | `@turno1.dia7 .papoItemID11238@` | `@turno1.dia7.papoItemID11238@` | Est. 70, ciclo 2, con una copia temporal del Inicio fechada el 07/10 a las 03:00: la casilla muestra "0" |
+
+Las copias temporales (8523–8527) se borraron; mientras existieron, `custom.signature` de Gestión firmó tres veces el ciclo de TR11-0101 como NA (8528–8530, también borradas; anotado en el BACKLOG).
+
+AC10-1801 no tenía error: el OPERARIO lee `@endShift1.user@` (y OPERARIO 2, `@endShift2.user@`), así que sale vacío en los ciclos sin Fin de turno y muestra el operario en los que lo tienen.
 
 ## AC10-1801, registro de 30 min
 
