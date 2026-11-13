@@ -1,0 +1,176 @@
+{
+  "custom": {
+    "dbConnection": "papo_db",
+    "question": ""
+  },
+  "params": {
+    "answer": "No Cumple",
+    "enabled": true,
+    "falseText": "",
+    "falseValue": "No Cumple",
+    "fontSize": 17,
+    "papoItemID": null,
+    "question": "",
+    "trueText": "",
+    "trueValue": "Cumple",
+    "value": false
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.question": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "papoItemID": "{view.params.papoItemID}",
+            "question": "{view.params.question}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "params.answer": {
+      "binding": {
+        "config": {
+          "expression": "if({view.params.value}, {view.params.trueValue}, {view.params.falseValue})"
+        },
+        "type": "expr"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    },
+    "params.enabled": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.falseText": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.falseValue": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.fontSize": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoItemID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.question": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.trueText": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.trueValue": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.value": {
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 50,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Field"
+        },
+        "position": {
+          "basis": "0px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "view.params.enabled"
+              },
+              "type": "property"
+            }
+          },
+          "props.selected": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.params.value"
+              },
+              "type": "property"
+            }
+          },
+          "props.style.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "if(coalesce({view.params.trueText}, \"\") + coalesce({view.params.falseText}, \"\") !\u003d \"\", if({view.params.value}, {view.params.trueText}, {view.params.falseText}), {view.custom.question})"
+              },
+              "type": "expr"
+            }
+          }
+        },
+        "props": {
+          "checkedIcon": {
+            "color": {
+              "disabled": "#1199C7"
+            }
+          },
+          "style": {
+            "classes": "PAPO/Field/Checkbox"
+          },
+          "uncheckedIcon": {
+            "color": {
+              "disabled": "#1199C7"
+            }
+          }
+        },
+        "type": "ia.input.checkbox"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "alignItems": "stretch",
+      "style": {
+        "overflow": "hidden",
+        "position": "relative"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

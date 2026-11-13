@@ -1,0 +1,2520 @@
+{
+  "custom": {
+    "db": "papo_db",
+    "dbConnection": "papo_db",
+    "fontSize": 17,
+    "initialPapoDateTime": {
+      "$": [
+        "ts",
+        192,
+        1784833990236
+      ],
+      "$ts": 1784833990236
+    },
+    "insights": " | T: 3, H: 14:13 - ",
+    "path": "",
+    "referencePapo": "",
+    "registerTypeID": 7,
+    "sign": "",
+    "supervisorOption": [],
+    "user": "Soporte D."
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tself.custom.initialPapoDateTime \u003d system.date.now()\n\tself.custom.supervisorOption \u003d papo_core.sign.supervisorOpt(self)\n\tpapo_core.ui.initForm(self)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "nodeID": 26,
+    "papoID": 35,
+    "workstationID": 1,
+    "workstationnodeID": 1
+  },
+  "propConfig": {
+    "custom.db": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.fontSize": {
+      "persistent": true
+    },
+    "custom.insights": {
+      "binding": {
+        "config": {
+          "path": "/root/TextField.props.text"
+        },
+        "transforms": [
+          {
+            "code": "\treturn papo_core.ui.preInsight(self, value)",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.path": {
+      "persistent": true
+    },
+    "custom.registerTypeID": {
+      "persistent": true
+    },
+    "custom.user": {
+      "binding": {
+        "config": {
+          "path": "session.props.auth.user.firstName"
+        },
+        "transforms": [
+          {
+            "expression": "{value} + \" \" +{session.props.auth.user.lastName}",
+            "type": "expression"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.workstationnodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 926,
+      "width": 926
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Label5"
+        },
+        "position": {
+          "basis": "22px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "textStyle": {
+            "color": "--cla-text-question",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Label4"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "text-titles"
+          },
+          "text": "FORMULARIO INICIO DE TURNO",
+          "textStyle": {
+            "color": "--cla-text-question",
+            "fontWeight": "bold",
+            "textAlign": "left"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Spacer1"
+        },
+        "position": {
+          "basis": "15px",
+          "shrink": 0
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t\n\t#self.parent.flexToggle(self)\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section1"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup1.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Seguridad",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5134,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5135,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox_0"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5136,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox_1"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 220
+        },
+        "meta": {
+          "name": "FlexContainerGroup1"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t#self.parent.flexToggle(self)\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section2"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup2.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Estado - Antes del arranque o Durante el proceso",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5168,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox"
+                },
+                "position": {
+                  "basis": "200px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "PAPO/Field/Checkbox"
+                  },
+                  "text": "Antes del arranque"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5169,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "Checkbox_1"
+                },
+                "position": {
+                  "basis": "200px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.selected"
+                      },
+                      "transforms": [
+                        {
+                          "fallback": "none",
+                          "inputType": "scalar",
+                          "mappings": [
+                            {
+                              "input": true,
+                              "output": "Cumple"
+                            },
+                            {
+                              "input": false,
+                              "output": "No Cumple"
+                            }
+                          ],
+                          "outputType": "scalar",
+                          "type": "map"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.style.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "PAPO/Field/Checkbox"
+                  },
+                  "text": "Durante el proceso"
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "custom": {
+              "checkboxAnswers": [
+                null,
+                null
+              ],
+              "item": {
+                "papoItemID": 5168
+              }
+            },
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "45px"
+            },
+            "propConfig": {
+              "custom.checkboxAnswers": {
+                "onChange": {
+                  "enabled": null,
+                  "script": "    prevArr \u003d [v.value for v in previousValue.value] if previousValue.value else []\n    currArr \u003d [v.value for v in currentValue.value] if currentValue.value else []\n\t\n    # If two or more are True, keep only the one that just flipped True\n    if sum(1 for c in currArr if c) \u003e 1:\n        # Find the index that changed from False -\u003e True\n        idx \u003d next(i for i, (p, c) in enumerate(zip(prevArr, currArr)) if (not p and c))\n        self.custom.checkboxAnswers \u003d [(i \u003d\u003d idx) for i in range(len(currArr))]"
+                }
+              },
+              "custom.checkboxAnswers[0]": {
+                "binding": {
+                  "config": {
+                    "bidirectional": true,
+                    "coalesce": true,
+                    "path": "./Checkbox.props.selected"
+                  },
+                  "type": "property"
+                }
+              },
+              "custom.checkboxAnswers[1]": {
+                "binding": {
+                  "config": {
+                    "bidirectional": true,
+                    "coalesce": true,
+                    "path": "./Checkbox_1.props.selected"
+                  },
+                  "type": "property"
+                }
+              },
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.checkboxAnswers"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tanswerReturn \u003d [self.getChild(\"Checkbox\").props.text,\n\t\t\t\tself.getChild(\"Checkbox_1\").props.text]\n\t\n\t\n \treturn answerReturn[value.index(True)] if any(value) else \"-\"\n",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "justify": "space-around"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5137,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5138,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox_0"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5139,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox_1"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5140,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox_2"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5141,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox_3"
+            },
+            "position": {
+              "basis": "60px",
+              "grow": 0,
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0
+                  },
+                  "text": "Presión del soplador desde PLC (psi):"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5150,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField"
+                },
+                "position": {
+                  "basis": "12.5%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {},
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "3.4%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "paddingLeft": 0
+                  },
+                  "text": "Presión del soplador en  físico (psi):"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5151,
+                    "registerTypeID": 7
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_0"
+                },
+                "position": {
+                  "basis": "12.5%",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {},
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "39px"
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "571px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "108px"
+                },
+                "propConfig": {
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "text": "Reactor No. :"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item_dev": {
+                    "papoItemID": 7929
+                  }
+                },
+                "meta": {
+                  "name": "Label_3"
+                },
+                "position": {
+                  "basis": "32px",
+                  "display": false
+                },
+                "propConfig": {
+                  "custom.item_dev.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.text"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item_dev.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.text": {
+                    "binding": {
+                      "config": {
+                        "fallbackDelay": 2.5,
+                        "mode": "indirect",
+                        "references": {
+                          "1": "{view.custom.path}"
+                        },
+                        "tagPath": "{1}/Temp_Planchas"
+                      },
+                      "enabled": false,
+                      "type": "tag"
+                    }
+                  },
+                  "props.textStyle.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "style": {
+                    "classes": "text-data-2",
+                    "color": "#1199C7",
+                    "paddingLeft": 20
+                  },
+                  "text": 25
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 7929
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_0"
+                },
+                "position": {
+                  "basis": "17.2%"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": 2,
+                    "enabled": false,
+                    "showQuestion": false,
+                    "value": 2
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {},
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_3"
+            },
+            "position": {
+              "basis": "40px"
+            },
+            "props": {
+              "justify": "space-around",
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 424
+        },
+        "meta": {
+          "name": "FlexContainerGroup2"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t\n\t#self.parent.flexToggle(self)\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section3"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup3.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Silos",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5142,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 100
+        },
+        "meta": {
+          "name": "FlexContainerGroup3"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t\n\t#self.parent.flexToggle(self)\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section4"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup4.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Molinos",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 5143,
+                "registerTypeID": 7
+              }
+            },
+            "meta": {
+              "name": "Checkbox"
+            },
+            "position": {
+              "basis": "50px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.papoItemID": {
+                "binding": {
+                  "config": {
+                    "path": "this.custom.item.papoItemID"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "No Cumple",
+                "falseValue": "No Cumple",
+                "question": "",
+                "trueValue": "Cumple",
+                "value": false
+              },
+              "path": "Objects/Checkbox",
+              "style": {},
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 80
+        },
+        "meta": {
+          "name": "FlexContainerGroup4"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "events": {
+          "dom": {
+            "onClick": {
+              "config": {
+                "script": "\t\n\t#self.parent.flexToggle(self)\n\tsectionIndex \u003d int(self.meta.name.replace(\"Section\", \"\"))\n\tself.view.getChild(\"root\").toggleFlexRoot(sectionIndex)"
+              },
+              "scope": "G",
+              "type": "script"
+            }
+          }
+        },
+        "meta": {
+          "name": "Section5"
+        },
+        "position": {
+          "basis": "40px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.style.classes": {
+            "binding": {
+              "config": {
+                "path": "../FlexContainerGroup5.position.display"
+              },
+              "transforms": [
+                {
+                  "fallback": "button-questions",
+                  "inputType": "scalar",
+                  "mappings": [
+                    {
+                      "input": true,
+                      "output": "button-questions"
+                    },
+                    {
+                      "input": false,
+                      "output": "button-questions-2"
+                    }
+                  ],
+                  "outputType": "scalar",
+                  "type": "map"
+                }
+              ],
+              "type": "property"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.custom.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {},
+          "text": "Condiciones de operación",
+          "textStyle": {
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "60px"
+                },
+                "props": {
+                  "text": "Temperatura del crisol (entre 450 y 510°C)"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "60px"
+                },
+                "props": {
+                  "text": "Temperatura de la canoa (entre 450 y 500°C)"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_1"
+                },
+                "position": {
+                  "basis": "60px"
+                },
+                "props": {
+                  "text": "Temperatura del reactor (entre 340 y 380°C)"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_2"
+                },
+                "position": {
+                  "basis": "90px"
+                },
+                "props": {
+                  "text": "Temperatura de la cámara de precalentamiento antes de arranque  (reactor 1, 2, 3 entre 200 y 550 °C, reactor 4 entre 300 y 510 °C)"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Label_3"
+                },
+                "position": {
+                  "basis": "90px"
+                },
+                "props": {
+                  "text": "Temperatura de la cámara de precalentamiento en operacion (reactor 1, 2, 3 entre 200 y 500 °C, reactor 4 entre 320 y 380 °C)"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "70%"
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Label"
+                },
+                "position": {
+                  "basis": "15px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5145
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_0"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "maxValue": 510,
+                    "minValue": 450,
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {
+                    "width": "100%"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_0"
+                },
+                "position": {
+                  "basis": "25px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5146
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_1"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "maxValue": 500,
+                    "minValue": 450,
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {
+                    "width": "100%"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_4"
+                },
+                "position": {
+                  "basis": "30px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5147
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_2"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "maxValue": 380,
+                    "minValue": 340,
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {
+                    "width": "100%"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_5"
+                },
+                "position": {
+                  "basis": "45px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5148
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_3"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "maxValue": 550,
+                    "minValue": 200,
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {
+                    "width": "100%"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              },
+              {
+                "meta": {
+                  "name": "Label_6"
+                },
+                "position": {
+                  "basis": "60px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "custom": {
+                  "item": {
+                    "papoItemID": 5149
+                  }
+                },
+                "meta": {
+                  "name": "NumericEntryField_4"
+                },
+                "position": {
+                  "basis": "32px"
+                },
+                "propConfig": {
+                  "custom.item.answer": {
+                    "binding": {
+                      "config": {
+                        "path": "this.props.params.answer"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "custom.item.registerTypeID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t# Query parametrizada\n\tquery \u003d \"\"\"\n\t\tSELECT RegisterTypeID\n\t\tFROM papoitem\n\t\tWHERE ID \u003d ?\n\t\"\"\"\n\t\n\t# args recibe el ID que pasas en \"value\" o podrías sustituirlo por otra variable\n\targs \u003d [value]\n\t\n\t# Ejecutar consulta\n\tresults \u003d system.db.runPrepQuery(query, args, self.view.custom.db)\n\t\n\t# Si hay resultados, devolver la descripción\n\tif len(results) \u003e 0:\n\t\treturn results[0][\"RegisterTypeID\"]\n\telse:\n\t\treturn None",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.fontSize": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.fontSize"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoItemID": {
+                    "binding": {
+                      "config": {
+                        "path": "this.custom.item.papoItemID"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "params": {
+                    "answer": "",
+                    "maxValue": 500,
+                    "minValue": 200,
+                    "questionAsPlaceholder": true,
+                    "showQuestion": false,
+                    "value": ""
+                  },
+                  "path": "Objects/NumericField",
+                  "style": {
+                    "width": "100%"
+                  },
+                  "useDefaultViewHeight": false,
+                  "useDefaultViewWidth": false
+                },
+                "type": "ia.display.view"
+              }
+            ],
+            "custom": {
+              "basePapo": 5145
+            },
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "30%"
+            },
+            "props": {
+              "alignItems": "flex-start",
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "custom": {
+          "baseBasisPx": 400
+        },
+        "meta": {
+          "name": "FlexContainerGroup5"
+        },
+        "position": {
+          "basis": "0px",
+          "display": false,
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "backgroundColor": "",
+            "borderBottomLeftRadius": 15,
+            "borderBottomRightRadius": 15,
+            "borderTopLeftRadius": 15,
+            "borderTopRightRadius": 15,
+            "marginLeft": 20,
+            "marginRight": 20,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_2"
+        },
+        "position": {
+          "basis": "12px",
+          "grow": 1
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 0
+          },
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_2"
+            },
+            "position": {
+              "basis": "94px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "paddingLeft": 15
+              },
+              "text": "Supervisor:",
+              "textStyle": {
+                "fontSize": 14
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "item": {
+                "papoItemID": 10962
+              }
+            },
+            "meta": {
+              "name": "Dropdown"
+            },
+            "position": {
+              "basis": "250px"
+            },
+            "propConfig": {
+              "custom.item.answer": {
+                "binding": {
+                  "config": {
+                    "path": "this.props.params.answer"
+                  },
+                  "type": "property"
+                }
+              },
+              "custom.item.registerTypeID": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.registerTypeID"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.fontSize": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.fontSize"
+                  },
+                  "type": "property"
+                }
+              },
+              "props.params.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.supervisorOption"
+                  },
+                  "transforms": [
+                    {
+                      "code": "# Transform the array to dropdown format\n\tif value is None or len(value) \u003d\u003d 0:\n\t\treturn [{\"label\": \"No hay supervisores disponibles\", \"value\": \"\"}]\n\t\n\treturn [{\"label\": user, \"value\": user} for user in value]",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "params": {
+                "answer": "",
+                "answerFrom": "label",
+                "showQuestion": false,
+                "value": null
+              },
+              "path": "Objects/Dropdown",
+              "style": {
+                "marginLeft": 15,
+                "marginRight": 30
+              },
+              "useDefaultViewHeight": false,
+              "useDefaultViewWidth": false
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "custom": {
+          "papoItemID": 10962
+        },
+        "meta": {
+          "name": "FlexContainerSupervisor"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "propConfig": {},
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_1"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "paddingLeft": 15
+          },
+          "text": "Observaciones:",
+          "textStyle": {
+            "fontSize": 14
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "TextField"
+        },
+        "position": {
+          "basis": "32px",
+          "shrink": 0
+        },
+        "props": {
+          "placeholder": "Esciba aqui",
+          "style": {
+            "classes": "PAPO/Field/Input",
+            "marginLeft": 15,
+            "marginRight": 30
+          }
+        },
+        "type": "ia.input.text-field"
+      },
+      {
+        "children": [
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\tpapo_core.ui.confirmSave()"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-1"
+              },
+              "text": "Guardar"
+            },
+            "scripts": {
+              "customMethods": [],
+              "extensionFunctions": null,
+              "messageHandlers": []
+            },
+            "type": "ia.input.button"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t\n\t\n\tsystem.perspective.sendMessage(\n\t    messageType\u003d\"closeEmbeded\", \n\t    payload\u003d{\"estado\": False,},\n\t    scope\u003d\"session\"\n\t)"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_1"
+            },
+            "position": {
+              "basis": "100px",
+              "shrink": 0
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-2"
+              },
+              "text": "Cancelar"
+            },
+            "type": "ia.input.button"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer_0"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "justify": "center"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "custom": {
+      "flexCount": [
+        5
+      ],
+      "flexGroupCount": 1
+    },
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column",
+      "style": {
+        "classes": "container-borders-dautom-widget PAPO/Form",
+        "marginLeft": 10,
+        "paddingLeft": 10
+      }
+    },
+    "scripts": {
+      "customMethods": [
+        {
+          "name": "toggleFlexRoot",
+          "params": [
+            "sectionIndex"
+          ],
+          "script": "\tpapo_core.ui.toggleSection(self, sectionIndex)"
+        },
+        {
+          "name": "answerRecopile",
+          "params": [
+            "flexContainer"
+          ],
+          "script": "\treturn papo_core.register.recopile(flexContainer, self)"
+        }
+      ],
+      "extensionFunctions": null,
+      "messageHandlers": [
+        {
+          "messageType": "saveDataRoot",
+          "pageScope": true,
+          "script": "\tpapo_core.register.save(self)",
+          "sessionScope": false,
+          "viewScope": false
+        }
+      ]
+    },
+    "type": "ia.container.flex"
+  }
+}

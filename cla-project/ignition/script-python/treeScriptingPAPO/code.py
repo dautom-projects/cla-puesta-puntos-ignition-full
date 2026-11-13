@@ -99,6 +99,12 @@ tree_data = [
                 "expanded": False,
                 "data": {"path": "0/3", "url": "/cpk"},  # <- ej: "/tendencias"
                 "items": []
+            },
+            {
+                "label": "Gestion Gerencial",
+                "expanded": False,
+                "data": {"path": "0/4", "url": "/manageAdministration"},  # <- ej: "/manageAdministration"
+                "items": []
             }
         ]
     }

@@ -1,0 +1,766 @@
+{
+  "custom": {
+    "data": {
+      "$": [
+        "ds",
+        192,
+        1755800491227
+      ],
+      "$columns": [
+        {
+          "data": [
+            16,
+            22,
+            23,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ],
+          "name": "ProductCodeNodeID",
+          "type": "Integer"
+        },
+        {
+          "data": [
+            "Test QA",
+            "123",
+            "12028188481",
+            "122000036.0",
+            "122000005.0",
+            "122000628.0",
+            "122000542.0",
+            "122000629.0",
+            "122000632.0",
+            "test1",
+            "122000636.0",
+            "122000631.0",
+            "122000635.0",
+            "121000603.0",
+            "121000589.0",
+            "Test QA 2"
+          ],
+          "name": "ProductCode",
+          "type": "String"
+        }
+      ]
+    },
+    "dbConnection": "mes_core",
+    "inEnable": true,
+    "inStandard": 0,
+    "labelText": "",
+    "productLineID": 0,
+    "productMoldeID": null
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\tdb \u003d self.custom.dbConnection\n\tself.custom.data \u003d mes_core.model.getProductCodeLine(dbConnection \u003d db, nodeID \u003d self.params.nodeID, disable \u003d 1)"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "function": "Crear",
+    "lineName": "",
+    "nodeID": 4,
+    "selection": {
+      "selDisable": true,
+      "selID": "",
+      "selProductLineID": "",
+      "selStandardRate": "",
+      "selStandardRateID": ""
+    }
+  },
+  "propConfig": {
+    "custom.data": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.inEnable": {
+      "binding": {
+        "config": {
+          "path": "/root/MainContainer/CapWeight_Container/Checkbox_Enable.props.selected"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.inStandard": {
+      "binding": {
+        "config": {
+          "path": "/root/MainContainer/CapWeight_Container/CapContainer/TextField_Cap.props.text"
+        },
+        "transforms": [
+          {
+            "code": "\ttry: return int(value)\n\texcept: return 0",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.labelText": {
+      "persistent": true
+    },
+    "custom.productLineID": {
+      "binding": {
+        "config": {
+          "path": "/root/MainContainer/SelectContainer/AssignContainer/Dropdown_Assign.props.value"
+        },
+        "transforms": [
+          {
+            "code": "\ttry: return int(value)\n\texcept: return 0",
+            "type": "script"
+          }
+        ],
+        "type": "property"
+      },
+      "onChange": {
+        "enabled": null,
+        "script": "\tdb \u003d self.custom.dbConnection\n\tlineID \u003d self.params.lineID\n\tproductCodeLineID \u003d currentValue.value\n\ttry :\n\t\tds \u003d mes_core.model.getProductCodeMoldeIDByLineAndProductCodeLine(lineID, productCodeLineID, dbConnection \u003d db)\n\t\tself.custom.productMoldeID \u003d ds.getValueAt(0,\u0027ProductCodeMoldeID\u0027)\n\texcept:\n\t\tself.custom.productMoldeID \u003d None"
+      },
+      "persistent": true
+    },
+    "params.function": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.lineName": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.nodeID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.selection": {
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 250,
+      "width": 581
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Spacer_L"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Spacer_0"
+            },
+            "position": {
+              "basis": "32px"
+            },
+            "props": {
+              "textStyle": {
+                "color": "#FF0000"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Assign"
+                    },
+                    "position": {
+                      "basis": "51px"
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.lineName"
+                          },
+                          "enabled": false,
+                          "transforms": [
+                            {
+                              "code": "\treturn \u0027Asignar producto a linea \u0027+ value",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "text": "Asignar producto ",
+                      "textStyle": {
+                        "classes": "text-titles-2",
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tself.view.custom.labelText \u003d \u0027\u0027"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "Dropdown_Assign"
+                    },
+                    "position": {
+                      "basis": "47px"
+                    },
+                    "propConfig": {
+                      "props.options": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.data"
+                          },
+                          "type": "property"
+                        }
+                      },
+                      "props.value": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.selection.selProductLineID"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "dropdownOptionStyle": {
+                        "classes": "dropdown-downoptions"
+                      },
+                      "placeholder": {
+                        "text": "Seleccione..."
+                      },
+                      "showClearIcon": true,
+                      "style": {
+                        "classes": "dropdown"
+                      }
+                    },
+                    "type": "ia.input.dropdown"
+                  }
+                ],
+                "meta": {
+                  "name": "AssignContainer"
+                },
+                "position": {
+                  "basis": "200px",
+                  "grow": 1
+                },
+                "props": {
+                  "direction": "column"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable",
+                  "visible": false
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "#555555"
+                    }
+                  },
+                  "selected": true,
+                  "text": "Habilitado",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              }
+            ],
+            "meta": {
+              "name": "SelectContainer"
+            },
+            "position": {
+              "basis": "200px"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Spacer_3"
+            },
+            "position": {
+              "basis": "32px"
+            },
+            "props": {
+              "textStyle": {
+                "color": "#FF0000"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_Cap"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "props": {
+                      "text": "Velocidad estandar",
+                      "textStyle": {
+                        "classes": "text-titles-2",
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "events": {
+                      "dom": {
+                        "onClick": {
+                          "config": {
+                            "script": "\tself.view.custom.textLabel \u003d \u0027\u0027"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "TextField_Cap"
+                    },
+                    "position": {
+                      "basis": "32px",
+                      "shrink": 0
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "path": "view.params.selection.selStandardRate"
+                          },
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "placeholder": "Ingrese valor",
+                      "style": {
+                        "backgroundColor": "--cla-page-bg",
+                        "borderBottomLeftRadius": 5,
+                        "borderBottomRightRadius": 5,
+                        "borderTopLeftRadius": 5,
+                        "borderTopRightRadius": 5,
+                        "color": "000000",
+                        "marginBottom": 5,
+                        "marginLeft": 5,
+                        "marginRight": 5,
+                        "marginTop": 5
+                      }
+                    },
+                    "type": "ia.input.text-field"
+                  }
+                ],
+                "meta": {
+                  "name": "CapContainer"
+                },
+                "position": {
+                  "basis": "200px"
+                },
+                "props": {
+                  "direction": "column",
+                  "justify": "center",
+                  "style": {
+                    "overflow": "hidden"
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_1"
+                },
+                "position": {
+                  "basis": "50px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_2"
+                },
+                "position": {
+                  "basis": "50px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "meta": {
+                  "name": "Checkbox_Enable"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "propConfig": {
+                  "props.enabled": {
+                    "binding": {
+                      "config": {
+                        "path": ".../Dropdown_Material.props.value"
+                      },
+                      "enabled": false,
+                      "transforms": [
+                        {
+                          "code": "\treturn False if not value else True",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.selected": {
+                    "binding": {
+                      "config": {
+                        "path": "view.params.selection.selDisable"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\treturn bool(value)",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "checkedIcon": {
+                    "color": {
+                      "enabled": "--cla-text-data"
+                    }
+                  },
+                  "indeterminateIcon": {
+                    "style": {
+                      "color": "--cla-text"
+                    }
+                  },
+                  "style": {
+                    "color": "--cla-text-title",
+                    "fontFamily": "Arial"
+                  },
+                  "text": "Habilitado",
+                  "textPosition": "top"
+                },
+                "type": "ia.input.checkbox"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_3"
+                },
+                "position": {
+                  "basis": "50px"
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "CapWeight_Container"
+            },
+            "position": {
+              "basis": "64px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Spacer_4"
+            },
+            "position": {
+              "basis": "32px"
+            },
+            "props": {
+              "textStyle": {
+                "color": "#FF0000"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "Spacer_L"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "draggable": false,
+                        "id": "createeditline",
+                        "modal": true,
+                        "overlayDismiss": true,
+                        "resizable": false,
+                        "showCloseIcon": true,
+                        "type": "close",
+                        "viewPath": "Page/PopUps/CreateOrEditStandardLine-Clarios",
+                        "viewportBound": false
+                      },
+                      "scope": "C",
+                      "type": "popup"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button_Cancel"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "props": {
+                  "image": {
+                    "icon": {
+                      "path": "material/cancel_presentation"
+                    },
+                    "width": 15
+                  },
+                  "style": {
+                    "classes": "button-2"
+                  },
+                  "text": "Cancelar"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_M"
+                },
+                "position": {
+                  "basis": "50px"
+                },
+                "type": "ia.display.label"
+              },
+              {
+                "events": {
+                  "dom": {
+                    "onClick": {
+                      "config": {
+                        "script": "\tdb \u003d self.view.custom.dbConnection\n\ttable \u003d mes_core.model.standardrateTable(db)\n\tfunction \u003d self.view.params.function\n\tproductLineID \u003d self.view.custom.productLineID\n\tdisable \u003d self.view.custom.inEnable\n\tlineName \u003d self.view.params.lineName\n\tlineID \u003d self.view.params.lineID\n\tselID \u003d self.view.params.selection.selID\n\tstandardRate \u003d self.view.custom.inStandard\n\tproductMoldeID \u003d self.view.custom.productMoldeID\n\n\tif not productLineID:\n\t\tself.view.custom.labelText \u003d \u0027Selecione un producto a asignar\u0027\n\t\treturn 0\n\telif standardRate \u003c 1: \n\t\tself.view.custom.labelText \u003d \u0027La velocidad Estandar debe ser mayor o igual a 1\u0027\n\t\treturn 0\n\telif  productMoldeID is None:\n\t\tself.view.custom.labelText \u003d \u0027No hay un molde asignado a este producto\u0027\n\t\treturn 0\n\telif function \u003d\u003d \"Crear\": #First function Crear:\n\t\tcondition, ids \u003d table.validateColumn({\u0027ProductCodeLineID\u0027:productLineID})\n\t\t\n\t\tif condition:\n\t\t\tself.view.custom.labelText \u003d \u0027Ya existe una relacion con este producto\u0027\n\t\t#message \u003d \u0027Almacen Destino \"{}\" asignado a la linea \"{}\" correctamente\u0027.format(inputVal, lineName)\n\t\telse:\n\t\t\ttable.insert(productcodelineid \u003d productLineID, productcodemoldeid \u003d productMoldeID,standardrate \u003d standardRate, disable \u003d disable)\n\t\t\tsystem.perspective.closePopup(\"createeditline\")\n\t\t\tmessage \u003d \u0027Relacion creada correctamente\u0027\n\t\t\t# Pop up for succesful transaction\n\t\t\talerts.actionSuccess(title\u003d\u0027Relacion creada\u0027, \n\t\t\t\t\t\t\t\tmessage\u003dmessage)\n\t\t\t\t\t\t\t\n\t\t\t# Refresh table after query\n\t\t\tsystem.perspective.sendMessage(\"refreshTableStandardRate\", payload\u003d{})\n\t\t\n\telif self.view.params.function \u003d\u003d \"Editar\": #Second function editar\n\t\tcondition, ids \u003d table.validateColumn({\u0027ProductCodeLineID\u0027:productLineID})\n\t\tif condition and selID not in ids:\n\t\t\tself.view.custom.labelText \u003d \u0027Ya existe una relacion con este producto\u0027\n\t\t\treturn 0\n\t\telse:\n\t\t\t\n\t\t\ttable.updateID(selID,{\u0027ProductCodeLineID\u0027:productLineID,\u0027ProductCodeMoldeID\u0027:productMoldeID,\u0027Disable\u0027:disable,\u0027StandardRate\u0027:standardRate})\n\t\t\t# Pop up for succesful transaction\n\t\t\tmessage \u003d \u0027Relacion editada correctamente\u0027\n\t\t\talerts.actionSuccess(title\u003d\u0027Relacion editada\u0027, \n\t\t\t\t\t\t\t\tmessage\u003dmessage)\n\t\t\tsystem.perspective.closePopup(\"createeditline\")\n\t\t\t\t\t\t\t\t\n\t\t\t# Refresh table after query\n\t\t\tsystem.perspective.sendMessage(\"refreshTableStandardRate\", payload\u003d{})"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "Button_CreateEdit"
+                },
+                "position": {
+                  "basis": "100px",
+                  "grow": 1
+                },
+                "props": {
+                  "image": {
+                    "icon": {
+                      "path": "material/assignment_turned_in"
+                    },
+                    "width": 15
+                  },
+                  "style": {
+                    "classes": "button-1"
+                  },
+                  "text": "Asignar"
+                },
+                "type": "ia.input.button"
+              },
+              {
+                "meta": {
+                  "name": "Spacer_R"
+                },
+                "position": {
+                  "basis": "50px",
+                  "grow": 1
+                },
+                "type": "ia.display.label"
+              }
+            ],
+            "meta": {
+              "name": "Button_Container"
+            },
+            "position": {
+              "basis": "56px",
+              "shrink": 0
+            },
+            "props": {
+              "justify": "center",
+              "style": {
+                "classes": "Utilities/p-8",
+                "overflow": "hidden"
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "meta": {
+              "name": "Spacer_5"
+            },
+            "position": {
+              "basis": "32px"
+            },
+            "props": {
+              "textStyle": {
+                "color": "#FF0000"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Message"
+            },
+            "position": {
+              "basis": "32px"
+            },
+            "propConfig": {
+              "props.text": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.labelText"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "textStyle": {
+                "color": "#FF0000",
+                "textAlign": "center"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Spacer_1"
+            },
+            "position": {
+              "basis": "32px"
+            },
+            "props": {
+              "textStyle": {
+                "color": "#FF0000"
+              }
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "MainContainer"
+        },
+        "position": {
+          "basis": "363px",
+          "grow": 1
+        },
+        "props": {
+          "direction": "column",
+          "style": {
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Spacer_R"
+        },
+        "position": {
+          "basis": "32px"
+        },
+        "type": "ia.display.label"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "classes": "container-borders-dautom-widget",
+        "overflow": "hidden"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

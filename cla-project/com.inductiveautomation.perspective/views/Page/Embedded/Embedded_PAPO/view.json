@@ -1,8 +1,10 @@
 {
   "custom": {
+    "dbConnection": "papo_db",
     "refreshStatus": false,
     "timeFormated": "00h 10m",
-    "viewDigitalization": "/nodeID/value/papoID/value/workstationID/value/workstationnodeID/value/digitalization",
+    "topic": null,
+    "viewDigitalization": "/nodeID/1/papoID/value/workstationID/value/workstationnodeID/value/digitalization",
     "viewOn": true
   },
   "events": {
@@ -27,7 +29,7 @@
     "action": "value",
     "minutesSince": 10,
     "name": "value",
-    "nodeID": "value",
+    "nodeID": 1,
     "papoID": "value",
     "reference": "value",
     "status": "value",
@@ -37,10 +39,19 @@
     "workstationnodeID": "value"
   },
   "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
     "custom.refreshStatus": {
       "onChange": {
         "enabled": null,
-        "script": "\timport time\n\tstatusView \u003d self.custom.viewOn\n\tif statusView:\n\t\ttime.sleep(1)\n\t\t\t\n\t\tlistCustom \u003d [\n\t\t    \n\t\t    \"viewDigitalization\"\n\t\t]\n\t\tfor path in listCustom:\n\t\t    self.view.refreshBinding(\"custom.{}\".format(path))\n\t\t    \n\t\tself.custom.refreshStatus \u003d False\n\telse:\n\t\tNone"
+        "script": "\timport time\n\tstatusView \u003d self.custom.viewOn\n\tif statusView:\n\t\ttime.sleep(1)\n\t\t\t\n\t\tlistCustom \u003d [\n\t\t    \n\t\t    \"viewDigitalization\",\n\t\t    \"topic\"\n\t\t]\n\t\tfor path in listCustom:\n\t\t    self.view.refreshBinding(\"custom.{}\".format(path))\n\t\t    \n\t\tself.custom.refreshStatus \u003d False\n\telse:\n\t\tNone"
       },
       "persistent": true
     },
@@ -55,6 +66,26 @@
         "transforms": [
           {
             "code": "\tmins \u003d value[\"mins\"]\n\tminsFormated \u003d utils.minutesformat(mins)\n\treturn str(minsFormated)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.topic": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "nodeID": "{view.params.nodeID}",
+            "workstationID": "{view.params.workstationID}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tdbConnection \u003d value[\"dbConnection\"]\n\tnodeID \u003d value[\"nodeID\"]\n\tworkstationID \u003d value[\"workstationID\"]\n\t\n\tquery \u003d \"SELECT topic from node where ID \u003d ?\"\n\targs \u003d [nodeID]\n\tdata \u003d system.db.runPrepQuery(query, args, dbConnection)\n\ttopic \u003d data.getValueAt(0, 0)\n\t\n\tif workstationID:\n\t\tquery2 \u003d \"SELECT Description FROM workstation WHERE ID \u003d ?\"\n\t\targs2 \u003d [workstationID]\n\t\tdata2 \u003d system.db.runPrepQuery(query2, args2, dbConnection)\n\t\tif data2.getRowCount() \u003e 0:\n\t\t\treturn \"De: \" + topic + \"/\" + data2.getValueAt(0, 0)\n\t\n\treturn \"De: \" + topic",
             "type": "script"
           }
         ],
@@ -138,8 +169,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 285,
-      "width": 345
+      "height": 274,
+      "width": 431
     }
   },
   "root": {
@@ -178,8 +209,7 @@
           "name": "FlexContainer_3"
         },
         "position": {
-          "basis": "50px",
-          "grow": 1,
+          "basis": "40px",
           "shrink": 0
         },
         "props": {
@@ -195,7 +225,6 @@
           "name": "Label_3"
         },
         "position": {
-          "basis": "30px",
           "grow": 1,
           "shrink": 0
         },
@@ -257,7 +286,7 @@
           "name": "FlexContainer_4"
         },
         "position": {
-          "basis": "40px",
+          "basis": "30px",
           "grow": 1,
           "shrink": 0
         },
@@ -400,7 +429,7 @@
           "name": "FlexContainer_6"
         },
         "position": {
-          "basis": "35px",
+          "basis": "30px",
           "grow": 1,
           "shrink": 0
         },
@@ -466,7 +495,7 @@
           "name": "FlexContainer_7"
         },
         "position": {
-          "basis": "35px",
+          "basis": "30px",
           "grow": 1,
           "shrink": 0
         },
@@ -476,6 +505,42 @@
           }
         },
         "type": "ia.container.flex"
+      },
+      {
+        "meta": {
+          "name": "Label_4"
+        },
+        "position": {
+          "basis": "11px",
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.text": {
+            "binding": {
+              "config": {
+                "path": "view.custom.topic"
+              },
+              "transforms": [
+                {
+                  "code": "\ttry:\n\t\treturn value\n\texcept:\n\t\treturn None",
+                  "type": "script"
+                }
+              ],
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "style": {
+            "color": "#808080",
+            "paddingBottom": 0
+          },
+          "textStyle": {
+            "fontSize": 10,
+            "textAlign": "center"
+          }
+        },
+        "type": "ia.display.label"
       }
     ],
     "custom": {

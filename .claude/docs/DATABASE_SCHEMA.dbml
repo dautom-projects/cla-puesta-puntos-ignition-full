@@ -1,0 +1,253 @@
+// papo_db - generated from live schema
+// Generated: 2026-10-22 05:28
+
+Table fa_cpk_nivel_specs {
+  "id" int [pk, increment, not null]
+  "referencia" varchar(100) [not null]
+  "nominal" decimal [null]
+  "lsl_inicial" decimal [null]
+  "usl_inicial" decimal [null]
+  "lsl_final" decimal [null]
+  "usl_final" decimal [null]
+  "created_at" datetime [not null, default: `getdate()`]
+  "receta_sli" int [null]
+  "receta_hd" int [null]
+
+  Note: '''Rows: 182'''
+}
+
+Table fa_cpk_program_specs {
+  "id" int [pk, increment, not null]
+  "linea" varchar(20) [not null]
+  "programa_num" int [not null]
+  "nombre" varchar(100) [not null]
+  "ocv_lsl" decimal [null]
+  "ocv_usl" decimal [null]
+  "hrdv_lsl" decimal [null]
+  "hrdv_usl" decimal [null]
+  "created_at" datetime [not null, default: `getdate()`]
+
+  Note: '''Rows: 515'''
+}
+
+Table node {
+  "ID" int [pk, increment, not null]
+  "Selectable" tinyint [not null]
+  "Type" varchar(255) [null]
+  "DisplayName" varchar(255) [null]
+  "ParentNodeID" int [null]
+  "Name" varchar(255) [null]
+  "Topic" varchar(255) [null]
+
+  Note: '''Plant hierarchy: ENTERPRISE > SITE > AREA > LINE > CELL (self-reference via ParentNodeID). Rows: 81'''
+}
+
+Table nodepapo {
+  "ID" int [pk, increment, not null]
+  "NodeID" int [not null]
+  "PapoID" int [not null]
+
+  Note: '''Form assignment to nodes. Rows: 88'''
+}
+
+Table papo {
+  "ID" int [pk, increment, not null]
+  "Description" varchar(255) [not null]
+  "Reference" varchar(255) [not null]
+  "MasterPapoID" int [null]
+
+  Note: '''Form catalog (Reference e.g. EA11-0901). Records with MasterPapoID inherit questions from the master and have no papoitem rows. Rows: 74'''
+}
+
+Table papoitem {
+  "ID" int [pk, increment, not null]
+  "RegisterTypeID" int [not null]
+  "PapoID" int [not null]
+  "Description" nvarchar(max) [null]
+  "AnswerType" varchar(10) [not null]
+
+  Note: '''Questions of each form. Rows: 3210'''
+}
+
+Table papoitem_registertype {
+  "PapoItemID" int [pk, not null]
+  "RegisterTypeID" int [pk, not null]
+
+  Note: '''Many-to-many papoitem <-> registertype. Rows: 3954'''
+}
+
+Table registerhistory {
+  "ID" int [pk, increment, not null]
+  "Timestamp" datetime [not null]
+  "DataAnswer" varchar(max) [null]
+  "Status" varchar(50) [null]
+  "PapoID" int [not null]
+  "RegisterTypeID" int [not null]
+  "User" varchar(100) [not null]
+  "WorkstationNodeID" int [not null]
+  "NodeID" int [not null]
+  "WorkstationID" int [not null]
+  "RegisterCode" int [not null, default: `0`]
+
+  Note: '''Every form record. DataAnswer is JSON {items:[{papoItemID, answer, registerTypeID}, ..., {insights, registerTypeID, user, timestamp}]}. RegisterCode identifies a cycle per WorkstationNodeID+PapoID; read the latest with ORDER BY RegisterCode DESC, never by Timestamp. Row Timestamp is the authoritative time for shift calculation. Rows: 2895'''
+}
+
+Table registertype {
+  "ID" int [pk, increment, not null]
+  "Description" varchar(255) [not null]
+
+  Note: '''Rows: 22'''
+}
+
+Table roles {
+  "ID" int [pk, increment, not null]
+  "RoleName" varchar(50) [not null]
+  "Description" varchar(255) [null]
+
+  Note: '''Rows: 7'''
+}
+
+Table scada_roles {
+  "id" int [pk, increment, not null]
+  "role_name" nvarchar(255) [not null]
+
+  Note: '''Rows: 0'''
+}
+
+Table scada_user_ci {
+  "id" int [pk, increment, not null]
+  "user_id" int [not null]
+  "contact_type" nvarchar(255) [not null]
+  "contact_value" nvarchar(255) [null]
+  "sort_order" int [null]
+
+  Note: '''Rows: 0'''
+}
+
+Table scada_user_ex {
+  "id" int [pk, increment, not null]
+  "user_id" int [not null]
+  "prop_name" nvarchar(255) [not null]
+  "prop_value" nvarchar(255) [null]
+
+  Note: '''Rows: 0'''
+}
+
+Table scada_user_rl {
+  "user_id" int [not null]
+  "role_id" int [not null]
+
+  Note: '''WARNING: no primary key defined. Rows: 0'''
+}
+
+Table scada_user_sa {
+  "id" int [pk, increment, not null]
+  "user_id" int [not null]
+  "start_date" datetime [null]
+  "end_date" datetime [null]
+  "is_available" int [null]
+  "entry_note" nvarchar(255) [null]
+
+  Note: '''Rows: 0'''
+}
+
+Table scada_users {
+  "id" int [pk, increment, not null]
+  "username" nvarchar(255) [not null]
+  "passwd" nvarchar(255) [not null]
+  "fname" nvarchar(255) [null]
+  "lname" nvarchar(255) [null]
+  "notes" nvarchar(255) [null]
+  "schedule" nvarchar(255) [null]
+  "language" nvarchar(255) [null]
+  "badge" nvarchar(255) [null]
+
+  Note: '''Rows: 0'''
+}
+
+Table user_roles {
+  "UserID" int [pk, not null]
+  "RoleID" int [pk, not null]
+
+  Note: '''Rows: 671'''
+}
+
+Table users {
+  "ID" int [pk, increment, not null]
+  "Username" varchar(50) [not null]
+  "Password" varchar(255) [not null]
+  "FirstName" varchar(100) [null]
+  "LastName" varchar(100) [null]
+  "Email" varchar(255) [null]
+  "Schedule" varchar(50) [null]
+  "Language" varchar(10) [null]
+  "Notes" varchar(max) [null]
+  "Enabled" bit [not null, default: `1`]
+  "Badge" varchar(50) [null]
+
+  Note: '''Rows: 336'''
+}
+
+Table workstation {
+  "ID" int [pk, increment, not null]
+  "Description" varchar(255) [null]
+  "Hostname" varchar(50) [not null, default: '']
+  "IpAddress" varchar(255) [not null, default: '']
+
+  Note: '''Terminals; IpAddress used for Supervisor_PAPO signature validation. Rows: 47'''
+}
+
+Table workstationnode {
+  "ID" int [pk, increment, not null]
+  "NodeID" int [not null]
+  "WorkstationID" int [not null]
+
+  Note: '''Workstation assignment to nodes. A form card exists per workstationnode with a type 12 record. Rows: 69'''
+}
+
+// Logical relations (no FK constraint in the database)
+Ref: node."ParentNodeID" > node."ID"
+Ref: nodepapo."NodeID" > node."ID"
+Ref: nodepapo."PapoID" > papo."ID"
+Ref: papo."MasterPapoID" > papo."ID"
+Ref: papoitem."PapoID" > papo."ID"
+Ref: papoitem."RegisterTypeID" > registertype."ID"
+Ref: papoitem_registertype."PapoItemID" > papoitem."ID"
+Ref: papoitem_registertype."RegisterTypeID" > registertype."ID"
+Ref: workstationnode."NodeID" > node."ID"
+Ref: workstationnode."WorkstationID" > workstation."ID"
+Ref: registerhistory."PapoID" > papo."ID"
+Ref: registerhistory."RegisterTypeID" > registertype."ID"
+Ref: registerhistory."WorkstationNodeID" > workstationnode."ID"
+Ref: registerhistory."NodeID" > node."ID"
+Ref: registerhistory."WorkstationID" > workstation."ID"
+
+// registertype catalog
+//   1 = Una hora
+//   2 = Dos horas
+//   3 = Media hora
+//   4 = Cuatro horas
+//   5 = Cambio de referencia
+//   6 = Mantenimiento
+//   7 = Inicio de turno
+//   8 = Fin de turno
+//   9 = Mitad de turno
+//   10 = Firma
+//   11 = Diario
+//   12 = Idle
+//   13 = Al inicio, cada cambio de referencia, despuÃ???Ã??Ã?Â©s de un mantenimiento y cada 30 minutos
+//   14 = Rechazos
+//   15 = Hallazgo
+//   16 = Ingreso de  baterias
+//   17 = Salida de baterias
+//   18 = Defectos
+//   19 = Paro
+//   20 = Barcada
+//   1000 = Deprecated
+//   1001 = Item
+
+// registerhistory.Status values in use
+//   En proceso (1544 rows)
+//   Finalizado (671 rows)
+//   Sin Iniciar (584 rows)
+//   Revisado (96 rows)

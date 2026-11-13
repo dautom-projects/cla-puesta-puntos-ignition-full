@@ -1,0 +1,156 @@
+# Verificación de F&A y OREC (2026-10-28)
+
+Pedido del usuario: asegurar que los formularios de F&A y OREC funcionan. Cada PAPO se corrió en el navegador a 1920x1080 con un usuario con sesión iniciada, desde su estación en `Digitalizacion_Template`, con el ciclo completo de un operario: cada botón de registro (Inicio, 30 min, SKU, Mmto, 1 hr, 4 hr, Barcada, Paro, Hallazgo, Nueva Ref., Fin…), todos los campos llenos, Firma Supervisor y Firma Operario. Después:
+
+1. **Registros:** cada registro guardado del ciclo trae exactamente los ítems que recolecta su vista (`papo_core.register.save`), en el mismo orden y sin `papoItemID` nulo; el ciclo cierra (tipo 12) con las dos firmas.
+2. **PDF:** el PDF del ciclo, abierto desde Gestión, se compara casilla por casilla con lo guardado: cada `@grupo.papoItemIDn@` muestra la respuesta y cada marca (Cumple / No cumple, Bueno / Malo, Si / No) aparece solo cuando la respuesta es esa.
+
+Herramientas en el scratchpad de la sesión (`verify/`: `run.js`, `check.py`, `plan.json`); no están en el repo.
+
+## Resultado
+
+47 PAPOs (los 19 de F&A y los 28 de OREC) con el ciclo completo: **0 diferencias** en los registros y **0 diferencias** en los PDF.
+
+| Área | PAPOs | Registros | PDF |
+|---|---|---|---|
+| F&A | AC10-0201, AC10-0202-HD, AC10-0202-SLI, AC10-0301, AC10-0501, AC10-0801, AC10-1003, AC10-1101, AC10-1801, CA02-2102, CG10-0101, FO10-0100, FO10-0601, FO10-1701, FO10-1701-1, GR10-0501, PT11-0104, TE11-0601, TE11-2601 (19) | iguales a la vista | sin diferencias |
+| OREC | CI11-0101, CU11-0101, EC07-0101, EC11-0101, EJ07-0101, EJ11-0101, EJ11-0102, MZ07-0101, MZ11-0101, PO07-0101, PO11-0101-1…4, RJ11-0101-1…12, SO02-4502, RJ07-0101 (28) | iguales a la vista | sin diferencias |
+
+AC10-0202-SLI, FO10-0100 y GR10-0501 se corrieron antes de sus correcciones del mismo día (checkbox de llenado, tabla de ingresos y total, rotación con fecha e inventario final); esos cambios se probaron aparte en el navegador (ver sus informes en esta carpeta).
+
+## Operario y supervisor en el PDF
+
+Revisadas también las casillas de quien guardó y firmó (2026-10-28, a pedido del usuario):
+
+- **Quien guardó cada registro** (`register1.user`, `shift1.user`, `endShift1.user`…): sale el nombre ("Soporte D.") en los 47; las que quedan vacías son de registros que el ciclo no tuvo (p. ej. `register2`…`register9` de FO10-1701-1)
+- **Supervisor** (`firmaAdministratorN`): sale el nombre en todos
+- **Operario** (`firmaOperator`): vacía en AC10-0301, AC10-0501, AC10-1003, CA02-2102, FO10-0601, TE11-2601 y EC07-0101 (FO10-0100 imprime `<N/A>`). No es el reporte: el reporte pone cada firma según el rol guardado con ella (`Operator` → operario, `Supervisor_PAPO` → supervisor) y el usuario de prueba de develop (admin, "Soporte D.") tiene Administrator y Supervisor_PAPO, no Operator, así que su firma de operario cae en la casilla del supervisor
+- Comprobado con ciclos firmados por operarios reales de la base de prueba, abiertos desde Gestión: AC10-0501 del 25/06 (parredhe, modo `roleLast`) imprime "Hernan Arredondo" y CA02-2102 del 25/06 (bsalinm2, modo `role`) imprime "Mauricio Salinas", el nombre y apellido guardados en su firma. Los 7 reportes usan uno de esos dos modos; CG10-0101 (modo `status`) ya la llena en develop
+
+## Firmas con usuarios de prueba con rol (2026-10-28)
+
+En la fuente `default` del gateway (la del inicio de sesión) se crearon `qa.operario` ("QA Operario"; Operator, OREC) y `qa.supervisor` ("QA Supervisor"; Supervisor_PAPO); contraseñas en `~/.config/papo-sql/papo_test_users.env`, fuera del repo.
+
+- **Operario:** con la sesión de `qa.operario` se guardó un registro y se firmó en EA11-0901 (estación 1) y AC10-0501 (estación 38). La firma queda con `role: ["Operator","OREC"]` y el PDF imprime "QA Operario" en la casilla del operario en los dos, también en AC10-0501, uno de los 7 que salían vacíos con admin (registros 8431–8434 y el ciclo de AC10-0501 del 28/10 23:07)
+- **Supervisor desde el popup:** la contraseña pasa (`system.security.validateUser`, fuente de la sesión), pero los roles se leen de `session.custom.userSource` = "ClariosAD" y `qa.supervisor` no existe ahí: "El usuario qa.supervisor no cuenta con los permisos para firmar". ClariosAD solo existe en producción
+- **Popup completo con la fuente apuntada a `default` (temporal, revertido):** con `userSource` = "default" en las session props (sesión nueva) y la sesión de `qa.operario`, en AC10-0501 (estación 38, workstation 31):
+  - rol Supervisor_PAPO aceptado y **validación de IP correcta**: "Estación no válida" desde este navegador (192.168.65.1 contra 10.69.195.88 de la estación)
+  - con la IP de la estación puesta un momento en 192.168.65.1: "Firma Exitosa"; el Revisado queda con `role: ["Supervisor_PAPO"]`, "QA Supervisor" (registro 8439; hora del servidor SQL en UTC, como ya está en el BACKLOG)
+  - firma del operario y PDF desde Gestión: operario "QA Operario" y supervisor "QA Supervisor"
+  - restaurados: `userSource` = "ClariosAD" (git limpio) e IP 10.69.195.88
+
+## Las otras áreas con el comparador nuevo (2026-10-28)
+
+Los PDF de la prueba general (Ensamble, Metalurgia, General / POLY / Cubiertas, capturados el 2026-10-28 00:10–00:20 para comparar los reportes con `build()`) se volvieron a revisar con las marcas y las casillas de usuario y firma, que el comparador de esa prueba no miraba:
+
+- **Marcas:** 0 diferencias en las 456 revisadas (EA11-1101, FU11-0101, PA11-0301, RE10-0102, RE11-0101, TR11-0101). PA11-0301 imprime ✘ en las Cumple de su copia `startShiftmodes`: es el modo "mark" (equis en Cumple, blanco en No Cumple), como está definido
+- **Quien guardó y supervisor:** con nombre en todos; la firma del operario vacía por el mismo motivo del rol en develop
+- **Valores:** EA11-1101 y EA11-1601 tuvieron registros nuevos en su ciclo después de capturar el PDF (no se comparan); RE11-0101 4404 es el ítem guardado dos veces que ya está en el BACKLOG
+- **EA11-0901:** guardaba el supervisor con `papoItemID` nulo; corregido (10938, `EA11-0901-supervisor.md`)
+
+## Cierre automático en el gateway (2026-10-28)
+
+La corrida de las 14:10 fue con `papo_core.sign` v1.3.0 y cerró los 8 ciclos que estaban abiertos y habían empezado antes de las 14:00 (los 7 en "Revisado" de junio y julio, y FO10-0100 de la estación 13), con el turno del ciclo en el comentario y la firma a nombre del operario del último formulario. Dejó abierto FO10-0100 de la estación 44 (ciclo sin formularios). A esa hora no había ciclos abiertos de Granja ni de Metalurgia: las exclusiones quedan probadas solo con los tests. A las 22:10 no corrió (la prueba gratuita del gateway estaba vencida).
+
+### Simulación del cierre (2026-10-29)
+
+Para no esperar a las 14:10 se insertaron ciclos de prueba con la hora atrasada (comentario "Simulacion QA cierre automatico") y se corrió `papo_core.sign.autoCloseOpenForms("papo_db")` a las 09:14 desde una página temporal del gateway (ya borrada; el turno en curso es el 2, que empieza a las 06:00). Resultado "Cerrados: 3":
+
+| Ciclo de prueba | Esperado | Resultado |
+|---|---|---|
+| AC10-0801 est. 39, Inicio 05:30 | cerrar | cerrado, "T: 1", a nombre de QA Operario (8458–8459) |
+| EJ11-0102 est. 17, Inicio 05:00 y Revisado 05:40 | cerrar a nombre del operario | cerrado, "T: 1", QA Operario y no el supervisor (8454–8455) |
+| CU11-0101 est. 21, Inicio 06:30 | no tocar (turno en curso) | abierto |
+| PT11-0104 est. 11 (Granja de ácidos) | no tocar | abierto |
+| FU10-0202 est. 68 (Metalurgia) | no tocar | abierto |
+| FO10-0100 est. 44 (ciclo sin formularios) | no tocar | abierto |
+
+También cerró AC10-1801 de la estación 14 ("T: 3"), un ciclo real que quedó abierto el 28/10. Con Gestión abierta en dos sesiones, su firma automática NA insertó dos "Revisado" por ciclo en los ciclos atrasados (8448–8453, también en Granja y Metalurgia); ya estaba en el BACKLOG.
+
+## Firmas, permisos y guardados (2026-10-29)
+
+Con `qa.operario`, admin y sin sesión, a 1920x1080. Las IP de las estaciones se cambiaron un momento a la de este navegador (192.168.65.1) y se restauraron.
+
+**Firmar desde Gestión**
+
+- Sin fila elegida: "Selección no válida" (el script no tiene `return` después del aviso)
+- Admin desde un PC que no es la estación: "No se encuentra en la estación…". Gestión no exime a Administrator de la IP, el popup sí; tampoco acepta INTEGRADOR (solo Administrator y Supervisor_PAPO)
+- Con la IP de la estación: "Formulario firmado" (8460). **Se puede firmar otra vez el mismo ciclo** (8461): el "Revisado" lleva la hora UTC del servidor SQL, 5 h adelante, y Gestión filtra hasta la hora actual, así que la fila sigue en "En proceso"
+- `qa.operario`: "Usuario no cuenta con los permisos suficientes para firmar"
+- Sin sesión: Gestión muestra los datos y Firmar no hace nada visible ni inserta nada
+
+**Overview del operario**
+
+- Con una IP que no es de ninguna estación: sin tarjetas y el menú solo con "Formularios Puesta Punto"
+- Con la IP de la estación 16: solo la tarjeta de CU11-0101 de esa estación. La etiqueta dice "Workstation no registrada, IP: 16" justo cuando la encontró (el transform está invertido) y la tarjeta marcó "Idle (05h 01m)" para un registro de hace un minuto (el tag `Papos_Info` no está en el repo; probablemente calcula con la hora UTC del servidor SQL)
+
+**Doble clic y firmas seguidas**
+
+- Doble clic en "Si" del aviso de guardar (AC10-0501 est. 38): **dos registros iguales** (8462 y 8463, 33 ms entre uno y otro)
+- Doble clic en "Si" de Firma Operario: **dos "Finalizado" del ciclo 5 y dos "Sin Iniciar" del 6** (8464–8467)
+- El botón principal de `Alerts/alert` envía el mensaje en `onClick` antes de cerrar el popup y nada impide un segundo envío. Dos sesiones guardando o firmando a la vez en la misma estación no aplica: cada estación tiene un solo PC. Corregido el mismo día (`Alerts/alert` envía la acción una sola vez; 8479–8481)
+- **Firma del operario en el ciclo equivocado** (CU11-0101 est. 21): tras la firma de Gestión del ciclo 10 (hora UTC, 14:20), el operario firmó el 10 (8468–8469), guardó un Inicio del 11 (8470) y firmó otra vez: el "Finalizado" quedó con el código 10 (8471) y el ciclo 11 sigue abierto. `signOperator` de `Page/Digitalizacion_Template` toma el último código por `Timestamp DESC` (papo-lint ya lo marcaba) y gana el "Revisado" adelantado. En producción pasa si el servidor SQL no está en la hora de Bogotá
+
+## PDF: casos borde (2026-10-29)
+
+Ciclos armados en AC10-0501 est. 38 (códigos 8–12, registros 8482–8515) copiando registros reales (Inicio 8476, una Media hora, la firma de `qa.operario` y la del supervisor del Template) con otra hora y otros textos; PDF desde Gestión. Además, los ciclos del cierre automático simulado (AC10-0801, EJ11-0102, AC10-1801).
+
+| Caso | Resultado |
+|---|---|
+| Cierre automático (ciclo 10) | OPERARIO vacío: la firma del cierre guarda `role: "SYSTEM"` y el reporte llena la casilla solo con `Operator`. El comentario "Cierre automatico" no sale (el reporte solo junta los `insights`) y el historial lo muestra como "Firma / Finalizado" de QA Operario: el PDF no dice que el ciclo se cerró solo |
+| Firma del supervisor desde el Template (ciclo 10) | Sale "QA Supervisor", pero el rol se guarda como texto `"<ArrayWrapper>: [u'Supervisor_PAPO']"` (8477) y el reporte lo encuentra porque busca el rol dentro del texto. Gestión y el popup guardan una lista |
+| 16 registros para 12 casillas (ciclo 11) | Salen los 12 primeros (06:50–08:40); los de 08:50 a 09:20 no aparecen en la grilla, solo en Observaciones y en el historial, sin aviso. La casilla 11 tampoco muestra el campo 5621: la plantilla no lo tiene |
+| Textos largos y caracteres especiales (ciclo 12) | El PDF se genera (sin error 500). ñ, tildes, & < > " ' salen bien. Un texto largo en una casilla se corta ("Lote ÁÉÍÓÚ" de 300 caracteres; "MEDIANOCHE" sale "MEDIANOCH"). Observaciones con 700 caracteres se encoge a ~1,6 pt, ilegible; con ~350 (ciclo 11) se lee en 3 líneas |
+| Límites de turno (ciclos 8 y 9) | Correctos: ciclo de 23:50 → FECHA 28/10 y TURNO 1 aunque siga después de medianoche; Inicio 05:58 → TURNO 1 y la Media hora de 06:02 con "T: 2" |
+
+**Cierre automático en el PDF, corregido (2026-10-29).** Decisión del usuario: el aviso sale en la última página y dice que el cierre fue automático; la firma del operario queda vacía, pero el operario sí sale, para saber quién inició el ciclo. `papo_core.report` v2.9.0 llena `data["autoClose"]` y las 65 plantillas lo imprimen. PDF desde Gestión a 1920x1080:
+
+| Ciclo | Resultado |
+|---|---|
+| AC10-0501 est. 38, ciclo 13 (cerrado a las 14:10 por el job real, horizontal, firmas `roleLast`) | Aviso en rojo sobre el historial: "Cierre automático el 29/10/2026 a las 14:10, sin firma del operario. Inició: Soporte D."; la fila del cierre dice "Cierre automático". Página 1: OPERARIO vacío, SUPERVISOR "Soporte D." |
+| CU11-0101 est. 21, ciclo 12 (vertical, firmas `role`) | Mismo aviso con "Inició: QA Operario"; la página 1 sigue mostrando OPERARIO "QA Operario" (`startShift.user`) y SUPERVISOR "QA Supervisor" |
+| EA11-0901 est. 1, ciclo 12 (firmas `status`) | Aviso y fila "Cierre automático"; "Firma operador de turno" ya no imprime "Cierre Automatico"; OPERARIO "Soporte D." en la cabecera |
+| PL11-0101-CA est. 23, ciclo 1 (Pacífico, sin historial; firma de cierre temporal 8522, borrada después) | Aviso bajo "Vo. Bo. LIDER DE LINEA", sin tocar nada |
+| AC10-0501 est. 38 (11:17) y PL11-0101-CA sin cierre automático | Sin aviso; la tabla del historial baja 16 pt, nada más cambia |
+
+Sin abrir con datos: `Cubiertas/PL11-0101` (no tiene ciclos en la base de prueba), donde la caja de Observaciones pasa de 65 a 49 pt para dejar el aviso debajo.
+
+**Más registros que casillas en la base de prueba** (registros anteriores a 8482). No aplica en la planta: un ciclo real nunca pasa de las casillas de su plantilla (el usuario, 2026-10-30).
+
+| Reporte | Sección | Casillas | Máximo en un ciclo | Ciclos que no caben |
+|---|---|---|---|---|
+| AC10-0201 | register (Inicio, 30 min, SKU, Mmto) | 12 | 16 | 23 de 61 |
+| AC10-1101 | register | 12 | 21 | 4 de 23 |
+| AC10-1801 | register | 12 | 15 | 4 de 19 |
+| CA02-2102 | register | 12 | 16 | 2 de 11 |
+| MZ07-0101 | register | 15 | 20 | 1 de 6 |
+| EA11-1501 | 2 hr | 4 | 6 | 1 de 3 |
+
+Secciones de una casilla (Inicio, Fin, 4 hr) con varios registros en el ciclo (de 2 a 5, guardados otra vez): EA11-0901, AC10-0801, AC10-1101, CA02-2102, CG10-0101, PT11-0104, CI11-0101, EC07-0101, EC11-0101, EJ11-0101, MZ07-0101, PO11-0101 y RJ11-0101; el PDF muestra uno solo.
+
+En datos reales las observaciones de un ciclo juntas llegan a 316 caracteres (1 de 487 ciclos pasa de 300): se leen.
+
+**Claves de plantilla, corregido (2026-10-30).** La casilla 11 de AC10-0501 existía con la clave mal escrita (`@register11papoItemID5621@`). Una búsqueda de claves mal formadas en las 65 plantillas (uniendo los tramos de texto de cada casilla) encontró 4, todas corregidas:
+
+| Reporte | Antes | Ahora | PDF desde Gestión |
+|---|---|---|---|
+| AC10-0501 | `@register11papoItemID5621@` | `@register11.papoItemID5621@` | Est. 38, ciclo 11: la casilla 11 muestra "R11" |
+| MZ07-0101 | `@register15papoItemID5228@` | `@register15.papoItemID5228@` | Est. 18, ciclo 6: la casilla 15 muestra "4.3" |
+| TR11-0101 | `@daily6..papoItemID4430@` | `@daily6.papoItemID4430@` | Est. 70, ciclo 2, con una copia temporal del Diario fechada el sábado 31/10 (la casilla de día toma la semana del primer registro): "Sabado: SABADO-QA" |
+| TR11-0102 | `@turno1.dia7 .papoItemID11238@` | `@turno1.dia7.papoItemID11238@` | Est. 70, ciclo 2, con una copia temporal del Inicio fechada el 07/10 a las 03:00: la casilla muestra "0" |
+
+Las copias temporales (8523–8527) se borraron; mientras existieron, `custom.signature` de Gestión firmó tres veces el ciclo de TR11-0101 como NA (8528–8530, también borradas; anotado en el BACKLOG).
+
+AC10-1801 no tenía error: el OPERARIO lee `@endShift1.user@` (y OPERARIO 2, `@endShift2.user@`), así que sale vacío en los ciclos sin Fin de turno y muestra el operario en los que lo tienen.
+
+## AC10-1801, registro de 30 min
+
+En las dos corridas (2026-10-28 09:57 y 16:46) el registro de 30 min se guardó sin llenar: textos vacíos y checkbox en "No Cumple" (solo la Referencia elegida); los de SKU y Mantenimiento, con los mismos 49 ítems, salieron llenos. No es el formulario: llenado a mano a 1920x1080 guarda lo escrito ("PRUEBA1" en Lote batería, "Cumple" en Apariencia del poliblado; registro 8430) y elegir la Referencia no borra los demás campos. Es el llenado automático de la prueba en esa vista (hay dos botones "30 min" en la página). En septiembre, con el formulario original, los operarios sí guardaban esos campos.
+
+Detalles de la prueba que no son errores: en TE11-2601 dos checkbox de "Verificación de línea auxiliar" no tienen texto porque es una grilla (la pregunta está en la etiqueta de la izquierda, como en el original); en TE11-0601 la copia A / R del reporte muestra "A" en las casillas Cumple.
+
+## Hallazgos
+
+- **Ítems que se guardan y el PDF no imprime:** la plantilla original no tiene la casilla (supervisores, EPP de AC10-1003, densidad y penetración de MZ07-0101, textos de hallazgo de SO02-4502…). Lista completa en `items-ajenos.md` ("Casillas que el PDF no tiene"). Decidir con el área si alguno debe salir
+- **Hora de la firma del supervisor:** el "Revisado" se inserta con `CURRENT_TIMESTAMP` del servidor SQL; en develop el servidor está en UTC y queda 5 h adelante del resto del ciclo (EJ07-0101: Fin 15:06, Revisado 20:06). Anotado en el BACKLOG
+- Ya conocidos (BACKLOG): CI11-0101 guarda 4844–4851 dos veces; PO11-0101-N guarda 5168 dos veces y 5169, que no existe en `papoitem`

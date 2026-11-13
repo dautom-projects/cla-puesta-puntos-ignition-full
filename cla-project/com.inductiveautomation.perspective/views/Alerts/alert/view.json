@@ -1,5 +1,7 @@
 {
-  "custom": {},
+  "custom": {
+    "sent": false
+  },
   "events": {
     "system": {
       "onShutdown": {
@@ -564,7 +566,7 @@
               "dom": {
                 "onClick": {
                   "config": {
-                    "script": "\tmessageType \u003d self.view.params.btnActionPrimary\t\n\tsystem.perspective.sendMessage(messageType,payload\u003d{},scope \u003d \"page\")\n\tsystem.perspective.sendMessage(\u0027closePopup\u0027)"
+                    "script": "\t# Send the action only once: a double click fires onClick twice before the popup closes\n\tif self.view.custom.sent:\n\t\treturn\n\tself.view.custom.sent \u003d True\n\tmessageType \u003d self.view.params.btnActionPrimary\t\n\tsystem.perspective.sendMessage(messageType,payload\u003d{},scope \u003d \"page\")\n\tsystem.perspective.sendMessage(\u0027closePopup\u0027)"
                   },
                   "scope": "G",
                   "type": "script"
