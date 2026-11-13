@@ -25,11 +25,10 @@ Regla general: **lo que un recurso llama va antes que el recurso**. Si un paso f
 6. `2026-10-26_preguntas_OREC.sql` (2 `UPDATE`)
 7. `2026-10-27_tildes_papoitem.sql` (tildes y símbolos mal codificados: 62 ítems y `registertype` 13; cada `UPDATE` solo cambia el texto si sigue roto, así que puede ir en cualquier momento)
 
-8. `2026-11-13_codificacion_papoitem.sql` (después de los anteriores): diagnóstico, respaldo (`papoitem_bak_20261113`, `registertype_bak_20261113`) y reparación de los símbolos raros (`VerificaciÃ³n` → `Verificación`) que quedan si un script se ejecutó leyendo el UTF-8 como Windows-1252. Al final lista lo que queda para revisar a mano
 
 F&A y General/POLY/Cubiertas no tienen SQL. Un área puede desplegarse sin las demás, pero siempre con su SQL antes que sus formularios.
 
-**Codificación de los scripts (2026-11-13):** todos los `.sql` son solo ASCII: cada tilde va como `NCHAR(n)` (`N'Verificaci' + NCHAR(243) + N'n'`), así que da igual con qué codificación los abra SSMS o sqlcmd. Antes estaban en UTF-8 sin BOM: abiertos como Windows-1252, escribían `VerificaciÃ³n` en `papoitem` (los símbolos raros que se vieron en producción). Un script nuevo se pasa por `python3 .claude/skills/papo-qa/scripts/sql_encoding.py ascii <archivo.sql>` (`papo_objects.py --questions-sql` ya los genera así).
+**Textos sin tildes ni ñ (2026-11-13, decisión del usuario):** las preguntas de `papoitem` (y `registertype`) van sin tildes ni ñ (`Verificacion`, `Dano`), y los `.sql` son solo ASCII. Así ningún programa (SSMS, sqlcmd) puede volver a escribir símbolos raros como `VerificaciÃ³n`. Un script nuevo se pasa por `python3 .claude/skills/papo-qa/scripts/sql_encoding.py plain <archivo.sql>` (`papo_objects.py --questions-sql` ya los genera así).
 
 ### Paso 6: formularios
 

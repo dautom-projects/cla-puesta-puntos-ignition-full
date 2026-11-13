@@ -5,7 +5,7 @@
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
 -- Page/Embedded/OREC/Form_EC11-0101_start  antes: N'Succion de Ciclon'
-UPDATE papoitem SET Description = (N'Succi' + NCHAR(243) + N'n cicl' + NCHAR(243) + N'n') WHERE ID = 5123;
+UPDATE papoitem SET Description = N'Succion ciclon' WHERE ID = 5123;
 -- Page/Embedded/OREC/Form_MZ11-0101_4h, Page/Embedded/OREC/Form_MZ11-0101_start  antes: N'Tiempo de mezcla'
 UPDATE papoitem SET Description = N'Tiempo de Mezcla' WHERE ID = 5167;
 COMMIT;

@@ -65,8 +65,8 @@ Changelog:
 		maxValue bound to the same struct; numeric inputBounds carried to the object (Objects/NumericField v2.6)
 	2026-10-27 | William M. | v2.13.1 - A label row without a px height counts the height of its text lines in the
 		section (the general test found sections cut by "Referencia hora/hora" labels of 23 px counted as 0)
-	2026-11-13 | William M. | v2.14.0 - --questions-sql writes only ASCII (NCHAR for accents, sql_encoding): a UTF-8
-		script opened as Windows-1252 left weird symbols in papoitem in production
+	2026-11-13 | William M. | v2.14.0 - --questions-sql writes the questions without accents or n and only ASCII
+		(sql_encoding): papoitem goes without them, decision of the user after weird symbols in production
 	2026-10-27 | William M. | v2.13.2 - fitSections also fits section groups without custom.baseBasisPx: their px
 		position.basis is the expanded height toggleSection takes (general test of F&A: AC10-1101, CA02-2102, AC10 _end)
 
@@ -1136,7 +1136,7 @@ def writeQuestionsSql(found, path):
 			missing.append(pid)
 		elif len(texts) > 1:
 			conflicts.append((pid, texts, sorted({e["view"] for e in entries})))
-		elif texts[0] != (current[pid] or "").strip():
+		elif sql_encoding.plain(texts[0]) != sql_encoding.plain((current[pid] or "").strip()):
 			updates.append((pid, texts[0], current[pid], sorted({e["view"] for e in entries})))
 	lines = ["-- Preguntas fijas de los formularios -> papoitem.Description",
 		"-- Generado por papo_objects.py --questions-sql el {}: el formulario lee la pregunta de papoItemID y".format(datetime.date.today().isoformat()),
@@ -1157,7 +1157,7 @@ def writeQuestionsSql(found, path):
 	for pid in missing:
 		lines.append("-- NO EXISTE en papoitem: {}".format(pid))
 	os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-	# Only ASCII: the tool that runs it cannot turn the accents into weird symbols
+	# Questions without accents or ñ and only ASCII: the tool that runs it cannot turn them into weird symbols
 	open(path, "w", encoding="ascii").write(sql_encoding.to_ascii("\n".join(lines) + "\n"))
 	return len(updates), conflicts, missing
 

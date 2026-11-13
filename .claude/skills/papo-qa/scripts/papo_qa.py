@@ -16,7 +16,7 @@ Compares each view against its version in a baseline commit and runs the stages:
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.15.0
+Version: 1.16.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -55,6 +55,8 @@ Changelog:
 		view receives fails (general test: MZ11-0101_4h did not save after its legacy handler was removed)
 	2026-10-28 | William M. | v1.15.0 - Stage 4: the root may also handle refreshPreviewTable (sent by papo_core after a
 		save or a signature) to re-read what the form shows from the cycle; FO10-0100_input table of entries
+	2026-11-13 | William M. | v1.16.0 - Stage 3: the question read from papoItemID compares without accents or n
+		(papoitem goes without them, decision of the user)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -89,6 +91,7 @@ import papo_lint as lint
 import pilot_swap
 import ranges
 import view_refs
+import sql_encoding
 
 REPO = design.REPO_ROOT
 VIEWS = design.VIEWS_DIR
@@ -617,7 +620,8 @@ def _sameQuestion(expected, shown):
 	if expected == shown:
 		return True
 	if expected[0] == "text" and expected[1] and shown[0] == "item" and isinstance(shown[1], int):
-		return shown[1] in BASE_TEXTS or ((_description(shown[1]) or "").strip() == expected[1].strip())
+		# papoitem goes without accents or ñ: the form may still show them
+		return shown[1] in BASE_TEXTS or (sql_encoding.plain((_description(shown[1]) or "").strip()) == sql_encoding.plain(expected[1].strip()))
 	return False
 
 
