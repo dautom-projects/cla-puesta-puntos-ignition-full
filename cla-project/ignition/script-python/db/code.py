@@ -358,18 +358,36 @@ def restore():
 	Import a SQL Server schema+data backup produced by bk() into a database,
 	replacing every table the backup file contains.
 
-	Drops all existing foreign keys on the target database first (the bk()
-	export never captures them, so the restored schema won't have any
-	either), then splits the backup file on standalone "GO" lines and
-	executes each resulting batch (DROP TABLE / CREATE TABLE / INSERT)
-	against the target connection. Shows a confirm dialog before touching
-	anything, since this is destructive and cannot be undone.
+	Reads the backup as UTF-8, drops all existing foreign keys on the target
+	database (the bk() export never captures them, so the restored schema
+	won't have any either), splits the file on standalone "GO" lines and runs
+	every batch (DROP TABLE / CREATE TABLE / SET IDENTITY_INSERT / INSERT)
+	inside ONE transaction: all batches share the same connection, so
+	IDENTITY_INSERT stays on between batches, and any error rolls everything
+	back, leaving the database exactly as it was. Shows a confirm dialog
+	before touching anything.
+
+	Version: 1.1.0
+
+	Changelog:
+		2026-11-13 | William M. | v1.1.0 - One transaction for all batches: each runUpdateQuery took
+			any pooled connection, so SET IDENTITY_INSERT was lost on a busy gateway and the restore
+			stopped halfway (papoitem with 900 of 3213 rows). File read as UTF-8: the raw bytes turned
+			accents and symbols into two weird characters each (the symbols seen in production). Java errors are
+			caught (except Exception does not catch them in Jython) and roll everything back
+		v1.0.0 - Initial version
 
 	Returns:
-		bool: True if every batch executed without error, False otherwise.
+		bool: True if every batch ran and the transaction was committed,
+			False otherwise (nothing changed in the database).
 	"""
+	import codecs
+	from java.lang import Exception as JavaException
 
 	logger = system.util.getLogger("scriptConsole/schemaImport")
+	tx = None
+	batches = []
+	batchIndex = None
 
 	try:
 		# ==========================================
@@ -388,7 +406,8 @@ def restore():
 			"Esto va a BORRAR y reemplazar TODAS las tablas de '" + dbConnection + "' " +
 			"con el contenido de:\n" + inputFilePath + "\n\n" +
 			"Tambien se eliminaran todas las foreign keys existentes " +
-			"(el backup no las incluye). Esta accion NO se puede deshacer.\n\n" +
+			"(el backup no las incluye). Todo corre en una transaccion: " +
+			"si algo falla, la base queda como estaba.\n\n" +
 			"Continuar?",
 			"Confirmar restauracion de base de datos"
 		)
@@ -401,92 +420,109 @@ def restore():
 		print "Target database: " + dbConnection
 		print ""
 
-		fileHandle = open(inputFilePath, 'r')
+		# Read the backup as UTF-8 text ("utf-8-sig" also drops a BOM if present)
+		fileHandle = codecs.open(inputFilePath, "r", "utf-8-sig")
 		fileContent = fileHandle.read()
 		fileHandle.close()
 
-		# Drop existing foreign keys so DROP TABLE order doesn't matter
-		print "Dropping existing foreign keys on " + dbConnection + "..."
-		fkQuery = """
-			SELECT
-				fk.name AS constraintName,
-				OBJECT_NAME(fk.parent_object_id) AS tableName
-			FROM sys.foreign_keys fk
-		"""
-		foreignKeys = system.db.runQuery(fkQuery, database=dbConnection)
-
-		for fk in foreignKeys:
-			dropFkSql = "ALTER TABLE [dbo].[" + fk['tableName'] + "] DROP CONSTRAINT [" + fk['constraintName'] + "];"
-			system.db.runUpdateQuery(dropFkSql, database=dbConnection)
-
-		print "Dropped " + str(len(foreignKeys)) + " foreign key(s)"
-		print ""
-
 		# Split file into batches on standalone "GO" lines
-		rawLines = fileContent.split("\n")
-		batches = []
 		currentBatch = []
-
-		for line in rawLines:
+		for line in fileContent.split("\n"):
 			if line.strip().upper() == "GO":
 				if currentBatch:
 					batches.append("\n".join(currentBatch))
 					currentBatch = []
 			else:
 				currentBatch.append(line)
-
 		if currentBatch:
 			batches.append("\n".join(currentBatch))
 
-		print "Executing " + str(len(batches)) + " batches..."
-		print ""
-
-		executedCount = 0
-		errorCount = 0
-
-		for i in range(len(batches)):
-			batch = batches[i]
-
-			# Skip batches with no real SQL (blank lines / comments only)
-			hasContent = False
+		# Keep only batches with real SQL (not just blank lines / comments)
+		sqlBatches = []
+		for batch in batches:
 			for line in batch.split("\n"):
 				stripped = line.strip()
 				if stripped and not stripped.startswith("--"):
-					hasContent = True
+					sqlBatches.append(batch)
 					break
+		batches = sqlBatches
 
-			if not hasContent:
-				continue
+		# One transaction: every statement below runs on the same connection
+		tx = system.db.beginTransaction(database=dbConnection, timeout=300000)
 
-			try:
-				system.db.runUpdateQuery(batch, database=dbConnection)
-				executedCount += 1
-			except Exception as batchError:
-				errorCount += 1
-				logger.error("Batch " + str(i) + " failed: " + str(batchError))
-				print "  ERROR in batch " + str(i) + ": " + str(batchError)
+		# Clear any IDENTITY_INSERT left ON in this pooled connection by an earlier failed run
+		identityTables = system.db.runQuery("""
+			SELECT t.name AS tableName
+			FROM sys.tables t
+			WHERE SCHEMA_NAME(t.schema_id) = 'dbo' AND OBJECTPROPERTY(t.object_id, 'TableHasIdentity') = 1
+		""", database=dbConnection, tx=tx)
+		for row in identityTables:
+			system.db.runUpdateQuery("SET IDENTITY_INSERT [dbo].[" + row["tableName"] + "] OFF;", database=dbConnection, tx=tx)
 
-			if (i + 1) % 200 == 0:
-				print "  ... " + str(i + 1) + "/" + str(len(batches)) + " batches processed"
+		# Drop existing foreign keys so DROP TABLE order doesn't matter
+		print "Dropping existing foreign keys on " + dbConnection + "..."
+		foreignKeys = system.db.runQuery("""
+			SELECT
+				fk.name AS constraintName,
+				OBJECT_NAME(fk.parent_object_id) AS tableName
+			FROM sys.foreign_keys fk
+		""", database=dbConnection, tx=tx)
+		for fk in foreignKeys:
+			dropFkSql = "ALTER TABLE [dbo].[" + fk["tableName"] + "] DROP CONSTRAINT [" + fk["constraintName"] + "];"
+			system.db.runUpdateQuery(dropFkSql, database=dbConnection, tx=tx)
+		print "Dropped " + str(len(foreignKeys)) + " foreign key(s)"
+		print ""
 
-		logger.info("Import completed - Executed: " + str(executedCount) + " - Errors: " + str(errorCount))
+		print "Executing " + str(len(batches)) + " batches in one transaction..."
+		for i in range(len(batches)):
+			batchIndex = i
+			system.db.runUpdateQuery(batches[i], database=dbConnection, tx=tx)
+			if (i + 1) % 20 == 0:
+				print "  ... " + str(i + 1) + "/" + str(len(batches)) + " batches executed"
+		batchIndex = None
+
+		system.db.commitTransaction(tx)
+		logger.info("Import committed - " + str(len(batches)) + " batches from " + inputFilePath)
 
 		print ""
 		print "=========================================="
-		print "IMPORT COMPLETED"
+		print "IMPORT COMPLETED (committed)"
 		print "=========================================="
 		print "Database: " + dbConnection
-		print "Batches executed: " + str(executedCount)
-		print "Batches with errors: " + str(errorCount)
+		print "Batches executed: " + str(len(batches))
 		print "=========================================="
+		return True
 
-		return errorCount == 0
+	except (Exception, JavaException) as e:
+		if tx is not None:
+			system.db.rollbackTransaction(tx)
 
-	except Exception as e:
-		errorMsg = "Error importing database: " + str(e)
+		# Root cause of a Java error (the top message repeats the whole batch)
+		detail = str(e)
+		if isinstance(e, JavaException):
+			root = e
+			while root.getCause() is not None:
+				root = root.getCause()
+			detail = root.getMessage()
+
+		where = ""
+		if batchIndex is not None:
+			firstLine = ""
+			for line in batches[batchIndex].split("\n"):
+				if line.strip() and not line.strip().startswith("--"):
+					firstLine = line.strip()[:120]
+					break
+			where = " in batch " + str(batchIndex + 1) + "/" + str(len(batches)) + " (" + firstLine + ")"
+
+		errorMsg = "Error importing database" + where + ": " + detail
 		logger.error(errorMsg)
 		print errorMsg
+		print "ROLLED BACK - the database was not changed"
 		return False
+
+	finally:
+		if tx is not None:
+			system.db.closeTransaction(tx)
 ##Biblioteca de querys
 """
 INSERT INTO [dbo].[papo] (Description, Reference)
