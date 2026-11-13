@@ -1,0 +1,239 @@
+{
+  "custom": {
+    "dbConnection": "papo_db",
+    "question": ""
+  },
+  "params": {
+    "answer": "-",
+    "emptyAnswer": "-",
+    "enabled": true,
+    "fontSize": 17,
+    "options": [],
+    "papoItemID": null,
+    "question": "",
+    "questionBasis": "60%",
+    "showQuestion": true,
+    "value": null
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.question": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "papoItemID": "{view.params.papoItemID}",
+            "question": "{view.params.question}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "params.answer": {
+      "binding": {
+        "config": {
+          "struct": {
+            "emptyAnswer": "{view.params.emptyAnswer}",
+            "value": "{view.params.value}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t# Answer is the value, or emptyAnswer when the value is empty and emptyAnswer is set\n\tif value[\"emptyAnswer\"] is None:\n\t\treturn value[\"value\"]\n\treturn value[\"value\"] if value[\"value\"] else value[\"emptyAnswer\"]\n",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    },
+    "params.emptyAnswer": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.enabled": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.fontSize": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.options": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoItemID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.question": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.questionBasis": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.showQuestion": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.value": {
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 50,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Question"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.basis": {
+            "binding": {
+              "config": {
+                "path": "view.params.questionBasis"
+              },
+              "type": "property"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.params.showQuestion"
+              },
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{view.custom.question}"
+              },
+              "type": "expr"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Field"
+        },
+        "position": {
+          "basis": "auto",
+          "grow": 1,
+          "shrink": 0
+        },
+        "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "view.params.enabled"
+              },
+              "type": "property"
+            }
+          },
+          "props.radios": {
+            "binding": {
+              "config": {
+                "struct": {
+                  "options": "{view.params.options}",
+                  "value": "{view.params.value}"
+                },
+                "waitOnAll": true
+              },
+              "transforms": [
+                {
+                  "code": "\treturn [{\"text\": option, \"value\": option, \"selected\": option \u003d\u003d value[\"value\"]} for option in value[\"options\"] or []]",
+                  "type": "script"
+                }
+              ],
+              "type": "expr-struct"
+            }
+          },
+          "props.style.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.params.value"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "align": "center",
+          "orientation": "row",
+          "radioStyle": {
+            "paddingBottom": 0,
+            "paddingLeft": 0,
+            "paddingRight": 24,
+            "paddingTop": 0
+          },
+          "style": {
+            "classes": "PAPO/Field/Checkbox"
+          },
+          "textPosition": "right"
+        },
+        "type": "ia.input.radio-group"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "alignItems": "stretch",
+      "style": {
+        "overflow": "hidden",
+        "position": "relative"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

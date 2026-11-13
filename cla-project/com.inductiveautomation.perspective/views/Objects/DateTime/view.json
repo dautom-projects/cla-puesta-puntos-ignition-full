@@ -1,0 +1,252 @@
+{
+  "custom": {
+    "dbConnection": "papo_db",
+    "question": ""
+  },
+  "events": {
+    "system": {
+      "onStartup": {
+        "config": {
+          "script": "\t# A time field starts with the time the form opens, like the native date-time input\n\tif self.params.startNow and self.params.value is None:\n\t\tself.params.value \u003d system.date.now()"
+        },
+        "scope": "G",
+        "type": "script"
+      }
+    }
+  },
+  "params": {
+    "answer": null,
+    "displayFormat": "MMM D, YYYY h:mm A",
+    "enabled": true,
+    "fontSize": 17,
+    "format": "h:mm:ss a",
+    "papoItemID": null,
+    "pickerType": "time",
+    "question": "",
+    "questionBasis": "60%",
+    "showQuestion": true,
+    "startNow": false,
+    "value": null
+  },
+  "propConfig": {
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.question": {
+      "binding": {
+        "config": {
+          "struct": {
+            "dbConnection": "{view.custom.dbConnection}",
+            "papoItemID": "{view.params.papoItemID}",
+            "question": "{view.params.question}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\treturn value[\"question\"] or papo_core.items.getQuestionText(value)",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "params.answer": {
+      "binding": {
+        "config": {
+          "struct": {
+            "format": "{view.params.format}",
+            "value": "{view.params.value}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t# Answer is the selected time formatted as text; None when there is no value\n\tfrom java.text import SimpleDateFormat\n\tfrom java.util import Locale\n\ttry:\n\t\tif value[\"value\"] is None:\n\t\t\treturn None\n\t\treturn SimpleDateFormat(value[\"format\"], Locale.ENGLISH).format(value[\"value\"])\n\texcept:\n\t\treturn None\n",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "paramDirection": "output",
+      "persistent": true
+    },
+    "params.displayFormat": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.enabled": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.fontSize": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.format": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.papoItemID": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.pickerType": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.question": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.questionBasis": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.showQuestion": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.startNow": {
+      "paramDirection": "input",
+      "persistent": true
+    },
+    "params.value": {
+      "onChange": {
+        "enabled": null,
+        "script": "\t# The form can push its empty value after the object started: keep the opening time\n\tif currentValue.value is None and self.params.startNow:\n\t\tself.params.value \u003d system.date.now()"
+      },
+      "paramDirection": "inout",
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 50,
+      "width": 400
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "meta": {
+          "name": "Question"
+        },
+        "position": {
+          "shrink": 0
+        },
+        "propConfig": {
+          "position.basis": {
+            "binding": {
+              "config": {
+                "path": "view.params.questionBasis"
+              },
+              "type": "property"
+            }
+          },
+          "position.display": {
+            "binding": {
+              "config": {
+                "path": "view.params.showQuestion"
+              },
+              "type": "property"
+            }
+          },
+          "props.text": {
+            "binding": {
+              "config": {
+                "expression": "{view.custom.question}"
+              },
+              "type": "expr"
+            }
+          },
+          "props.textStyle.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "type": "ia.display.label"
+      },
+      {
+        "meta": {
+          "name": "Field"
+        },
+        "position": {
+          "basis": "0px",
+          "grow": 1
+        },
+        "propConfig": {
+          "props.enabled": {
+            "binding": {
+              "config": {
+                "path": "view.params.enabled"
+              },
+              "type": "property"
+            }
+          },
+          "props.format": {
+            "binding": {
+              "config": {
+                "path": "view.params.displayFormat"
+              },
+              "type": "property"
+            }
+          },
+          "props.pickerType": {
+            "binding": {
+              "config": {
+                "path": "view.params.pickerType"
+              },
+              "type": "property"
+            }
+          },
+          "props.style.fontSize": {
+            "binding": {
+              "config": {
+                "path": "view.params.fontSize"
+              },
+              "type": "property"
+            }
+          },
+          "props.value": {
+            "binding": {
+              "config": {
+                "bidirectional": true,
+                "path": "view.params.value"
+              },
+              "type": "property"
+            }
+          }
+        },
+        "props": {
+          "formattedValue": null,
+          "style": {
+            "classes": "PAPO/Field/Input"
+          }
+        },
+        "type": "ia.input.date-time-input"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "style": {
+        "overflow": "hidden",
+        "position": "relative"
+      }
+    },
+    "type": "ia.container.flex"
+  }
+}

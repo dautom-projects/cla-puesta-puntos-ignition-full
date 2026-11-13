@@ -1,0 +1,4096 @@
+{
+  "custom": {
+    "actualDateTime": {
+      "$": [
+        "ts",
+        192,
+        1792703770362
+      ],
+      "$ts": 1792703770361
+    },
+    "areaFilter": null,
+    "dataAreas": null,
+    "dataReports": [
+      {
+        "NodeID": 8,
+        "NodeName": "Fundicion",
+        "Operador": "Soporte D.",
+        "OperadorEsperado": "admin",
+        "PapoDescription": "Nombre pendiente",
+        "PapoID": 1102,
+        "PapoReference": "FU10-0202",
+        "Path": "Clarios/Andina/Metalurgia/Fundicion",
+        "RegisterCode": 3,
+        "Status": "Finalizado",
+        "Supervisor": "Soporte D.",
+        "SupervisorEsperado": "Soporte D.",
+        "SupervisorUser": "admin",
+        "Timestamp": {
+          "$": [
+            "ts",
+            192,
+            1792703770399
+          ],
+          "$ts": 1792697757170
+        },
+        "User": "admin",
+        "WorkstationDescription": "Horno",
+        "WorkstationID": 5,
+        "WorkstationNodeID": 68
+      },
+      {
+        "NodeID": 8,
+        "NodeName": "Fundicion",
+        "Operador": "Soporte D.",
+        "OperadorEsperado": "admin",
+        "PapoDescription": "Nombre pendiente",
+        "PapoID": 1102,
+        "PapoReference": "FU10-0202",
+        "Path": "Clarios/Andina/Metalurgia/Fundicion",
+        "RegisterCode": 2,
+        "Status": "Finalizado",
+        "Supervisor": "",
+        "SupervisorEsperado": "Sin asignar",
+        "SupervisorUser": "",
+        "Timestamp": {
+          "$": [
+            "ts",
+            192,
+            1792703770399
+          ],
+          "$ts": 1792684165877
+        },
+        "User": "admin",
+        "WorkstationDescription": "Horno",
+        "WorkstationID": 5,
+        "WorkstationNodeID": 68
+      },
+      {
+        "NodeID": 10,
+        "NodeName": "Triturado",
+        "Operador": "Soporte D.",
+        "OperadorEsperado": "admin",
+        "PapoDescription": "Triturado en el autonomo",
+        "PapoID": 12,
+        "PapoReference": "TR11-0101",
+        "Path": "Clarios/Andina/Metalurgia/Triturado",
+        "RegisterCode": 1,
+        "Status": "Finalizado",
+        "Supervisor": "Soporte D.",
+        "SupervisorEsperado": "Soporte D.",
+        "SupervisorUser": "admin",
+        "Timestamp": {
+          "$": [
+            "ts",
+            192,
+            1792703770399
+          ],
+          "$ts": 1792618948010
+        },
+        "User": "admin",
+        "WorkstationDescription": "Triturado",
+        "WorkstationID": 6,
+        "WorkstationNodeID": 70
+      }
+    ],
+    "dataSupervisors": {
+      "$": [
+        "ds",
+        192,
+        1792703770398
+      ],
+      "$columns": [
+        {
+          "data": [
+            "Soporte D."
+          ],
+          "name": "fullName",
+          "type": "String"
+        }
+      ]
+    },
+    "dbConnection": "papo_db",
+    "endTime": {
+      "$": [
+        "ts",
+        192,
+        1792703770363
+      ],
+      "$ts": 1792703819999
+    },
+    "path": "Clarios/Andina/Metalurgia/FU10-0202",
+    "refreshPDF": 0,
+    "selection": {
+      "NodeID": 8,
+      "PapoDescription": "Nombre pendiente",
+      "PapoID": 1102,
+      "PapoReference": "FU10-0202",
+      "Path": "Clarios/Andina/Metalurgia/Fundicion",
+      "RegisterCode": 2,
+      "SupervisorEsperado": "Sin asignar",
+      "Timestamp": "Thu Oct 22 2026 10:49:25 GMT-0500 (Colombia Standard Time)"
+    },
+    "shift": 3,
+    "sinFirmaOperario": 0,
+    "sinFirmaSupervisor": 3,
+    "startTime": {
+      "$": [
+        "ts",
+        192,
+        1792703770363
+      ],
+      "$ts": 1792378800000
+    },
+    "supervisorId": null,
+    "totalReportes": 3
+  },
+  "params": {},
+  "propConfig": {
+    "custom.actualDateTime": {
+      "binding": {
+        "config": {
+          "expression": "{[System]Gateway/CurrentDateTime}"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.areaFilter": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Area.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.dataAreas": {
+      "persistent": true
+    },
+    "custom.dataReports": {
+      "binding": {
+        "config": {
+          "struct": {
+            "area": "{view.custom.areaFilter}",
+            "db": "{view.custom.dbConnection}",
+            "endDate": "{view.custom.endTime}",
+            "startDate": "{view.custom.startTime}",
+            "supervisor": "{view.custom.supervisorId}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\t\"\"\"\n\tBuild the reports dataset from registerhistory.\n\n\tThree separate queries:\n\t  1. Cycles active in period + their REAL latest status (no time filter on status)\n\t  2. Type-10 signature records for those cycles\n\t  3. Supervisor name from form field (papoitem \u0027Supervisor\u0027)\n\n\tA cycle lacks the operator signature when it has no \"Finalizado\" of a person (the\n\tautomatic closure, role SYSTEM, does not count) and lacks the supervisor signature\n\twhen it has no \"Revisado\" of a person (the automatic NA signature of Gestion does\n\tnot count), whatever the order of the signatures.\n\n\tVersion: 6.0.0\n\n\tArgs:\n\t\tvalue (dict): Struct with db, startDate, endDate, supervisor, area (Company/Plant/Area path)\n\n\tReturns:\n\t\tlist[dict]: Report rows for table consumption\n\n\tChangelog:\n\t\t2026-11-13 | William M. | v6.0.0 - Signatures decide who did not sign: the supervisor\n\t\t\twho signs before the operator was counted as missing (the latest status was\n\t\t\tFinalizado), the NA signature of Gestion and a Revisado without the operator as\n\t\t\tsigned; area filter (options \u003d every area of the node table, as in Gestion)\n\t\t2026-10-22 | William M. | v5.0.0 - Cycle key includes WorkstationNodeID\n\t\t\t(stations sharing a node no longer mix); supervisor question resolved\n\t\t\tthrough MasterPapoID; supervisor filter (normalized full name) and\n\t\t\tcounters applied here; no refresh tick (re-query only on filter change);\n\t\t\tsupervisor options \u003d supervisors with reports in the period; latest\n\t\t\tstart-form answer wins\n\t\t2026-09-01 | Andres G. | v4.0.0 - Add supervisor from form field;\n\t\t\tOperadorEsperado/SupervisorEsperado as row fields, not custom props;\n\t\t\tCierre Automatico detection for sinFirmaOperario counter\n\t\"\"\"\n\tlogger \u003d system.util.getLogger(\"transform.dataReports.{}\".format(self.view.id))\n\n\tdb \u003d value[\"db\"]\n\tstartDate \u003d value[\"startDate\"]\n\tendDate \u003d value[\"endDate\"]\n\tsupervisorFilter \u003d value.get(\"supervisor\")\n\tareaFilter \u003d value.get(\"area\")\n\n\ttry:\n\t\t# --- Query 1: cycles active in period + REAL latest status ---\n\t\tqueryCycles \u003d \"\"\"\n\t\t\tWITH activeCycles AS (\n\t\t\t\tSELECT DISTINCT\n\t\t\t\t\trh.NodeID,\n\t\t\t\t\trh.PapoID,\n\t\t\t\t\trh.WorkstationNodeID,\n\t\t\t\t\trh.RegisterCode\n\t\t\t\tFROM registerhistory rh\n\t\t\t\tWHERE rh.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh.Timestamp \u003c\u003d ?\n\t\t\t),\n\t\t\tfullCycles AS (\n\t\t\t\tSELECT\n\t\t\t\t\tac.NodeID, ac.PapoID, ac.WorkstationNodeID, ac.RegisterCode,\n\t\t\t\t\tMAX(rh.ID) AS lastID,\n\t\t\t\t\tMAX(CASE WHEN rh.RegisterTypeID \u003d 7 THEN rh.Timestamp END) AS startTime\n\t\t\t\tFROM activeCycles ac\n\t\t\t\tJOIN registerhistory rh\n\t\t\t\t\tON rh.NodeID \u003d ac.NodeID\n\t\t\t\t\tAND rh.PapoID \u003d ac.PapoID\n\t\t\t\t\tAND rh.WorkstationNodeID \u003d ac.WorkstationNodeID\n\t\t\t\t\tAND rh.RegisterCode \u003d ac.RegisterCode\n\t\t\t\tWHERE rh.RegisterTypeID !\u003d 12\n\t\t\t\tGROUP BY ac.NodeID, ac.PapoID, ac.WorkstationNodeID, ac.RegisterCode\n\t\t\t)\n\t\t\tSELECT\n\t\t\t\tfc.NodeID, fc.PapoID, fc.RegisterCode,\n\t\t\t\tfc.startTime,\n\t\t\t\trh.Status, rh.Timestamp, rh.[User],\n\t\t\t\trh.WorkstationNodeID, rh.WorkstationID,\n\t\t\t\tp.Reference AS PapoReference,\n\t\t\t\tp.Description AS PapoDescription,\n\t\t\t\tn.Name AS NodeName,\n\t\t\t\tn.Topic AS Path,\n\t\t\t\tw.Description AS WorkstationDescription\n\t\t\tFROM fullCycles fc\n\t\t\tJOIN registerhistory rh ON rh.ID \u003d fc.lastID\n\t\t\tJOIN papo p ON p.ID \u003d fc.PapoID\n\t\t\tJOIN node n ON n.ID \u003d fc.NodeID\n\t\t\tLEFT JOIN workstation w ON w.ID \u003d rh.WorkstationID\n\t\t\tWHERE LOWER(rh.Status) !\u003d \u0027sin iniciar\u0027\n\t\t\tORDER BY rh.Timestamp DESC\n\t\t\"\"\"\n\t\tdsCycles \u003d system.db.runPrepQuery(queryCycles, [startDate, endDate], db)\n\n\t\t# --- Query 2: signatures for those cycles (NO time filter) ---\n\t\tquerySigs \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\trh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode,\n\t\t\t\trh.Status, rh.DataAnswer, rh.[User] AS SigUser\n\t\t\tFROM registerhistory rh\n\t\t\tWHERE rh.RegisterTypeID \u003d 10\n\t\t\t  AND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM registerhistory rh2\n\t\t\t\tWHERE rh2.NodeID \u003d rh.NodeID\n\t\t\t\t  AND rh2.PapoID \u003d rh.PapoID\n\t\t\t\t  AND rh2.WorkstationNodeID \u003d rh.WorkstationNodeID\n\t\t\t\t  AND rh2.RegisterCode \u003d rh.RegisterCode\n\t\t\t\t  AND rh2.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh2.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh2.Timestamp \u003c\u003d ?\n\t\t\t)\n\t\t\"\"\"\n\t\tdsSigs \u003d system.db.runPrepQuery(querySigs, [startDate, endDate], db)\n\n\t\t# --- Query 3: supervisor name from form data ---\n\t\tquerySup \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\trh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode,\n\t\t\t\trh.DataAnswer,\n\t\t\t\tpi.ID AS SupervisorItemID\n\t\t\tFROM registerhistory rh\n\t\t\tJOIN papo p ON p.ID \u003d rh.PapoID\n\t\t\tJOIN papoitem pi\n\t\t\t\tON pi.PapoID \u003d COALESCE(p.MasterPapoID, p.ID)\n\t\t\t\tAND pi.RegisterTypeID \u003d 7\n\t\t\t\tAND LOWER(RTRIM(LTRIM(REPLACE(pi.Description, \u0027.\u0027, \u0027\u0027)))) \u003d \u0027supervisor\u0027\n\t\t\tWHERE rh.RegisterTypeID \u003d 7\n\t\t\t  AND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM registerhistory rh2\n\t\t\t\tWHERE rh2.NodeID \u003d rh.NodeID\n\t\t\t\t  AND rh2.PapoID \u003d rh.PapoID\n\t\t\t\t  AND rh2.WorkstationNodeID \u003d rh.WorkstationNodeID\n\t\t\t\t  AND rh2.RegisterCode \u003d rh.RegisterCode\n\t\t\t\t  AND rh2.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh2.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh2.Timestamp \u003c\u003d ?\n\t\t\t)\n\t\t\tORDER BY rh.ID DESC\n\t\t\"\"\"\n\t\tdsSup \u003d system.db.runPrepQuery(querySup, [startDate, endDate], db)\n\n\t\t# --- Build signature lookup ---\n\t\tEMPTY_SIGS \u003d {\"operador\": \"\", \"operadorReal\": False, \"cierreAuto\": False,\n\t\t\t\"supervisor\": \"\", \"supervisorUser\": \"\", \"supervisorReal\": False}\n\t\tsigMap \u003d {}\n\t\tfor i in range(dsSigs.getRowCount()):\n\t\t\tnodeID \u003d dsSigs.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsSigs.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsSigs.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsSigs.getValueAt(i, \"RegisterCode\")\n\t\t\tsigStatus \u003d (dsSigs.getValueAt(i, \"Status\") or \"\").strip().lower()\n\t\t\traw \u003d dsSigs.getValueAt(i, \"DataAnswer\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\tif key not in sigMap:\n\t\t\t\tsigMap[key] \u003d dict(EMPTY_SIGS)\n\n\t\t\tif raw is None or raw \u003d\u003d \"\":\n\t\t\t\tcontinue\n\n\t\t\ttry:\n\t\t\t\tobj \u003d system.util.jsonDecode(raw)\n\t\t\t\tfullName \u003d (obj.get(\"name\", \"\") + \" \" + obj.get(\"lastname\", \"\")).strip()\n\t\t\t\tsigUser \u003d obj.get(\"user\", \"\") or dsSigs.getValueAt(i, \"SigUser\") or \"\"\n\t\t\texcept:\n\t\t\t\tcontinue\n\n\t\t\tif sigStatus \u003d\u003d \"finalizado\":\n\t\t\t\t# The automatic closure (role SYSTEM) is not a signature of the operator\n\t\t\t\tif obj.get(\"role\") \u003d\u003d \"SYSTEM\":\n\t\t\t\t\tsigMap[key][\"cierreAuto\"] \u003d True\n\t\t\t\t\tif not sigMap[key][\"operadorReal\"]:\n\t\t\t\t\t\tsigMap[key][\"operador\"] \u003d fullName\n\t\t\t\telse:\n\t\t\t\t\tsigMap[key][\"operadorReal\"] \u003d True\n\t\t\t\t\tsigMap[key][\"operador\"] \u003d fullName\n\t\t\telif sigStatus \u003d\u003d \"revisado\":\n\t\t\t\t# The automatic signature of Gestion (user NA) is not a signature of the supervisor\n\t\t\t\tif unicode(sigUser).strip().upper() in (\"\", \"NA\") or fullName.upper() \u003d\u003d \"NA NA\":\n\t\t\t\t\tcontinue\n\t\t\t\tsigMap[key][\"supervisorReal\"] \u003d True\n\t\t\t\tsigMap[key][\"supervisor\"] \u003d fullName\n\t\t\t\tsigMap[key][\"supervisorUser\"] \u003d sigUser\n\n\t\t# --- Build supervisor-from-form lookup ---\n\t\tsupFromForm \u003d {}\n\t\tfor i in range(dsSup.getRowCount()):\n\t\t\tnodeID \u003d dsSup.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsSup.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsSup.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsSup.getValueAt(i, \"RegisterCode\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\t# Rows come newest first: keep the latest start-form answer of the cycle\n\t\t\tif key in supFromForm:\n\t\t\t\tcontinue\n\n\t\t\traw \u003d dsSup.getValueAt(i, \"DataAnswer\")\n\t\t\tsupItemID \u003d dsSup.getValueAt(i, \"SupervisorItemID\")\n\n\t\t\tif not raw:\n\t\t\t\tcontinue\n\n\t\t\ttry:\n\t\t\t\tobj \u003d system.util.jsonDecode(raw)\n\t\t\t\titems \u003d obj.get(\"items\", [])\n\t\t\t\tfor item in items:\n\t\t\t\t\tif item.get(\"papoItemID\") \u003d\u003d supItemID:\n\t\t\t\t\t\tanswer \u003d (item.get(\"answer\") or \"\").strip()\n\t\t\t\t\t\tif answer and answer !\u003d \"-\":\n\t\t\t\t\t\t\tsupFromForm[key] \u003d answer\n\t\t\t\t\t\tbreak\n\t\t\texcept:\n\t\t\t\tcontinue\n\n\t\t# --- Build report list ---\n\t\treportList \u003d []\n\t\tfor i in range(dsCycles.getRowCount()):\n\t\t\tnodeID \u003d dsCycles.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsCycles.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsCycles.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsCycles.getValueAt(i, \"RegisterCode\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\tsigs \u003d sigMap.get(key, EMPTY_SIGS)\n\t\t\tpath \u003d dsCycles.getValueAt(i, \"Path\") or \"\"\n\t\t\tsegments \u003d path.split(\"/\")\n\t\t\toperador \u003d sigs[\"operador\"] or dsCycles.getValueAt(i, \"User\") or \"\"\n\n\t\t\t# Supervisor esperado: form field \u003e signature \u003e fallback\n\t\t\tformSup \u003d supFromForm.get(key, \"\")\n\t\t\tif formSup:\n\t\t\t\tsupervisorEsperado \u003d formSup\n\t\t\telif sigs[\"supervisor\"]:\n\t\t\t\tsupervisorEsperado \u003d sigs[\"supervisor\"]\n\t\t\telse:\n\t\t\t\tsupervisorEsperado \u003d \"Sin asignar\"\n\n\t\t\treportList.append({\n\t\t\t\t\"PapoReference\": dsCycles.getValueAt(i, \"PapoReference\"),\n\t\t\t\t\"PapoDescription\": dsCycles.getValueAt(i, \"PapoDescription\"),\n\t\t\t\t\"RegisterCode\": regCode,\n\t\t\t\t\"NodeName\": dsCycles.getValueAt(i, \"NodeName\"),\n\t\t\t\t\"Status\": dsCycles.getValueAt(i, \"Status\"),\n\t\t\t\t\"Timestamp\": dsCycles.getValueAt(i, \"Timestamp\"),\n\t\t\t\t\"User\": dsCycles.getValueAt(i, \"User\"),\n\t\t\t\t\"WorkstationDescription\": dsCycles.getValueAt(i, \"WorkstationDescription\") or \"\",\n\t\t\t\t\"Operador\": operador,\n\t\t\t\t\"Supervisor\": sigs[\"supervisor\"],\n\t\t\t\t\"SupervisorUser\": sigs[\"supervisorUser\"],\n\t\t\t\t\"SupervisorEsperado\": supervisorEsperado,\n\t\t\t\t\"OperadorEsperado\": dsCycles.getValueAt(i, \"User\") or \"\",\n\t\t\t\t\"NodeID\": nodeID,\n\t\t\t\t\"PapoID\": papoID,\n\t\t\t\t\"Path\": path,\n\t\t\t\t\"Area\": segments[2] if len(segments) \u003e 2 else \"\",\n\t\t\t\t\"AreaPath\": \"/\".join(segments[:3]),\n\t\t\t\t\"SinFirmaOperario\": not sigs[\"operadorReal\"],\n\t\t\t\t\"SinFirmaSupervisor\": not sigs[\"supervisorReal\"],\n\t\t\t\t\"WorkstationNodeID\": dsCycles.getValueAt(i, \"WorkstationNodeID\"),\n\t\t\t\t\"WorkstationID\": dsCycles.getValueAt(i, \"WorkstationID\"),\n\t\t\t})\n\n\t\t# --- Supervisor filter (normalized full name: case and repeated spaces ignored) ---\n\t\tdef normName(text):\n\t\t\treturn \" \".join(unicode(text or \"\").split()).lower()\n\n\t\t# --- Area filter: options \u003d every area node, as in Gestion (with reports in the period or not) ---\n\t\tdsAreas \u003d system.db.runPrepQuery(\"SELECT Name, Topic FROM node WHERE Type \u003d \u0027AREA\u0027 ORDER BY Name\", [], db)\n\t\tself.view.custom.dataAreas \u003d system.dataset.toDataSet(\n\t\t\t[\"label\", \"value\"], [[dsAreas.getValueAt(k, \"Name\"), dsAreas.getValueAt(k, \"Topic\")] for k in range(dsAreas.getRowCount())])\n\n\t\tif areaFilter not in (None, \"\", \"null\"):\n\t\t\treportList \u003d [r for r in reportList if r[\"AreaPath\"] \u003d\u003d areaFilter]\n\n\t\t# Dropdown options: supervisors with reports in the period and area (before filtering)\n\t\tnotANames \u003d set([\"\", \"-\", \"na\", \"na na\", \"no hay supervisores disponibles\", \"sin asignar\"])\n\t\tsupNames \u003d {}\n\t\tfor r in reportList:\n\t\t\tname \u003d \" \".join(unicode(r[\"SupervisorEsperado\"] or \"\").split())\n\t\t\tif name.lower() not in notANames:\n\t\t\t\tsupNames.setdefault(name.lower(), name)\n\t\tself.view.custom.dataSupervisors \u003d system.dataset.toDataSet(\n\t\t\t[\"fullName\"], [[supNames[k]] for k in sorted(supNames)])\n\n\t\tif supervisorFilter not in (None, \"\", \"null\"):\n\t\t\twanted \u003d normName(supervisorFilter)\n\t\t\treportList \u003d [r for r in reportList if normName(r[\"SupervisorEsperado\"]) \u003d\u003d wanted]\n\n\t\t# --- Counters (over the filtered rows) ---\n\t\ttotalReportes \u003d len(reportList)\n\t\tsinFirmaOp \u003d 0\n\t\tsinFirmaSup \u003d 0\n\n\t\tfor r in reportList:\n\t\t\tif r[\"SinFirmaOperario\"]:\n\t\t\t\tsinFirmaOp +\u003d 1\n\t\t\tif r[\"SinFirmaSupervisor\"]:\n\t\t\t\tsinFirmaSup +\u003d 1\n\n\t\tself.view.custom.totalReportes \u003d totalReportes\n\t\tself.view.custom.sinFirmaOperario \u003d sinFirmaOp\n\t\tself.view.custom.sinFirmaSupervisor \u003d sinFirmaSup\n\n\t\treturn reportList\n\n\texcept Exception as e:\n\t\tlogger.error(\"Error in transform dataReports: \" + str(e))\n\t\tself.view.custom.totalReportes \u003d 0\n\t\tself.view.custom.sinFirmaOperario \u003d 0\n\t\tself.view.custom.sinFirmaSupervisor \u003d 0\n\t\treturn []",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.dataSupervisors": {
+      "persistent": true
+    },
+    "custom.dbConnection": {
+      "binding": {
+        "config": {
+          "path": "session.custom.dbConnection"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.endTime": {
+      "binding": {
+        "config": {
+          "expression": "{this.custom.actualDateTime}"
+        },
+        "transforms": [
+          {
+            "code": "\t# endTime\n\t\n\tdef endOfMinute():\n\t\t\"\"\"Helper: now rounded up to the end of the minute, stable for 60 s.\"\"\"\n\t\tmillis \u003d system.date.toMillis(system.date.now())\n\t\treturn system.date.fromMillis(millis - millis % 60000 + 59999)\n\n\tdef set_time(date, hour, minute\u003d0, second\u003d0):\n\t\t\"\"\"Helper: set time on a date.\"\"\"\n\t\treturn system.date.setTime(date, hour, minute, second)\n\t\n\tyear \u003d system.date.getYear(value)\n\tmonth \u003d system.date.getMonth(value)\n\tday \u003d system.date.getDayOfMonth(value)\n\thour \u003d system.date.getHour24(value)\n\t\n\tdropDownPeriod \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"Dropdown Periodo\").props.value\n\tshift \u003d int(self.custom.shift)\n\tendTime \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"DateTimeInput_EndTime\").props.value\n\t\n\tif dropDownPeriod \u003d\u003d 7:  # Personalizado\n\t\treturn endTime\n\t\n\ttoday \u003d system.date.getDate(year, month, day)\n\tyesterday \u003d system.date.addDays(today, -1)\n\ttomorrow \u003d system.date.addDays(today, 1)\n\t\n\t# \u003d\u003d\u003d Turnos (0\u003dTurno1, 1\u003dTurno2, 2\u003dTurno3) \u003d\u003d\u003d\n\tif dropDownPeriod in [0, 1, 2]:\n\t\tselectedShift \u003d dropDownPeriod + 1\n\t\t\n\t\t# Si es el turno actual, el fin es ahora\n\t\tif selectedShift \u003d\u003d shift:\n\t\t\tvalue \u003d endOfMinute()\n\t\t\n\t\telif shift \u003d\u003d 1:  # En Turno 1 (22:00-06:00)\n\t\t\tif selectedShift \u003d\u003d 2:\n\t\t\t\tif hour \u003e\u003d 22:\n\t\t\t\t\tvalue \u003d set_time(today, 13, 59, 59)\n\t\t\t\telse:\n\t\t\t\t\tvalue \u003d set_time(yesterday, 13, 59, 59)\n\t\t\telif selectedShift \u003d\u003d 3:\n\t\t\t\tif hour \u003e\u003d 22:\n\t\t\t\t\tvalue \u003d set_time(today, 21, 59, 59)\n\t\t\t\telse:\n\t\t\t\t\tvalue \u003d set_time(yesterday, 21, 59, 59)\n\t\t\n\t\telif shift \u003d\u003d 2:  # En Turno 2 (06:00-14:00)\n\t\t\tif selectedShift \u003d\u003d 1:\n\t\t\t\tvalue \u003d set_time(today, 5, 59, 59)\n\t\t\telif selectedShift \u003d\u003d 3:\n\t\t\t\tvalue \u003d set_time(yesterday, 21, 59, 59)\n\t\t\n\t\telif shift \u003d\u003d 3:  # En Turno 3 (14:00-22:00)\n\t\t\tif selectedShift \u003d\u003d 1:\n\t\t\t\tvalue \u003d set_time(today, 5, 59, 59)\n\t\t\telif selectedShift \u003d\u003d 2:\n\t\t\t\tvalue \u003d set_time(today, 13, 59, 59)\n\t\n\t# \u003d\u003d\u003d Día Actual → ahora \u003d\u003d\u003d\n\telif dropDownPeriod \u003d\u003d 4:\n\t\tvalue \u003d endOfMinute()\n\t\n\t# \u003d\u003d\u003d Día Anterior → fin del día \u003d inicio del día actual - 1s \u003d\u003d\u003d\n\t# The production day starts at 22:00 (Turno 1) of the previous calendar day\n\telif dropDownPeriod \u003d\u003d 3:\n\t\tif hour \u003e\u003d 22:\n\t\t\tvalue \u003d set_time(today, 21, 59, 59)\n\t\telse:\n\t\t\tvalue \u003d set_time(yesterday, 21, 59, 59)\n\t\n\t# \u003d\u003d\u003d Semana → ahora \u003d\u003d\u003d\n\telif dropDownPeriod \u003d\u003d 5:\n\t\tvalue \u003d endOfMinute()\n\t\n\t# \u003d\u003d\u003d Mes → ahora \u003d\u003d\u003d\n\telif dropDownPeriod \u003d\u003d 6:\n\t\tvalue \u003d endOfMinute()\n\t\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.path": {
+      "binding": {
+        "config": {
+          "struct": {
+            "db": "{view.custom.dbConnection}",
+            "papoId": "{view.custom.selection.PapoID}",
+            "path": "{view.custom.selection.Path}",
+            "reference": "{view.custom.selection.PapoReference}"
+          },
+          "waitOnAll": true
+        },
+        "transforms": [
+          {
+            "code": "\tlogger \u003d system.util.getLogger(\"transform.path.{}\".format(self.view.id))\n\n\tdef unwrap(v):\n\t\t# Perspective quality wrapper (dict or object wrapper) -\u003e raw value\n\t\tif v is not None and not isinstance(v, basestring) and hasattr(v, \u0027get\u0027):\n\t\t\treturn v.get(\u0027value\u0027, \u0027\u0027)\n\t\treturn v\n\n\tpath \u003d unwrap(value.get(\u0027path\u0027,\u0027\u0027))\n\treference \u003d unwrap(value.get(\u0027reference\u0027,\u0027\u0027))\n\tpapoId \u003d unwrap(value.get(\u0027papoId\u0027,\u0027\u0027))\n\tdb \u003d value.get(\u0027db\u0027,\u0027\u0027)\n\n\t# No row selected yet: keep the default source without logging an error\n\tif not path or papoId in (None, \u0027\u0027):\n\t\treturn \u0027Default\u0027\n\n\ttry:\n\t\tareaPath \u003d \u0027/\u0027.join(path.split(\u0027/\u0027)[:3])\n\n\t\tquery \u003d \"\"\"\n\t\t\tSELECT p2.Reference\n\t\t\tFROM papo p1\n\t\t\tJOIN papo p2 ON p2.ID \u003d COALESCE(p1.MasterPapoID, p1.ID)\n\t\t\tWHERE p1.ID \u003d ?\n\t\t\"\"\"\n\t\tresult \u003d system.db.runPrepQuery(query, [papoId], db)\n\t\treportReference \u003d result.getValueAt(0, 0) if result.getRowCount() \u003e 0 else reference\n\n\t\treturn areaPath+\u0027/\u0027+reportReference\n\n\texcept Exception as e:\n\t\tlogger.error(\"Error in transform path: \" + str(e))\n\t\treturn \u0027Default\u0027",
+            "type": "script"
+          }
+        ],
+        "type": "expr-struct"
+      },
+      "persistent": true
+    },
+    "custom.refreshPDF": {
+      "persistent": true
+    },
+    "custom.selection": {
+      "persistent": true
+    },
+    "custom.shift": {
+      "binding": {
+        "config": {
+          "expression": "if(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 22 || dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 6,\r\n\t1,\r\n\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 6 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 14,\r\n\t\t\t2, \r\n\t\t\tif(dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003e\u003d 14 \u0026\u0026 dateExtract({this.custom.actualDateTime},\u0027hour\u0027) \u003c 22, \r\n\t\t\t\t\t3, \r\n\t\t\t\t\t\u0027none\u0027\r\n\t\t\t\t\t)\r\n\t\t\t)\r\n\t)"
+        },
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.sinFirmaOperario": {
+      "persistent": true
+    },
+    "custom.sinFirmaSupervisor": {
+      "persistent": true
+    },
+    "custom.startTime": {
+      "binding": {
+        "config": {
+          "expression": "{this.custom.actualDateTime}"
+        },
+        "transforms": [
+          {
+            "code": "# startTime\n\t\n\tdef set_time(date, hour):\n\t\t\"\"\"Helper: set hour on a date, minutes and seconds to 0.\"\"\"\n\t\treturn system.date.setTime(date, hour, 0, 0)\n\t\n\tyear \u003d system.date.getYear(value)\n\tmonth \u003d system.date.getMonth(value)\n\tday \u003d system.date.getDayOfMonth(value)\n\thour \u003d system.date.getHour24(value)\n\t\n\tdropDownPeriod \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"Dropdown Periodo\").props.value\n\tshift \u003d self.custom.shift  # 1, 2, or 3\n\tstartTime \u003d self.getChild(\"root\").getChild(\"Filters\").getChild(\"DateTimeInput_StartTime\").props.value\n\t\n\tif dropDownPeriod \u003d\u003d 7:  # Personalizado\n\t\treturn startTime\n\t\n\ttoday \u003d system.date.getDate(year, month, day)\n\tyesterday \u003d system.date.addDays(today, -1)\n\t\n\t# \u003d\u003d\u003d Turnos (0\u003dTurno1, 1\u003dTurno2, 2\u003dTurno3) \u003d\u003d\u003d\n\tif dropDownPeriod in [0, 1, 2]:\n\t\tselectedShift \u003d dropDownPeriod + 1  # 0→1, 1→2, 2→3\n\t\t\n\t\tif shift \u003d\u003d 1:  # En Turno 1 (22:00-06:00)\n\t\t\tif selectedShift \u003d\u003d 1:\n\t\t\t\tif hour \u003e\u003d 22:\n\t\t\t\t\tvalue \u003d set_time(today, 22)\n\t\t\t\telse:  # 0-5\n\t\t\t\t\tvalue \u003d set_time(yesterday, 22)\n\t\t\telif selectedShift \u003d\u003d 2:\n\t\t\t\tif hour \u003e\u003d 22:\n\t\t\t\t\tvalue \u003d set_time(today, 6)\n\t\t\t\telse:\n\t\t\t\t\tvalue \u003d set_time(yesterday, 6)\n\t\t\telif selectedShift \u003d\u003d 3:\n\t\t\t\tif hour \u003e\u003d 22:\n\t\t\t\t\tvalue \u003d set_time(today, 14)\n\t\t\t\telse:\n\t\t\t\t\tvalue \u003d set_time(yesterday, 14)\n\t\t\n\t\telif shift \u003d\u003d 2:  # En Turno 2 (06:00-14:00)\n\t\t\tif selectedShift \u003d\u003d 1:\n\t\t\t\tvalue \u003d set_time(yesterday, 22)\n\t\t\telif selectedShift \u003d\u003d 2:\n\t\t\t\tvalue \u003d set_time(today, 6)\n\t\t\telif selectedShift \u003d\u003d 3:\n\t\t\t\tvalue \u003d set_time(yesterday, 14)\n\t\t\n\t\telif shift \u003d\u003d 3:  # En Turno 3 (14:00-22:00)\n\t\t\tif selectedShift \u003d\u003d 1:\n\t\t\t\tvalue \u003d set_time(yesterday, 22)\n\t\t\telif selectedShift \u003d\u003d 2:\n\t\t\t\tvalue \u003d set_time(today, 6)\n\t\t\telif selectedShift \u003d\u003d 3:\n\t\t\t\tvalue \u003d set_time(today, 14)\n\t\n\t# \u003d\u003d\u003d Día Actual: inicia con Turno 1 → 22:00 del día anterior \u003d\u003d\u003d\n\t# From 22:00 on, Turno 1 of the next production day has already started\n\telif dropDownPeriod \u003d\u003d 4:\n\t\tif hour \u003e\u003d 22:\n\t\t\tvalue \u003d set_time(today, 22)\n\t\telse:\n\t\t\tvalue \u003d set_time(yesterday, 22)\n\t\n\t# \u003d\u003d\u003d Día Anterior: un día antes del Día Actual \u003d\u003d\u003d\n\telif dropDownPeriod \u003d\u003d 3:\n\t\tif hour \u003e\u003d 22:\n\t\t\tvalue \u003d set_time(yesterday, 22)\n\t\telse:\n\t\t\tvalue \u003d set_time(system.date.addDays(today, -2), 22)\n\t\n\t# \u003d\u003d\u003d Semana: domingo anterior a las 22:00 (inicio del Turno 1 del lunes) \u003d\u003d\u003d\n\telif dropDownPeriod \u003d\u003d 5:\n\t\tdayOfWeek \u003d system.date.getDayOfWeek(today)\n\t\t# getDayOfWeek: 1\u003dDomingo, 2\u003dLunes, ..., 7\u003dSábado\n\t\t\n\t\tif dayOfWeek \u003d\u003d 1:  # Domingo\n\t\t\tif hour \u003e\u003d 22:\n\t\t\t\t# Ya arrancó la nueva semana\n\t\t\t\tvalue \u003d set_time(today, 22)\n\t\t\telse:\n\t\t\t\t# Aún semana anterior: domingo pasado a las 22\n\t\t\t\tpreviousSunday \u003d system.date.addDays(today, -7)\n\t\t\t\tvalue \u003d set_time(previousSunday, 22)\n\t\telif dayOfWeek \u003d\u003d 2:  # Lunes\n\t\t\t# Domingo anterior \u003d ayer\n\t\t\tvalue \u003d set_time(yesterday, 22)\n\t\telse:  # Martes(3) a Sábado(7)\n\t\t\tdaysToMonday \u003d dayOfWeek - 2\n\t\t\tmonday \u003d system.date.addDays(today, -daysToMonday)\n\t\t\tsundayBefore \u003d system.date.addDays(monday, -1)\n\t\t\tvalue \u003d set_time(sundayBefore, 22)\n\t\n\t# \u003d\u003d\u003d Mes: día anterior al 1ro del mes a las 22:00 \u003d\u003d\u003d\n\telif dropDownPeriod \u003d\u003d 6:\n\t\tfirstOfMonth \u003d system.date.getDate(year, month, 1)\n\t\tdayBefore \u003d system.date.addDays(firstOfMonth, -1)\n\t\tvalue \u003d set_time(dayBefore, 22)\n\t\n\treturn value",
+            "type": "script"
+          }
+        ],
+        "type": "expr"
+      },
+      "persistent": true
+    },
+    "custom.supervisorId": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Supervisor.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.totalReportes": {
+      "persistent": true
+    }
+  },
+  "props": {
+    "defaultSize": {
+      "height": 1024,
+      "width": 1814
+    }
+  },
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "EmbeddedView"
+            },
+            "position": {
+              "basis": "100%"
+            },
+            "props": {
+              "params": {
+                "icon": "material/assignment",
+                "text": "Seguimiento General",
+                "transform": "value"
+              },
+              "path": "Page/Embedded/Title_Header"
+            },
+            "type": "ia.display.view"
+          }
+        ],
+        "meta": {
+          "name": "Title"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "meta": {
+              "name": "Label_Papo_0"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Area"
+            },
+            "position": {
+              "basis": "45px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Area:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_9"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Dropdown Area"
+            },
+            "position": {
+              "basis": "162px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dataAreas"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value is None:\n\t\treturn []\n\n\t# Value is the Company/Plant/Area path of the node: what dataReports compares\n\toptions \u003d []\n\tfor row in range(value.getRowCount()):\n\t\toptions.append({\"label\": value.getValueAt(row, \"label\"), \"value\": value.getValueAt(row, \"value\")})\n\n\treturn options",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "1vw"
+                  }
+                },
+                "text": "Seleccione"
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "margin": 8,
+                "textAlign": "center"
+              },
+              "value": null
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_10"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Supervisor"
+            },
+            "position": {
+              "basis": "87px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Supervisor:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_1"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Supervisor"
+            },
+            "position": {
+              "basis": "162px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dataSupervisors"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value is None:\n\t\treturn []\n\n\t# Value is the full name: it is what SupervisorEsperado holds\n\toptions \u003d []\n\tfor row in range(value.getRowCount()):\n\t\tfullName \u003d value.getValueAt(row, \"fullName\")\n\t\toptions.append({\"label\": fullName, \"value\": fullName})\n\n\treturn options",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "1vw"
+                  }
+                },
+                "text": "Seleccione"
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "margin": 8,
+                "textAlign": "center"
+              },
+              "value": null
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_2"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Period"
+            },
+            "position": {
+              "basis": "60px",
+              "shrink": 0
+            },
+            "props": {
+              "enabled": false,
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Periodo:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_3"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "custom": {
+              "selectedCode": "421",
+              "selectedLabel": "Boiler 3"
+            },
+            "meta": {
+              "name": "Dropdown Periodo"
+            },
+            "position": {
+              "basis": "130px",
+              "shrink": 0
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "options": [
+                {
+                  "label": "Turno 1",
+                  "value": 0
+                },
+                {
+                  "label": "Turno 2",
+                  "value": 1
+                },
+                {
+                  "label": "Turno 3",
+                  "value": 2
+                },
+                {
+                  "label": "Día Anterior",
+                  "value": 3
+                },
+                {
+                  "label": "Día Actual",
+                  "value": 4
+                },
+                {
+                  "label": "Semana",
+                  "value": 5
+                },
+                {
+                  "label": "Mes",
+                  "value": 6
+                },
+                {
+                  "label": "Personalizado",
+                  "value": 7
+                }
+              ],
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "2vw"
+                  }
+                },
+                "text": "Seleccione"
+              },
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "margin": 8,
+                "textAlign": "center"
+              },
+              "value": 5
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_4"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Start_Time"
+            },
+            "position": {
+              "basis": "48px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Inicio:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_8"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "system": {
+                "onStartup": {
+                  "config": {
+                    "script": "\t#from datetime import date\n\t#from datetime import datetime\n\t#today \u003ddate.today()\n\t#midnight \u003d datetime.combine(today, datetime.min.time())\n\t#self.props.value \u003d midnight\n\t#self.props.value \u003d system.date.addDays(today, -1)\n\t#self.props.value \u003d system.date.addDays(system.date.now(),-1)\n\t#self.props.value \u003d system.date.now()\n\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day-1)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate\n\t"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "DateTimeInput_StartTime"
+            },
+            "position": {
+              "basis": "171px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Periodo.props.value} !\u003d 7 ,false,true)"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.maxDate": {
+                "binding": {
+                  "config": {
+                    "expression": "now(5000)"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, 00, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.startTime"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dismissOnSelect": false,
+              "format": "YYYY-MM-DD HH:mm:00",
+              "formattedValue": "2026-10-18 22:00:00",
+              "inputProps": {
+                "style": {
+                  "classes": "dateTime"
+                }
+              },
+              "locale": "es",
+              "style": {
+                "marginBottom": 8,
+                "marginTop": 8
+              }
+            },
+            "type": "ia.input.date-time-input"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_5"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label__End_Time"
+            },
+            "position": {
+              "basis": "32px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Fin:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_7"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "system": {
+                "onStartup": {
+                  "config": {
+                    "script": "\t#from datetime import date\n\t#from datetime import datetime\n\t#today \u003d date.today()\n\t#midnight \u003d datetime.combine(today, datetime.min.time())\n\t#self.props.value \u003d midnight\n\t#self.props.value \u003d today\n\t#self.props.value \u003d system.date.now()\n\tYear \u003d system.date.getYear(system.date.now())\n\tMonth \u003d system.date.getMonth(system.date.now())\n\tDay \u003d system.date.getDayOfMonth(system.date.now())\n\tHour \u003d system.date.getHour24(system.date.now())\n\tMinute \u003d system.date.getMinute(system.date.now())\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tself.props.value \u003d newDate"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "DateTimeInput_EndTime"
+            },
+            "position": {
+              "basis": "170px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.enabled": {
+                "binding": {
+                  "config": {
+                    "expression": "if({../Dropdown Periodo.props.value} !\u003d 7 ,false,true)"
+                  },
+                  "type": "expr"
+                }
+              },
+              "props.maxDate": {
+                "binding": {
+                  "config": {
+                    "expression": "now(5000)"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tYear \u003d system.date.getYear(value)\n\tMonth \u003d system.date.getMonth(value)\n\tDay \u003d system.date.getDayOfMonth(value)\n\tHour \u003d system.date.getHour24(value)\n\tMinute \u003d system.date.getMinute(value)\n\t\n\tdate \u003d system.date.getDate(Year, Month, Day)\n\tdatetime \u003d system.date.setTime(date, Hour, Minute, 00)\n\tnewDate \u003d datetime\n\tvalue \u003d newDate\n\treturn value",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr"
+                }
+              },
+              "props.value": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.endTime"
+                  },
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dismissOnSelect": false,
+              "format": "YYYY-MM-DD HH:mm:ss",
+              "formattedValue": "2026-10-22 16:16:59",
+              "inputProps": {
+                "style": {
+                  "classes": "dateTime"
+                }
+              },
+              "locale": "es",
+              "style": {
+                "marginBottom": 8,
+                "marginTop": 8
+              }
+            },
+            "type": "ia.input.date-time-input"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_6"
+            },
+            "position": {
+              "basis": "30px",
+              "grow": 1,
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Period_0"
+            },
+            "position": {
+              "basis": "1px",
+              "shrink": 0
+            },
+            "props": {
+              "enabled": false,
+              "textStyle": {
+                "classes": "text-subtitles"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label"
+            },
+            "position": {
+              "basis": "10px"
+            },
+            "type": "ia.display.label"
+          }
+        ],
+        "meta": {
+          "name": "Filters"
+        },
+        "position": {
+          "basis": "50px",
+          "shrink": 0
+        },
+        "props": {
+          "style": {
+            "classes": "container-borders-dautom-widget",
+            "marginLeft": 10,
+            "marginRight": 10,
+            "marginTop": 10,
+            "overflow": "hidden"
+          }
+        },
+        "type": "ia.container.flex"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "meta": {
+                      "name": "Label_2"
+                    },
+                    "position": {
+                      "basis": "70%"
+                    },
+                    "props": {
+                      "text": "Formularios Realizados",
+                      "textStyle": {
+                        "fontSize": 20,
+                        "fontWeight": "bold",
+                        "paddingLeft": 20,
+                        "textAlign": "left"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  },
+                  {
+                    "meta": {
+                      "name": "Label_1"
+                    },
+                    "position": {
+                      "basis": "30%"
+                    },
+                    "propConfig": {
+                      "props.text": {
+                        "binding": {
+                          "config": {
+                            "expression": "{view.custom.totalReportes}"
+                          },
+                          "type": "expr"
+                        }
+                      }
+                    },
+                    "props": {
+                      "textStyle": {
+                        "fontSize": 20,
+                        "fontWeight": "bold",
+                        "paddingLeft": 20,
+                        "paddingRight": 20,
+                        "textAlign": "right"
+                      }
+                    },
+                    "type": "ia.display.label"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer"
+                },
+                "position": {
+                  "basis": "40px"
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "events": {
+                  "component": {
+                    "onRowClick": {
+                      "config": {
+                        "script": "\tselectedRows \u003d self.props.selection.data\n\tif selectedRows is None or len(selectedRows) \u003d\u003d 0:\n\t\treturn\n\n\trawRow \u003d selectedRows[0]\n\n\t# Unwrap {\"value\": x, \"style\": {...}} format from transform\n\tselection \u003d {}\n\tfor key in rawRow:\n\t\tcell \u003d rawRow[key]\n\t\tif isinstance(cell, dict) and \"value\" in cell:\n\t\t\tselection[key] \u003d cell[\"value\"]\n\t\telse:\n\t\t\tselection[key] \u003d cell\n\n\tself.view.custom.selection \u003d selection"
+                      },
+                      "scope": "G",
+                      "type": "script"
+                    }
+                  }
+                },
+                "meta": {
+                  "name": "TablaGeneral"
+                },
+                "position": {
+                  "basis": "100%"
+                },
+                "propConfig": {
+                  "props.data": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.dataReports"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\t\"\"\"\n\tTablaGeneral: all reports (already filtered by supervisor in dataReports).\n\n\tVersion: 4.0.0\n\tChangelog:\n\t\t2026-10-22 | William M. | v4.0.0 - Supervisor filter moved to dataReports\n\t\t2026-09-01 | Andres G. | v3.0.0 - Remove row colors; filter by SupervisorEsperado\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "cells": {
+                    "style": {
+                      "borderRightColor": "#D5D5D5",
+                      "borderRightStyle": "solid",
+                      "borderRightWidth": 1
+                    }
+                  },
+                  "columns": [
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "RegisterCode",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "ID"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 40
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "PapoReference",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Referencia"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": false,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 65
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "PapoDescription",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Nombre"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 100
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "Operador",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Operador"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 70
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY",
+                      "editable": false,
+                      "field": "Supervisor",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Supervisor"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 70
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "Timestamp",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Fecha"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": true,
+                      "width": 70
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "Status",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "Estado"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": false,
+                      "width": 100
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "NodeID",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "NodeID"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": false,
+                      "width": 100
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "PapoID",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "PapoID"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": false,
+                      "width": 100
+                    },
+                    {
+                      "align": "center",
+                      "boolean": "checkbox",
+                      "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                      "editable": false,
+                      "field": "Path",
+                      "filter": {
+                        "boolean": {
+                          "condition": ""
+                        },
+                        "date": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "enabled": false,
+                        "number": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "string": {
+                          "condition": "",
+                          "value": ""
+                        },
+                        "visible": "on-hover"
+                      },
+                      "footer": {
+                        "align": "center",
+                        "justify": "left",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": ""
+                      },
+                      "header": {
+                        "align": "center",
+                        "justify": "center",
+                        "style": {
+                          "classes": ""
+                        },
+                        "title": "PapoID"
+                      },
+                      "justify": "center",
+                      "nullFormat": {
+                        "includeNullStrings": false,
+                        "nullFormatValue": "",
+                        "strict": false
+                      },
+                      "number": "value",
+                      "numberFormat": "0,0.##",
+                      "progressBar": {
+                        "bar": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "max": 100,
+                        "min": 0,
+                        "track": {
+                          "color": "",
+                          "style": {
+                            "classes": ""
+                          }
+                        },
+                        "value": {
+                          "enabled": true,
+                          "format": "0,0.##",
+                          "justify": "center",
+                          "style": {
+                            "classes": ""
+                          }
+                        }
+                      },
+                      "render": "auto",
+                      "resizable": true,
+                      "sort": "none",
+                      "sortable": true,
+                      "strictWidth": false,
+                      "style": {
+                        "classes": ""
+                      },
+                      "toggleSwitch": {
+                        "color": {
+                          "selected": "",
+                          "unselected": ""
+                        }
+                      },
+                      "viewParams": {},
+                      "viewPath": "",
+                      "visible": false,
+                      "width": 100
+                    }
+                  ],
+                  "dragOrderable": false,
+                  "headerStyle": {
+                    "borderRightColor": "D5D5D5",
+                    "borderRightStyle": "none",
+                    "borderRightWidth": 1
+                  },
+                  "selection": {
+                    "data": [
+                      {
+                        "NodeID": {
+                          "value": 8
+                        },
+                        "NodeName": {
+                          "value": "Fundicion"
+                        },
+                        "Operador": {
+                          "value": "Soporte D."
+                        },
+                        "OperadorEsperado": {
+                          "value": "admin"
+                        },
+                        "PapoDescription": {
+                          "value": "Nombre pendiente"
+                        },
+                        "PapoID": {
+                          "value": 1102
+                        },
+                        "PapoReference": {
+                          "value": "FU10-0202"
+                        },
+                        "Path": {
+                          "value": "Clarios/Andina/Metalurgia/Fundicion"
+                        },
+                        "RegisterCode": {
+                          "value": 2
+                        },
+                        "Status": {
+                          "value": "Finalizado"
+                        },
+                        "Supervisor": {
+                          "value": ""
+                        },
+                        "SupervisorEsperado": {
+                          "value": "Sin asignar"
+                        },
+                        "SupervisorUser": {
+                          "value": ""
+                        },
+                        "Timestamp": {
+                          "value": {
+                            "$": [
+                              "ts",
+                              0,
+                              1792697685073
+                            ],
+                            "$ts": 1792684165877
+                          }
+                        },
+                        "User": {
+                          "value": "admin"
+                        },
+                        "WorkstationDescription": {
+                          "value": "Horno"
+                        },
+                        "WorkstationID": {
+                          "value": 5
+                        },
+                        "WorkstationNodeID": {
+                          "value": 68
+                        }
+                      }
+                    ],
+                    "selectedColumn": "PapoDescription",
+                    "selectedRow": 1
+                  },
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10,
+                    "classes": "table"
+                  }
+                },
+                "type": "ia.display.table"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer"
+            },
+            "position": {
+              "basis": "35%"
+            },
+            "props": {
+              "direction": "column",
+              "style": {
+                "classes": "container-borders-dautom-widget",
+                "margin": 10
+              }
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_2"
+                        },
+                        "position": {
+                          "basis": "70%"
+                        },
+                        "props": {
+                          "text": "Sin Firma Operario",
+                          "textStyle": {
+                            "fontSize": 20,
+                            "fontWeight": "bold",
+                            "paddingLeft": 20,
+                            "textAlign": "left"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_1"
+                        },
+                        "position": {
+                          "basis": "30%"
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{view.custom.sinFirmaOperario} + \" / \" + {view.custom.totalReportes}"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "textStyle": {
+                            "fontSize": 20,
+                            "fontWeight": "bold",
+                            "paddingLeft": 0,
+                            "paddingRight": 20,
+                            "textAlign": "right"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "40px"
+                    },
+                    "props": {
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "events": {
+                      "component": {
+                        "onRowClick": {
+                          "config": {
+                            "script": "\tselectedRows \u003d self.props.selection.data\n\tif selectedRows is None or len(selectedRows) \u003d\u003d 0:\n\t\treturn\n\n\trawRow \u003d selectedRows[0]\n\n\t# Unwrap {\"value\": x, \"style\": {...}} format from transform\n\tselection \u003d {}\n\tfor key in rawRow:\n\t\tcell \u003d rawRow[key]\n\t\tif isinstance(cell, dict) and \"value\" in cell:\n\t\t\tselection[key] \u003d cell[\"value\"]\n\t\telse:\n\t\t\tselection[key] \u003d cell\n\n\tself.view.custom.selection \u003d selection"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "TablaOperario"
+                    },
+                    "position": {
+                      "basis": "100%"
+                    },
+                    "propConfig": {
+                      "props.data": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dataReports"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t\"\"\"\n\tTablaOperario: reports WITHOUT the operator signature (SinFirmaOperario of dataReports).\n\n\tVersion: 3.0.0\n\tChangelog:\n\t\t2026-11-13 | William M. | v3.0.0 - SinFirmaOperario (signatures of the cycle): a Revisado\n\t\t\twithout the operator signature was left out; the automatic closure still counts\n\t\t2026-08-31 | Andres G. | v2.0.0 - Case-insensitive status filter\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\tif not row.get(\"SinFirmaOperario\"):\n\t\t\tcontinue\n\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "cells": {
+                        "style": {
+                          "borderRightColor": "#D5D5D5",
+                          "borderRightStyle": "solid",
+                          "borderRightWidth": 1
+                        }
+                      },
+                      "columns": [
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "RegisterCode",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "ID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 40
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "PapoReference",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Referencia"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": false,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 65
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "PapoDescription",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Nombre"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 80
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "OperadorEsperado",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Operador"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 100
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "Timestamp",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Fecha"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 60
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                          "editable": false,
+                          "field": "NodeID",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "NodeID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": false,
+                          "width": 100
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                          "editable": false,
+                          "field": "PapoID",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "PapoID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": false,
+                          "width": 100
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                          "editable": false,
+                          "field": "Path",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "PapoID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": false,
+                          "width": 100
+                        }
+                      ],
+                      "dragOrderable": false,
+                      "headerStyle": {
+                        "borderRightColor": "D5D5D5",
+                        "borderRightStyle": "none",
+                        "borderRightWidth": 1
+                      },
+                      "selection": {
+                        "selectedRow": -1
+                      },
+                      "style": {
+                        "borderBottomLeftRadius": 10,
+                        "borderBottomRightRadius": 10,
+                        "borderTopLeftRadius": 10,
+                        "borderTopRightRadius": 10,
+                        "classes": "table"
+                      }
+                    },
+                    "type": "ia.display.table"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_1"
+                },
+                "position": {
+                  "basis": "50%"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "classes": "container-borders-dautom-widget",
+                    "margin": 10,
+                    "marginLeft": 0
+                  }
+                },
+                "type": "ia.container.flex"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "meta": {
+                          "name": "Label_2"
+                        },
+                        "position": {
+                          "basis": "70%"
+                        },
+                        "props": {
+                          "text": "Sin Firma Supervisor",
+                          "textStyle": {
+                            "fontSize": 20,
+                            "fontWeight": "bold",
+                            "paddingLeft": 20,
+                            "textAlign": "left"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      },
+                      {
+                        "meta": {
+                          "name": "Label_1"
+                        },
+                        "position": {
+                          "basis": "30%"
+                        },
+                        "propConfig": {
+                          "props.text": {
+                            "binding": {
+                              "config": {
+                                "expression": "{view.custom.sinFirmaSupervisor} + \" / \" + {view.custom.totalReportes}"
+                              },
+                              "type": "expr"
+                            }
+                          }
+                        },
+                        "props": {
+                          "textStyle": {
+                            "fontSize": 20,
+                            "fontWeight": "bold",
+                            "paddingRight": 20,
+                            "textAlign": "right"
+                          }
+                        },
+                        "type": "ia.display.label"
+                      }
+                    ],
+                    "meta": {
+                      "name": "FlexContainer"
+                    },
+                    "position": {
+                      "basis": "40px"
+                    },
+                    "props": {
+                      "style": {
+                        "overflow": "hidden"
+                      }
+                    },
+                    "type": "ia.container.flex"
+                  },
+                  {
+                    "events": {
+                      "component": {
+                        "onRowClick": {
+                          "config": {
+                            "script": "\tselectedRows \u003d self.props.selection.data\n\tif selectedRows is None or len(selectedRows) \u003d\u003d 0:\n\t\treturn\n\n\trawRow \u003d selectedRows[0]\n\n\t# Unwrap {\"value\": x, \"style\": {...}} format from transform\n\tselection \u003d {}\n\tfor key in rawRow:\n\t\tcell \u003d rawRow[key]\n\t\tif isinstance(cell, dict) and \"value\" in cell:\n\t\t\tselection[key] \u003d cell[\"value\"]\n\t\telse:\n\t\t\tselection[key] \u003d cell\n\n\tself.view.custom.selection \u003d selection"
+                          },
+                          "scope": "G",
+                          "type": "script"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "name": "TablaSupervisor"
+                    },
+                    "position": {
+                      "basis": "100%"
+                    },
+                    "propConfig": {
+                      "props.data": {
+                        "binding": {
+                          "config": {
+                            "path": "view.custom.dataReports"
+                          },
+                          "transforms": [
+                            {
+                              "code": "\t\"\"\"\n\tTablaSupervisor: reports WITHOUT the supervisor signature (SinFirmaSupervisor of dataReports).\n\n\tVersion: 4.0.0\n\tChangelog:\n\t\t2026-11-13 | William M. | v4.0.0 - SinFirmaSupervisor (signatures of the cycle): a\n\t\t\tsupervisor who signed before the operator was listed as missing; the NA signature of\n\t\t\tGestion is not a signature\n\t\t2026-10-22 | William M. | v3.0.0 - Supervisor filter applied in dataReports\n\t\t2026-08-31 | Andres G. | v2.0.0 - Case-insensitive status filter + supervisor filter\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\tif not row.get(\"SinFirmaSupervisor\"):\n\t\t\tcontinue\n\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
+                              "type": "script"
+                            }
+                          ],
+                          "type": "property"
+                        }
+                      }
+                    },
+                    "props": {
+                      "cells": {
+                        "style": {
+                          "borderRightColor": "#D5D5D5",
+                          "borderRightStyle": "solid",
+                          "borderRightWidth": 1
+                        }
+                      },
+                      "columns": [
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "RegisterCode",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "ID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 40
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "PapoReference",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Referencia"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": false,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 65
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "PapoDescription",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Nombre"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 80
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "SupervisorEsperado",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Supervisor"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 100
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY",
+                          "editable": false,
+                          "field": "Timestamp",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "Fecha"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": true,
+                          "width": 60
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                          "editable": false,
+                          "field": "NodeID",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "NodeID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": false,
+                          "width": 100
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                          "editable": false,
+                          "field": "PapoID",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "PapoID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": false,
+                          "width": 100
+                        },
+                        {
+                          "align": "center",
+                          "boolean": "checkbox",
+                          "dateFormat": "MM/DD/YYYY HH:mm:ss",
+                          "editable": false,
+                          "field": "Path",
+                          "filter": {
+                            "boolean": {
+                              "condition": ""
+                            },
+                            "date": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "enabled": false,
+                            "number": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "string": {
+                              "condition": "",
+                              "value": ""
+                            },
+                            "visible": "on-hover"
+                          },
+                          "footer": {
+                            "align": "center",
+                            "justify": "left",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": ""
+                          },
+                          "header": {
+                            "align": "center",
+                            "justify": "center",
+                            "style": {
+                              "classes": ""
+                            },
+                            "title": "PapoID"
+                          },
+                          "justify": "center",
+                          "nullFormat": {
+                            "includeNullStrings": false,
+                            "nullFormatValue": "",
+                            "strict": false
+                          },
+                          "number": "value",
+                          "numberFormat": "0,0.##",
+                          "progressBar": {
+                            "bar": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "max": 100,
+                            "min": 0,
+                            "track": {
+                              "color": "",
+                              "style": {
+                                "classes": ""
+                              }
+                            },
+                            "value": {
+                              "enabled": true,
+                              "format": "0,0.##",
+                              "justify": "center",
+                              "style": {
+                                "classes": ""
+                              }
+                            }
+                          },
+                          "render": "auto",
+                          "resizable": true,
+                          "sort": "none",
+                          "sortable": true,
+                          "strictWidth": false,
+                          "style": {
+                            "classes": ""
+                          },
+                          "toggleSwitch": {
+                            "color": {
+                              "selected": "",
+                              "unselected": ""
+                            }
+                          },
+                          "viewParams": {},
+                          "viewPath": "",
+                          "visible": false,
+                          "width": 100
+                        }
+                      ],
+                      "dragOrderable": false,
+                      "headerStyle": {
+                        "borderRightColor": "D5D5D5",
+                        "borderRightStyle": "none",
+                        "borderRightWidth": 1
+                      },
+                      "selection": {
+                        "data": [
+                          {
+                            "NodeID": {
+                              "value": 8
+                            },
+                            "NodeName": {
+                              "value": "Fundicion"
+                            },
+                            "Operador": {
+                              "value": "Soporte D."
+                            },
+                            "OperadorEsperado": {
+                              "value": "admin"
+                            },
+                            "PapoDescription": {
+                              "value": "Nombre pendiente"
+                            },
+                            "PapoID": {
+                              "value": 1102
+                            },
+                            "PapoReference": {
+                              "value": "FU10-0202"
+                            },
+                            "Path": {
+                              "value": "Clarios/Andina/Metalurgia/Fundicion"
+                            },
+                            "RegisterCode": {
+                              "value": 3
+                            },
+                            "Status": {
+                              "value": "Finalizado"
+                            },
+                            "Supervisor": {
+                              "value": "Soporte D."
+                            },
+                            "SupervisorEsperado": {
+                              "value": "Soporte D."
+                            },
+                            "SupervisorUser": {
+                              "value": "admin"
+                            },
+                            "Timestamp": {
+                              "value": {
+                                "$": [
+                                  "ts",
+                                  0,
+                                  1792697758093
+                                ],
+                                "$ts": 1792697757170
+                              }
+                            },
+                            "User": {
+                              "value": "admin"
+                            },
+                            "WorkstationDescription": {
+                              "value": "Horno"
+                            },
+                            "WorkstationID": {
+                              "value": 5
+                            },
+                            "WorkstationNodeID": {
+                              "value": 68
+                            }
+                          }
+                        ],
+                        "selectedColumn": "PapoReference",
+                        "selectedRow": 0
+                      },
+                      "style": {
+                        "borderBottomLeftRadius": 10,
+                        "borderBottomRightRadius": 10,
+                        "borderTopLeftRadius": 10,
+                        "borderTopRightRadius": 10,
+                        "classes": "table"
+                      }
+                    },
+                    "type": "ia.display.table"
+                  }
+                ],
+                "meta": {
+                  "name": "FlexContainer_2"
+                },
+                "position": {
+                  "basis": "50%"
+                },
+                "props": {
+                  "direction": "column",
+                  "style": {
+                    "classes": "container-borders-dautom-widget",
+                    "margin": 10,
+                    "marginLeft": 0,
+                    "marginTop": 0
+                  }
+                },
+                "type": "ia.container.flex"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_2"
+            },
+            "position": {
+              "basis": "35%"
+            },
+            "props": {
+              "direction": "column"
+            },
+            "type": "ia.container.flex"
+          },
+          {
+            "children": [
+              {
+                "meta": {
+                  "name": "ReportViewer"
+                },
+                "position": {
+                  "basis": "100%"
+                },
+                "propConfig": {
+                  "props.params.nodeID": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.selection.NodeID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t# Verifica si el valor es un diccionario\n\t\tif not isinstance(value, (int,long)):\n\t\t\t# Usa .get para evitar KeyError si no existe la clave\n\t\t\treturn value.get(\"value\", None)\n\t\telse:\n\t\t\t# Si no es diccionario, devuelve el valor directamente\n\t\t\treturn value\n\texcept:\n\t\treturn \tNone     # Te da el tipo real del objeto",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.papoID": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.selection.PapoID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\ttry:\n\t\t# Verifica si el valor es un diccionario\n\t\tif not isinstance(value, (int,long)):\n\t\t\t# Usa .get para evitar KeyError si no existe la clave\n\t\t\treturn value.get(\"value\", None)\n\t\telse:\n\t\t\t# Si no es diccionario, devuelve el valor directamente\n\t\t\treturn value\n\texcept:\n\t\treturn \tNone     # Te da el tipo real del objeto",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.refresh": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.refreshPDF"
+                      },
+                      "type": "property"
+                    }
+                  },
+                  "props.params.registerCode": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.selection.RegisterCode"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n\ttry:\n\t\t# Verifica si el valor es un diccionario\n\t\tif not isinstance(value, (int,long)):\n\t\t\t# Usa .get para evitar KeyError si no existe la clave\n\t\t\treturn value.get(\"value\", None)\n\t\telse:\n\t\t\t# Si no es diccionario, devuelve el valor directamente\n\t\t\treturn value\n\texcept:\n\t\treturn \tNone     # Te da el tipo real del objeto\n\t",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.params.workstationNodeID": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.selection.WorkstationNodeID"
+                      },
+                      "transforms": [
+                        {
+                          "code": "\n\ttry:\n\t\t# Verifica si el valor es un diccionario\n\t\tif not isinstance(value, (int,long)):\n\t\t\t# Usa .get para evitar KeyError si no existe la clave\n\t\t\treturn value.get(\"value\", None)\n\t\telse:\n\t\t\t# Si no es diccionario, devuelve el valor directamente\n\t\t\treturn value\n\texcept:\n\t\treturn \tNone     # Te da el tipo real del objeto\n\t",
+                          "type": "script"
+                        }
+                      ],
+                      "type": "property"
+                    }
+                  },
+                  "props.source": {
+                    "binding": {
+                      "config": {
+                        "path": "view.custom.path"
+                      },
+                      "type": "property"
+                    }
+                  }
+                },
+                "props": {
+                  "page": 1,
+                  "pageCount": 3,
+                  "params": {
+                    "EndDate": "value",
+                    "StartDate": "value"
+                  },
+                  "style": {
+                    "borderBottomLeftRadius": 10,
+                    "borderBottomRightRadius": 10,
+                    "borderStyle": "none",
+                    "borderTopLeftRadius": 10,
+                    "borderTopRightRadius": 10
+                  },
+                  "zoomLevel": 150
+                },
+                "type": "ia.reporting.report-viewer"
+              }
+            ],
+            "meta": {
+              "name": "FlexContainer_0"
+            },
+            "position": {
+              "basis": "30%"
+            },
+            "props": {
+              "style": {
+                "borderStyle": "none",
+                "marginBottom": 10,
+                "marginRight": 10,
+                "marginTop": 10
+              }
+            },
+            "type": "ia.container.flex"
+          }
+        ],
+        "meta": {
+          "name": "FlexContainer"
+        },
+        "position": {
+          "basis": "100%"
+        },
+        "type": "ia.container.flex"
+      }
+    ],
+    "meta": {
+      "name": "root"
+    },
+    "props": {
+      "direction": "column"
+    },
+    "type": "ia.container.flex"
+  }
+}

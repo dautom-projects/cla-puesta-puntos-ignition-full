@@ -72,11 +72,13 @@ def papoByNode(nodeId=None, db='papo_db'):
             FROM nodepapo np
             INNER JOIN papo p ON p.ID = np.PapoID
             INNER JOIN node n ON n.ID = np.NodeID
-            WHERE n.ID = ?
+            -- The node and its children: a LINE also lists the forms of its cells
+            WHERE n.ID = ? OR n.ParentNodeID = ?
+            GROUP BY p.ID, p.Reference
             ORDER BY p.ID DESC
         '''
         
-        result = system.db.runPrepQuery(query, [nodeId], database=db)
+        result = system.db.runPrepQuery(query, [nodeId, nodeId], database=db)
         return result
 
     except Exception as e:
@@ -88,9 +90,17 @@ def papoByNode(nodeId=None, db='papo_db'):
 def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, db='papo_db'):
     """
     Recupera el último registro válido (Status != 'Sin Iniciar') 
-    para cada combinación (NodeID, PapoID, RegisterCode) desde registerhistory,
-    incluyendo StartTime (último Timestamp del tipo RegisterTypeID=7 de la misma combinación,
+    para cada ciclo (NodeID, PapoID, WorkstationNodeID, RegisterCode) desde registerhistory,
+    incluyendo StartTime (último Timestamp del tipo RegisterTypeID=7 del mismo ciclo,
     anterior o igual al registro actual).
+
+    El filtro por nodo es en cascada: nodeId puede ser un AREA, LINE o CELL e
+    incluye los registros de ese nodo y de sus descendientes (hasta 2 niveles).
+
+    Changelog:
+        2026-10-22 | William M. | Filtro por nodo en cascada (AREA > LINE > CELL)
+        2026-10-22 | William M. | WorkstationNodeID en la llave del ciclo: dos estaciones
+            del mismo nodo con el mismo PAPO y RegisterCode ya no se mezclan
     """
     logger = system.util.getLogger("getRegisterHistory")
 
@@ -125,14 +135,16 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                     w.Description AS WorkstationDescription,
                     
                     ROW_NUMBER() OVER (
-                        PARTITION BY rh.NodeID, rh.PapoID, rh.RegisterCode
+                        PARTITION BY rh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode
                         ORDER BY rh.Timestamp DESC
                     ) AS rn
                 FROM registerhistory rh
                 INNER JOIN node n ON n.ID = rh.NodeID
+                LEFT JOIN node pn ON pn.ID = n.ParentNodeID
                 INNER JOIN papo p ON p.ID = rh.PapoID
                 INNER JOIN workstation w ON w.ID = rh.WorkstationID
-                WHERE ( (? IS NULL OR n.ID = ?) )
+                -- Cascading node filter: the node itself, its children and grandchildren
+                WHERE ( (? IS NULL OR n.ID = ? OR n.ParentNodeID = ? OR pn.ParentNodeID = ?) )
                   AND ( (? IS NULL OR p.ID = ?) )
                   AND ( (? IS NULL OR rh.Timestamp >= ?) )
                   AND ( (? IS NULL OR rh.Timestamp <= ?) )
@@ -143,6 +155,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                 SELECT 
                     rh.NodeID,
                     rh.PapoID,
+                    rh.WorkstationNodeID,
                     rh.RegisterCode,
                     rh.Timestamp AS StartTime
                 FROM registerhistory rh
@@ -158,6 +171,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
                 LEFT JOIN start_records s
                   ON r.NodeID = s.NodeID
                  AND r.PapoID = s.PapoID
+                 AND r.WorkstationNodeID = s.WorkstationNodeID
                  AND r.RegisterCode = s.RegisterCode
                  AND s.StartTime <= r.Timestamp
                 GROUP BY r.RegisterID
@@ -190,7 +204,7 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
         """
 
         args = [
-            nodeId, nodeId,
+            nodeId, nodeId, nodeId, nodeId,
             papoId, papoId,
             startDate, startDate,
             endDate, endDate
@@ -205,3 +219,101 @@ def getRegisterHistory(nodeId=None, papoId=None, startDate=None, endDate=None, d
             (str(nodeId), str(papoId), str(startDate), str(endDate), str(e))
         )
         return None
+def lineAll(db='papo_db'):
+	"""
+	Get all lines without filtering by area.
+	
+	Args:
+		db (str): Database connection name.
+	
+	Returns:
+		Dataset: All lines with ID and Name columns.
+	"""
+	logger = system.util.getLogger("sql/lineAll")
+	
+	query = '''
+		SELECT
+			ID,
+			Name
+		FROM
+			node
+		WHERE 
+			Type = 'LINE'
+		ORDER BY Name ASC
+	'''
+	
+	try:
+		result = system.db.runQuery(query, database=db)
+		return result
+	except Exception as e:
+		logger.error("Error in lineAll(): %s" % str(e))
+		return None
+
+
+def papoAll(db='papo_db'):
+	"""
+	Get all papos (forms) without filtering.
+	
+	Args:
+		db (str): Database connection name.
+	
+	Returns:
+		Dataset: All papos with ID and Reference columns.
+	"""
+	logger = system.util.getLogger("sql/papoAll")
+	
+	query = '''
+		SELECT DISTINCT
+			p.ID,
+			p.Reference
+		FROM
+			papo p
+		INNER JOIN nodepapo np ON p.ID = np.PapoID
+		ORDER BY p.Reference ASC
+	'''
+	
+	try:
+		result = system.db.runQuery(query, database=db)
+		return result
+	except Exception as e:
+		logger.error("Error in papoAll(): %s" % str(e))
+		return None
+
+
+def papoByArea(areaId, db='papo_db'):
+	"""
+	Get all papos (forms) associated with lines under a specific area, or with the cells of those lines.
+	
+	Changelog:
+		2026-10-28 | William M. | Cells of the lines too (F&A listed 9 of its 20 forms, OREC 13 of 29)
+	
+	Args:
+		areaId (int): The area node ID.
+		db (str): Database connection name.
+	
+	Returns:
+		Dataset: Papos with ID and Reference columns.
+	"""
+	logger = system.util.getLogger("sql/papoByArea")
+	
+	query = '''
+		SELECT DISTINCT
+			p.ID,
+			p.Reference
+		FROM
+			papo p
+		INNER JOIN nodepapo np ON p.ID = np.PapoID
+		INNER JOIN node n ON n.ID = np.NodeID
+		LEFT JOIN node pn ON pn.ID = n.ParentNodeID
+		-- Lines of the area and their cells
+		WHERE
+			n.ParentNodeID = ? OR pn.ParentNodeID = ?
+		ORDER BY p.Reference ASC
+	'''
+	
+	try:
+		result = system.db.runPrepQuery(query, [areaId, areaId], database=db)
+		return result
+	except Exception as e:
+		logger.error("Error in papoByArea(areaId=%s): %s" % (str(areaId), str(e)))
+		return None
