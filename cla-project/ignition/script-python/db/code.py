@@ -39,11 +39,11 @@ def bk():
         #excludedTables = []
         #excludedTables = [ "registerhistory", "roles", "scada_roles", "scada_user_ci", "scada_user_ex", "scada_user_rl", "scada_user_sa", "scada_users", "sysdiagrams","user_roles", "users"]
         #excludedTables = ["fa_cpk_nivel_specs", "fa_cpk_program_specs", "node", "nodepapo", "papo","papoitem", "papoitem_registertype", "registerhistory", "registertype","roles", "scada_roles", "scada_user_ci", "scada_user_ex", "scada_user_rl","scada_user_sa", "scada_users", "sysdiagrams", "user_roles", "users","workstation", "workstationnode"]
-        excludedTables = ["fa_cpk_nivel_specs", "fa_cpk_program_specs", "papo", "papoitem_registertype", "registerhistory", "registertype","roles", "scada_roles", "scada_user_ci", "scada_user_ex", "scada_user_rl","scada_user_sa", "scada_users", "sysdiagrams", "user_roles", "users"]
+        excludedTables = ["fa_cpk_nivel_specs", "fa_cpk_program_specs", "registerhistory","roles", "scada_roles", "scada_user_ci", "scada_user_ex", "scada_user_rl","scada_user_sa", "scada_users", "sysdiagrams", "user_roles", "users", "workstation"]
         # Output file path - CHANGE THIS to your preferred location
         #outputFilePath = "C:/Users/A1000625/Downloads/database_{}_export.sql".format(dbConnection)
         #outputFilePath = "C:/Users/A1000625/Documents/Dautom/02 - Database/01 - dbbk/database_{}_export.sql".format(dbConnection)
-        outputFilePath = "/Users/dautom/Library/CloudStorage/GoogleDrive-william.mejia@dautom.com.co/Shared drives/CLA/Proyectos/2026-05-21 - CLA - Puesta a Puntos/04 - Software/08 - Database/database_261022_dev_export.sql".format(dbConnection)
+        outputFilePath = "/Users/dautom/Library/CloudStorage/GoogleDrive-william.mejia@dautom.com.co/Shared drives/CLA/Proyectos/2026-05-21 - CLA - Puesta a Puntos/04 - Software/08 - Database/database_261123_dev_export.sql".format(dbConnection)
  
         # ==========================================
         # SCRIPT EXECUTION - DO NOT MODIFY
@@ -395,7 +395,7 @@ def restore():
 		# ==========================================
 
 		dbConnection = "papo_db"
-		inputFilePath = "/Users/dautom/Library/CloudStorage/GoogleDrive-william.mejia@dautom.com.co/Shared drives/CLA/Proyectos/2026-05-21 - CLA - Puesta a Puntos/04 - Software/08 - Database/database_260917_debug_prod_export 1.sql"
+		inputFilePath = "/Users/dautom/Library/CloudStorage/GoogleDrive-william.mejia@dautom.com.co/Shared drives/CLA/Proyectos/2026-05-21 - CLA - Puesta a Puntos/04 - Software/08 - Database/database_261113-2_prod_export.sql"
 		#"C:\Users\A1000625\Documents\Dautom\02 - Database\01 - dbbk\database_papo_db_export_dev.sql"
 
 		# ==========================================
