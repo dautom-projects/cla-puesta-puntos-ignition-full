@@ -477,6 +477,23 @@ class ReportBuildTest(unittest.TestCase):
 		history = data["RegisterHistoryStation"]
 		self.assertEqual(history.getValueAt(4, "Estado"), "Finalizado")
 
+	def test_headerFromFirstWithoutStartForm(self):
+		# No start record (type 99 here): the header still gets who, when and the shift of the cycle's first form
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [99], "name": "Iniciodeturno", "headerFromFirst": True}], history=None)
+		self.assertEqual(self.report.system.errors, [])
+		header = data["Iniciodeturno1"]
+		self.assertEqual(header["user"], "Soporte D.")
+		self.assertEqual(header["shift"], "3")
+		self.assertEqual(header["hora_registro"], "19:43:47")
+		self.assertFalse([k for k in header if k.startswith("papoItemID")])
+
+	def test_headerFromFirstKeepsTheStartForm(self):
+		data = self._data(station=7)
+		self.report.build(data, [{"types": [7], "name": "Iniciodeturno", "headerFromFirst": True}], history=None)
+		self.assertEqual(data["Iniciodeturno1"]["papoItemID6100"], u"\u2714")
+		self.assertEqual(data["Iniciodeturno2"]["user"], "Otro U.")
+
 	def test_everyQueryFiltersTheStation(self):
 		self._pilot(self._data(station=7))
 		cycleQueries = [q for q in self.report.system.queries if "registerhistory" in q[0]]

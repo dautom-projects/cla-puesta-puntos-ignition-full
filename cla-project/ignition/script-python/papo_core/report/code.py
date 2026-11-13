@@ -16,9 +16,11 @@ passes workstationNodeID (Gestion): two stations of the same node number
 their cycles apart, so a cycle is (PapoID, NodeID, WorkstationNodeID,
 RegisterCode). Without it the cycle is read by node, as before.
 
-Version: 2.9.0
+Version: 2.10.0
 
 Changelog:
+	2026-11-13 | William M. | v2.10.0 - build() section option headerFromFirst: a cycle without the start
+		form still gets the user, date and shift of its first form in the header (EA11-1603)
 	2026-10-29 | William M. | v2.9.0 - Cycle closed by autoCloseOpenForms (signature with role SYSTEM):
 		data["autoClose"] gives the notice of the last page (closing date and time, no operator signature
 		and who started the cycle), the history reads "Cierre automático" in Estado and the "status"
@@ -841,6 +843,24 @@ def _header(data, typeID, papoID, nodeID, registerCode, db, station=None):
 		data["shift"] = None
 
 
+def _headerFromFirst(data, section, papoID, nodeID, registerCode, db, station=None):
+	"""First slot of a section without records: user, date, shift and hora_registro of the cycle's first form
+	(signatures and the idle record that opens the cycle are not forms); its questions stay blank."""
+	cycleSql, params = _cycleFilter(papoID, nodeID, registerCode, station)
+	ds = system.db.runPrepQuery('''
+		SELECT DataAnswer, RegisterTypeID, Timestamp
+		FROM registerhistory
+		WHERE {0} AND RegisterTypeID NOT IN (10, 12)
+		ORDER BY ID ASC
+	'''.format(cycleSql), params, db)
+	if ds.getRowCount() == 0:
+		return
+	holder = {}
+	_fillDataFromDataset(_oneRow(ds, 0), holder, "x")
+	meta = dict((k, v) for k, v in (holder.get("x") or {}).items() if k in ("user", "date", "shift", "hora_registro"))
+	data["{0}{1}".format(section["name"], section.get("start", 1))] = _normalizeDict(meta, section.get("normalize", "check"))
+
+
 def _historyList(papoID, nodeID, registerCode, db, station=None):
 	"""Records of the cycle for the history table (same columns as the report query RegisterHistory); the
 	automatic closure reads AUTO_CLOSE_STATUS in Estado."""
@@ -915,7 +935,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 	signatures and the history list. Logic that only one form has stays as a
 	few lines after this call in its report.
 
-	Version: 1.1.0
+	Version: 1.2.0
 
 	Args:
 		data (dict): Report data dict with papoID, nodeID, registerCode, db and,
@@ -954,6 +974,9 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 			copies (list, optional): the same slots again under another name with another
 				normalize, each a dict with name and normalize (e.g. "ar" -> A / R, "mark" ->
 				check-x on Cumple, blank on No Cumple)
+			headerFromFirst (bool, optional): when the cycle has no record of the section, its
+				first slot still gets user, date, shift and hora_registro of the cycle's first form
+				(the header of a report whose start form was not filled); its questions stay blank
 		history (str): key of the history list the template table reads, or None
 		signatures (str): "role" (default, as the report scripts: Supervisor_PAPO ->
 			adminKey1, 2..., Operator -> operatorKey), "roleLast" (one adminKey and one
@@ -971,6 +994,7 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 		None: Populates data in place
 
 	Changelog:
+		2026-11-13 | William M. | v1.2.0 - Section option headerFromFirst
 		2026-10-29 | William M. | v1.1.0 - data["autoClose"] and "Cierre automático" in the history
 		2026-10-27 | William M. | v1.0.0 - Initial version (pilot AC10-0202, AC10-0301,
 			AC10-1101, CA02-2102); reprocessedNormalize for FO10-0601 / FO10-1701;
@@ -997,6 +1021,8 @@ def build(data, sections, history="RegisterHistoryStation", signatures="role", s
 		for section in sections:
 			ds = _queryByTypes(section["types"], papoID, nodeID, registerCode, db, station)
 			_buildSection(ds, data, section, typeNames)
+			if section.get("headerFromFirst") and ds.getRowCount() == 0:
+				_headerFromFirst(data, section, papoID, nodeID, registerCode, db, station)
 
 		data["comment"] = _extractComments(papoID, nodeID, registerCode, db, station)
 		if signatures == "status":
