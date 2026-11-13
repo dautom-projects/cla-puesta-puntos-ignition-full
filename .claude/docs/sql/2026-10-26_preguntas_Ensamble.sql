@@ -1,153 +1,153 @@
 -- Preguntas fijas de los formularios -> papoitem.Description
 -- Generado por papo_objects.py --questions-sql el 2026-10-26: el formulario lee la pregunta de papoItemID y
--- la base queda con el texto que mostraba. Aplicar en cla-db-papo y luego en producción.
+-- la base queda con el texto que mostraba. Aplicar en cla-db-papo y luego en produccion.
 
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
--- Page/Embedded/Ensamble/Form_EA11-1101_1h · antes: N'Verificacion dimensional de la placa con galga segun procedimiento Manejo de galgas EA12-0300'
-UPDATE papoitem SET Description = N'Verificación dimensional de la placa con galga según procedimiento Manejo de galgas EA12-0300' WHERE ID = 280;
--- Page/Embedded/Ensamble/Form_EA11-1101_1h · antes: N'Verificacion de atributos de placa Positiva segun criterio de aceptacion y rechazos RH02-0500 ANEXO 4.'
-UPDATE papoitem SET Description = N'Verificación de atributos de placa Positiva según criterio de aceptación y rechazos RH02-0500 ANEXO 4.' WHERE ID = 281;
--- Page/Embedded/Ensamble/Form_EA11-1101_1h · antes: N'Verificacion de atributos de placa Negativa segun criterio de aceptacion y rechazos RH02-0500 ANEXO 4.'
-UPDATE papoitem SET Description = N'Verificación de atributos de placa Negativa según criterio de aceptación y rechazos RH02-0500 ANEXO 4.' WHERE ID = 282;
--- Page/Embedded/Ensamble/Form_EA11-1101_1h · antes: N'Funcionamiento del balancin de tension del rollo (Estado de lubricacion y movimiento libre sin atasques)'
-UPDATE papoitem SET Description = N'Funcionamiento del balancin de tensión del rollo (Estado de lubricacion y movimiento libre sin atasques)' WHERE ID = 287;
--- Page/Embedded/Ensamble/Form_EA11-1101_1h · antes: N'Placa negativa sin deformacion despues de ensobrada'
-UPDATE papoitem SET Description = N'Placa negativa sin deformación despues de ensobrada' WHERE ID = 292;
--- Page/Embedded/Ensamble/Form_EA11-1101_1h · antes: N'Bateria referencia Sofasa, segregar los primeros 50 cm del rollo y ubicarlos en el anaquel'
-UPDATE papoitem SET Description = N'Batería referencia Sofasa, segregar los primeros 50 cm del rollo y ubicarlos en el anaquel' WHERE ID = 293;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5s'
+-- Page/Embedded/Ensamble/Form_EA11-1101_1h  antes: N'Verificacion dimensional de la placa con galga segun procedimiento Manejo de galgas EA12-0300'
+UPDATE papoitem SET Description = (N'Verificaci' + NCHAR(243) + N'n dimensional de la placa con galga seg' + NCHAR(250) + N'n procedimiento Manejo de galgas EA12-0300') WHERE ID = 280;
+-- Page/Embedded/Ensamble/Form_EA11-1101_1h  antes: N'Verificacion de atributos de placa Positiva segun criterio de aceptacion y rechazos RH02-0500 ANEXO 4.'
+UPDATE papoitem SET Description = (N'Verificaci' + NCHAR(243) + N'n de atributos de placa Positiva seg' + NCHAR(250) + N'n criterio de aceptaci' + NCHAR(243) + N'n y rechazos RH02-0500 ANEXO 4.') WHERE ID = 281;
+-- Page/Embedded/Ensamble/Form_EA11-1101_1h  antes: N'Verificacion de atributos de placa Negativa segun criterio de aceptacion y rechazos RH02-0500 ANEXO 4.'
+UPDATE papoitem SET Description = (N'Verificaci' + NCHAR(243) + N'n de atributos de placa Negativa seg' + NCHAR(250) + N'n criterio de aceptaci' + NCHAR(243) + N'n y rechazos RH02-0500 ANEXO 4.') WHERE ID = 282;
+-- Page/Embedded/Ensamble/Form_EA11-1101_1h  antes: N'Funcionamiento del balancin de tension del rollo (Estado de lubricacion y movimiento libre sin atasques)'
+UPDATE papoitem SET Description = (N'Funcionamiento del balancin de tensi' + NCHAR(243) + N'n del rollo (Estado de lubricacion y movimiento libre sin atasques)') WHERE ID = 287;
+-- Page/Embedded/Ensamble/Form_EA11-1101_1h  antes: N'Placa negativa sin deformacion despues de ensobrada'
+UPDATE papoitem SET Description = (N'Placa negativa sin deformaci' + NCHAR(243) + N'n despues de ensobrada') WHERE ID = 292;
+-- Page/Embedded/Ensamble/Form_EA11-1101_1h  antes: N'Bateria referencia Sofasa, segregar los primeros 50 cm del rollo y ubicarlos en el anaquel'
+UPDATE papoitem SET Description = (N'Bater' + NCHAR(237) + N'a referencia Sofasa, segregar los primeros 50 cm del rollo y ubicarlos en el anaquel') WHERE ID = 293;
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5s'
 UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5''s.' WHERE ID = 258;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Cabinas electricas cerradas'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Cabinas electricas cerradas'
 UPDATE papoitem SET Description = N'Cabinas electricas cerradas.' WHERE ID = 259;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Guardas en su lugar'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Guardas en su lugar'
 UPDATE papoitem SET Description = N'Guardas en su lugar.' WHERE ID = 260;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Cabinas electricas con libre acceso'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Cabinas electricas con libre acceso'
 UPDATE papoitem SET Description = N'Cabinas electricas con libre acceso.' WHERE ID = 261;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Verificacion del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena'
-UPDATE papoitem SET Description = N'Verificación del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena' WHERE ID = 262;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'No hay objetos sobre las cabinas electicas'
-UPDATE papoitem SET Description = N'No hay objetos sobre las cabinas elécticas.' WHERE ID = 263;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Cableado en buenas condiciones'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Verificacion del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena'
+UPDATE papoitem SET Description = (N'Verificaci' + NCHAR(243) + N'n del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena') WHERE ID = 262;
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'No hay objetos sobre las cabinas electicas'
+UPDATE papoitem SET Description = (N'No hay objetos sobre las cabinas el' + NCHAR(233) + N'cticas.') WHERE ID = 263;
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Cableado en buenas condiciones'
 UPDATE papoitem SET Description = N'Cableado en buenas condiciones.' WHERE ID = 264;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Switch y controles de seguridad funcionando correctamente'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Switch y controles de seguridad funcionando correctamente'
 UPDATE papoitem SET Description = N'Switch y controles de seguridad funcionando correctamente.' WHERE ID = 265;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'No hay fugas ni goteos en las maquinas'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'No hay fugas ni goteos en las maquinas'
 UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas.' WHERE ID = 266;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Boton parada de emergencia funcionando correctamente'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Boton parada de emergencia funcionando correctamente'
 UPDATE papoitem SET Description = N'Boton parada de emergencia funcionando correctamente.' WHERE ID = 267;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Buen estado y tension de las cadenas, pinones y bandas'
-UPDATE papoitem SET Description = N'Buen estado y tension de las cadenas, piñones y bandas' WHERE ID = 269;
--- Page/Embedded/Ensamble/Form_EA11-1101_start · antes: N'Se encuentran calibrados los elementos de medicion'
-UPDATE papoitem SET Description = N'Se encuentran calibrados los elementos de medición' WHERE ID = 272;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Penetracion bandera hombro'
-UPDATE papoitem SET Description = N'Penetración bandera hombro' WHERE ID = 341;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Aplicacion de flux en bandera.'
-UPDATE papoitem SET Description = N'Aplicación de flux en bandera' WHERE ID = 343;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Alineacion de bandera - hombro.'
-UPDATE papoitem SET Description = N'Alineación de bandera - hombro' WHERE ID = 347;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Frecuencia segun plan control EA07-0300'
-UPDATE papoitem SET Description = N'Frecuencia según plan control EA07-0300' WHERE ID = 2017;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Espesor de hombro.'
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Buen estado y tension de las cadenas, pinones y bandas'
+UPDATE papoitem SET Description = (N'Buen estado y tension de las cadenas, pi' + NCHAR(241) + N'ones y bandas') WHERE ID = 269;
+-- Page/Embedded/Ensamble/Form_EA11-1101_start  antes: N'Se encuentran calibrados los elementos de medicion'
+UPDATE papoitem SET Description = (N'Se encuentran calibrados los elementos de medici' + NCHAR(243) + N'n') WHERE ID = 272;
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Penetracion bandera hombro'
+UPDATE papoitem SET Description = (N'Penetraci' + NCHAR(243) + N'n bandera hombro') WHERE ID = 341;
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Aplicacion de flux en bandera.'
+UPDATE papoitem SET Description = (N'Aplicaci' + NCHAR(243) + N'n de flux en bandera') WHERE ID = 343;
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Alineacion de bandera - hombro.'
+UPDATE papoitem SET Description = (N'Alineaci' + NCHAR(243) + N'n de bandera - hombro') WHERE ID = 347;
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Frecuencia segun plan control EA07-0300'
+UPDATE papoitem SET Description = (N'Frecuencia seg' + NCHAR(250) + N'n plan control EA07-0300') WHERE ID = 2017;
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Espesor de hombro.'
 UPDATE papoitem SET Description = N'Espesor de hombro' WHERE ID = 342;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Estado de banderas segun plan control EA07-0300.'
-UPDATE papoitem SET Description = N'Estado de banderas según plan control EA07-0300' WHERE ID = 344;
--- Page/Embedded/Ensamble/Form_EA11-2201_1h · antes: N'Condicion del strap segun plan control EA07-0300.'
-UPDATE papoitem SET Description = N'Condición del strap según plan control EA07-0300' WHERE ID = 346;
--- Page/Embedded/Ensamble/Form_EA11-2201_2h · antes: N'No Cristalizacion ni fractura de espigos y hombros segun plan control EA07-0300.'
-UPDATE papoitem SET Description = N'No Cristalizacion ni fractura de espigos y hombros según plan control EA07-0300' WHERE ID = 349;
--- Page/Embedded/Ensamble/Form_EA11-2201_start · antes: N'aÂrea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Estado de banderas segun plan control EA07-0300.'
+UPDATE papoitem SET Description = (N'Estado de banderas seg' + NCHAR(250) + N'n plan control EA07-0300') WHERE ID = 344;
+-- Page/Embedded/Ensamble/Form_EA11-2201_1h  antes: N'Condicion del strap segun plan control EA07-0300.'
+UPDATE papoitem SET Description = (N'Condici' + NCHAR(243) + N'n del strap seg' + NCHAR(250) + N'n plan control EA07-0300') WHERE ID = 346;
+-- Page/Embedded/Ensamble/Form_EA11-2201_2h  antes: N'No Cristalizacion ni fractura de espigos y hombros segun plan control EA07-0300.'
+UPDATE papoitem SET Description = (N'No Cristalizacion ni fractura de espigos y hombros seg' + NCHAR(250) + N'n plan control EA07-0300') WHERE ID = 349;
+-- Page/Embedded/Ensamble/Form_EA11-2201_start  antes: N'aArea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
 UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5''s.' WHERE ID = 312;
--- Page/Embedded/Ensamble/Form_EA11-2201_start · antes: N'Guardas, switch y controles de seguridad funcionando correctamente..'
+-- Page/Embedded/Ensamble/Form_EA11-2201_start  antes: N'Guardas, switch y controles de seguridad funcionando correctamente..'
 UPDATE papoitem SET Description = N'Guardas, switch y controles de seguridad funcionando correctamente.' WHERE ID = 314;
--- Page/Embedded/Ensamble/Form_EA11-2201_start · antes: N'No hay fugas ni goteos en las maquinas'
+-- Page/Embedded/Ensamble/Form_EA11-2201_start  antes: N'No hay fugas ni goteos en las maquinas'
 UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas.' WHERE ID = 318;
--- Page/Embedded/Ensamble/Form_EA11-2201_start · antes: N'Verificacion del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena.'
-UPDATE papoitem SET Description = N'Verificación del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena.' WHERE ID = 319;
--- Page/Embedded/Ensamble/Form_EA11-2501_30min · antes: N'Prueba de desgarre soldadura de punto cada 30 minutos, revisar criterios de Aceptacion y Rechazo.'
-UPDATE papoitem SET Description = N'Prueba de desgarre soldadura de punto cada 30 minutos, revisar criterios de Aceptación y Rechazo' WHERE ID = 3093;
--- Page/Embedded/Ensamble/Form_EA11-2501_30min · antes: N'Alineacion de soldadura.'
-UPDATE papoitem SET Description = N'Alineación de soldadura' WHERE ID = 3095;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
+-- Page/Embedded/Ensamble/Form_EA11-2201_start  antes: N'Verificacion del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena.'
+UPDATE papoitem SET Description = (N'Verificaci' + NCHAR(243) + N'n del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena.') WHERE ID = 319;
+-- Page/Embedded/Ensamble/Form_EA11-2501_30min  antes: N'Prueba de desgarre soldadura de punto cada 30 minutos, revisar criterios de Aceptacion y Rechazo.'
+UPDATE papoitem SET Description = (N'Prueba de desgarre soldadura de punto cada 30 minutos, revisar criterios de Aceptaci' + NCHAR(243) + N'n y Rechazo') WHERE ID = 3093;
+-- Page/Embedded/Ensamble/Form_EA11-2501_30min  antes: N'Alineacion de soldadura.'
+UPDATE papoitem SET Description = (N'Alineaci' + NCHAR(243) + N'n de soldadura') WHERE ID = 3095;
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
 UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5''s.' WHERE ID = 3054;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'No hay fugas ni goteos en las maquinas'
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'No hay fugas ni goteos en las maquinas'
 UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas.' WHERE ID = 3061;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Los electrodos de prueba se encuentra en buen estado.'
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Los electrodos de prueba se encuentra en buen estado.'
 UPDATE papoitem SET Description = N'Los electrodos de prueba se encuentran en buen estado.' WHERE ID = 3062;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Electrodos en buen estado segun criterios de aceptacion y rechazo.'
-UPDATE papoitem SET Description = N'Electrodos en buen estado según criterio de aceptación y rechazo' WHERE ID = 3067;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'El cableado electrico esta bien conectado.'
-UPDATE papoitem SET Description = N'El cableado eléctrico está bien conectado.' WHERE ID = 3063;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Electrodos, mordazas, aislante y correas limpias, secas, en buen estado alineados y ajustados..'
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Electrodos en buen estado segun criterios de aceptacion y rechazo.'
+UPDATE papoitem SET Description = (N'Electrodos en buen estado seg' + NCHAR(250) + N'n criterio de aceptaci' + NCHAR(243) + N'n y rechazo') WHERE ID = 3067;
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'El cableado electrico esta bien conectado.'
+UPDATE papoitem SET Description = (N'El cableado el' + NCHAR(233) + N'ctrico est' + NCHAR(225) + N' bien conectado.') WHERE ID = 3063;
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Electrodos, mordazas, aislante y correas limpias, secas, en buen estado alineados y ajustados..'
 UPDATE papoitem SET Description = N'Electrodos, mordazas, aislante y correas limpias, secas, en buen estado alineados y ajustados.' WHERE ID = 3068;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'La estacion de rechazo se encuentra operando adecuadamente.'
-UPDATE papoitem SET Description = N'La estación de rechazo se encuentra operando adecuadamente' WHERE ID = 3064;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'El nivel de aceite en la unidad de mantenimiento se encuentra bien.'
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'La estacion de rechazo se encuentra operando adecuadamente.'
+UPDATE papoitem SET Description = (N'La estaci' + NCHAR(243) + N'n de rechazo se encuentra operando adecuadamente') WHERE ID = 3064;
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'El nivel de aceite en la unidad de mantenimiento se encuentra bien.'
 UPDATE papoitem SET Description = N'El nivel de aceite en la unidad de mantenimiento se encuentra bien' WHERE ID = 3069;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Los instrumentos de medicion se encuentran calibrados.'
-UPDATE papoitem SET Description = N'Los instrumentos de medición se encuentran calibrados.' WHERE ID = 3066;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Los instrumentos de medicion se encuentran calibrados.'
-UPDATE papoitem SET Description = N'Los instrumentos de medición se encuentran calibrados.' WHERE ID = 3072;
--- Page/Embedded/Ensamble/Form_EA11-2501_start · antes: N'Tornilleria bien ajustada y en buen estado.'
-UPDATE papoitem SET Description = N'Tornillería bien ajustada y en buen estado.' WHERE ID = 3073;
--- Page/Embedded/Ensamble/Form_EA11-2601_2h · antes: N'Peso Hotmelt (Bat. 31: 80 +/- 10 gr/Bat. Bat. 4D-4DLT y 8D: 150 +/- 10 gr/Bat)'
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Los instrumentos de medicion se encuentran calibrados.'
+UPDATE papoitem SET Description = (N'Los instrumentos de medici' + NCHAR(243) + N'n se encuentran calibrados.') WHERE ID = 3066;
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Los instrumentos de medicion se encuentran calibrados.'
+UPDATE papoitem SET Description = (N'Los instrumentos de medici' + NCHAR(243) + N'n se encuentran calibrados.') WHERE ID = 3072;
+-- Page/Embedded/Ensamble/Form_EA11-2501_start  antes: N'Tornilleria bien ajustada y en buen estado.'
+UPDATE papoitem SET Description = (N'Torniller' + NCHAR(237) + N'a bien ajustada y en buen estado.') WHERE ID = 3073;
+-- Page/Embedded/Ensamble/Form_EA11-2601_2h  antes: N'Peso Hotmelt (Bat. 31: 80 +/- 10 gr/Bat. Bat. 4D-4DLT y 8D: 150 +/- 10 gr/Bat)'
 UPDATE papoitem SET Description = N'Peso Hotmelt (Bat. 31 (80 +/- 10 gr/Bat) Bat. 4D-4DLT y 8D ( 150+/- 10 gr/Bat)' WHERE ID = 11352;
--- Page/Embedded/Ensamble/Form_EA11-4101_1h, Page/Embedded/Ensamble/Form_EA11-4101_2h · antes: N'Altura  Espigos acorde especificacion / USE GALGA '
-UPDATE papoitem SET Description = N'Altura Espigos acorde especificación/ USE GALGA' WHERE ID = 3118;
--- Page/Embedded/Ensamble/Form_EA11-4101_2h · antes: N'Medidores de gas y oxigeno de alta en buen estado.'
-UPDATE papoitem SET Description = N'Medidores de gas y oxígeno de alta en buen estado.' WHERE ID = 3122;
--- Page/Embedded/Ensamble/Form_EA11-4101_2h · antes: N'Rotametros enfriamiento en buen estado .'
-UPDATE papoitem SET Description = N'Rotámetros enfríamiento en buen estado.' WHERE ID = 3117;
--- Page/Embedded/Ensamble/Form_EA11-4101_end · antes: N'Buen estado de electrodos ( Cambiar electrodos cada 5000 baterias Fabricadas).'
+-- Page/Embedded/Ensamble/Form_EA11-4101_1h, Page/Embedded/Ensamble/Form_EA11-4101_2h  antes: N'Altura  Espigos acorde especificacion / USE GALGA '
+UPDATE papoitem SET Description = (N'Altura Espigos acorde especificaci' + NCHAR(243) + N'n/ USE GALGA') WHERE ID = 3118;
+-- Page/Embedded/Ensamble/Form_EA11-4101_2h  antes: N'Medidores de gas y oxigeno de alta en buen estado.'
+UPDATE papoitem SET Description = (N'Medidores de gas y ox' + NCHAR(237) + N'geno de alta en buen estado.') WHERE ID = 3122;
+-- Page/Embedded/Ensamble/Form_EA11-4101_2h  antes: N'Rotametros enfriamiento en buen estado .'
+UPDATE papoitem SET Description = (N'Rot' + NCHAR(225) + N'metros enfr' + NCHAR(237) + N'amiento en buen estado.') WHERE ID = 3117;
+-- Page/Embedded/Ensamble/Form_EA11-4101_end  antes: N'Buen estado de electrodos ( Cambiar electrodos cada 5000 baterias Fabricadas).'
 UPDATE papoitem SET Description = N'Buen estado de electrodos (Cambiar electrodos cada 5000 baterias Fabricadas).' WHERE ID = 3124;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
 UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5''s.' WHERE ID = 3099;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'No hay objetos dentro ni sobre las cabinas electricas.'
-UPDATE papoitem SET Description = N'No hay objetos dentro ni sobre las cabinas eléctricas.' WHERE ID = 3103;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'No hay fugas ni goteos en las las maquinas.'
-UPDATE papoitem SET Description = N'No hay fugas ni goteos en las máquinas.' WHERE ID = 3105;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'Switch de seguro de puerta activo .'
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'No hay objetos dentro ni sobre las cabinas electricas.'
+UPDATE papoitem SET Description = (N'No hay objetos dentro ni sobre las cabinas el' + NCHAR(233) + N'ctricas.') WHERE ID = 3103;
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'No hay fugas ni goteos en las las maquinas.'
+UPDATE papoitem SET Description = (N'No hay fugas ni goteos en las m' + NCHAR(225) + N'quinas.') WHERE ID = 3105;
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'Switch de seguro de puerta activo .'
 UPDATE papoitem SET Description = N'Switch de seguro de puerta activo.' WHERE ID = 3106;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'Presion de aire de la linea principal entre SET POINT 95psi - VARIACIaÂN PROCESO 85 - 105.'
-UPDATE papoitem SET Description = N'Presión de aire de la línea principal entre SET POINT 95 psi   - Variación proceso 85 - 105 psi' WHERE ID = 3107;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'Buen estado pantalla de control panel touch .'
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'Presion de aire de la linea principal entre SET POINT 95psi - VARIACIaAN PROCESO 85 - 105.'
+UPDATE papoitem SET Description = (N'Presi' + NCHAR(243) + N'n de aire de la l' + NCHAR(237) + N'nea principal entre SET POINT 95 psi' + NCHAR(160) + N' ' + NCHAR(160) + N'- Variaci' + NCHAR(243) + N'n proceso 85 - 105 psi') WHERE ID = 3107;
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'Buen estado pantalla de control panel touch .'
 UPDATE papoitem SET Description = N'Buen estado pantalla de control panel touch.' WHERE ID = 3108;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'No hay fugas  de  gas y oxigeno.'
-UPDATE papoitem SET Description = N'No hay fugas de gas y oxígeno.' WHERE ID = 3113;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'Mangueras de Borneadora manual y APB en buen estado, grafadas y con arrestador de llama en la salida.'
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'No hay fugas  de  gas y oxigeno.'
+UPDATE papoitem SET Description = (N'No hay fugas de gas y ox' + NCHAR(237) + N'geno.') WHERE ID = 3113;
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'Mangueras de Borneadora manual y APB en buen estado, grafadas y con arrestador de llama en la salida.'
 UPDATE papoitem SET Description = N'Mangueras de borneadora manual y APB en buen estado, grafadas y con arrestador de llama en salida.' WHERE ID = 3114;
--- Page/Embedded/Ensamble/Form_EA11-4101_start · antes: N'Buen estado del economizador (apague la llama cuando se ubique sobre el).'
-UPDATE papoitem SET Description = N'Buen estado del economizador (apague la llama cuando se ubique sobre él).' WHERE ID = 3115;
--- Page/Embedded/Ensamble/Form_EA11-4200_1h, Page/Embedded/Ensamble/Form_EA11-4200_2h, Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Verificacion DAPE con muestra patron'
-UPDATE papoitem SET Description = N'Verificación de DAPE con muestra patrón' WHERE ID = 3050;
--- Page/Embedded/Ensamble/Form_EA11-4200_1h, Page/Embedded/Ensamble/Form_EA11-4200_2h, Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Apariencia de bateria (rayada, quemada, golpeada, deformaciones en sellado, etc)'
-UPDATE papoitem SET Description = N'Apariencia de batería (rayada, quemada, golpeada, deformaciones en sellado, etc)' WHERE ID = 3053;
--- Page/Embedded/Ensamble/Form_EA11-4200_2h, Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'No presencia de rebabas'
+-- Page/Embedded/Ensamble/Form_EA11-4101_start  antes: N'Buen estado del economizador (apague la llama cuando se ubique sobre el).'
+UPDATE papoitem SET Description = (N'Buen estado del economizador (apague la llama cuando se ubique sobre ' + NCHAR(233) + N'l).') WHERE ID = 3115;
+-- Page/Embedded/Ensamble/Form_EA11-4200_1h, Page/Embedded/Ensamble/Form_EA11-4200_2h, Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Verificacion DAPE con muestra patron'
+UPDATE papoitem SET Description = (N'Verificaci' + NCHAR(243) + N'n de DAPE con muestra patr' + NCHAR(243) + N'n') WHERE ID = 3050;
+-- Page/Embedded/Ensamble/Form_EA11-4200_1h, Page/Embedded/Ensamble/Form_EA11-4200_2h, Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Apariencia de bateria (rayada, quemada, golpeada, deformaciones en sellado, etc)'
+UPDATE papoitem SET Description = (N'Apariencia de bater' + NCHAR(237) + N'a (rayada, quemada, golpeada, deformaciones en sellado, etc)') WHERE ID = 3053;
+-- Page/Embedded/Ensamble/Form_EA11-4200_2h, Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'No presencia de rebabas'
 UPDATE papoitem SET Description = N'No presencia de rebabas.' WHERE ID = 3048;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'aÂrea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'aArea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.'
 UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5''s.' WHERE ID = 3001;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Estibador manual en buen estado.'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Estibador manual en buen estado.'
 UPDATE papoitem SET Description = N'Estibador manual en buen estado' WHERE ID = 3005;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'No hay fugas ni goteos en las maquinas'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'No hay fugas ni goteos en las maquinas'
 UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas.' WHERE ID = 3009;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Todas las resistencias se encuentras en buen estado.'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Todas las resistencias se encuentras en buen estado.'
 UPDATE papoitem SET Description = N'Todas las resistencias se encuentran en buen estado' WHERE ID = 3011;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Manometros calibrados y en buen estado.'
-UPDATE papoitem SET Description = N'Manómetros calibrados y en buen estado' WHERE ID = 3016;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Se encuentran las galgas en el puesto y con calibracion vigente.'
-UPDATE papoitem SET Description = N'Se encuentran las galgas en el puesto y con calibración vigente' WHERE ID = 3012;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Presion de aire alcanza el valor indicado en la prueba.'
-UPDATE papoitem SET Description = N'Presión de aire alcanza el valor indicado en la prueba' WHERE ID = 3017;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Los amperimetros estan funcionando.'
-UPDATE papoitem SET Description = N'Los amperímetros están funcionando' WHERE ID = 3013;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'El equipo opera correctamente.'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Manometros calibrados y en buen estado.'
+UPDATE papoitem SET Description = (N'Man' + NCHAR(243) + N'metros calibrados y en buen estado') WHERE ID = 3016;
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Se encuentran las galgas en el puesto y con calibracion vigente.'
+UPDATE papoitem SET Description = (N'Se encuentran las galgas en el puesto y con calibraci' + NCHAR(243) + N'n vigente') WHERE ID = 3012;
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Presion de aire alcanza el valor indicado en la prueba.'
+UPDATE papoitem SET Description = (N'Presi' + NCHAR(243) + N'n de aire alcanza el valor indicado en la prueba') WHERE ID = 3017;
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Los amperimetros estan funcionando.'
+UPDATE papoitem SET Description = (N'Los amper' + NCHAR(237) + N'metros est' + NCHAR(225) + N'n funcionando') WHERE ID = 3013;
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'El equipo opera correctamente.'
 UPDATE papoitem SET Description = N'El equipo opera correctamente' WHERE ID = 3018;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Inexistencia de ruidos inusuales.'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Inexistencia de ruidos inusuales.'
 UPDATE papoitem SET Description = N'Inexistencia de ruidos inusuales' WHERE ID = 3014;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Inexistencia de ruidos inusuales.'
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Inexistencia de ruidos inusuales.'
 UPDATE papoitem SET Description = N'Inexistencia de ruidos inusuales' WHERE ID = 3019;
--- Page/Embedded/Ensamble/Form_EA11-4200_start · antes: N'Los instrumentos de medicion se encuentran calibrados.'
-UPDATE papoitem SET Description = N'Los instrumentos de medición se encuentran calibrados' WHERE ID = 3015;
+-- Page/Embedded/Ensamble/Form_EA11-4200_start  antes: N'Los instrumentos de medicion se encuentran calibrados.'
+UPDATE papoitem SET Description = (N'Los instrumentos de medici' + NCHAR(243) + N'n se encuentran calibrados') WHERE ID = 3015;
 COMMIT;
 
 -- Rollback:
@@ -177,13 +177,13 @@ COMMIT;
 -- UPDATE papoitem SET Description = N'Estado de banderas segun plan control EA07-0300.' WHERE ID = 344;
 -- UPDATE papoitem SET Description = N'Condicion del strap segun plan control EA07-0300.' WHERE ID = 346;
 -- UPDATE papoitem SET Description = N'No Cristalizacion ni fractura de espigos y hombros segun plan control EA07-0300.' WHERE ID = 349;
--- UPDATE papoitem SET Description = N'aÂrea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 312;
+-- UPDATE papoitem SET Description = N'aArea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 312;
 -- UPDATE papoitem SET Description = N'Guardas, switch y controles de seguridad funcionando correctamente..' WHERE ID = 314;
 -- UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas' WHERE ID = 318;
 -- UPDATE papoitem SET Description = N'Verificacion del estado del polipasto y los elementos como cadena, botonera, dispositivos de izaje y bolsa guarda cadena.' WHERE ID = 319;
 -- UPDATE papoitem SET Description = N'Prueba de desgarre soldadura de punto cada 30 minutos, revisar criterios de Aceptacion y Rechazo.' WHERE ID = 3093;
 -- UPDATE papoitem SET Description = N'Alineacion de soldadura.' WHERE ID = 3095;
--- UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 3054;
+-- UPDATE papoitem SET Description = N'Area de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 3054;
 -- UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas' WHERE ID = 3061;
 -- UPDATE papoitem SET Description = N'Los electrodos de prueba se encuentra en buen estado.' WHERE ID = 3062;
 -- UPDATE papoitem SET Description = N'Electrodos en buen estado segun criterios de aceptacion y rechazo.' WHERE ID = 3067;
@@ -203,7 +203,7 @@ COMMIT;
 -- UPDATE papoitem SET Description = N'No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 3103;
 -- UPDATE papoitem SET Description = N'No hay fugas ni goteos en las las maquinas.' WHERE ID = 3105;
 -- UPDATE papoitem SET Description = N'Switch de seguro de puerta activo .' WHERE ID = 3106;
--- UPDATE papoitem SET Description = N'Presion de aire de la linea principal entre SET POINT 95psi - VARIACIaÂN PROCESO 85 - 105.' WHERE ID = 3107;
+-- UPDATE papoitem SET Description = N'Presion de aire de la linea principal entre SET POINT 95psi - VARIACIaAN PROCESO 85 - 105.' WHERE ID = 3107;
 -- UPDATE papoitem SET Description = N'Buen estado pantalla de control panel touch .' WHERE ID = 3108;
 -- UPDATE papoitem SET Description = N'No hay fugas  de  gas y oxigeno.' WHERE ID = 3113;
 -- UPDATE papoitem SET Description = N'Mangueras de Borneadora manual y APB en buen estado, grafadas y con arrestador de llama en la salida.' WHERE ID = 3114;
@@ -211,7 +211,7 @@ COMMIT;
 -- UPDATE papoitem SET Description = N'Verificacion DAPE con muestra patron' WHERE ID = 3050;
 -- UPDATE papoitem SET Description = N'Apariencia de bateria (rayada, quemada, golpeada, deformaciones en sellado, etc)' WHERE ID = 3053;
 -- UPDATE papoitem SET Description = N'No presencia de rebabas' WHERE ID = 3048;
--- UPDATE papoitem SET Description = N'aÂrea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 3001;
+-- UPDATE papoitem SET Description = N'aArea de trabajo aseada y libre de obstaculos cumpliendo el estandar 5S. No hay objetos dentro ni sobre las cabinas electricas.' WHERE ID = 3001;
 -- UPDATE papoitem SET Description = N'Estibador manual en buen estado.' WHERE ID = 3005;
 -- UPDATE papoitem SET Description = N'No hay fugas ni goteos en las maquinas' WHERE ID = 3009;
 -- UPDATE papoitem SET Description = N'Todas las resistencias se encuentras en buen estado.' WHERE ID = 3011;
