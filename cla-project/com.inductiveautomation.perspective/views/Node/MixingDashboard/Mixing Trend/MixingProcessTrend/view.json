@@ -1,18 +1,19 @@
 {
   "custom": {
-    "areaId": "FA",
+    "areaId": "Ensamble",
     "areaName": "value",
     "dataArea": {
       "$": [
         "ds",
         192,
-        1760645934957
+        1779225685850
       ],
       "$columns": [
         {
           "data": [
             3,
             28,
+            45,
             4,
             26
           ],
@@ -23,6 +24,7 @@
           "data": [
             "Ensamble",
             "F\u0026A",
+            "General",
             "Metalurgia",
             "OREC"
           ],
@@ -113,8 +115,8 @@
   },
   "props": {
     "defaultSize": {
-      "height": 3080,
-      "width": 1920
+      "height": 1336,
+      "width": 1820
     }
   },
   "root": {
@@ -187,7 +189,7 @@
               "name": "Dropdown Area"
             },
             "position": {
-              "basis": "200px",
+              "basis": "250px",
               "shrink": 0
             },
             "propConfig": {
@@ -231,7 +233,7 @@
                 "margin": 8,
                 "textAlign": "center"
               },
-              "value": 28
+              "value": 3
             },
             "type": "ia.input.dropdown"
           },
@@ -260,6 +262,60 @@
               "grow": 1
             },
             "type": "ia.display.label"
+          },
+          {
+            "events": {
+              "dom": {
+                "onClick": {
+                  "config": {
+                    "script": "\t\"\"\"\n\tExport PowerChart historical data to Excel file.\n\t\n\tThis script reads the current PowerChart configuration (pens and date range),\n\tqueries historical tag data, and exports it to an Excel file with format:\n\t|timestamp|variable1|variable2|variable3|\n\t\n\tHandles both \u0027realtime\u0027 and \u0027historical\u0027 modes.\n\tReturns raw data without aggregation.\n\t\"\"\"\n\t\n\timport system.perspective\n\timport system.tag\n\timport system.date\n\t\n\tlogger \u003d system.util.getLogger(\"trends.exportPowerChart\")\n\t\n\ttry:\n\t\t# Read PowerChart configuration properties\n\t\tchartMode \u003d self.parent.parent.getChild(\"All\").getChild(\"Chart Cont\").getChild(\"Power Chart\").props.config.mode\n\t\tpens \u003d self.parent.parent.getChild(\"All\").getChild(\"Chart Cont\").getChild(\"Power Chart\").props.pens\n\t\t\n\t\t# Validate pens exist\n\t\tif pens is None or len(pens) \u003d\u003d 0:\n\t\t\talerts.noValidOption(\"No hay variables configuradas en el PowerChart\")\n\t\t\t# logger.info(\"Export failed - No pens configured\")\n\t\t\traise ValueError(\"No pens configured\")\n\t\t\n\t\t# Calculate date range based on mode\n\t\tif chartMode \u003d\u003d \"realtime\":\n\t\t\t# Read realtime configuration\n\t\t\tunitOfTime \u003d self.parent.parent.getChild(\"All\").getChild(\"Chart Cont\").getChild(\"Power Chart\").props.config.unitOfTime\n\t\t\tmeasureOfTime \u003d self.parent.parent.getChild(\"All\").getChild(\"Chart Cont\").getChild(\"Power Chart\").props.config.measureOfTime\n\t\t\t\n\t\t\t# Calculate end date (now)\n\t\t\tendDate \u003d system.date.now()\n\t\t\t\n\t\t\t# Calculate start date based on measure unit (string)\n\t\t\tif measureOfTime \u003d\u003d \"seconds\":\n\t\t\t\tstartDate \u003d system.date.addSeconds(endDate, -unitOfTime)\n\t\t\telif measureOfTime \u003d\u003d \"minutes\":\n\t\t\t\tstartDate \u003d system.date.addMinutes(endDate, -unitOfTime)\n\t\t\telif measureOfTime \u003d\u003d \"hours\":\n\t\t\t\tstartDate \u003d system.date.addHours(endDate, -unitOfTime)\n\t\t\telif measureOfTime \u003d\u003d \"days\":\n\t\t\t\tstartDate \u003d system.date.addDays(endDate, -unitOfTime)\n\t\t\telif measureOfTime \u003d\u003d \"weeks\":\n\t\t\t\tstartDate \u003d system.date.addWeeks(endDate, -unitOfTime)\n\t\t\telif measureOfTime \u003d\u003d \"months\":\n\t\t\t\tstartDate \u003d system.date.addMonths(endDate, -unitOfTime)\n\t\t\telif measureOfTime \u003d\u003d \"years\":\n\t\t\t\tstartDate \u003d system.date.addYears(endDate, -unitOfTime)\n\t\t\telse:\n\t\t\t\t# Default to 1 hour if unknown\n\t\t\t\tstartDate \u003d system.date.addHours(endDate, -1)\n\t\t\t\n\t\telse:  # historical mode\n\t\t\t# Read historical configuration\n\t\t\tstartDate \u003d self.parent.parent.getChild(\"All\").getChild(\"Chart Cont\").getChild(\"Power Chart\").props.config.startDate\n\t\t\tendDate \u003d self.parent.parent.getChild(\"All\").getChild(\"Chart Cont\").getChild(\"Power Chart\").props.config.endDate\n\t\t\t\n\t\t\t# Validate dates exist\n\t\t\tif startDate is None or endDate is None:\n\t\t\t\talerts.noValidOption(\"Fechas de inicio o fin no configuradas\")\n\t\t\t\t# logger.info(\"Export failed - Dates not configured\")\n\t\t\t\traise ValueError(\"Dates not configured\")\n\t\t\n\t\t# print \"Export range: {} to {}\".format(startDate, endDate)\n\t\t# logger.info(\"Exporting data from {} to {}\".format(startDate, endDate))\n\t\t\n\t\t# Build tag paths list from pens\n\t\ttagPaths \u003d []\n\t\tpenNames \u003d []\n\t\tfor pen in pens:\n\t\t\ttagPaths.append(pen[\u0027data\u0027][\u0027source\u0027])\n\t\t\tpenNames.append(pen[\u0027name\u0027])\n\t\t\n\t\t# print \"Tag paths: {}\".format(tagPaths)\n\t\t# print \"Pen names: {}\".format(penNames)\n\t\t\n\t\t# Query historical data for all tags\n\t\t# returnFormat: Wide returns one column per tag\n\t\t# returnSize: -1 returns raw data without aggregation\n\t\thistoryData \u003d system.tag.queryTagHistory(\n\t\t    paths\u003dtagPaths,\n\t\t    startDate\u003dstartDate,\n\t\t    endDate\u003dendDate,\n\t\t    returnFormat\u003d\u0027Wide\u0027,\n\t\t    returnSize\u003d-1,\n\t\t    noInterpolation\u003dTrue,\n\t\t)\n\t\tfor row in range(min(5, historyData.rowCount)):\n\t\t    for col in range(historyData.columnCount):\n\t\t        value \u003d historyData.getValueAt(row, col)\n\t\t        logger.info(\"Row {}, Col {}: type\u003d{}, value\u003d{}\".format(row, col, type(value), value))\n\t\t\n\t\t# print \"Retrieved {} rows of historical data\".format(historyData.rowCount)\n\t\t\n\t\t# Validate data retrieved\n\t\tif historyData.rowCount \u003d\u003d 0:\n\t\t\talerts.noValidOption(\"No se encontraron datos historicos en el rango seleccionado\")\n\t\t\t# logger.info(\"Export warning - No data in range\")\n\t\t\treturn\n\t\t\n\t\t# Build headers for Excel: timestamp + pen names\n\t\theaders \u003d [\u0027timestamp\u0027] + penNames\n\t\t\n\t\t# Convert dataset to list for Excel export - proper numeric conversion\n\t\tdata \u003d []\n\t\tfor row in range(historyData.rowCount):\n\t\t\trowData \u003d []\n\t\t\t\n\t\t\tfor col in range(historyData.columnCount):\n\t\t\t\tvalue \u003d historyData.getValueAt(row, col)\n\t\t\t\t\n\t\t\t\t# Handle different data types with proper conversion\n\t\t\t\tif value is None:\n\t\t\t\t\trowData.append(\u0027\u0027)\n\t\t\t\telif col \u003d\u003d 0:\n\t\t\t\t\t# First column is t_stamp (Timestamp object) - convert to string\n\t\t\t\t\tformattedDate \u003d system.date.format(value, \"yyyy-MM-dd HH:mm:ss.SSS\")\n\t\t\t\t\trowData.append(formattedDate)\n\t\t\t\telse:\n\t\t\t\t\t# Numeric values - ensure proper float/int conversion\n\t\t\t\t\ttry:\n\t\t\t\t\t\t# Convert to Python float first, then to string with proper format\n\t\t\t\t\t\tnumValue \u003d float(value)\n\t\t\t\t\t\t# Format with period as decimal separator\n\t\t\t\t\t\trowData.append(str(numValue))\n\t\t\t\t\texcept:\n\t\t\t\t\t\t# If conversion fails, use string representation\n\t\t\t\t\t\trowData.append(str(value))\n\t\t\t\n\t\t\tdata.append(rowData)\n\t\t\t\n\t\tseen \u003d {}\n\t\tfor row in data:\n\t\t    seen[row[0]] \u003d row\n\t\t\n\t\tdata \u003d sorted(seen.values(), key\u003dlambda r: r[0])\n\t\t# Create dataset for Excel export\n\t\texportDataset \u003d system.dataset.toDataSet(headers, data)\n\t\t\n\t\t# Generate filename with current timestamp\n\t\tcurrentTimestamp \u003d system.date.format(system.date.now(), \"yyyy-MM-dd_HH-mm\")\n\t\tfilename \u003d \"PowerChart_Export_{}.xls\".format(currentTimestamp)\n\t\t\n\t\t# Export to Excel\n\t\texcelBytes \u003d system.dataset.dataSetToExcel(True, [exportDataset])\n\t\t\n\t\t# Download file to client\n\t\tsystem.perspective.download(filename, excelBytes)\n\t\t\n\t\t# Show success alert\n\t\talerts.actionSuccess(\"Exportacion exitosa\", \"Datos exportados correctamente a {}\".format(filename))\n\t\t\n\t\t# logger.info(\"Excel exported successfully: {}\".format(filename))\n\t\t# print \"Export completed: {}\".format(filename)\n\t\n\texcept Exception as e:\n\t\tlogger.error(\"Error exporting PowerChart to Excel: \" + str(e))\n\t\talerts.actionDeleteError(\"Error al exportar\", \"No se pudo exportar los datos. Revise los logs para mas detalles.\")"
+                  },
+                  "scope": "G",
+                  "type": "script"
+                }
+              }
+            },
+            "meta": {
+              "name": "Button_Apply_2"
+            },
+            "position": {
+              "basis": "140px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "position.display": {
+                "binding": {
+                  "config": {
+                    "struct": {
+                      "nodeID": "{view.params.nodeID}",
+                      "papoID": "{view.params.papoID}"
+                    },
+                    "waitOnAll": true
+                  },
+                  "enabled": false,
+                  "transforms": [
+                    {
+                      "code": "\tpapoID \u003d int(value[\u0027papoID\u0027])\n\tnodeID \u003d int(value[\u0027nodeID\u0027])\n\tif papoID \u003d\u003d 13:\n\t\treturn False\n\telse:\n\t\treturn True",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "expr-struct"
+                }
+              }
+            },
+            "props": {
+              "image": {
+                "height": 30,
+                "width": 15
+              },
+              "primary": false,
+              "style": {
+                "classes": "button-1",
+                "marginRight": 0
+              },
+              "text": "Descargar Excel"
+            },
+            "type": "ia.input.button"
           }
         ],
         "meta": {
@@ -288,8 +344,7 @@
               "name": "FlexRepeater"
             },
             "position": {
-              "basis": "350px",
-              "grow": 1,
+              "basis": "20%",
               "shrink": 0
             },
             "propConfig": {
@@ -439,8 +494,24 @@
                 },
                 "props": {
                   "config": {
-                    "measureOfTime": "minutes",
+                    "endDate": {
+                      "$": [
+                        "ts",
+                        0,
+                        1773411265684
+                      ],
+                      "$ts": 1773291540000
+                    },
+                    "rangeSelectorPen": "histprov:UNS:/tag:Clarios/Andina/FA/Formacion/Edge/AC10_0202/Densidad_Especifica",
                     "responsiveDesignWidth": 100,
+                    "startDate": {
+                      "$": [
+                        "ts",
+                        0,
+                        1773411265682
+                      ],
+                      "$ts": 1772518440000
+                    },
                     "visibility": {
                       "buttons": {
                         "showAnnotationButton": false,
@@ -451,6 +522,7 @@
                   },
                   "interaction": {
                     "chartZoomLevel": 1,
+                    "mode": "rangeBrush",
                     "rangeZoomLevel": 1
                   },
                   "plots": [],
@@ -531,7 +603,8 @@
               "name": "Chart Cont"
             },
             "position": {
-              "basis": "1552px"
+              "basis": "80%",
+              "grow": 1
             },
             "props": {
               "direction": "column"

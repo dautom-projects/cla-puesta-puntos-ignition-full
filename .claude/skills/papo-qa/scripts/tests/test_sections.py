@@ -1,0 +1,82 @@
+"""
+Tests of papo_objects.fitSections: an open section keeps its height and fits its rows. Cases taken from
+F&A/Form_AC10-0201_30min (group that could shrink) and F&A/Form_AC10-0201_end (height below its rows).
+
+Run: python3 -m unittest discover -s .claude/skills/papo-qa/scripts/tests -v
+"""
+
+import collections
+import os
+import sys
+import unittest
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "..", "papo-design", "scripts"))
+import papo_objects as objects
+
+
+def _view(base, rows, position=None, style=None):
+	group = {"meta": {"name": "FlexContainerGroup1"}, "custom": {"baseBasisPx": base}, "type": "ia.container.flex",
+		"position": position if position is not None else {"basis": "0px", "display": False, "shrink": 0},
+		"props": {"direction": "column", "style": style or {}},
+		"children": [{"meta": {"name": "Row{}".format(i)}, "type": "ia.container.flex", "position": {"basis": "{}px".format(h)},
+			"props": {"style": {"marginTop": m}}} for i, (h, m) in enumerate(rows)]}
+	return {"root": {"meta": {"name": "root"}, "children": [group]}}, group
+
+
+class SectionsTest(unittest.TestCase):
+	def test_heightReachesRows(self):
+		view, group = _view(419, [(60, 0), (48, 0), (230, 0), (60, 0), (50, 0)])
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertEqual(group["custom"]["baseBasisPx"], 448)
+
+	def test_marginsAndPadding(self):
+		view, group = _view(100, [(40, 5), (40, 5)], style={"paddingTop": 10, "paddingBottom": 10})
+		objects.fitSections(view, collections.Counter())
+		self.assertEqual(group["custom"]["baseBasisPx"], 110)
+
+	def test_groupDoesNotShrink(self):
+		view, group = _view(2615, [(50, 0)] * 10, position={"basis": "0px", "display": False})
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertEqual(group["position"]["shrink"], 0)
+		self.assertEqual(group["custom"]["baseBasisPx"], 2615)
+
+	def test_labelWithoutHeight(self):
+		# EA11-4101_2h: "Referencia hora/hora" (basis -141.2%, rendered auto: 23 px) above 25 + 200 px rows
+		view, group = _view(225, [(25, 0), (200, 0)])
+		group["children"].insert(0, {"meta": {"name": "Label_3"}, "type": "ia.display.label", "position": {"basis": "-141.2%"},
+			"props": {"text": "Referencia hora/hora"}})
+		objects.fitSections(view, collections.Counter())
+		self.assertEqual(group["custom"]["baseBasisPx"], 248)
+
+	def test_basisWithoutBase(self):
+		# F&A/Form_AC10-1101_30min: no custom.baseBasisPx, toggleSection opens it with its 600px basis (rows need 632)
+		view, group = _view(None, [(48, 0)] * 9 + [(50, 0)] * 4, position={"basis": "600px", "display": False, "shrink": 0})
+		del group["custom"]["baseBasisPx"]
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertEqual(group["position"]["basis"], "632px")
+		self.assertNotIn("baseBasisPx", group["custom"])
+		self.assertEqual(stats["secciones ajustadas a sus filas"], 1)
+
+	def test_supervisorWithoutBase(self):
+		# FlexContainerSupervisor is not a section: its basis is not the height of an accordion
+		view, group = _view(None, [(300, 0)], position={"basis": "32px", "shrink": 0})
+		del group["custom"]["baseBasisPx"]
+		group["meta"]["name"] = "FlexContainerSupervisor"
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertEqual(group["position"]["basis"], "32px")
+		self.assertFalse(stats)
+
+	def test_alreadyFits(self):
+		view, group = _view(500, [(50, 0)] * 4)
+		stats = collections.Counter()
+		objects.fitSections(view, stats)
+		self.assertFalse(stats)
+
+
+if __name__ == "__main__":
+	unittest.main()
