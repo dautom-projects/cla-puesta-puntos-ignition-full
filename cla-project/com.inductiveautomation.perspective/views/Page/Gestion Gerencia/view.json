@@ -8,6 +8,8 @@
       ],
       "$ts": 1792703770361
     },
+    "areaFilter": null,
+    "dataAreas": null,
     "dataReports": [
       {
         "NodeID": 8,
@@ -153,10 +155,23 @@
       },
       "persistent": true
     },
+    "custom.areaFilter": {
+      "binding": {
+        "config": {
+          "path": "/root/Filters/Dropdown Area.props.value"
+        },
+        "type": "property"
+      },
+      "persistent": true
+    },
+    "custom.dataAreas": {
+      "persistent": true
+    },
     "custom.dataReports": {
       "binding": {
         "config": {
           "struct": {
+            "area": "{view.custom.areaFilter}",
             "db": "{view.custom.dbConnection}",
             "endDate": "{view.custom.endTime}",
             "startDate": "{view.custom.startTime}",
@@ -166,7 +181,7 @@
         },
         "transforms": [
           {
-            "code": "\t\"\"\"\n\tBuild the reports dataset from registerhistory.\n\n\tThree separate queries:\n\t  1. Cycles active in period + their REAL latest status (no time filter on status)\n\t  2. Type-10 signature records for those cycles\n\t  3. Supervisor name from form field (papoitem \u0027Supervisor\u0027)\n\n\tVersion: 5.0.0\n\n\tArgs:\n\t\tvalue (dict): Struct with db, startDate, endDate, supervisor\n\n\tReturns:\n\t\tlist[dict]: Report rows for table consumption\n\n\tChangelog:\n\t\t2026-10-22 | William M. | v5.0.0 - Cycle key includes WorkstationNodeID\n\t\t\t(stations sharing a node no longer mix); supervisor question resolved\n\t\t\tthrough MasterPapoID; supervisor filter (normalized full name) and\n\t\t\tcounters applied here; no refresh tick (re-query only on filter change);\n\t\t\tsupervisor options \u003d supervisors with reports in the period; latest\n\t\t\tstart-form answer wins\n\t\t2026-09-01 | Andres G. | v4.0.0 - Add supervisor from form field;\n\t\t\tOperadorEsperado/SupervisorEsperado as row fields, not custom props;\n\t\t\tCierre Automatico detection for sinFirmaOperario counter\n\t\"\"\"\n\tlogger \u003d system.util.getLogger(\"transform.dataReports.{}\".format(self.view.id))\n\n\tdb \u003d value[\"db\"]\n\tstartDate \u003d value[\"startDate\"]\n\tendDate \u003d value[\"endDate\"]\n\tsupervisorFilter \u003d value.get(\"supervisor\")\n\n\ttry:\n\t\t# --- Query 1: cycles active in period + REAL latest status ---\n\t\tqueryCycles \u003d \"\"\"\n\t\t\tWITH activeCycles AS (\n\t\t\t\tSELECT DISTINCT\n\t\t\t\t\trh.NodeID,\n\t\t\t\t\trh.PapoID,\n\t\t\t\t\trh.WorkstationNodeID,\n\t\t\t\t\trh.RegisterCode\n\t\t\t\tFROM registerhistory rh\n\t\t\t\tWHERE rh.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh.Timestamp \u003c\u003d ?\n\t\t\t),\n\t\t\tfullCycles AS (\n\t\t\t\tSELECT\n\t\t\t\t\tac.NodeID, ac.PapoID, ac.WorkstationNodeID, ac.RegisterCode,\n\t\t\t\t\tMAX(rh.ID) AS lastID,\n\t\t\t\t\tMAX(CASE WHEN rh.RegisterTypeID \u003d 7 THEN rh.Timestamp END) AS startTime\n\t\t\t\tFROM activeCycles ac\n\t\t\t\tJOIN registerhistory rh\n\t\t\t\t\tON rh.NodeID \u003d ac.NodeID\n\t\t\t\t\tAND rh.PapoID \u003d ac.PapoID\n\t\t\t\t\tAND rh.WorkstationNodeID \u003d ac.WorkstationNodeID\n\t\t\t\t\tAND rh.RegisterCode \u003d ac.RegisterCode\n\t\t\t\tWHERE rh.RegisterTypeID !\u003d 12\n\t\t\t\tGROUP BY ac.NodeID, ac.PapoID, ac.WorkstationNodeID, ac.RegisterCode\n\t\t\t)\n\t\t\tSELECT\n\t\t\t\tfc.NodeID, fc.PapoID, fc.RegisterCode,\n\t\t\t\tfc.startTime,\n\t\t\t\trh.Status, rh.Timestamp, rh.[User],\n\t\t\t\trh.WorkstationNodeID, rh.WorkstationID,\n\t\t\t\tp.Reference AS PapoReference,\n\t\t\t\tp.Description AS PapoDescription,\n\t\t\t\tn.Name AS NodeName,\n\t\t\t\tn.Topic AS Path,\n\t\t\t\tw.Description AS WorkstationDescription\n\t\t\tFROM fullCycles fc\n\t\t\tJOIN registerhistory rh ON rh.ID \u003d fc.lastID\n\t\t\tJOIN papo p ON p.ID \u003d fc.PapoID\n\t\t\tJOIN node n ON n.ID \u003d fc.NodeID\n\t\t\tLEFT JOIN workstation w ON w.ID \u003d rh.WorkstationID\n\t\t\tWHERE LOWER(rh.Status) !\u003d \u0027sin iniciar\u0027\n\t\t\tORDER BY rh.Timestamp DESC\n\t\t\"\"\"\n\t\tdsCycles \u003d system.db.runPrepQuery(queryCycles, [startDate, endDate], db)\n\n\t\t# --- Query 2: signatures for those cycles (NO time filter) ---\n\t\tquerySigs \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\trh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode,\n\t\t\t\trh.Status, rh.DataAnswer\n\t\t\tFROM registerhistory rh\n\t\t\tWHERE rh.RegisterTypeID \u003d 10\n\t\t\t  AND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM registerhistory rh2\n\t\t\t\tWHERE rh2.NodeID \u003d rh.NodeID\n\t\t\t\t  AND rh2.PapoID \u003d rh.PapoID\n\t\t\t\t  AND rh2.WorkstationNodeID \u003d rh.WorkstationNodeID\n\t\t\t\t  AND rh2.RegisterCode \u003d rh.RegisterCode\n\t\t\t\t  AND rh2.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh2.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh2.Timestamp \u003c\u003d ?\n\t\t\t)\n\t\t\"\"\"\n\t\tdsSigs \u003d system.db.runPrepQuery(querySigs, [startDate, endDate], db)\n\n\t\t# --- Query 3: supervisor name from form data ---\n\t\tquerySup \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\trh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode,\n\t\t\t\trh.DataAnswer,\n\t\t\t\tpi.ID AS SupervisorItemID\n\t\t\tFROM registerhistory rh\n\t\t\tJOIN papo p ON p.ID \u003d rh.PapoID\n\t\t\tJOIN papoitem pi\n\t\t\t\tON pi.PapoID \u003d COALESCE(p.MasterPapoID, p.ID)\n\t\t\t\tAND pi.RegisterTypeID \u003d 7\n\t\t\t\tAND LOWER(RTRIM(LTRIM(REPLACE(pi.Description, \u0027.\u0027, \u0027\u0027)))) \u003d \u0027supervisor\u0027\n\t\t\tWHERE rh.RegisterTypeID \u003d 7\n\t\t\t  AND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM registerhistory rh2\n\t\t\t\tWHERE rh2.NodeID \u003d rh.NodeID\n\t\t\t\t  AND rh2.PapoID \u003d rh.PapoID\n\t\t\t\t  AND rh2.WorkstationNodeID \u003d rh.WorkstationNodeID\n\t\t\t\t  AND rh2.RegisterCode \u003d rh.RegisterCode\n\t\t\t\t  AND rh2.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh2.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh2.Timestamp \u003c\u003d ?\n\t\t\t)\n\t\t\tORDER BY rh.ID DESC\n\t\t\"\"\"\n\t\tdsSup \u003d system.db.runPrepQuery(querySup, [startDate, endDate], db)\n\n\t\t# --- Build signature lookup ---\n\t\tsigMap \u003d {}\n\t\tfor i in range(dsSigs.getRowCount()):\n\t\t\tnodeID \u003d dsSigs.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsSigs.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsSigs.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsSigs.getValueAt(i, \"RegisterCode\")\n\t\t\tsigStatus \u003d (dsSigs.getValueAt(i, \"Status\") or \"\").strip().lower()\n\t\t\traw \u003d dsSigs.getValueAt(i, \"DataAnswer\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\tif key not in sigMap:\n\t\t\t\tsigMap[key] \u003d {\"operador\": \"\", \"supervisor\": \"\", \"supervisorUser\": \"\"}\n\n\t\t\tif raw is None or raw \u003d\u003d \"\":\n\t\t\t\tcontinue\n\n\t\t\ttry:\n\t\t\t\tobj \u003d system.util.jsonDecode(raw)\n\t\t\t\tfullName \u003d (obj.get(\"name\", \"\") + \" \" + obj.get(\"lastname\", \"\")).strip()\n\t\t\t\tsigUser \u003d obj.get(\"user\", \"\")\n\t\t\texcept:\n\t\t\t\tcontinue\n\n\t\t\tif sigStatus \u003d\u003d \"finalizado\":\n\t\t\t\tsigMap[key][\"operador\"] \u003d fullName\n\t\t\telif sigStatus \u003d\u003d \"revisado\":\n\t\t\t\tsigMap[key][\"supervisor\"] \u003d fullName\n\t\t\t\tsigMap[key][\"supervisorUser\"] \u003d sigUser\n\n\t\t# --- Build supervisor-from-form lookup ---\n\t\tsupFromForm \u003d {}\n\t\tfor i in range(dsSup.getRowCount()):\n\t\t\tnodeID \u003d dsSup.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsSup.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsSup.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsSup.getValueAt(i, \"RegisterCode\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\t# Rows come newest first: keep the latest start-form answer of the cycle\n\t\t\tif key in supFromForm:\n\t\t\t\tcontinue\n\n\t\t\traw \u003d dsSup.getValueAt(i, \"DataAnswer\")\n\t\t\tsupItemID \u003d dsSup.getValueAt(i, \"SupervisorItemID\")\n\n\t\t\tif not raw:\n\t\t\t\tcontinue\n\n\t\t\ttry:\n\t\t\t\tobj \u003d system.util.jsonDecode(raw)\n\t\t\t\titems \u003d obj.get(\"items\", [])\n\t\t\t\tfor item in items:\n\t\t\t\t\tif item.get(\"papoItemID\") \u003d\u003d supItemID:\n\t\t\t\t\t\tanswer \u003d (item.get(\"answer\") or \"\").strip()\n\t\t\t\t\t\tif answer and answer !\u003d \"-\":\n\t\t\t\t\t\t\tsupFromForm[key] \u003d answer\n\t\t\t\t\t\tbreak\n\t\t\texcept:\n\t\t\t\tcontinue\n\n\t\t# --- Build report list ---\n\t\treportList \u003d []\n\t\tfor i in range(dsCycles.getRowCount()):\n\t\t\tnodeID \u003d dsCycles.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsCycles.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsCycles.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsCycles.getValueAt(i, \"RegisterCode\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\tsigs \u003d sigMap.get(key, {\"operador\": \"\", \"supervisor\": \"\", \"supervisorUser\": \"\"})\n\t\t\toperador \u003d sigs[\"operador\"] or dsCycles.getValueAt(i, \"User\") or \"\"\n\n\t\t\t# Supervisor esperado: form field \u003e signature \u003e fallback\n\t\t\tformSup \u003d supFromForm.get(key, \"\")\n\t\t\tif formSup:\n\t\t\t\tsupervisorEsperado \u003d formSup\n\t\t\telif sigs[\"supervisor\"]:\n\t\t\t\tsupervisorEsperado \u003d sigs[\"supervisor\"]\n\t\t\telse:\n\t\t\t\tsupervisorEsperado \u003d \"Sin asignar\"\n\n\t\t\treportList.append({\n\t\t\t\t\"PapoReference\": dsCycles.getValueAt(i, \"PapoReference\"),\n\t\t\t\t\"PapoDescription\": dsCycles.getValueAt(i, \"PapoDescription\"),\n\t\t\t\t\"RegisterCode\": regCode,\n\t\t\t\t\"NodeName\": dsCycles.getValueAt(i, \"NodeName\"),\n\t\t\t\t\"Status\": dsCycles.getValueAt(i, \"Status\"),\n\t\t\t\t\"Timestamp\": dsCycles.getValueAt(i, \"Timestamp\"),\n\t\t\t\t\"User\": dsCycles.getValueAt(i, \"User\"),\n\t\t\t\t\"WorkstationDescription\": dsCycles.getValueAt(i, \"WorkstationDescription\") or \"\",\n\t\t\t\t\"Operador\": operador,\n\t\t\t\t\"Supervisor\": sigs[\"supervisor\"],\n\t\t\t\t\"SupervisorUser\": sigs[\"supervisorUser\"],\n\t\t\t\t\"SupervisorEsperado\": supervisorEsperado,\n\t\t\t\t\"OperadorEsperado\": dsCycles.getValueAt(i, \"User\") or \"\",\n\t\t\t\t\"NodeID\": nodeID,\n\t\t\t\t\"PapoID\": papoID,\n\t\t\t\t\"Path\": dsCycles.getValueAt(i, \"Path\") or \"\",\n\t\t\t\t\"WorkstationNodeID\": dsCycles.getValueAt(i, \"WorkstationNodeID\"),\n\t\t\t\t\"WorkstationID\": dsCycles.getValueAt(i, \"WorkstationID\"),\n\t\t\t})\n\n\t\t# --- Supervisor filter (normalized full name: case and repeated spaces ignored) ---\n\t\tdef normName(text):\n\t\t\treturn \" \".join(unicode(text or \"\").split()).lower()\n\n\t\t# Dropdown options: supervisors with reports in the period (before filtering)\n\t\tnotANames \u003d set([\"\", \"-\", \"na\", \"na na\", \"no hay supervisores disponibles\", \"sin asignar\"])\n\t\tsupNames \u003d {}\n\t\tfor r in reportList:\n\t\t\tname \u003d \" \".join(unicode(r[\"SupervisorEsperado\"] or \"\").split())\n\t\t\tif name.lower() not in notANames:\n\t\t\t\tsupNames.setdefault(name.lower(), name)\n\t\tself.view.custom.dataSupervisors \u003d system.dataset.toDataSet(\n\t\t\t[\"fullName\"], [[supNames[k]] for k in sorted(supNames)])\n\n\t\tif supervisorFilter not in (None, \"\", \"null\"):\n\t\t\twanted \u003d normName(supervisorFilter)\n\t\t\treportList \u003d [r for r in reportList if normName(r[\"SupervisorEsperado\"]) \u003d\u003d wanted]\n\n\t\t# --- Counters (over the filtered rows) ---\n\t\ttotalReportes \u003d len(reportList)\n\t\tsinFirmaOp \u003d 0\n\t\tsinFirmaSup \u003d 0\n\n\t\tfor r in reportList:\n\t\t\tstatus \u003d (r[\"Status\"] or \"\").strip().lower()\n\t\t\toperador \u003d (r[\"Operador\"] or \"\").strip().lower()\n\n\t\t\tif status \u003d\u003d \"en proceso\" or operador \u003d\u003d \"cierre automatico\":\n\t\t\t\tsinFirmaOp +\u003d 1\n\t\t\tif status \u003d\u003d \"finalizado\":\n\t\t\t\tsinFirmaSup +\u003d 1\n\n\t\tself.view.custom.totalReportes \u003d totalReportes\n\t\tself.view.custom.sinFirmaOperario \u003d sinFirmaOp\n\t\tself.view.custom.sinFirmaSupervisor \u003d sinFirmaSup\n\n\t\treturn reportList\n\n\texcept Exception as e:\n\t\tlogger.error(\"Error in transform dataReports: \" + str(e))\n\t\tself.view.custom.totalReportes \u003d 0\n\t\tself.view.custom.sinFirmaOperario \u003d 0\n\t\tself.view.custom.sinFirmaSupervisor \u003d 0\n\t\treturn []",
+            "code": "\t\"\"\"\n\tBuild the reports dataset from registerhistory.\n\n\tThree separate queries:\n\t  1. Cycles active in period + their REAL latest status (no time filter on status)\n\t  2. Type-10 signature records for those cycles\n\t  3. Supervisor name from form field (papoitem \u0027Supervisor\u0027)\n\n\tA cycle lacks the operator signature when it has no \"Finalizado\" of a person (the\n\tautomatic closure, role SYSTEM, does not count) and lacks the supervisor signature\n\twhen it has no \"Revisado\" of a person (the automatic NA signature of Gestion does\n\tnot count), whatever the order of the signatures.\n\n\tVersion: 6.0.0\n\n\tArgs:\n\t\tvalue (dict): Struct with db, startDate, endDate, supervisor, area (Company/Plant/Area path)\n\n\tReturns:\n\t\tlist[dict]: Report rows for table consumption\n\n\tChangelog:\n\t\t2026-11-13 | William M. | v6.0.0 - Signatures decide who did not sign: the supervisor\n\t\t\twho signs before the operator was counted as missing (the latest status was\n\t\t\tFinalizado), the NA signature of Gestion and a Revisado without the operator as\n\t\t\tsigned; area filter (options \u003d areas with reports in the period)\n\t\t2026-10-22 | William M. | v5.0.0 - Cycle key includes WorkstationNodeID\n\t\t\t(stations sharing a node no longer mix); supervisor question resolved\n\t\t\tthrough MasterPapoID; supervisor filter (normalized full name) and\n\t\t\tcounters applied here; no refresh tick (re-query only on filter change);\n\t\t\tsupervisor options \u003d supervisors with reports in the period; latest\n\t\t\tstart-form answer wins\n\t\t2026-09-01 | Andres G. | v4.0.0 - Add supervisor from form field;\n\t\t\tOperadorEsperado/SupervisorEsperado as row fields, not custom props;\n\t\t\tCierre Automatico detection for sinFirmaOperario counter\n\t\"\"\"\n\tlogger \u003d system.util.getLogger(\"transform.dataReports.{}\".format(self.view.id))\n\n\tdb \u003d value[\"db\"]\n\tstartDate \u003d value[\"startDate\"]\n\tendDate \u003d value[\"endDate\"]\n\tsupervisorFilter \u003d value.get(\"supervisor\")\n\tareaFilter \u003d value.get(\"area\")\n\n\ttry:\n\t\t# --- Query 1: cycles active in period + REAL latest status ---\n\t\tqueryCycles \u003d \"\"\"\n\t\t\tWITH activeCycles AS (\n\t\t\t\tSELECT DISTINCT\n\t\t\t\t\trh.NodeID,\n\t\t\t\t\trh.PapoID,\n\t\t\t\t\trh.WorkstationNodeID,\n\t\t\t\t\trh.RegisterCode\n\t\t\t\tFROM registerhistory rh\n\t\t\t\tWHERE rh.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh.Timestamp \u003c\u003d ?\n\t\t\t),\n\t\t\tfullCycles AS (\n\t\t\t\tSELECT\n\t\t\t\t\tac.NodeID, ac.PapoID, ac.WorkstationNodeID, ac.RegisterCode,\n\t\t\t\t\tMAX(rh.ID) AS lastID,\n\t\t\t\t\tMAX(CASE WHEN rh.RegisterTypeID \u003d 7 THEN rh.Timestamp END) AS startTime\n\t\t\t\tFROM activeCycles ac\n\t\t\t\tJOIN registerhistory rh\n\t\t\t\t\tON rh.NodeID \u003d ac.NodeID\n\t\t\t\t\tAND rh.PapoID \u003d ac.PapoID\n\t\t\t\t\tAND rh.WorkstationNodeID \u003d ac.WorkstationNodeID\n\t\t\t\t\tAND rh.RegisterCode \u003d ac.RegisterCode\n\t\t\t\tWHERE rh.RegisterTypeID !\u003d 12\n\t\t\t\tGROUP BY ac.NodeID, ac.PapoID, ac.WorkstationNodeID, ac.RegisterCode\n\t\t\t)\n\t\t\tSELECT\n\t\t\t\tfc.NodeID, fc.PapoID, fc.RegisterCode,\n\t\t\t\tfc.startTime,\n\t\t\t\trh.Status, rh.Timestamp, rh.[User],\n\t\t\t\trh.WorkstationNodeID, rh.WorkstationID,\n\t\t\t\tp.Reference AS PapoReference,\n\t\t\t\tp.Description AS PapoDescription,\n\t\t\t\tn.Name AS NodeName,\n\t\t\t\tn.Topic AS Path,\n\t\t\t\tw.Description AS WorkstationDescription\n\t\t\tFROM fullCycles fc\n\t\t\tJOIN registerhistory rh ON rh.ID \u003d fc.lastID\n\t\t\tJOIN papo p ON p.ID \u003d fc.PapoID\n\t\t\tJOIN node n ON n.ID \u003d fc.NodeID\n\t\t\tLEFT JOIN workstation w ON w.ID \u003d rh.WorkstationID\n\t\t\tWHERE LOWER(rh.Status) !\u003d \u0027sin iniciar\u0027\n\t\t\tORDER BY rh.Timestamp DESC\n\t\t\"\"\"\n\t\tdsCycles \u003d system.db.runPrepQuery(queryCycles, [startDate, endDate], db)\n\n\t\t# --- Query 2: signatures for those cycles (NO time filter) ---\n\t\tquerySigs \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\trh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode,\n\t\t\t\trh.Status, rh.DataAnswer, rh.[User] AS SigUser\n\t\t\tFROM registerhistory rh\n\t\t\tWHERE rh.RegisterTypeID \u003d 10\n\t\t\t  AND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM registerhistory rh2\n\t\t\t\tWHERE rh2.NodeID \u003d rh.NodeID\n\t\t\t\t  AND rh2.PapoID \u003d rh.PapoID\n\t\t\t\t  AND rh2.WorkstationNodeID \u003d rh.WorkstationNodeID\n\t\t\t\t  AND rh2.RegisterCode \u003d rh.RegisterCode\n\t\t\t\t  AND rh2.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh2.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh2.Timestamp \u003c\u003d ?\n\t\t\t)\n\t\t\"\"\"\n\t\tdsSigs \u003d system.db.runPrepQuery(querySigs, [startDate, endDate], db)\n\n\t\t# --- Query 3: supervisor name from form data ---\n\t\tquerySup \u003d \"\"\"\n\t\t\tSELECT\n\t\t\t\trh.NodeID, rh.PapoID, rh.WorkstationNodeID, rh.RegisterCode,\n\t\t\t\trh.DataAnswer,\n\t\t\t\tpi.ID AS SupervisorItemID\n\t\t\tFROM registerhistory rh\n\t\t\tJOIN papo p ON p.ID \u003d rh.PapoID\n\t\t\tJOIN papoitem pi\n\t\t\t\tON pi.PapoID \u003d COALESCE(p.MasterPapoID, p.ID)\n\t\t\t\tAND pi.RegisterTypeID \u003d 7\n\t\t\t\tAND LOWER(RTRIM(LTRIM(REPLACE(pi.Description, \u0027.\u0027, \u0027\u0027)))) \u003d \u0027supervisor\u0027\n\t\t\tWHERE rh.RegisterTypeID \u003d 7\n\t\t\t  AND EXISTS (\n\t\t\t\tSELECT 1\n\t\t\t\tFROM registerhistory rh2\n\t\t\t\tWHERE rh2.NodeID \u003d rh.NodeID\n\t\t\t\t  AND rh2.PapoID \u003d rh.PapoID\n\t\t\t\t  AND rh2.WorkstationNodeID \u003d rh.WorkstationNodeID\n\t\t\t\t  AND rh2.RegisterCode \u003d rh.RegisterCode\n\t\t\t\t  AND rh2.RegisterTypeID NOT IN (10, 12)\n\t\t\t\t  AND rh2.Timestamp \u003e\u003d ?\n\t\t\t\t  AND rh2.Timestamp \u003c\u003d ?\n\t\t\t)\n\t\t\tORDER BY rh.ID DESC\n\t\t\"\"\"\n\t\tdsSup \u003d system.db.runPrepQuery(querySup, [startDate, endDate], db)\n\n\t\t# --- Build signature lookup ---\n\t\tEMPTY_SIGS \u003d {\"operador\": \"\", \"operadorReal\": False, \"cierreAuto\": False,\n\t\t\t\"supervisor\": \"\", \"supervisorUser\": \"\", \"supervisorReal\": False}\n\t\tsigMap \u003d {}\n\t\tfor i in range(dsSigs.getRowCount()):\n\t\t\tnodeID \u003d dsSigs.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsSigs.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsSigs.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsSigs.getValueAt(i, \"RegisterCode\")\n\t\t\tsigStatus \u003d (dsSigs.getValueAt(i, \"Status\") or \"\").strip().lower()\n\t\t\traw \u003d dsSigs.getValueAt(i, \"DataAnswer\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\tif key not in sigMap:\n\t\t\t\tsigMap[key] \u003d dict(EMPTY_SIGS)\n\n\t\t\tif raw is None or raw \u003d\u003d \"\":\n\t\t\t\tcontinue\n\n\t\t\ttry:\n\t\t\t\tobj \u003d system.util.jsonDecode(raw)\n\t\t\t\tfullName \u003d (obj.get(\"name\", \"\") + \" \" + obj.get(\"lastname\", \"\")).strip()\n\t\t\t\tsigUser \u003d obj.get(\"user\", \"\") or dsSigs.getValueAt(i, \"SigUser\") or \"\"\n\t\t\texcept:\n\t\t\t\tcontinue\n\n\t\t\tif sigStatus \u003d\u003d \"finalizado\":\n\t\t\t\t# The automatic closure (role SYSTEM) is not a signature of the operator\n\t\t\t\tif obj.get(\"role\") \u003d\u003d \"SYSTEM\":\n\t\t\t\t\tsigMap[key][\"cierreAuto\"] \u003d True\n\t\t\t\t\tif not sigMap[key][\"operadorReal\"]:\n\t\t\t\t\t\tsigMap[key][\"operador\"] \u003d fullName\n\t\t\t\telse:\n\t\t\t\t\tsigMap[key][\"operadorReal\"] \u003d True\n\t\t\t\t\tsigMap[key][\"operador\"] \u003d fullName\n\t\t\telif sigStatus \u003d\u003d \"revisado\":\n\t\t\t\t# The automatic signature of Gestion (user NA) is not a signature of the supervisor\n\t\t\t\tif unicode(sigUser).strip().upper() in (\"\", \"NA\") or fullName.upper() \u003d\u003d \"NA NA\":\n\t\t\t\t\tcontinue\n\t\t\t\tsigMap[key][\"supervisorReal\"] \u003d True\n\t\t\t\tsigMap[key][\"supervisor\"] \u003d fullName\n\t\t\t\tsigMap[key][\"supervisorUser\"] \u003d sigUser\n\n\t\t# --- Build supervisor-from-form lookup ---\n\t\tsupFromForm \u003d {}\n\t\tfor i in range(dsSup.getRowCount()):\n\t\t\tnodeID \u003d dsSup.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsSup.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsSup.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsSup.getValueAt(i, \"RegisterCode\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\t# Rows come newest first: keep the latest start-form answer of the cycle\n\t\t\tif key in supFromForm:\n\t\t\t\tcontinue\n\n\t\t\traw \u003d dsSup.getValueAt(i, \"DataAnswer\")\n\t\t\tsupItemID \u003d dsSup.getValueAt(i, \"SupervisorItemID\")\n\n\t\t\tif not raw:\n\t\t\t\tcontinue\n\n\t\t\ttry:\n\t\t\t\tobj \u003d system.util.jsonDecode(raw)\n\t\t\t\titems \u003d obj.get(\"items\", [])\n\t\t\t\tfor item in items:\n\t\t\t\t\tif item.get(\"papoItemID\") \u003d\u003d supItemID:\n\t\t\t\t\t\tanswer \u003d (item.get(\"answer\") or \"\").strip()\n\t\t\t\t\t\tif answer and answer !\u003d \"-\":\n\t\t\t\t\t\t\tsupFromForm[key] \u003d answer\n\t\t\t\t\t\tbreak\n\t\t\texcept:\n\t\t\t\tcontinue\n\n\t\t# --- Build report list ---\n\t\treportList \u003d []\n\t\tfor i in range(dsCycles.getRowCount()):\n\t\t\tnodeID \u003d dsCycles.getValueAt(i, \"NodeID\")\n\t\t\tpapoID \u003d dsCycles.getValueAt(i, \"PapoID\")\n\t\t\twsnID \u003d dsCycles.getValueAt(i, \"WorkstationNodeID\")\n\t\t\tregCode \u003d dsCycles.getValueAt(i, \"RegisterCode\")\n\t\t\tkey \u003d (nodeID, papoID, wsnID, regCode)\n\n\t\t\tsigs \u003d sigMap.get(key, EMPTY_SIGS)\n\t\t\tpath \u003d dsCycles.getValueAt(i, \"Path\") or \"\"\n\t\t\tsegments \u003d path.split(\"/\")\n\t\t\toperador \u003d sigs[\"operador\"] or dsCycles.getValueAt(i, \"User\") or \"\"\n\n\t\t\t# Supervisor esperado: form field \u003e signature \u003e fallback\n\t\t\tformSup \u003d supFromForm.get(key, \"\")\n\t\t\tif formSup:\n\t\t\t\tsupervisorEsperado \u003d formSup\n\t\t\telif sigs[\"supervisor\"]:\n\t\t\t\tsupervisorEsperado \u003d sigs[\"supervisor\"]\n\t\t\telse:\n\t\t\t\tsupervisorEsperado \u003d \"Sin asignar\"\n\n\t\t\treportList.append({\n\t\t\t\t\"PapoReference\": dsCycles.getValueAt(i, \"PapoReference\"),\n\t\t\t\t\"PapoDescription\": dsCycles.getValueAt(i, \"PapoDescription\"),\n\t\t\t\t\"RegisterCode\": regCode,\n\t\t\t\t\"NodeName\": dsCycles.getValueAt(i, \"NodeName\"),\n\t\t\t\t\"Status\": dsCycles.getValueAt(i, \"Status\"),\n\t\t\t\t\"Timestamp\": dsCycles.getValueAt(i, \"Timestamp\"),\n\t\t\t\t\"User\": dsCycles.getValueAt(i, \"User\"),\n\t\t\t\t\"WorkstationDescription\": dsCycles.getValueAt(i, \"WorkstationDescription\") or \"\",\n\t\t\t\t\"Operador\": operador,\n\t\t\t\t\"Supervisor\": sigs[\"supervisor\"],\n\t\t\t\t\"SupervisorUser\": sigs[\"supervisorUser\"],\n\t\t\t\t\"SupervisorEsperado\": supervisorEsperado,\n\t\t\t\t\"OperadorEsperado\": dsCycles.getValueAt(i, \"User\") or \"\",\n\t\t\t\t\"NodeID\": nodeID,\n\t\t\t\t\"PapoID\": papoID,\n\t\t\t\t\"Path\": path,\n\t\t\t\t\"Area\": segments[2] if len(segments) \u003e 2 else \"\",\n\t\t\t\t\"AreaPath\": \"/\".join(segments[:3]),\n\t\t\t\t\"SinFirmaOperario\": not sigs[\"operadorReal\"],\n\t\t\t\t\"SinFirmaSupervisor\": not sigs[\"supervisorReal\"],\n\t\t\t\t\"WorkstationNodeID\": dsCycles.getValueAt(i, \"WorkstationNodeID\"),\n\t\t\t\t\"WorkstationID\": dsCycles.getValueAt(i, \"WorkstationID\"),\n\t\t\t})\n\n\t\t# --- Supervisor filter (normalized full name: case and repeated spaces ignored) ---\n\t\tdef normName(text):\n\t\t\treturn \" \".join(unicode(text or \"\").split()).lower()\n\n\t\t# --- Area filter: options \u003d areas with reports in the period (before filtering) ---\n\t\tareas \u003d {}\n\t\tfor r in reportList:\n\t\t\tif r[\"AreaPath\"]:\n\t\t\t\tareas.setdefault(r[\"AreaPath\"], r[\"Area\"])\n\t\tself.view.custom.dataAreas \u003d system.dataset.toDataSet(\n\t\t\t[\"label\", \"value\"], [[areas[k], k] for k in sorted(areas, key\u003dlambda p: areas[p].lower())])\n\n\t\tif areaFilter not in (None, \"\", \"null\"):\n\t\t\treportList \u003d [r for r in reportList if r[\"AreaPath\"] \u003d\u003d areaFilter]\n\n\t\t# Dropdown options: supervisors with reports in the period and area (before filtering)\n\t\tnotANames \u003d set([\"\", \"-\", \"na\", \"na na\", \"no hay supervisores disponibles\", \"sin asignar\"])\n\t\tsupNames \u003d {}\n\t\tfor r in reportList:\n\t\t\tname \u003d \" \".join(unicode(r[\"SupervisorEsperado\"] or \"\").split())\n\t\t\tif name.lower() not in notANames:\n\t\t\t\tsupNames.setdefault(name.lower(), name)\n\t\tself.view.custom.dataSupervisors \u003d system.dataset.toDataSet(\n\t\t\t[\"fullName\"], [[supNames[k]] for k in sorted(supNames)])\n\n\t\tif supervisorFilter not in (None, \"\", \"null\"):\n\t\t\twanted \u003d normName(supervisorFilter)\n\t\t\treportList \u003d [r for r in reportList if normName(r[\"SupervisorEsperado\"]) \u003d\u003d wanted]\n\n\t\t# --- Counters (over the filtered rows) ---\n\t\ttotalReportes \u003d len(reportList)\n\t\tsinFirmaOp \u003d 0\n\t\tsinFirmaSup \u003d 0\n\n\t\tfor r in reportList:\n\t\t\tif r[\"SinFirmaOperario\"]:\n\t\t\t\tsinFirmaOp +\u003d 1\n\t\t\tif r[\"SinFirmaSupervisor\"]:\n\t\t\t\tsinFirmaSup +\u003d 1\n\n\t\tself.view.custom.totalReportes \u003d totalReportes\n\t\tself.view.custom.sinFirmaOperario \u003d sinFirmaOp\n\t\tself.view.custom.sinFirmaSupervisor \u003d sinFirmaSup\n\n\t\treturn reportList\n\n\texcept Exception as e:\n\t\tlogger.error(\"Error in transform dataReports: \" + str(e))\n\t\tself.view.custom.totalReportes \u003d 0\n\t\tself.view.custom.sinFirmaOperario \u003d 0\n\t\tself.view.custom.sinFirmaSupervisor \u003d 0\n\t\treturn []",
             "type": "script"
           }
         ],
@@ -313,6 +328,114 @@
           {
             "meta": {
               "name": "Label_Papo_0"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Area"
+            },
+            "position": {
+              "basis": "45px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "text": "Area:",
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_9"
+            },
+            "position": {
+              "basis": "30px",
+              "shrink": 0
+            },
+            "props": {
+              "style": {
+                "classes": "text-description-centered"
+              },
+              "textStyle": {
+                "fontSize": 18,
+                "textAlign": "right"
+              }
+            },
+            "type": "ia.display.label"
+          },
+          {
+            "meta": {
+              "name": "Dropdown Area"
+            },
+            "position": {
+              "basis": "162px",
+              "shrink": 0
+            },
+            "propConfig": {
+              "props.options": {
+                "binding": {
+                  "config": {
+                    "path": "view.custom.dataAreas"
+                  },
+                  "transforms": [
+                    {
+                      "code": "\tif value is None:\n\t\treturn []\n\n\t# Value is the Company/Plant/Area path of the node: what dataReports compares\n\toptions \u003d []\n\tfor row in range(value.getRowCount()):\n\t\toptions.append({\"label\": value.getValueAt(row, \"label\"), \"value\": value.getValueAt(row, \"value\")})\n\n\treturn options",
+                      "type": "script"
+                    }
+                  ],
+                  "type": "property"
+                }
+              }
+            },
+            "props": {
+              "dropdownOptionStyle": {
+                "classes": "dropdown-downoptions"
+              },
+              "maxMenuHeight": 1000,
+              "placeholder": {
+                "icon": {
+                  "path": "material/search",
+                  "style": {
+                    "height": "2vh",
+                    "width": "1vw"
+                  }
+                },
+                "text": "Seleccione"
+              },
+              "showClearIcon": true,
+              "style": {
+                "classes": "dropdown dropdown-text",
+                "fontWeight": "normal",
+                "margin": 8,
+                "textAlign": "center"
+              },
+              "value": null
+            },
+            "type": "ia.input.dropdown"
+          },
+          {
+            "meta": {
+              "name": "Label_Papo_10"
             },
             "position": {
               "basis": "30px",
@@ -2086,7 +2209,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\t\"\"\"\n\tTablaOperario: reports WITHOUT operator signature (Status \u003d \u0027En proceso\u0027).\n\n\tVersion: 2.0.0\n\tChangelog:\n\t\t2026-08-31 | Andres G. | v2.0.0 - Case-insensitive status filter\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\tstatus \u003d str(row.get(\"Status\", \"\") or \"\").strip().lower()\n\t\toperador \u003d str(row.get(\"Operador\", \"\") or \"\").strip().lower()\n\n\t\tisEnProceso \u003d status \u003d\u003d \"en proceso\"\n\t\tisCierreAuto \u003d operador \u003d\u003d \"cierre automatico\"\n\n\t\tif not isEnProceso and not isCierreAuto:\n\t\t\tcontinue\n\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
+                              "code": "\t\"\"\"\n\tTablaOperario: reports WITHOUT the operator signature (SinFirmaOperario of dataReports).\n\n\tVersion: 3.0.0\n\tChangelog:\n\t\t2026-11-13 | William M. | v3.0.0 - SinFirmaOperario (signatures of the cycle): a Revisado\n\t\t\twithout the operator signature was left out; the automatic closure still counts\n\t\t2026-08-31 | Andres G. | v2.0.0 - Case-insensitive status filter\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\tif not row.get(\"SinFirmaOperario\"):\n\t\t\tcontinue\n\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
                               "type": "script"
                             }
                           ],
@@ -2965,7 +3088,7 @@
                           },
                           "transforms": [
                             {
-                              "code": "\t\"\"\"\n\tTablaSupervisor: reports WITHOUT supervisor signature (Status \u003d \u0027Finalizado\u0027).\n\n\tVersion: 3.0.0\n\tChangelog:\n\t\t2026-10-22 | William M. | v3.0.0 - Supervisor filter applied in dataReports\n\t\t2026-08-31 | Andres G. | v2.0.0 - Case-insensitive status filter + supervisor filter\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\tstatus \u003d str(row.get(\"Status\", \"\") or \"\").strip().lower()\n\t\tif status !\u003d \"finalizado\":\n\t\t\tcontinue\n\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
+                              "code": "\t\"\"\"\n\tTablaSupervisor: reports WITHOUT the supervisor signature (SinFirmaSupervisor of dataReports).\n\n\tVersion: 4.0.0\n\tChangelog:\n\t\t2026-11-13 | William M. | v4.0.0 - SinFirmaSupervisor (signatures of the cycle): a\n\t\t\tsupervisor who signed before the operator was listed as missing; the NA signature of\n\t\t\tGestion is not a signature\n\t\t2026-10-22 | William M. | v3.0.0 - Supervisor filter applied in dataReports\n\t\t2026-08-31 | Andres G. | v2.0.0 - Case-insensitive status filter + supervisor filter\n\t\"\"\"\n\tif value is None:\n\t\treturn []\n\n\tout \u003d []\n\tfor row in value:\n\t\tif not row.get(\"SinFirmaSupervisor\"):\n\t\t\tcontinue\n\n\t\trowCells \u003d {}\n\t\tfor key in row:\n\t\t\trowCells[key] \u003d {\"value\": row[key]}\n\t\tout.append(rowCells)\n\n\treturn out",
                               "type": "script"
                             }
                           ],
