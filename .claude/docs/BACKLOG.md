@@ -76,6 +76,12 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - ~~`Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedaban nativos porque cada fila tenía un `custom.answers` legacy que leía el valor del campo~~ corregido (papo_objects v2.11 quita el recolector de fila; los 42 son `Objects/Dropdown`)
 
+## FO10-1701, Referencia (prueba del 2026-11-13)
+
+- ~~**Referencia vacía en la vista previa del Template**~~ corregido el 2026-11-13: `Form_FO10-1701_output` guardaba el ítem 6155 tres veces (dos TextField ocultos, uno en la fila Referencia y otro en la fila Tipo, y el desplegable), así que cada registro llevaba `[], [referencia], []`. La vista previa toma la primera respuesta de cada ítem y mostraba la Referencia vacía; el PDF toma la primera no vacía y salía bien. Los dos ocultos pasan a `item_dev` (venía así del original). Probado en la estación 45: 9226 (antes) con tres respuestas y la fila vacía, 9227 (después) con una sola, "24 5X5", y la fila llena
+- **Tipo (SLI/HD) de FO10-1701 no se registra:** el desplegable Tipo de la Salida de baterías solo escribe el tag `{path}/Tipo`; no hay ítem en `papoitem` para guardarlo. Decidir si se crea el ítem
+- **EA11-1603_1h, ítem 11387 (Long sobre):** lo guardan un NumericEntryField visible y cinco componentes en contenedores ocultos (`[7],[QA],[7],[7],[7],[7]` en 7145). Como el visible va primero, la vista previa y el PDF muestran su valor; revisar si los ocultos se pasan a `item_dev`
+
 ## Errores de los reportes (encontrados al revisar los PDF de los pilotos, 2026-10-26)
 
 - ~~Reporte `Clarios/Andina/Ensamble/EA11-1601`: el PDF falla con error 500 en los dos ciclos de prueba (`java.lang.StackOverflowError` en `RMLinkedText.getXString`, recursión del texto que pagina). Ya pasó el 2026-10-21, antes de los objetos estándar; la plantilla no cambia desde el checkpoint `1a0ba2b` y el original y el piloto guardan el mismo DataAnswer (`--compare-db --exact`). Sospecha: textos con el desborde por defecto en cajas más bajas que una línea (p. ej. "3" + salto de línea en x=346 y=38, 20×10 con letra de 12, y `@twohourN.papoItemID11208@` con salto de línea en cajas de 10 de alto). Revisarlo en el Designer (Overflow → Shrink) y probar el PDF~~ corregido el 2026-10-27 con `report_bin.py`: la causa era "SECCION 1" (`wrap="wrap"`, Calibri 10 en 12 de alto: la línea no cabe y el texto se enlaza sin fin); queda en `shrink` con las 59 cajas en Paginate más bajas que su línea. El PDF sale y coincide con lo guardado
