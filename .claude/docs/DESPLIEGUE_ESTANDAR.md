@@ -82,3 +82,17 @@ Verificado en PAPOS el 2026-10-27, en Chrome a 1920x1080: foto de los estilos ca
 - Preguntas: el rollback comentado al final de cada SQL
 - Tema: copiar al gateway el de producción guardado antes del paso 4 (o el de `gateway-themes/` del commit anterior a `feat: tema corregido global`) y reiniciar Perspective
 - Library, clases y objetos: son nuevos o compatibles con los formularios viejos; no hace falta revertirlos para volver un formulario atrás
+
+## Modo tablet (rama `feature/tablet-responsive`, 2026-11-14)
+
+Hace usable la app en una tablet de 10" horizontal (1280x800) sin cambiar nada en 1920x1080. Todo lo de tablet aplica por debajo de **1300 px** de ancho. Va después del estándar (los formularios ya tienen `PAPO/Form` y objetos).
+
+| # | Qué | Dónde (repo → gateway) | Por qué va en ese lugar | Verificar |
+|:-:|---|---|---|---|
+| 1 | Clases marcador `PAPO/Tablet/Group`, `Row`, `ObjectRow` (vacías) | `style-classes/PAPO/Tablet/` | Los formularios marcados las usan; sin ellas el QA marca clases inexistentes | Las clases aparecen en el Designer |
+| 2 | `page-config` (dock izquierdo) y `Header/Header` | `page-config/config.json`, `views/Header/Header` | Menú oculto bajo 1300 px y el ícono de menú que lo abre; no depende de lo demás | A 1280 px el menú arranca oculto y el ícono lo abre; a 1920 se ve como antes |
+| 3 | Tema `cla-light.css` y `cla-dark.css` con el bloque `MODO TABLET` | `gateway-themes/` → `data/modules/com.inductiveautomation.perspective/themes/`; reiniciar el módulo Perspective (o el gateway) y F5 en los clientes | Las clases de estilo de 8.1.19 no aceptan `min-height`: el alto táctil y el crecimiento de filas viven en el tema, dentro de `@media (max-width: 1300px)` | El CSS servido trae `@media (max-width: 1300px)` con `psc-PAPO\/Tablet` |
+| 4 | Formularios marcados (`tablet_rows.py`: clases `PAPO/Tablet/*` y `shrink: 0` en las secciones) | `views/Page/Embedded/<área>/Form_*` | Al final: necesitan las clases y el tema | A 1280x800 los campos miden 40 px y las secciones no se aplastan; a 1920 nada cambia |
+
+Para revertir: el tema anterior (el de `gateway-themes/` del commit antes del bloque `MODO TABLET`) con reinicio de Perspective, y `git revert` de los commits de la rama. Si solo se revierte el tema, los formularios marcados se ven igual que antes en todo tamaño (las clases quedan vacías).
+

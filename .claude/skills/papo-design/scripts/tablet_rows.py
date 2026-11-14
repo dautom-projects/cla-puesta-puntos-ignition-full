@@ -11,16 +11,21 @@ Per Form view:
 		                                               its rows instead of cutting them)
 		container or label  -> PAPO/Tablet/Row        (tablet: min-height min-content, the row keeps its px height
 		                                               and grows when its text wraps or its field is taller)
+	  and every embedded Objects/* view inside a group, stacked or inside a row:
 		embedded Objects/*  -> PAPO/Tablet/ObjectRow  (tablet: min-height of a touch target; an embedded view has no
-		                                               content height of its own)
-	  A row without content height (spacer, container of embedded views) keeps its px height.
+		                                               content height of its own, so the row around it grows with it)
+	  A row without content height (spacer) keeps its px height.
+	The style lives in the gateway theme (gateway-themes/cla-*.css, block "MODO TABLET"): 8.1.19 style classes do not
+	accept min-height, so the PAPO/Tablet/* classes are empty markers.
 Nothing else changes: answer collection is checked before writing and the classes are only appended (a class with a
 binding is left as it is and reported). Simulates by default.
 
-Version: 1.0.0
+Version: 1.1.0
 
 Changelog:
 	2026-11-14 | William M. | v1.0.0 - Initial version (tablet mode, plan of feature/tablet-responsive)
+	2026-11-14 | William M. | v1.1.0 - Every embedded Objects/* view of a group is marked, also inside a row (EA11-1201:
+		the numeric of a grid row kept the row at 27 px); style in the gateway theme
 
 Args (CLI):
 	--views (str...): Form folders relative to views/ (default: every Form_* view with the PAPO/Form class, pilots included)
@@ -69,15 +74,18 @@ def _addClass(node, cls, stats, key):
 	stats[key] += 1
 
 
+def _isObject(node):
+	return node.get("type") == "ia.display.view" and str((node.get("props") or {}).get("path", "")).startswith("Objects/")
+
+
 def _markRows(container, stats):
 	column = _isColumn(container)
 	for child in container.get("children", []) or []:
 		basis = str((child.get("position") or {}).get("basis", ""))
-		if column and basis.endswith("px"):
-			if child.get("type") == "ia.display.view":
-				_addClass(child, OBJECT_ROW_CLASS, stats, "filas objeto")
-			else:
-				_addClass(child, ROW_CLASS, stats, "filas")
+		if _isObject(child):
+			_addClass(child, OBJECT_ROW_CLASS, stats, "objetos")
+		elif column and basis.endswith("px") and child.get("type") != "ia.display.view":
+			_addClass(child, ROW_CLASS, stats, "filas")
 		if child.get("type") == "ia.container.flex":
 			_markRows(child, stats)
 

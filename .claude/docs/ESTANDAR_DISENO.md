@@ -114,3 +114,14 @@ Producción y PAPOS corren 8.1.19: no hay stylesheet avanzado (llegó en 8.1.22)
 **Tema global (2026-10-26, fase 4; verificado el 2026-10-27).** Con todos los formularios automáticos ya con `PAPO/Form`, el parche se aplicó a todo el tema y se quitó el bloque `PILOTO PAPO`: las 65 reglas del bloque están en el tema global con las mismas declaraciones, así que la corrección llega a todas las vistas. En Chrome no cambió ningún estilo calculado en Overview, Gestión, el Template y dos formularios (1107 componentes); el cambio se nota en el Designer. La clase `PAPO/Form` se queda en las raíces como marca del estándar. Orden de despliegue y verificación: `DESPLIEGUE_ESTANDAR.md`.
 
 Qué falta probar: el Designer contra Chrome en un formulario estandarizado (Sections, botones, checkbox, dropdown, numéricos fuera de rango en rojo), el hover de los botones, el tema oscuro y una vista de otro módulo (`Node/MixingDashboard`, `Alerts`).
+
+## Modo tablet (2026-11-14, rama `feature/tablet-responsive`)
+
+Objetivo: tablet Android de 10" en horizontal (1280x800), flujo del operario. Regla: **en 1920x1080 nada cambia**; todo lo de tablet aplica por debajo de 1300 px de ancho.
+
+- **Menú**: el dock `Docks/Tree_v2` tiene `show: auto`, `autoBreakpoint: 1300` y `content: auto` (oculto bajo 1300 px y encima del contenido al abrirlo). El ícono de menú del encabezado se ve solo bajo 1300 px (binding `{page.props.dimensions.viewport.width} < 1300`).
+- **Secciones**: toda `SectionN` y `FlexContainerGroupN` de la raíz con `shrink: 0` (papo_qa etapa 5). Sin eso los encabezados se aplastan cuando el formulario no cabe en alto.
+- **Filas y campos**: `tablet_rows.py` marca los grupos (`PAPO/Tablet/Group`), las filas apiladas con alto en px (`PAPO/Tablet/Row`) y los objetos embebidos (`PAPO/Tablet/ObjectRow`). El estilo está en el tema, bloque `MODO TABLET`: grupos y filas con `min-height: min-content` (conservan su alto y crecen con el contenido), objetos y campos `PAPO/Field/{Input,Dropdown,Checkbox}` con `min-height: 40px`. Ningún `basis` cambia.
+- **Por qué en el tema**: en 8.1.19 las clases de estilo solo aceptan fondo, borde, texto, márgenes y relleno (`StyleAttribute`): `min-height`, `display`, `height` y `flex` se descartan sin aviso. La media query sí funciona (`"media": {"feature": "maxWidth", "value": "1300px"}`), pero solo con esas propiedades. Los selectores llevan `[data-component]` para ganarle al `min-height: 0` que Perspective pone a sus contenedores (su CSS carga después del tema).
+- **Verificación**: `layout_snapshot.js` (rects y estilos calculados) compara 1920x1080 antes y después; `ui_check.js` con `minTouchPx: 40` revisa la tablet. Auditoría: `.claude/docs/qa/tablet-auditoria.md`.
+
