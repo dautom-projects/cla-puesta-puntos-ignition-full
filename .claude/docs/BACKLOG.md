@@ -76,6 +76,8 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - ~~`Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedaban nativos porque cada fila tenía un `custom.answers` legacy que leía el valor del campo~~ corregido (papo_objects v2.11 quita el recolector de fila; los 42 son `Objects/Dropdown`)
 
+- Textos cortados también a 1920x1080 (auditoría del modo tablet, 2026-11-14, `.claude/docs/qa/tablet-auditoria.md`): 39 en 7 PAPOs, en filas o celdas más bajas que su texto. AC10-0201 (Inicio, 30 min, Nueva Ref., Mantenimiento: "Densidad vs especificacion…", "Valor del equipo…", "Voltaje antes de la volcadora…", "Area de trabajo aseada…", "Cabinas electricas…"), EA11-1101 1 hr (`Min:`/`Max:` y valores `null`), EA11-1601 2 hr (las dos temperaturas de termosellado), EA11-2501 2 hr (10 valores de referencia), FO10-0100 (Ing. Baterias y Fin) y TE11-2601 Inicio. Las clases `PAPO/Tablet/*` las dejan crecer solo en tablet; en escritorio siguen igual
+
 ## FO10-1701, Referencia (prueba del 2026-11-13)
 
 - ~~**Referencia vacía en la vista previa del Template**~~ corregido el 2026-11-13: `Form_FO10-1701_output` guardaba el ítem 6155 tres veces (dos TextField ocultos, uno en la fila Referencia y otro en la fila Tipo, y el desplegable), así que cada registro llevaba `[], [referencia], []`. La vista previa toma la primera respuesta de cada ítem y mostraba la Referencia vacía; el PDF toma la primera no vacía y salía bien. Los dos ocultos pasan a `item_dev` (venía así del original). Probado en la estación 45: 9226 (antes) con tres respuestas y la fila vacía, 9227 (después) con una sola, "24 5X5", y la fila llena
