@@ -1,4 +1,4 @@
-# Auditoría del modo tablet a 1280x800 (fase 0, 2026-11-14)
+# Auditoría del modo tablet a 1280x800 (2026-11-14)
 
 `ui_check.js` v1.4 sin llenar ni guardar (`papoUiAudit`, `minTouchPx: 40`) en el panel del navegador emulando una
 tablet de 10" horizontal (1280x800), con el menú lateral cerrado (como quedará en la fase 1). Recorre los 69 PAPOs
@@ -27,12 +27,31 @@ con estación de la base de prueba (una estación por PAPO) y abre cada registro
   - FO10-0100 (Ing. Baterias y Fin): "Temperatura agua de la mesa (menor a 45C)", "A quien se le escalo el problema…"
   - TE11-2601 Inicio: "En caso de presentar desviacion en el producto, re…"
 - Lo que sí falta para tablet es el **tamaño táctil**: campos de texto y numéricos de unos 30 px, dropdowns y
-  algunos checkbox bajos. Eso lo cubren las variantes de las clases `PAPO/Field/*` y las filas `PAPO/Tablet/*`
+  algunos checkbox bajos. Eso lo cubren el bloque `MODO TABLET` del tema y las clases marcador `PAPO/Tablet/*`
   (fases 2 y 3).
 - Otros avisos que no son del modo tablet: 12 preguntas repetidas dentro de una sección (ya conocidas), 2 checkbox sin
   texto en TE11-2601 Inicio y el registro "Diario" de TR11-0102, que no es un formulario con secciones ni Guardar.
 
-## Formularios con textos cortados (1280x800)
+## Después del modo tablet (fase 4)
+
+Misma auditoría con las 238 vistas marcadas (`tablet_rows.py`) y el tema con el bloque `MODO TABLET` cargado en el
+gateway local:
+
+| Revisión | Antes | Después |
+|---|---|---|
+| Textos cortados | 40 en 11 formularios | 10, todos en EA11-2501 2 hr (valores de referencia en celdas de una fila horizontal, también cortados a 1920) |
+| Filas apretadas / final de sección cortado | 0 | 0 |
+| Campos fuera de la sección | 0 | 0 |
+| Controles de menos de 40 px | 1353 en 118 formularios | 15 en 6 PAPOs |
+
+- Los 15 controles que siguen de unos 32 px están anidados: el objeto queda dentro de contenedores que se encogen
+  dentro de una fila de alto fijo. Son EA11-0901 1 hr (6 numéricos), AC10-0202-SLI (1 numérico en 4 registros),
+  AC10-1801 Inicio (2 numéricos), FO10-0601 Fin y FO10-1701 Sal. Baterias (un dropdown cada uno) y CI11-0101 Inicio
+  (el numérico nativo de dos rangos). Se pueden usar; quedan en el BACKLOG.
+- Avisos de "checkbox sin texto" en AC10-1801, CA02-2102 y TR11-0101 fueron de tiempo de carga: con más espera
+  salen limpios. El de TE11-2601 Inicio ya estaba antes.
+
+## Formularios con textos cortados antes del modo tablet (1280x800)
 
 | PAPO | Registro | Secciones | Textos cortados | También a 1920 |
 |---|---|---|---|---|
