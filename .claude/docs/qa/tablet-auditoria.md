@@ -53,15 +53,16 @@ gateway local:
 
 ## Encabezado del Template (AC10-1801, 2026-11-14)
 
-La auditoría abre los registros con `click()` y no revisaba el encabezado. A 1280x800, en los 69 PAPOs:
+La auditoría abre los registros con `click()` y no revisaba el encabezado. Revisión de los 69 PAPOs:
 
-| Revisión | Antes | Después |
-|---|---|---|
-| Título partido en dos líneas (25 px) | 6: AC10-1801, EA11-1501, PA11-0301, PL11-0101-S&A, RE11-0101, TE11-0601 | 0 (20 px, una línea; el más largo mide 1181 de 1220 px) |
-| Botón de registro oculto (segunda fila tapada por el formulario) | 2: "Fin" de AC10-1801 y EA11-1601 | 0 (la barra crece a dos filas) |
-| Botones de firma estirados | — | 0 (`margin-bottom: auto` bajo 1300 px) |
+| Revisión | Antes, a 1280 | Después, a 1280 | Después, a 800 |
+|---|---|---|---|
+| Título partido o cortado | 6 a 25 px (AC10-1801, EA11-1501, PA11-0301, PL11-0101-S&A, RE11-0101, TE11-0601) | 0 (20 px, una línea) | 0 (20 px, hasta dos líneas dentro de la barra) |
+| Botón de registro oculto | 2: "Fin" de AC10-1801 y EA11-1601 | 0 | 0 |
+| Registros en dos filas | — | 0 | 15, todos de 5 o 6 registros (ninguno de estación con tablet) |
+| Botones de firma estirados | — | 0 | 0 |
 
-Clases `PAPO/Tablet/Title` (título) y `PAPO/Tablet/BarButton` (botones de firma); la barra lleva `PAPO/Tablet/Row`. A 1920x1080 el encabezado no cambia (81 fotos de `layout_snapshot.js`).
+Bajo 1300 px los espacios vacíos de la barra pasan a 0 y los botones de registro a 120 px (el texto más largo, "Mantenimiento", mide 99): 4 registros caben en una fila desde 780 px, 5 desde 900 y 6 desde 1020. Los PAPOs de las estaciones con tablet tienen como mucho 4. A 1920x1080 el encabezado no cambia (81 fotos de `layout_snapshot.js`).
 
 ## Formularios con textos cortados antes del modo tablet (1280x800)
 
