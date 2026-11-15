@@ -64,6 +64,13 @@ La auditoría abre los registros con `click()` y no revisaba el encabezado. Revi
 
 Bajo 1300 px los espacios vacíos de la barra pasan a 0 y los botones de registro a 120 px (el texto más largo, "Mantenimiento", mide 99): 4 registros caben en una fila desde 780 px, 5 desde 900 y 6 desde 1020. Los PAPOs de las estaciones con tablet tienen como mucho 4. A 1920x1080 el encabezado no cambia (81 fotos de `layout_snapshot.js`).
 
+## Popups, ciclo y Overview en tamaño tablet (2026-11-15)
+
+- **Ciclo completo a 800x600** en EA11-1201 (base de prueba): Guardar Inicio, Firma Supervisor, Guardar Fin y Firma Operario. En `registerhistory` quedaron En proceso (7), Revisado, En proceso (8), Finalizado y Sin Iniciar con RegisterCode 2.
+- **Popups** de confirmación ("Guardar registro", "Firmar PAPO") y de aviso ("Firma Exitosa"): centrados y completos a 960 y 800 px. `Page/PopUps/Authenticator` (supervisor que firma sobre la sesión del operario) se abre centrado con 350x220 fijos y no depende del ancho; no se abrió en el ciclo porque la sesión era de `admin`, que firma sin pedir usuario.
+- **Overview**: a 800 px el filtro Estación quedaba en 0 px y Ref se salía; corregido con bindings bajo 1300 px. Las tarjetas (431 px fijos) quedan de a una por debajo de unos 900 px. El pie de 9 px (`Total: …`) mide lo mismo a 1920: viene del original.
+- **Pendiente**: en los 75 formularios con supervisor, el desplegable (`Objects/Dropdown`, 40 px en tablet) queda dentro de `FlexContainerSupervisor` de 32 px y se le cortan 8 px abajo.
+
 ## Formularios con textos cortados antes del modo tablet (1280x800)
 
 | PAPO | Registro | Secciones | Textos cortados | También a 1920 |
