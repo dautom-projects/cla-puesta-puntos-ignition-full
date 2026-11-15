@@ -15,17 +15,22 @@ Per Form view:
 		embedded Objects/*  -> PAPO/Tablet/ObjectRow  (tablet: min-height of a touch target; an embedded view has no
 		                                               content height of its own, so the row around it grows with it)
 	  A row without content height (spacer) keeps its px height.
+	- FlexContainerSupervisor of the root gets PAPO/Tablet/Row and its embedded Objects/* PAPO/Tablet/ObjectRow (the
+	  supervisor dropdown is 40 px in tablet and its 32 px container cut it); only layout classes, its options and
+	  bindings are not touched
 	The style lives in the gateway theme (gateway-themes/cla-*.css, block "MODO TABLET"): 8.1.19 style classes do not
 	accept min-height, so the PAPO/Tablet/* classes are empty markers.
 Nothing else changes: answer collection is checked before writing and the classes are only appended (a class with a
 binding is left as it is and reported). Simulates by default.
 
-Version: 1.1.0
+Version: 1.2.0
 
 Changelog:
 	2026-11-14 | William M. | v1.0.0 - Initial version (tablet mode, plan of feature/tablet-responsive)
 	2026-11-14 | William M. | v1.1.0 - Every embedded Objects/* view of a group is marked, also inside a row (EA11-1201:
 		the numeric of a grid row kept the row at 27 px); style in the gateway theme
+	2026-11-15 | William M. | v1.2.0 - FlexContainerSupervisor and its Objects/* dropdown are marked (the dropdown was cut
+		by 8 px in tablet)
 
 Args (CLI):
 	--views (str...): Form folders relative to views/ (default: every Form_* view with the PAPO/Form class, pilots included)
@@ -55,6 +60,7 @@ ROW_CLASS = "PAPO/Tablet/Row"
 OBJECT_ROW_CLASS = "PAPO/Tablet/ObjectRow"
 SECTION = re.compile(r"^Section\d+$")
 GROUP = re.compile(r"^FlexContainerGroup\d+$")
+SUPERVISOR = "FlexContainerSupervisor"
 
 
 def _isColumn(node):
@@ -102,6 +108,11 @@ def tabletRows(view, stats):
 		if GROUP.match(name):
 			_addClass(child, GROUP_CLASS, stats, "grupos")
 			_markRows(child, stats)
+		if name == SUPERVISOR and child.get("type") == "ia.container.flex":
+			_addClass(child, ROW_CLASS, stats, "supervisor")
+			for item in child.get("children", []) or []:
+				if _isObject(item):
+					_addClass(item, OBJECT_ROW_CLASS, stats, "supervisor objeto")
 
 
 def main():
