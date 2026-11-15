@@ -7,9 +7,9 @@
 - Mensajes: 60
 - Tags referenciados: 213
 - Paginas y docks: 9
-- Clases de estilo: 107
+- Clases de estilo: 109
 - Session props: 5
-- Relaciones: 5214 (usa tag 668, llama 649, embebe/abre 533, maneja 326, monta 9, envia 335, usa sesion 271, usa estilo 2423)
+- Relaciones: 5217 (usa tag 668, llama 649, embebe/abre 533, maneja 326, monta 9, envia 335, usa sesion 271, usa estilo 2426)
 - Validacion de tags: sin definiciones cargadas (8.3: incluye `config/`; 8.1: usa `--tags`)
 
 ## Mayor impacto si cambian o se renombran
