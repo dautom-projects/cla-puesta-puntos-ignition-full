@@ -51,6 +51,18 @@ gateway local:
 - Avisos de "checkbox sin texto" en AC10-1801, CA02-2102 y TR11-0101 fueron de tiempo de carga: con más espera
   salen limpios. El de TE11-2601 Inicio ya estaba antes.
 
+## Encabezado del Template (AC10-1801, 2026-11-14)
+
+La auditoría abre los registros con `click()` y no revisaba el encabezado. A 1280x800, en los 69 PAPOs:
+
+| Revisión | Antes | Después |
+|---|---|---|
+| Título partido en dos líneas (25 px) | 6: AC10-1801, EA11-1501, PA11-0301, PL11-0101-S&A, RE11-0101, TE11-0601 | 0 (20 px, una línea; el más largo mide 1181 de 1220 px) |
+| Botón de registro oculto (segunda fila tapada por el formulario) | 2: "Fin" de AC10-1801 y EA11-1601 | 0 (la barra crece a dos filas) |
+| Botones de firma estirados | — | 0 (`margin-bottom: auto` bajo 1300 px) |
+
+Clases `PAPO/Tablet/Title` (título) y `PAPO/Tablet/BarButton` (botones de firma); la barra lleva `PAPO/Tablet/Row`. A 1920x1080 el encabezado no cambia (81 fotos de `layout_snapshot.js`).
+
 ## Formularios con textos cortados antes del modo tablet (1280x800)
 
 | PAPO | Registro | Secciones | Textos cortados | También a 1920 |
