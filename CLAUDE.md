@@ -76,7 +76,7 @@ papo_core.sign.signOperator(self)
 
 Módulos (`papo_core/<modulo>/code.py`, funciones públicas):
 - `register` — recopile, save
-- `ui` — toggleSection, initForm, preInsight, confirmSave, getSecurityImage
+- `ui` — toggleSection, initForm, preInsight, confirmSave, getSecurityImage, getShift, signalIndicatorHtml (indicador de señal del encabezado)
 - `sign` — supervisorOpt, signOperator, requestSupervisorAuth, signSupervisor, signSupervisorFromSelection, authenticateAndSign, autoCloseOpenForms
 - `report` — build (la llamada de todos los reportes), monthGrid, extractShiftChecklist; extractReportData y extractReportDataAuto quedan sin uso
 - `overview` — getPapoListFiltered, getCardPath
