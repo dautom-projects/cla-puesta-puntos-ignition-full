@@ -10,13 +10,13 @@ Compares each view against its version in a baseline commit and runs the stages:
 	                  question / checkbox text, placeholder, enabled, value and option bindings
 	4 Flujo v2        standard wrappers, no legacy handlers, no new "papo_db"
 	5 Diseño          PAPO/Form root, standard fields, no fixed px widths, no new missing classes,
-	                  expanded sections as tall as their rows (custom.baseBasisPx)
+	                  expanded sections as tall as their rows (custom.baseBasisPx), sections that do not shrink
 	6 Contrato        params passed to Objects/* exist with the right direction
 	7 Grafo           no new unresolved references or unbalanced messages (--graph)
 	8 Datos           saved DataAnswer of two registerhistory rows (--compare-db, SELECT only)
 	9 Visual          manual checklist written to the report
 
-Version: 1.16.0
+Version: 1.17.0
 
 Changelog:
 	2026-10-25 | William M. | v1.0.0 - Initial version
@@ -57,6 +57,8 @@ Changelog:
 		save or a signature) to re-read what the form shows from the cycle; FO10-0100_input table of entries
 	2026-11-13 | William M. | v1.16.0 - Stage 3: the question read from papoItemID compares without accents or n
 		(papoitem goes without them, decision of the user)
+	2026-11-14 | William M. | v1.17.0 - Stage 5: every SectionN / FlexContainerGroupN of the root has shrink 0 (tablet
+		mode: without it the section headers squash when the form is taller than the screen, EA11-1201_start)
 
 Args (CLI):
 	--views (str...): View folders or view.json paths
@@ -107,6 +109,7 @@ FIXED_TEXT_FILE = os.path.join(REPO, ".claude", "docs", "sql", "preguntas_texto_
 FIXED_TEXTS = {int(k) for k in (json.load(open(FIXED_TEXT_FILE, encoding="utf-8")) if os.path.exists(FIXED_TEXT_FILE) else {}) if k.isdigit()}
 
 GROUP = re.compile(r"^(FlexContainerGroup\d+|FlexContainerSupervisor)$")
+NO_SHRINK = re.compile(r"^(Section\d+|FlexContainerGroup\d+)$")
 V2_PATTERNS = ("formOnStartup", "formInsights", "formToggleParams", "formSaveDataRoot", "formAnswerRecopile")
 VALUE_PROP = {"ia.input.checkbox": ("selected", False), "ia.input.numeric-entry-field": ("value", ""),
 	"ia.input.text-field": ("text", ""), "ia.input.dropdown": ("value", None)}
@@ -804,6 +807,10 @@ def stageDesign(cur, base):
 	for name, overflow in sorted(_sectionOverflow(cur).items()):
 		if overflow > max(0, before.get(name, 0)):
 			problems.append("{}: las filas miden {:.0f} px más que la sección abierta (custom.baseBasisPx)".format(name, overflow))
+	for child in cur["root"].get("children", []):
+		name = child.get("meta", {}).get("name", "")
+		if NO_SHRINK.match(name) and child.get("position", {}).get("shrink", 1) != 0:
+			problems.append("{}: sin shrink 0 (se aplasta cuando el formulario no cabe en alto)".format(name))
 	missingNow = {c for c in _classes(cur) if not _classExists(c)}
 	missingBefore = {c for c in _classes(base["view"]) if not _classExists(c)}
 	if missingNow - missingBefore:

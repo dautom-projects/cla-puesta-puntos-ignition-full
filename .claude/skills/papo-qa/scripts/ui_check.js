@@ -14,8 +14,13 @@
  * and on the pilot must give the same DataAnswer (papo_qa.py --compare-db PILOT ORIGINAL --exact).
  * Each section also reports its opening time (openMs) and the range color of its numerics (numericColors),
  * to compare between the two forms. Run it at 1920 x 1080, the size the application is built for.
+ * With minTouchPx (e.g. 40) it also reports, per section, the controls shorter than that (tablet mode).
  *
- * Version: 1.3.2
+ * papoUiAudit(list, opts) walks many PAPOs in the background without reloading the page (in-app navigation):
+ * per PAPO it opens every register button and runs papoUiCheck with fill/save off. Progress and compact results
+ * in window.papoAuditState (set papoAuditState.stop = true to stop it); nothing is saved.
+ *
+ * Version: 1.4.0
  *
  * Changelog:
  *   2026-10-25 | William M. | v1.0.0 - Initial version
@@ -28,6 +33,8 @@
  *   2026-10-26 | William M. | v1.3.1 - Hidden rows (display none) are not reported as squeezed nor as the end
  *   2026-10-26 | William M. | v1.3.2 - Forms without sections (an _end with only Observaciones) are found by their
  *     Guardar button
+ *   2026-11-14 | William M. | v1.4.0 - minTouchPx (controls shorter than the touch minimum, tablet mode) and
+ *     papoUiAudit (many PAPOs in one run, no fill, no save); waits keep their pace in a background page
  *
  * Usage (browser console or a javascript tool on the Template page):
  *   <contents of this file>; await papoUiCheck({register: "Inicio", fill: true, save: false})
@@ -35,9 +42,30 @@
  * Returns:
  *   {form, register, sections: [{name, rows, openMs, numericColors, problems, warnings}], problems, warnings, saved}
  */
+// Sleep that keeps its pace when the page is in the background (hidden tabs run setTimeout at most once per second):
+// a MessageChannel loop instead of a timer while the document is hidden
+window.papoSleep = (ms) => {
+	if (!document.hidden) {
+		return new Promise((r) => setTimeout(r, ms));
+	}
+	return new Promise((resolve) => {
+		const end = performance.now() + ms;
+		const ch = new MessageChannel();
+		ch.port1.onmessage = () => {
+			if (performance.now() >= end) {
+				ch.port1.close();
+				resolve();
+			} else {
+				ch.port2.postMessage(0);
+			}
+		};
+		ch.port2.postMessage(0);
+	});
+};
+
 window.papoUiCheck = async function (opts) {
-	const o = Object.assign({register: "Inicio", fill: true, save: false, wait: 2500, time: ["08", "15"]}, opts || {});
-	const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+	const o = Object.assign({register: "Inicio", fill: true, save: false, wait: 2500, openWait: 4000, time: ["08", "15"], minTouchPx: 0}, opts || {});
+	const sleep = window.papoSleep;
 	const all = (sel, root) => [...(root || document).querySelectorAll(sel)];
 	const text = (e) => (e && e.innerText || "").trim();
 	const report = {form: document.title, register: o.register, sections: [], problems: [], warnings: [], saved: false};
@@ -120,7 +148,7 @@ window.papoUiCheck = async function (opts) {
 		return report;
 	}
 	button.click();
-	await sleep(4000);
+	await sleep(o.openWait);
 	// The form root holds the Section buttons (original or standard form)
 	let form = (document.querySelector(".psc-button-questions, .psc-button-questions-2") || {}).parentElement;
 	if (!form) {
@@ -214,6 +242,22 @@ window.papoUiCheck = async function (opts) {
 				s.problems.push("campo fuera de la sección");
 			}
 		});
+		// Touch targets: controls shorter than the minimum (the whole checkbox component is its hit area)
+		if (o.minTouchPx) {
+			const kinds = {"ia.input.checkbox": "checkbox", "ia.input.numeric-entry-field": "numérico", "ia.input.text-field": "texto",
+				"ia.input.dropdown": "dropdown", "ia.input.date-time-input": "fecha", "ia.input.radio-group": "opción"};
+			const small = {};
+			Object.keys(kinds).forEach((k) => all('[data-component="' + k + '"]', group).forEach((c) => {
+				const h = c.getBoundingClientRect().height;
+				if (c.offsetParent && h > 0 && h < o.minTouchPx) {
+					small[kinds[k]] = (small[kinds[k]] || 0) + 1;
+				}
+			}));
+			const parts = Object.keys(small).map((k) => k + " x" + small[k]);
+			if (parts.length) {
+				s.warnings.push("controles de menos de " + o.minTouchPx + " px: " + parts.join(", "));
+			}
+		}
 
 		if (o.fill) {
 			// Checkboxes: check every unchecked one; the page must not move
@@ -343,4 +387,74 @@ window.papoUiCheck = async function (opts) {
 		report.saved = true;
 	}
 	return report;
+};
+
+// Audit of many PAPOs at the current window size: list = [{ref, url}] (url = Template path of one station).
+// Runs in the background; poll window.papoAuditState ({running, done, total, current, results}).
+window.papoUiAudit = function (list, opts) {
+	const o = Object.assign({wait: 1500, openWait: 4000, navWait: 5000, minTouchPx: 40}, opts || {});
+	const sleep = window.papoSleep;
+	const state = window.papoAuditState = {running: true, done: 0, total: list.length, current: null, results: [], size: [innerWidth, innerHeight]};
+	(async () => {
+		for (const item of list) {
+			if (state.stop) {
+				break;
+			}
+			state.current = item.ref;
+			const entry = {ref: item.ref, registers: {}};
+			try {
+				history.pushState({}, "", item.url);
+				dispatchEvent(new PopStateEvent("popstate", {state: {}}));
+				await sleep(o.navWait);
+				const regs = [...document.querySelectorAll('[data-component="ia.display.flex-repeater"] [data-component="ia.input.button"]')]
+					.filter((e) => e.offsetParent !== null).map((e) => e.innerText.trim());
+				for (const reg of regs) {
+					if (state.stop) {
+						break;
+					}
+					const r = await window.papoUiCheck({register: reg, fill: false, save: false, wait: o.wait, openWait: o.openWait, minTouchPx: o.minTouchPx});
+					entry.registers[reg] = {form: r.form, sections: r.sections.length, problems: r.problems, warnings: r.warnings};
+				}
+			} catch (e) {
+				entry.error = String(e);
+			}
+			state.results.push(entry);
+			state.done++;
+		}
+		state.running = false;
+		state.current = null;
+	})();
+	return "audit started: " + list.length + " PAPOs";
+};
+
+// Markdown summary of papoUiAudit results: one row per PAPO and register with the counts that matter for a screen
+// size (cut texts, squeezed rows or cut section end, fields outside the section, small controls, others)
+window.papoAuditMarkdown = function (results) {
+	const rows = [];
+	const total = {forms: 0, cut: 0, squeezed: 0, outside: 0, small: 0, formsWithIssues: 0};
+	for (const r of results) {
+		if (r.error) {
+			rows.push("| " + r.ref + " | — | error: " + r.error.slice(0, 60) + " | | | | |");
+			continue;
+		}
+		for (const [reg, v] of Object.entries(r.registers)) {
+			const all = v.problems.concat(v.warnings);
+			const cut = all.filter((t) => t.includes("texto cortado")).length;
+			const squeezed = all.filter((t) => t.includes("filas comprimidas") || t.includes("queda cortado")).length;
+			const outside = all.filter((t) => t.includes("campo fuera")).length;
+			let small = 0;
+			all.filter((t) => t.includes("controles de menos")).forEach((t) => (t.match(/x(\d+)/g) || []).forEach((m) => (small += parseInt(m.slice(1), 10))));
+			const other = all.filter((t) => !/texto cortado|filas comprimidas|queda cortado|campo fuera|controles de menos|pregunta repetida/.test(t));
+			total.forms++;
+			total.cut += cut;
+			total.squeezed += squeezed;
+			total.outside += outside;
+			total.small += small;
+			if (cut || squeezed || outside) {
+				total.formsWithIssues++;
+			}
+			rows.push("| " + r.ref + " | " + reg + " | " + v.sections + " | " + (cut || "") + " | " + (squeezed || "") + " | " + (outside || "") + " | " + (small || "") + " | " + other.map((t) => t.replace(/\|/g, "/")).join("; ").slice(0, 120) + " |");
+		}
+	}
+	return {total, table: "| PAPO | Registro | Secciones | Textos cortados | Filas apretadas / final cortado | Campos fuera | Controles < 40 px | Otros |\n|---|---|---|---|---|---|---|---|\n" + rows.join("\n")};
 };

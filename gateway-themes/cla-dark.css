@@ -621,3 +621,27 @@ div[data-component^="ia.input."] ::placeholder {
   color: #8993A4 !important;
   opacity: 1 !important;
 }
+
+/* =====================================================================
+   MODO TABLET (PAPO, 2026-11-14): solo por debajo de 1300 px de ancho
+   (tablet de 10" horizontal, 1280x800). En escritorio no aplica nada.
+   Las clases PAPO/Tablet/* son marcadores vacios en el proyecto (las clases
+   de estilo de 8.1.19 no aceptan min-height); las pone tablet_rows.py.
+   [data-component] sube la especificidad sobre el min-height: 0 que
+   Perspective da a sus contenedores (su CSS carga despues del tema).
+   ===================================================================== */
+@media (max-width: 1300px) {
+  /* Secciones y filas: conservan su alto en px y crecen con su contenido */
+  [data-component].psc-PAPO\/Tablet\/Group,
+  [data-component].psc-PAPO\/Tablet\/Row {
+    min-height: min-content;
+  }
+
+  /* Objetos embebidos (Objects/*) y campos: alto minimo tactil */
+  [data-component].psc-PAPO\/Tablet\/ObjectRow,
+  [data-component].psc-PAPO\/Field\/Input,
+  [data-component].psc-PAPO\/Field\/Dropdown,
+  [data-component].psc-PAPO\/Field\/Checkbox {
+    min-height: 40px;
+  }
+}

@@ -76,6 +76,11 @@ El estándar los reproduce tal cual; corregirlos aparte con `/bug`:
 
 - ~~`Metalurgia/Form_FU10-0202_dia`: sus 42 campos quedaban nativos porque cada fila tenía un `custom.answers` legacy que leía el valor del campo~~ corregido (papo_objects v2.11 quita el recolector de fila; los 42 son `Objects/Dropdown`)
 
+- Textos cortados también a 1920x1080 (auditoría del modo tablet, 2026-11-14, `.claude/docs/qa/tablet-auditoria.md`): 39 en 7 PAPOs, en filas o celdas más bajas que su texto. AC10-0201 (Inicio, 30 min, Nueva Ref., Mantenimiento: "Densidad vs especificacion…", "Valor del equipo…", "Voltaje antes de la volcadora…", "Area de trabajo aseada…", "Cabinas electricas…"), EA11-1101 1 hr (`Min:`/`Max:` y valores `null`), EA11-1601 2 hr (las dos temperaturas de termosellado), EA11-2501 2 hr (10 valores de referencia), FO10-0100 (Ing. Baterias y Fin) y TE11-2601 Inicio. Las clases `PAPO/Tablet/*` las dejan crecer solo en tablet; en escritorio siguen igual
+
+- Modo tablet (2026-11-14): 15 controles siguen de unos 32 px a 1280x800 porque el objeto está anidado en contenedores que se encogen dentro de una fila de alto fijo: EA11-0901 1 hr (6 numéricos), AC10-0202-SLI (1 numérico), AC10-1801 Inicio (2), FO10-0601 Fin y FO10-1701 Sal. Baterias (un dropdown) y el numérico nativo de CI11-0101. También EA11-2501 2 hr sigue con 10 valores de referencia cortados (celdas de una fila horizontal). Arreglo posible: quitar el alto fijo o el `shrink` de esos contenedores, revisando 1920 con `layout_snapshot.js`
+- Overview en tablet: las tarjetas (431 px de ancho fijo del embebido) entran de a dos por fila a 1280 px y queda espacio a la derecha. Opcional: tarjetas que se encojan para que entren tres
+
 ## FO10-1701, Referencia (prueba del 2026-11-13)
 
 - ~~**Referencia vacía en la vista previa del Template**~~ corregido el 2026-11-13: `Form_FO10-1701_output` guardaba el ítem 6155 tres veces (dos TextField ocultos, uno en la fila Referencia y otro en la fila Tipo, y el desplegable), así que cada registro llevaba `[], [referencia], []`. La vista previa toma la primera respuesta de cada ítem y mostraba la Referencia vacía; el PDF toma la primera no vacía y salía bien. Los dos ocultos pasan a `item_dev` (venía así del original). Probado en la estación 45: 9226 (antes) con tres respuestas y la fila vacía, 9227 (después) con una sola, "24 5X5", y la fila llena
