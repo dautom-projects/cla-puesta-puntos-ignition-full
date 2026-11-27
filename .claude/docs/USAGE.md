@@ -248,6 +248,18 @@ Muestra el diálogo estándar de confirmación de guardado; al confirmar envía 
 
 Vistas: 237 Form_* (detalle por vista en `MIGRATION_STATUS.md`).
 
+### `ui.signalIndicatorHtml()`
+
+Devuelve el HTML del indicador de señal con el servidor del encabezado. El script corre en el navegador (los bindings corren en el gateway y no ven la red de la tablet): cada 5 s pide `/StatusPing` y pinta barras con el promedio de las últimas 3 respuestas: Buena (≤ 300 ms), Regular (≤ 800 ms), Débil (más) o Sin conexión (sin respuesta en 3 s o equipo sin red). Viaja en base64 y lo ejecuta una imagen oculta que falla al cargar, dentro de un Markdown con `escapeHtml: false` (truco, no función oficial de Perspective; volver a probar si se actualiza Ignition). Solo muestra (`ui` v1.4.0).
+
+**Llamado desde:** 1 vista(s).
+
+| Componente | Ubicación | Veces |
+|---|---|---|
+| `Signal` | `propConfig:props.source` (`runScript(..., 0)`) | 1 |
+
+- `Header/Header`
+
 ### `ui.getSecurityImage(papoItemID,dbConnection)`
 
 Devuelve la ruta /system/images/EPP/... de la imagen de EPP según la descripción del papoItem.
